@@ -1,0 +1,33 @@
+name: TT-0.50 baseline role cadence
+
+on:
+  push:
+    branches: [tt050-candidate]
+    paths:
+      - '.flr/tt050-baseline-run-request'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tt050-baseline-role-cadence
+  cancel-in-progress: true
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: tt050-candidate
+          fetch-depth: 1
+      - name: Measure current TT-0.49 cadence
+        run: node .flr/tt050_baseline_role_cadence.js . > TT050_BASELINE_ROLE_CADENCE.json
+      - name: Persist result
+        run: |
+          git config user.name "FLR Candidate CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add TT050_BASELINE_ROLE_CADENCE.json
+          git diff --cached --quiet || { git commit -m "Record TT-0.50 role cadence baseline"; git push origin HEAD:tt050-candidate; }
