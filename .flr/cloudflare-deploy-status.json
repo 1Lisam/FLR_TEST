@@ -1,13 +1,16 @@
 {
-  "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_STATUS_0.1",
-  "status": "NEEDS_CREDENTIALS",
+  "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_STATUS_0.2",
+  "status": "DEPLOYED",
   "worker": "flr-bug-reporter",
   "bucket": "flr-bug-reports",
-  "endpoint": null,
-  "missingSecrets": [
-    "CLOUDFLARE_API_TOKEN",
-    "CLOUDFLARE_ACCOUNT_ID"
-  ],
-  "deployOutcome": "skipped",
-  "sourceCommit": "98cf0b871b4b2f41afd95b2020fc52fc451a5019"
+  "workerUrl": "https://flr-bug-reporter.sikarops.workers.dev",
+  "endpoint": "https://flr-bug-reporter.sikarops.workers.dev/report",
+  "missingSecrets": [],
+  "deployOutcome": "success",
+  "smoke": {
+    "ok": true,
+    "getMissingReport": "404",
+    "optionsReport": "204"
+  },
+  "sourceCommit": "dc021160daf11b1efb31495c7e994d2a100199a1"
 }
