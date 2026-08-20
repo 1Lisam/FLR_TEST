@@ -95,9 +95,22 @@ jobs:
             git -C candidate push origin "HEAD:${{ steps.cfg.outputs.branch }}"
           }
 
-      - name: Enforce QA gate
+      - name: Publish QA status without expected-failure email
         if: always()
         shell: bash
         env:
+          RESULT_DIR: ${{ steps.cfg.outputs.result_dir }}
           QA_CODE: ${{ steps.qa.outputs.code }}
-        run: test "${QA_CODE:-99}" = 0
+        run: |
+          set -euo pipefail
+          result="candidate/$RESULT_DIR/CI_RESULT.json"
+          if [ ! -s "$result" ]; then
+            echo "::error::Candidate QA infrastructure failed: CI_RESULT.json was not produced."
+            exit 1
+          fi
+          status="$(python -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8")).get("workflowStatus","UNKNOWN"))' "$result")"
+          if [ "${QA_CODE:-99}" != "0" ] || [ "$status" != "PASS" ]; then
+            echo "::warning::Candidate did not pass QA (status=$status, code=${QA_CODE:-99}). This is recorded in CI_RESULT.json and is not treated as a workflow failure."
+          else
+            echo "Candidate QA passed."
+          fi
