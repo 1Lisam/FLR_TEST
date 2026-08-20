@@ -1,0 +1,17 @@
+'use strict';
+const fs=require('fs'),path=require('path');
+const ROOT=path.resolve(process.argv[2]||'.');
+const idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
+const ui=fs.readFileSync(path.join(ROOT,'step71_hybrid_v06_ui.js'),'utf8');
+const failures=[];
+const check=(ok,msg)=>{if(!ok)failures.push(msg);};
+check(idx.includes('<title>FLR_TEST — TT-0.50 Cadence, Through-ball Timing & Exact Target</title>'),'TT-0.50 document title missing');
+check(idx.includes('FLR_TEST · TECHNICAL TEST <strong>TT-0.50</strong> · LIVE HYBRID V0.6 · STEP78'),'TT-0.50 developer build label missing');
+check(idx.includes('경기당 선택 밀도와 연속 전진의 흐름'),'TT-0.50 review purpose missing');
+check(!idx.includes('<strong>TT-0.49</strong>'),'stale TT-0.49 developer build label remains');
+check(ui.includes("b:'TT-0.50'"),'compact bug snapshot TT-0.50 build missing');
+check(!ui.includes("b:'TT-0.49'"),'stale compact bug snapshot TT-0.49 build remains');
+check(ui.includes('[TT-0.50][P${prio}]'),'TT-0.50 bug issue title missing');
+const result={schemaVersion:'FLR_TT050_LABEL_VALIDATION_0.1',build:'TT-0.50 USER_VISUAL_RETEST',labelOnly:true,runtimeLogicChanged:false,checks:{title:true,developerBuild:true,reviewPurpose:true,compactBugBuild:true,issueBuild:true},failures,status:failures.length?'FAIL':'PASS'};
+console.log(JSON.stringify(result,null,2));
+if(failures.length)process.exitCode=1;
