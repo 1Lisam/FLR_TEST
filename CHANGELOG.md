@@ -11,6 +11,7 @@ This file records Football Life RPG technical-test versions that were actually p
 ## TT-0.50 — 2026-08-20 — USER_VISUAL_RETEST
 **Engine deployment commit:** `791d0059af4fd479f92a11983b4b422ae7685537`  
 **Public-label finalization commit:** `cdea5af9eedb4c1ded606348b1df55abd4c0fcdb`  
+**Cloudflare full-JSON deployment/status commit:** `46aa6a016d919abf9be7eca466efd607c5fbea92`  
 **Validation:** `.flr/qa-results/TT-0.50/CI_RESULT.json` on `tt050-candidate` — `workflowStatus: PASS`, `PASS_CANDIDATE_INTERNAL`
 
 ### Changes
@@ -21,8 +22,9 @@ This file records Football Life RPG technical-test versions that were actually p
 - Reduced premature final-third recycling by preferring meaningful forward support when the attacking continuation is still available.
 - Added a light midfield/striker lane-separation correction for recovering LCM/RCM support so they do not repeatedly occupy the ST's central path.
 - Refined ST Hybrid promotion cadence so direct dangerous involvement is favored over every broad attacking involvement.
-- Prepared the browser bug-report path to upload the full integrated Episode JSON to a configured endpoint, while retaining the manual GitHub/fallback path when no endpoint is live.
-- Public page and compact bug-report metadata now identify the build as `TT-0.50`.
+- Connected the browser bug-report path to the live Cloudflare Worker/R2 backend. Registering a bug now uploads the full integrated Episode `debug` JSON, receives a permanent JSON URL, and inserts that URL into the GitHub Issue draft. GitHub issue creation still occurs in the user's authenticated browser; no GitHub token is stored in the browser or Worker.
+- Retained the manual GitHub/clipboard fallback path if the remote upload fails.
+- Public page and compact bug-report metadata identify the build as `TT-0.50`.
 
 ### Validation highlights
 - Through-ball timing test: ball arrival `2.627s`, runner arrival `2.823s`, difference `0.197s`; lead vector cosine `1.0`.
@@ -32,10 +34,10 @@ This file records Football Life RPG technical-test versions that were actually p
 - Frozen visible-target regression: `40` targeted choices, `0` execution/target failures. Hybrid visible-choice application failures: `0`.
 - Protagonist authority regression: `0` violations; future choice/outcome precomputation remains `false`.
 - RCM/ST measured overlap rate in the retained 4-match test was approximately `0.75%`.
-- Bug-report Worker unit round-trip stored the integrated debug object exactly in the test harness; this does **not** claim a live Cloudflare deployment.
+- Live Cloudflare verification: missing-report GET `404`, CORS OPTIONS `/report` `204`, live POST `/report` `201`, and the JSON read back from R2 was semantically identical to the posted `debug` object.
+- Live Worker endpoint: `https://flr-bug-reporter.sikarops.workers.dev/report`, backed by R2 bucket `flr-bug-reports`.
 
-### Not yet live / deferred
-- The Cloudflare Worker/R2 endpoint is not yet connected to the public page; `bug_report_config.js` therefore still falls back until a real endpoint is configured.
+### Deferred
 - Match perceived-time compression to the later ~5–6 minute target remains deferred.
 - Position Experience Layer remains deferred.
 
