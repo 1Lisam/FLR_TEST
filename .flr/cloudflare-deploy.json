@@ -4,6 +4,6 @@
   "worker": "flr-bug-reporter",
   "bucket": "flr-bug-reports",
   "purpose": "Anonymous tester bug intake: store full integrated Episode JSON plus description/meta without requiring GitHub login",
-  "requestedAt": "2026-08-21T08:47:00+09:00",
-  "attemptNonce": "tt051-predistribution-anonymous-intake-20260821-0847"
+  "requestedAt": "2026-08-21T08:52:00+09:00",
+  "attemptNonce": "tt051-predistribution-anonymous-intake-20260821-0852-retry1"
 }
