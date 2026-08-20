@@ -3,17 +3,18 @@
   "version": "TT-0.50",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
-  "baselineScript": ".flr/tt050_baseline_role_cadence.js",
   "applyScripts": [
     ".flr/tt050_apply.py",
-    ".flr/tt050_backend_refine.py"
+    ".flr/tt050_backend_refine.py",
+    ".flr/tt050_cadence_refine.py"
   ],
-  "validationScript": ".flr/tt050_validation.js",
+  "validationScript": ".flr/tt050_validation_v2.js",
   "changedFiles": [
     "runtime/ball_strike_model.js",
     "runtime/continuous_match_core.js",
     "runtime/protagonist_match_controller.js",
     "runtime/tactical_movement.js",
+    "live_hybrid_session_v02.js",
     "bug-report-worker/worker.js",
     "step71_hybrid_v06_ui.js",
     "index.html",
@@ -24,10 +25,11 @@
     "runtime/continuous_match_core.js",
     "runtime/protagonist_match_controller.js",
     "runtime/tactical_movement.js",
+    "live_hybrid_session_v02.js",
     "step71_hybrid_v06_ui.js",
     "bug_report_config.js",
     {"kind": "node-esm", "path": "bug-report-worker/worker.js"}
   ],
   "resultDir": ".flr/qa-results/TT-0.50",
-  "runNonce": "2026-08-20T17:29+09:00-r2"
+  "runNonce": "2026-08-20T17:38+09:00-r3-hybrid"
 }
