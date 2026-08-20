@@ -31,14 +31,15 @@ jobs:
           path: _incoming
           fetch-depth: 1
 
-      - name: Validate patch metadata
+      - name: Decode and validate patch metadata
         shell: bash
         run: |
           set -euo pipefail
+          base64 -d _incoming/.flr/incoming.patch.gz.b64 | gzip -d > /tmp/incoming.patch
           python - <<'PY'
           import hashlib, json, pathlib, subprocess
           manifest=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
-          patch=pathlib.Path('_incoming/.flr/incoming.patch').read_bytes()
+          patch=pathlib.Path('/tmp/incoming.patch').read_bytes()
           actual=hashlib.sha256(patch).hexdigest()
           if actual != manifest['patchSha256']:
               raise SystemExit(f"PATCH_SHA_MISMATCH expected={manifest['patchSha256']} actual={actual}")
@@ -59,8 +60,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git apply --check _incoming/.flr/incoming.patch
-          git apply _incoming/.flr/incoming.patch
+          git apply --check /tmp/incoming.patch
+          git apply /tmp/incoming.patch
           rm -rf _incoming
 
       - name: Syntax check changed JavaScript
