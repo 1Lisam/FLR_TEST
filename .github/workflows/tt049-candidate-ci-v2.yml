@@ -4,9 +4,7 @@ on:
   push:
     branches: [tt049-candidate]
     paths:
-      - '.github/workflows/tt049-candidate-ci-v2.yml'
-      - '.flr/tt049_apply.py'
-      - '.flr/tt049_validation_v2.js'
+      - '.flr/tt049-run-request-v2'
   workflow_dispatch:
 
 permissions:
