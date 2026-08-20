@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "FLR_TT051_PREDISTRIBUTION_VALIDATION_1.0",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "nonhero-shot-boundary",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "lowres-shot-no-goal-resolution",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "resume-accepts-shot-window",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "authority-shot-window",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "authority-export",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "ui-replay-only-goal",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "ui-anonymous-submit",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "worker-anonymous-meta",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "worker-token-optional",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "index-no-login-copy",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "readme-no-login-flow",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "worker-anonymous-roundtrip",
+      "status": "PASS",
+      "detail": "status=0 stderr="
+    },
+    {
+      "name": "dynamic-shot-window-sample",
+      "status": "PASS",
+      "detail": "found=24"
+    },
+    {
+      "name": "dynamic-no-lowres-goal-leak",
+      "status": "PASS",
+      "detail": "lowGoalLeak=0"
+    },
+    {
+      "name": "dynamic-no-precompute",
+      "status": "PASS",
+      "detail": "flagged=24/24"
+    },
+    {
+      "name": "dynamic-highres-goal-observed",
+      "status": "PASS",
+      "detail": "goals=3"
+    }
+  ],
+  "metrics": {
+    "found": 24,
+    "goals": 3,
+    "lowGoalLeak": 0
+  }
+}

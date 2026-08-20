@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-PREDISTRIBUTION",
+  "candidateBranch": "tt051-predistribution-candidate",
+  "baselineRef": "main",
+  "baselineSha": "72600f93333699315c81b017564aae919d32b57b",
+  "candidateSha": "df1289b57bb35cb6832302dba56ba4cc6e1c7c70",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
+  "changedFiles": [
+    "bug-report-worker/README.md",
+    "bug-report-worker/worker.js",
+    "index.html",
+    "live_hybrid_session_v02.js",
+    "live_v06_scene_authority_browser.js",
+    "step71_hybrid_v06_ui.js"
+  ],
+  "allowedChangedFiles": [
+    "index.html",
+    "live_hybrid_session_v02.js",
+    "live_v06_scene_authority_browser.js",
+    "step71_hybrid_v06_ui.js",
+    "bug-report-worker/worker.js",
+    "bug-report-worker/README.md"
+  ],
+  "patchSha256": "83c3f9366bd2486f291ffdc4ef71c9dc33abe72eb37244fffed13be8218daad2",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_PREDISTRIBUTION_VALIDATION_1.0",
+    "status": "PASS",
+    "checks": [
+      {
+        "name": "nonhero-shot-boundary",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "lowres-shot-no-goal-resolution",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "resume-accepts-shot-window",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "authority-shot-window",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "authority-export",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "ui-replay-only-goal",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "ui-anonymous-submit",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "worker-anonymous-meta",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "worker-token-optional",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "index-no-login-copy",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "readme-no-login-flow",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "worker-anonymous-roundtrip",
+        "status": "PASS",
+        "detail": "status=0 stderr="
+      },
+      {
+        "name": "dynamic-shot-window-sample",
+        "status": "PASS",
+        "detail": "found=24"
+      },
+      {
+        "name": "dynamic-no-lowres-goal-leak",
+        "status": "PASS",
+        "detail": "lowGoalLeak=0"
+      },
+      {
+        "name": "dynamic-no-precompute",
+        "status": "PASS",
+        "detail": "flagged=24/24"
+      },
+      {
+        "name": "dynamic-highres-goal-observed",
+        "status": "PASS",
+        "detail": "goals=3"
+      }
+    ],
+    "metrics": {
+      "found": 24,
+      "goals": 3,
+      "lowGoalLeak": 0
+    }
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt051_predistribution_apply.py",
+      "exitCode": 0,
+      "stdout": "TT-0.51 pre-distribution hardening applied\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": ""
+}
