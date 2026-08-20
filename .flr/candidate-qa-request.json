@@ -32,5 +32,5 @@
     {"kind": "node-esm", "path": "bug-report-worker/worker.js"}
   ],
   "resultDir": ".flr/qa-results/TT-0.50",
-  "runNonce": "2026-08-20T18:10+09:00-final-refine-r7"
+  "runNonce": "2026-08-20T18:16+09:00-final-refine-r8"
 }
