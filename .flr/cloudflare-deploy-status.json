@@ -1,21 +1,21 @@
 {
   "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_STATUS_0.3",
-  "status": "DEPLOYED",
+  "status": "DEPLOY_FAILED",
   "worker": "flr-bug-reporter",
   "bucket": "flr-bug-reports",
-  "workerUrl": "https://flr-bug-reporter.sikarops.workers.dev",
-  "endpoint": "https://flr-bug-reporter.sikarops.workers.dev/report",
+  "workerUrl": null,
+  "endpoint": null,
   "missingSecrets": [],
-  "deployOutcome": "success",
+  "deployOutcome": "failure",
   "smoke": {
-    "ok": true,
-    "getMissingReport": "404",
-    "optionsReport": "204"
+    "ok": false,
+    "getMissingReport": null,
+    "optionsReport": null
   },
   "liveRoundTrip": {
-    "ok": true,
-    "postReport": "201",
-    "storedDebugEqualsPostedDebug": true
+    "ok": false,
+    "postReport": null,
+    "storedDebugEqualsPostedDebug": false
   },
-  "sourceCommit": "d3b59934b023008d04013b86be6d6c90007447a4"
+  "sourceCommit": "804fc363896715bcb3fc6a13b777667f56472d1d"
 }
