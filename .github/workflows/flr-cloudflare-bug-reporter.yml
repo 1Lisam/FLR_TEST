@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Ensure R2 and deploy Worker
+      - name: Ensure R2, deploy Worker, and verify live round trip
         if: steps.creds.outputs.ready == 'true'
         id: cloudflare
         continue-on-error: true
@@ -102,7 +102,54 @@ jobs:
           echo "smoke_ok=${smoke_ok}" >> "$GITHUB_OUTPUT"
           echo "smoke_get=${get_code}" >> "$GITHUB_OUTPUT"
           echo "smoke_options=${options_code}" >> "$GITHUB_OUTPUT"
-          # A transient/unverified public route is recorded below rather than failing the workflow.
+
+          e2e_ok=false
+          post_code=000
+          if [ "$smoke_ok" = 'true' ]; then
+            report_id="tt050-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            python - "$report_id" <<'PY' > /tmp/flr_smoke_payload.json
+          import json,sys
+          rid=sys.argv[1]
+          print(json.dumps({
+            'reportId':rid,
+            'build':'TT-0.50-LIVE-SMOKE',
+            'step':78,
+            'category':'기타',
+            'priority':1,
+            'description':'Automated live full-JSON storage round-trip smoke test',
+            'summary':{'smoke':True},
+            'debug':{'liveSmoke':True,'version':'TT-0.50','probe':'full-json-round-trip'},
+            'client':{'source':'github-actions'}
+          }, ensure_ascii=False))
+          PY
+            post_code="$(curl --max-time 20 -sS -o /tmp/flr_smoke_response.json -w '%{http_code}' -X POST "${endpoint}/report" -H 'Origin: https://1lisam.github.io' -H 'Content-Type: application/json' --data-binary @/tmp/flr_smoke_payload.json || true)"
+            echo "Round-trip POST=${post_code}"
+            if [ "$post_code" = '200' ] || [ "$post_code" = '201' ]; then
+              python - <<'PY' > /tmp/flr_smoke_json_url.txt
+          import json
+          j=json.load(open('/tmp/flr_smoke_response.json',encoding='utf-8'))
+          if not j.get('ok') or not j.get('jsonUrl'): raise SystemExit(1)
+          print(j['jsonUrl'])
+          PY
+              json_url="$(cat /tmp/flr_smoke_json_url.txt 2>/dev/null || true)"
+              if [ -n "$json_url" ]; then
+                curl --max-time 20 -sS "$json_url" -o /tmp/flr_smoke_readback.json || true
+                if python - <<'PY'
+          import json,sys
+          got=json.load(open('/tmp/flr_smoke_readback.json',encoding='utf-8'))
+          exp={'liveSmoke':True,'version':'TT-0.50','probe':'full-json-round-trip'}
+          sys.exit(0 if got==exp else 1)
+          PY
+                then
+                  e2e_ok=true
+                fi
+              fi
+            fi
+          fi
+          echo "e2e_ok=${e2e_ok}" >> "$GITHUB_OUTPUT"
+          echo "e2e_post=${post_code}" >> "$GITHUB_OUTPUT"
+          echo "Live round-trip verified=${e2e_ok}"
+          # Expected verification mismatch is recorded below rather than failing the workflow.
           exit 0
 
       - name: Record deployment status and wire endpoint
@@ -117,12 +164,13 @@ jobs:
           SMOKE_OK: ${{ steps.cloudflare.outputs.smoke_ok }}
           SMOKE_GET: ${{ steps.cloudflare.outputs.smoke_get }}
           SMOKE_OPTIONS: ${{ steps.cloudflare.outputs.smoke_options }}
+          E2E_OK: ${{ steps.cloudflare.outputs.e2e_ok }}
+          E2E_POST: ${{ steps.cloudflare.outputs.e2e_post }}
           SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           git config user.name 'FLR Cloudflare Deploy Bot'
           git config user.email 'actions@users.noreply.github.com'
-          # Update the checkout before creating local status/config changes.
           git pull --rebase origin main
           mkdir -p .flr
           python - <<'PY'
@@ -131,6 +179,7 @@ jobs:
           outcome=os.environ.get('DEPLOY_OUTCOME','skipped')
           endpoint=(os.environ.get('ENDPOINT') or '').rstrip('/')
           smoke_ok=os.environ.get('SMOKE_OK')=='true'
+          e2e_ok=os.environ.get('E2E_OK')=='true'
           if not ready:
               missing=[]
               if os.environ.get('TOKEN_PRESENT')!='true': missing.append('CLOUDFLARE_API_TOKEN')
@@ -138,7 +187,7 @@ jobs:
               status='NEEDS_CREDENTIALS'
           elif outcome!='success' or not endpoint:
               missing=[]; status='DEPLOY_FAILED'
-          elif not smoke_ok:
+          elif not smoke_ok or not e2e_ok:
               missing=[]; status='DEPLOYED_UNVERIFIED'
           else:
               missing=[]; status='DEPLOYED'
@@ -146,7 +195,7 @@ jobs:
                   "window.FLR_BUG_REPORT_ENDPOINT = '"+endpoint+"/report'; // managed by FLR Cloudflare deploy workflow\n",
                   encoding='utf-8')
           obj={
-              'schemaVersion':'FLR_CLOUDFLARE_DEPLOY_STATUS_0.2',
+              'schemaVersion':'FLR_CLOUDFLARE_DEPLOY_STATUS_0.3',
               'status':status,
               'worker':'flr-bug-reporter',
               'bucket':'flr-bug-reports',
@@ -158,6 +207,11 @@ jobs:
                   'ok':smoke_ok,
                   'getMissingReport':os.environ.get('SMOKE_GET') or None,
                   'optionsReport':os.environ.get('SMOKE_OPTIONS') or None
+              },
+              'liveRoundTrip':{
+                  'ok':e2e_ok,
+                  'postReport':os.environ.get('E2E_POST') or None,
+                  'storedDebugEqualsPostedDebug':e2e_ok
               },
               'sourceCommit':os.environ.get('SOURCE_SHA')
           }
