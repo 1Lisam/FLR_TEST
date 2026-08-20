@@ -1,19 +1,30 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.50-LABELS",
-  "candidateBranch": "tt050-candidate",
+  "version": "TT-0.51",
+  "candidateBranch": "tt051-v14-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt050_label_finalize.py"
+    ".flr/tt051_apply_v14.py"
   ],
-  "validationScript": ".flr/tt050_label_validation.js",
+  "validationScript": ".flr/tt051_transfer_validation.js",
   "changedFiles": [
+    "CHANGELOG.md",
     "index.html",
+    "live_hybrid_session_v02.js",
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js",
     "step71_hybrid_v06_ui.js"
   ],
   "syntaxChecks": [
+    "live_hybrid_session_v02.js",
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js",
     "step71_hybrid_v06_ui.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.50-labels",
-  "runNonce": "2026-08-20T19:10+09:00-exact-label-patch-r1"
+  "resultDir": ".flr/qa-results/TT-0.51-v14",
+  "runNonce": "2026-08-21T02:00+09:00-v14-final-local-pass"
 }
