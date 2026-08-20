@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
+  "version": "TT-0.50",
+  "candidateBranch": "tt050-candidate",
+  "baselineRef": "main",
+  "baselineScript": ".flr/tt050_baseline_role_cadence.js",
+  "applyScripts": [
+    ".flr/tt050_apply.py",
+    ".flr/tt050_backend_refine.py"
+  ],
+  "validationScript": ".flr/tt050_validation.js",
+  "changedFiles": [
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js",
+    "bug-report-worker/worker.js",
+    "step71_hybrid_v06_ui.js",
+    "index.html",
+    "bug_report_config.js"
+  ],
+  "syntaxChecks": [
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js",
+    "step71_hybrid_v06_ui.js",
+    "bug_report_config.js",
+    {"kind": "node-esm", "path": "bug-report-worker/worker.js"}
+  ],
+  "resultDir": ".flr/qa-results/TT-0.50"
+}
