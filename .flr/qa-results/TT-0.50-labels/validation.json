@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "FLR_TT050_LABEL_VALIDATION_0.1",
+  "build": "TT-0.50 USER_VISUAL_RETEST",
+  "labelOnly": true,
+  "runtimeLogicChanged": false,
+  "checks": {
+    "title": true,
+    "developerBuild": true,
+    "reviewPurpose": true,
+    "compactBugBuild": true,
+    "issueBuild": true
+  },
+  "failures": [],
+  "status": "PASS"
+}

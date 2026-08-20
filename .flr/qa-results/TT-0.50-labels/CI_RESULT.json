@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.50-LABELS",
+  "candidateBranch": "tt050-candidate",
+  "baselineRef": "main",
+  "baselineSha": "ffbf02b04a65f3a0b2dae23c2e49d993659bd757",
+  "candidateSha": "91646e7d05ed93d7b1c69b01c3aa5bff85a1246a",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
+  "changedFiles": [
+    "index.html",
+    "step71_hybrid_v06_ui.js"
+  ],
+  "allowedChangedFiles": [
+    "index.html",
+    "step71_hybrid_v06_ui.js"
+  ],
+  "patchSha256": "e6ad45646e569b2b258b72c6e8288641147744be22dda8ab3bb2233c5b62ab2b",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT050_LABEL_VALIDATION_0.1",
+    "build": "TT-0.50 USER_VISUAL_RETEST",
+    "labelOnly": true,
+    "runtimeLogicChanged": false,
+    "checks": {
+      "title": true,
+      "developerBuild": true,
+      "reviewPurpose": true,
+      "compactBugBuild": true,
+      "issueBuild": true
+    },
+    "failures": [],
+    "status": "PASS"
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt050_label_finalize.py",
+      "exitCode": 0,
+      "stdout": "TT050_LABEL_FINALIZE_OK\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": ""
+}
