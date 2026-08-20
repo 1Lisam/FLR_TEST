@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_STATUS_0.1",
+  "status": "NEEDS_CREDENTIALS",
+  "worker": "flr-bug-reporter",
+  "bucket": "flr-bug-reports",
+  "endpoint": null,
+  "missingSecrets": [
+    "CLOUDFLARE_API_TOKEN",
+    "CLOUDFLARE_ACCOUNT_ID"
+  ],
+  "deployOutcome": "skipped",
+  "sourceCommit": "98cf0b871b4b2f41afd95b2020fc52fc451a5019"
+}
