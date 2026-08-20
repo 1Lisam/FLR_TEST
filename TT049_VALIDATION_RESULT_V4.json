@@ -1,0 +1,367 @@
+{
+  "schemaVersion": "FLR_TT049_CANDIDATE_VALIDATION_0.4",
+  "build": "TT-0.49 TEST_ONLY",
+  "step79Started": false,
+  "canonical": {
+    "hybridPrecomputesChoice": false,
+    "hybridPrecomputesOutcome": false,
+    "v06OwnsLiveChoiceDiscovery": true,
+    "v06OwnsPostChoiceResolution": true,
+    "protagonistUnchosenMaterialActionForbidden": true,
+    "choiceIdAndExactTargetIdImmutable": true
+  },
+  "tacticalMovementChanged": false,
+  "issue4": {
+    "through": [
+      "H-RW",
+      "H-LW"
+    ],
+    "trace": {
+      "at": 100,
+      "sourceId": "H-ST",
+      "choiceId": "THROUGH_PASS",
+      "requestedTargetId": "H-RW",
+      "resolvedTargetId": "H-RW",
+      "intendedReceiverId": "H-RW",
+      "firstControllerId": "H-RW",
+      "outcome": "SELECTED_TARGET_CONTROL",
+      "resolvedAt": 100.96
+    },
+    "falseLead": 0
+  },
+  "shootingCalibration": {
+    "trials": 600,
+    "goal": 262,
+    "save": 178,
+    "miss": 160,
+    "distribution": {
+      "goal": 0.4367,
+      "save": 0.2967,
+      "miss": 0.2667
+    },
+    "targetHit": false
+  },
+  "issue3": {
+    "trials": 180,
+    "decisive": 166,
+    "shot": 113,
+    "pass": 53,
+    "carryThenDecisive": 105,
+    "takeOn": 0,
+    "turnover": 4,
+    "noDecision": 14,
+    "decisiveRate": 0.9222,
+    "shotRate": 0.6278,
+    "takeOnRate": 0,
+    "earlyTurnoverRate": 0.0222,
+    "samples": [
+      {
+        "decisiveType": "SHOT",
+        "sawCarry": false,
+        "elapsed": 0.02,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "SHOT"
+        ]
+      },
+      {
+        "decisiveType": null,
+        "sawCarry": true,
+        "elapsed": 3.22,
+        "takeOn": false,
+        "lost": false,
+        "events": []
+      },
+      {
+        "decisiveType": "SHOT",
+        "sawCarry": true,
+        "elapsed": 1.56,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "SHOT"
+        ]
+      },
+      {
+        "decisiveType": null,
+        "sawCarry": true,
+        "elapsed": 3.22,
+        "takeOn": false,
+        "lost": false,
+        "events": []
+      },
+      {
+        "decisiveType": "PASS",
+        "sawCarry": true,
+        "elapsed": 2.72,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "PASS"
+        ]
+      },
+      {
+        "decisiveType": null,
+        "sawCarry": true,
+        "elapsed": 3.22,
+        "takeOn": false,
+        "lost": false,
+        "events": []
+      },
+      {
+        "decisiveType": "PASS",
+        "sawCarry": true,
+        "elapsed": 2.96,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "PASS"
+        ]
+      },
+      {
+        "decisiveType": "SHOT",
+        "sawCarry": true,
+        "elapsed": 1.56,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "SHOT"
+        ]
+      },
+      {
+        "decisiveType": "PASS",
+        "sawCarry": true,
+        "elapsed": 2.96,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "PASS"
+        ]
+      },
+      {
+        "decisiveType": "SHOT",
+        "sawCarry": true,
+        "elapsed": 2.2,
+        "takeOn": false,
+        "lost": false,
+        "events": [
+          "SHOT"
+        ]
+      }
+    ]
+  },
+  "fullMatch": {
+    "matches": 32,
+    "strict": 6,
+    "clean": 81,
+    "shots": 1968,
+    "goals": 467,
+    "strictPerMatch": 0.1875,
+    "cleanPerMatch": 2.5313,
+    "targetFrequencyHit": false,
+    "per": [
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 76,
+        "goals": 22
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 23,
+        "goals": 5
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 32,
+        "goals": 9
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "shots": 28,
+        "goals": 4
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 58,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "shots": 30,
+        "goals": 6
+      },
+      {
+        "strict": 1,
+        "clean": 4,
+        "shots": 22,
+        "goals": 5
+      },
+      {
+        "strict": 1,
+        "clean": 3,
+        "shots": 75,
+        "goals": 14
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 74,
+        "goals": 21
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 78,
+        "goals": 17
+      },
+      {
+        "strict": 1,
+        "clean": 3,
+        "shots": 66,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 76,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 77,
+        "goals": 24
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "shots": 65,
+        "goals": 12
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 39,
+        "goals": 8
+      },
+      {
+        "strict": 1,
+        "clean": 1,
+        "shots": 77,
+        "goals": 20
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 84,
+        "goals": 14
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 69,
+        "goals": 18
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 19,
+        "goals": 5
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 79,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 83,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 10,
+        "goals": 0
+      },
+      {
+        "strict": 0,
+        "clean": 5,
+        "shots": 75,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 6,
+        "shots": 81,
+        "goals": 24
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 89,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 57,
+        "goals": 12
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 81,
+        "goals": 13
+      },
+      {
+        "strict": 1,
+        "clean": 5,
+        "shots": 76,
+        "goals": 22
+      },
+      {
+        "strict": 1,
+        "clean": 3,
+        "shots": 63,
+        "goals": 14
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 66,
+        "goals": 26
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 76,
+        "goals": 21
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 64,
+        "goals": 14
+      }
+    ]
+  },
+  "authority": {
+    "tested": 2,
+    "violations": [],
+    "futureOutcomePrecomputed": false
+  },
+  "failures": [
+    "clean keeper chance frequency 2.53125/match"
+  ],
+  "status": "FAIL"
+}
