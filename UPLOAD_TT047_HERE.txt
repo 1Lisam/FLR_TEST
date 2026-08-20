@@ -1,2 +1,0 @@
-TT-0.47 baseline upload placeholder.
-Upload the extracted contents of FLR_TEST_GITHUB_BASELINE_TT-0.47.zip to the repository root, then this file can be removed.
