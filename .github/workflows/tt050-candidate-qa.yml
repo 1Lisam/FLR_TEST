@@ -1,0 +1,96 @@
+name: TT-0.50 candidate QA
+
+on:
+  push:
+    branches: [tt050-candidate]
+    paths:
+      - '.flr/tt050-qa-run-request'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tt050-candidate-qa
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          ref: tt050-candidate
+          path: candidate
+          fetch-depth: 1
+      - name: Checkout protected main baseline
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: baseline
+          fetch-depth: 1
+      - name: Clone baseline worktree
+        run: cp -a baseline work
+      - name: Measure TT-0.49 role cadence baseline
+        run: node candidate/.flr/tt050_baseline_role_cadence.js baseline > tt050-baseline.json
+      - name: Apply TT-0.50 candidate
+        run: |
+          python candidate/.flr/tt050_apply.py work | tee tt050-apply.log
+          git -C work add -N bug_report_config.js
+          git -C work diff --check
+      - name: Syntax checks
+        run: |
+          node --check work/runtime/ball_strike_model.js
+          node --check work/runtime/continuous_match_core.js
+          node --check work/runtime/protagonist_match_controller.js
+          node --check work/runtime/tactical_movement.js
+          node --check work/step71_hybrid_v06_ui.js
+          node --check work/bug_report_config.js
+          node --input-type=module --check < work/bug-report-worker/worker.js
+          node --check candidate/.flr/tt050_validation.js
+      - name: Run TT-0.50 internal gate
+        id: test
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          node candidate/.flr/tt050_validation.js work > tt050-validation.json 2> tt050-validation.stderr
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
+      - name: Build validated patch and persist result
+        if: always()
+        env:
+          TEST_CODE: ${{ steps.test.outputs.code }}
+        run: |
+          set -euo pipefail
+          git -C work diff -- runtime/ball_strike_model.js runtime/continuous_match_core.js runtime/protagonist_match_controller.js runtime/tactical_movement.js bug-report-worker/worker.js step71_hybrid_v06_ui.js index.html bug_report_config.js > tt050-candidate.patch
+          sha256sum tt050-candidate.patch > tt050-candidate.patch.sha256
+          python - <<'PY'
+          import json, os, pathlib, shutil
+          def load(p):
+              q=pathlib.Path(p)
+              if not q.exists(): return None
+              try: return json.loads(q.read_text(encoding='utf-8'))
+              except Exception as e: return {'parseError':str(e),'raw':q.read_text(encoding='utf-8',errors='replace')[-12000:]}
+          r={'schemaVersion':'FLR_TT050_CI_RESULT_0.1','exitCode':int(os.getenv('TEST_CODE') or 99),'baseline':load('tt050-baseline.json'),'validation':load('tt050-validation.json')}
+          r['applyLog']=pathlib.Path('tt050-apply.log').read_text(encoding='utf-8',errors='replace')[-12000:] if pathlib.Path('tt050-apply.log').exists() else None
+          r['stderr']=pathlib.Path('tt050-validation.stderr').read_text(encoding='utf-8',errors='replace')[-12000:] if pathlib.Path('tt050-validation.stderr').exists() else None
+          r['workflowStatus']='PASS' if r['exitCode']==0 else 'FAIL'
+          pathlib.Path('candidate/TT050_CI_RESULT.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if pathlib.Path('tt050-validation.json').exists(): shutil.copyfile('tt050-validation.json','candidate/TT050_VALIDATION_RESULT.json')
+          shutil.copyfile('tt050-baseline.json','candidate/TT050_BASELINE_ROLE_CADENCE.json')
+          shutil.copyfile('tt050-candidate.patch','candidate/.flr/tt050-candidate.patch')
+          shutil.copyfile('tt050-candidate.patch.sha256','candidate/.flr/tt050-candidate.patch.sha256')
+          PY
+          git -C candidate config user.name "FLR Candidate CI"
+          git -C candidate config user.email "actions@users.noreply.github.com"
+          git -C candidate add TT050_CI_RESULT.json TT050_VALIDATION_RESULT.json TT050_BASELINE_ROLE_CADENCE.json .flr/tt050-candidate.patch .flr/tt050-candidate.patch.sha256 || true
+          git -C candidate diff --cached --quiet || { git -C candidate commit -m "Record TT-0.50 candidate QA result"; git -C candidate push origin HEAD:tt050-candidate; }
+      - name: Enforce gate
+        if: always()
+        env:
+          TEST_CODE: ${{ steps.test.outputs.code }}
+        run: test "${TEST_CODE:-99}" = 0
