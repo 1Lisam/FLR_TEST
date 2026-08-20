@@ -1,0 +1,404 @@
+{
+  "schemaVersion": "FLR_TT049_CI_RESULT_V3_0.1",
+  "expectedBaseSha": "52e69323bbab47f7d93e0d0f1e3fa06837038afd",
+  "baseSha": "52e69323bbab47f7d93e0d0f1e3fa06837038afd",
+  "exitCode": 1,
+  "validation": {
+    "schemaVersion": "FLR_TT049_CANDIDATE_VALIDATION_0.3",
+    "build": "TT-0.49 TEST_ONLY",
+    "step79Started": false,
+    "canonical": {
+      "hybridPrecomputesChoice": false,
+      "hybridPrecomputesOutcome": false,
+      "v06OwnsLiveChoiceDiscovery": true,
+      "v06OwnsPostChoiceResolution": true,
+      "protagonistUnchosenMaterialActionForbidden": true,
+      "choiceIdAndExactTargetIdImmutable": true
+    },
+    "issue4": {
+      "through": [
+        "H-RW",
+        "H-LW"
+      ],
+      "safe": [
+        "H-RW",
+        "H-LW"
+      ],
+      "trace": {
+        "at": 100,
+        "sourceId": "H-ST",
+        "choiceId": "THROUGH_PASS",
+        "requestedTargetId": "H-RW",
+        "resolvedTargetId": "H-RW",
+        "intendedReceiverId": "H-RW",
+        "firstControllerId": "H-RW",
+        "outcome": "SELECTED_TARGET_CONTROL",
+        "resolvedAt": 100.96
+      },
+      "falseLead": 0
+    },
+    "shootingCalibration": {
+      "trials": 600,
+      "goal": 241,
+      "save": 184,
+      "miss": 175,
+      "distribution": {
+        "goal": 0.4017,
+        "save": 0.3067,
+        "miss": 0.2917
+      },
+      "targetHit": true
+    },
+    "issue3": {
+      "trials": 160,
+      "shot": 160,
+      "pass": 0,
+      "carryOnly": 0,
+      "takeOn": 0,
+      "other": 0,
+      "turnover": 0,
+      "decisiveRate": 1,
+      "earlyTurnoverRate": 0,
+      "samples": [
+        {
+          "decision": "SHOT",
+          "elapsed": 1.48,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 0.02,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 0.76,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 0.76,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 0.02,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 0.02,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 0.76,
+          "events": [
+            "SHOT"
+          ]
+        },
+        {
+          "decision": "SHOT",
+          "elapsed": 1.48,
+          "events": [
+            "SHOT"
+          ]
+        }
+      ]
+    },
+    "fullMatch": {
+      "matches": 32,
+      "strict": 7,
+      "clean": 71,
+      "shots": 2759,
+      "goals": 614,
+      "strictPerMatch": 0.2188,
+      "cleanPerMatch": 2.2188,
+      "targetFrequencyHit": false,
+      "zoneLastCoverCorrections": 146510,
+      "pivotLaneCorrections": 31301,
+      "per": [
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 32,
+          "goals": 6,
+          "zoneFix": 1544,
+          "pivotFix": 321
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "shots": 19,
+          "goals": 3,
+          "zoneFix": 972,
+          "pivotFix": 196
+        },
+        {
+          "strict": 1,
+          "clean": 2,
+          "shots": 87,
+          "goals": 18,
+          "zoneFix": 4216,
+          "pivotFix": 938
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "shots": 19,
+          "goals": 1,
+          "zoneFix": 879,
+          "pivotFix": 220
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 98,
+          "goals": 21,
+          "zoneFix": 5354,
+          "pivotFix": 937
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "shots": 104,
+          "goals": 26,
+          "zoneFix": 5514,
+          "pivotFix": 1165
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "shots": 89,
+          "goals": 24,
+          "zoneFix": 5622,
+          "pivotFix": 1291
+        },
+        {
+          "strict": 0,
+          "clean": 4,
+          "shots": 103,
+          "goals": 27,
+          "zoneFix": 5496,
+          "pivotFix": 1098
+        },
+        {
+          "strict": 0,
+          "clean": 5,
+          "shots": 111,
+          "goals": 26,
+          "zoneFix": 5153,
+          "pivotFix": 1122
+        },
+        {
+          "strict": 1,
+          "clean": 3,
+          "shots": 98,
+          "goals": 24,
+          "zoneFix": 5602,
+          "pivotFix": 1289
+        },
+        {
+          "strict": 1,
+          "clean": 4,
+          "shots": 116,
+          "goals": 23,
+          "zoneFix": 5314,
+          "pivotFix": 1200
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "shots": 90,
+          "goals": 21,
+          "zoneFix": 5475,
+          "pivotFix": 1193
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 106,
+          "goals": 16,
+          "zoneFix": 5554,
+          "pivotFix": 1276
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 59,
+          "goals": 19,
+          "zoneFix": 3233,
+          "pivotFix": 631
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 110,
+          "goals": 25,
+          "zoneFix": 5594,
+          "pivotFix": 1061
+        },
+        {
+          "strict": 0,
+          "clean": 4,
+          "shots": 103,
+          "goals": 25,
+          "zoneFix": 5555,
+          "pivotFix": 1207
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "shots": 98,
+          "goals": 21,
+          "zoneFix": 5596,
+          "pivotFix": 1223
+        },
+        {
+          "strict": 2,
+          "clean": 2,
+          "shots": 108,
+          "goals": 29,
+          "zoneFix": 5318,
+          "pivotFix": 1052
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "shots": 91,
+          "goals": 24,
+          "zoneFix": 5848,
+          "pivotFix": 1101
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "shots": 98,
+          "goals": 24,
+          "zoneFix": 5599,
+          "pivotFix": 1112
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 102,
+          "goals": 19,
+          "zoneFix": 5381,
+          "pivotFix": 1189
+        },
+        {
+          "strict": 1,
+          "clean": 2,
+          "shots": 115,
+          "goals": 23,
+          "zoneFix": 5384,
+          "pivotFix": 1152
+        },
+        {
+          "strict": 0,
+          "clean": 6,
+          "shots": 121,
+          "goals": 22,
+          "zoneFix": 5637,
+          "pivotFix": 1326
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 36,
+          "goals": 10,
+          "zoneFix": 2302,
+          "pivotFix": 559
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "shots": 85,
+          "goals": 19,
+          "zoneFix": 4768,
+          "pivotFix": 1096
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "shots": 96,
+          "goals": 25,
+          "zoneFix": 5592,
+          "pivotFix": 1107
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 70,
+          "goals": 12,
+          "zoneFix": 3758,
+          "pivotFix": 805
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "shots": 118,
+          "goals": 29,
+          "zoneFix": 5523,
+          "pivotFix": 1361
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "shots": 59,
+          "goals": 10,
+          "zoneFix": 3300,
+          "pivotFix": 698
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "shots": 47,
+          "goals": 9,
+          "zoneFix": 2322,
+          "pivotFix": 454
+        },
+        {
+          "strict": 1,
+          "clean": 3,
+          "shots": 99,
+          "goals": 18,
+          "zoneFix": 5355,
+          "pivotFix": 1144
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "shots": 72,
+          "goals": 15,
+          "zoneFix": 3750,
+          "pivotFix": 777
+        }
+      ]
+    },
+    "authority": {
+      "tested": 2,
+      "violations": [],
+      "futureOutcomePrecomputed": false
+    },
+    "failures": [
+      "clean 1v1 structural rate 2.21875/match"
+    ],
+    "status": "FAIL"
+  },
+  "applyLog": "patched runtime/action_candidate_engine.js: const VERSION='STEP78-ACTION-CANDIDATE-1.1-RUN-INTENT';\npatched runtime/action_candidate_engine.js: if(!inBox)s-=role==='CM'?4.2:2.9;if(attackingReceive&&(shot.blockers||0)===0&&shot.dGoal<=26)s+=\npatched runtime/action_candidate_engine.js: if(clearRunway)carry+=3.4;if(space>5.2&&pressure>1.6)carry+=0.68;if(role==='WF'&&wide)carry+=0.4\npatched runtime/action_candidate_engine.js: if(dd<1.15)s-=0.75;if(attackingReceive)s+=1.15;if(ctx.recentTakeOn)s-=2.20;if(inBox&&shot.openWi\npatched runtime/action_candidate_engine.js: if(ctx.recentTakeOnWin)p+=0.22;\npatched runtime/action_candidate_engine.js: case 'TAKE_ON': return clamp(0.065+(candidate.meta?.skillAdvantage||0)*0.0028+(candidate.meta?.s\npatched runtime/continuous_match_core.js: const targetLead=taskCommitted?{x:p.tx,y:p.ty}:null,speed=Math.hypot(p.vx,p.vy),motionLead=taskR\npatched runtime/continuous_match_core.js: const receiveAge=m.time-(owner.lastReceivedAt||-99),decisiveReceive=receiveAge>=.22&&receiveAge<\npatched runtime/continuous_match_core.js: const floor=clamp(0.855+(finishing-60)*0.0026-Math.max(0,assess.dGoal-9)*0.008-(assess.pressure<\npatched runtime/continuous_match_core.js: const floor=clamp(0.800+(finishing-60)*0.0023-Math.max(0,assess.dGoal-14)*0.012-(assess.pressure\npatched runtime/continuous_match_core.js: m.stats.shots++;m.stats.shotsByTeam[team]=(m.stats.shotsByTeam[team]||0)+1;m.stats.shotReasons[r\npatched runtime/continuous_match_core.js: if(isShot){if(p.role==='GK'){setControlled(m,p);m.stats.saves++;event(m,'SAVE',`${subjectName(p.\npatched runtime/continuous_match_core.js: const saveRoll=(hash32(shotKey)%10000)/10000;if(saveRoll>saveP)return false;m.stats.saves=(m.sta\npatched runtime/continuous_match_core.js: const team=m.ball.shotTeam,description=goalDescription(m,team,cross);m.score[team]++;m.stats.goa\npatched runtime/continuous_match_core.js:   const defendingGoalTeam=cross.side==='GOAL_LEFT'?HOME:AWAY;\npatched runtime/continuous_match_core.js:   const resolvedTargetId=c.meta?.targetId||c.targetId||null;\npatched runtime/continuous_match_core.js: if(m.r()<cleanTake){setControlled(m,p,false);p.nextThink=m.time+0.75;m.stats.turnovers++;m.stats\npatched runtime/continuous_match_core.js:   const oldTeam=m.possession,sourceId=m.ball.lastTouchPlayer,passTeam=m.ball.lastTouchTeam,deliv\npatched runtime/continuous_match_core.js: actionCandidates:m.actionCandidateTelemetry?JSON.parse(JSON.stringify(m.actionCandidateTelemetry\nTT049_APPLY_OK\npatched tactical_movement.js: early central shoulder\npatched tactical_movement.js: earlier cover activation\npatched tactical_movement.js: zone last-cover and pivot screen\nTT049_DEFENCE_APPLY_OK\n",
+  "stderr": "",
+  "workflowStatus": "FAIL"
+}
