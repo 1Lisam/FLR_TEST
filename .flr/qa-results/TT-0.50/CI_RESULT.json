@@ -1,0 +1,268 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.50",
+  "candidateBranch": "tt050-candidate",
+  "baselineRef": "main",
+  "baselineSha": "ed2bc9f6a2c6a0c6835de2c1beb2fb62547e1ac3",
+  "candidateSha": "dad423667c7a993087540dfa10d3e7a7c7cd5602",
+  "workflowStatus": "FAIL",
+  "validationExitCode": 1,
+  "failures": [
+    "apply script failed: .flr/tt050_apply.py",
+    "apply script failed: .flr/tt050_backend_refine.py",
+    "syntax failed bug-report-worker/worker.js: [stdin]:17\n}}};\n  ^\n\nSyntaxError: Unexpected token '}'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n    at node:internal/main/check_syntax:45:5\n    at Socket.<anonymous> (node:internal/process/execution:201:5)\n    at Socket.emit (node:events:531:35)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)\n\nNode.js v22.23.2\n",
+    "validation exit 1"
+  ],
+  "changedFiles": [
+    "bug-report-worker/worker.js",
+    "bug_report_config.js",
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js"
+  ],
+  "allowedChangedFiles": [
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js",
+    "bug-report-worker/worker.js",
+    "step71_hybrid_v06_ui.js",
+    "index.html",
+    "bug_report_config.js"
+  ],
+  "patchSha256": "be36485e57299b04ca8e4d4a4b5418f20d1ebedf4e0de2f74406be4066ed25c1",
+  "baseline": {
+    "schemaVersion": "FLR_TT050_BASELINE_ROLE_CADENCE_0.1",
+    "matchesPerRole": 3,
+    "roles": {
+      "ST": {
+        "rows": [
+          {
+            "choices": 130,
+            "pauses": 130,
+            "episodes": 34,
+            "maxChoicesInEpisode": 5,
+            "maxBurst5s": 3,
+            "sub2sGaps": 24,
+            "sub3sGaps": 27,
+            "medianGap": 8.600000000000136,
+            "score": {
+              "HOME": 2,
+              "AWAY": 3
+            }
+          },
+          {
+            "choices": 20,
+            "pauses": 20,
+            "episodes": 11,
+            "maxChoicesInEpisode": 3,
+            "maxBurst5s": 2,
+            "sub2sGaps": 4,
+            "sub3sGaps": 4,
+            "medianGap": 7,
+            "score": {
+              "HOME": 0,
+              "AWAY": 0
+            }
+          },
+          {
+            "choices": 69,
+            "pauses": 69,
+            "episodes": 32,
+            "maxChoicesInEpisode": 5,
+            "maxBurst5s": 4,
+            "sub2sGaps": 16,
+            "sub3sGaps": 18,
+            "medianGap": 11,
+            "score": {
+              "HOME": 1,
+              "AWAY": 4
+            }
+          }
+        ],
+        "avgChoices": 73,
+        "avgEpisodes": 25.67,
+        "avgSub2sGaps": 14.67,
+        "avgSub3sGaps": 16.33,
+        "maxBurst5s": 4,
+        "maxChoicesInEpisode": 5
+      },
+      "CM": {
+        "rows": [
+          {
+            "choices": 193,
+            "pauses": 193,
+            "episodes": 53,
+            "maxChoicesInEpisode": 2,
+            "maxBurst5s": 3,
+            "sub2sGaps": 11,
+            "sub3sGaps": 30,
+            "medianGap": 15.199999999999818,
+            "score": {
+              "HOME": 8,
+              "AWAY": 5
+            }
+          },
+          {
+            "choices": 144,
+            "pauses": 144,
+            "episodes": 55,
+            "maxChoicesInEpisode": 2,
+            "maxBurst5s": 2,
+            "sub2sGaps": 5,
+            "sub3sGaps": 12,
+            "medianGap": 21.899999999999636,
+            "score": {
+              "HOME": 4,
+              "AWAY": 7
+            }
+          },
+          {
+            "choices": 188,
+            "pauses": 188,
+            "episodes": 57,
+            "maxChoicesInEpisode": 2,
+            "maxBurst5s": 2,
+            "sub2sGaps": 8,
+            "sub3sGaps": 20,
+            "medianGap": 16.599999999999454,
+            "score": {
+              "HOME": 5,
+              "AWAY": 8
+            }
+          }
+        ],
+        "avgChoices": 175,
+        "avgEpisodes": 55,
+        "avgSub2sGaps": 8,
+        "avgSub3sGaps": 20.67,
+        "maxBurst5s": 3,
+        "maxChoicesInEpisode": 2
+      },
+      "CB": {
+        "rows": [
+          {
+            "choices": 208,
+            "pauses": 208,
+            "episodes": 54,
+            "maxChoicesInEpisode": 2,
+            "maxBurst5s": 3,
+            "sub2sGaps": 5,
+            "sub3sGaps": 21,
+            "medianGap": 14.600000000000364,
+            "score": {
+              "HOME": 8,
+              "AWAY": 7
+            }
+          },
+          {
+            "choices": 205,
+            "pauses": 205,
+            "episodes": 56,
+            "maxChoicesInEpisode": 3,
+            "maxBurst5s": 3,
+            "sub2sGaps": 6,
+            "sub3sGaps": 34,
+            "medianGap": 13.299999999999272,
+            "score": {
+              "HOME": 9,
+              "AWAY": 4
+            }
+          },
+          {
+            "choices": 235,
+            "pauses": 235,
+            "episodes": 58,
+            "maxChoicesInEpisode": 2,
+            "maxBurst5s": 3,
+            "sub2sGaps": 8,
+            "sub3sGaps": 40,
+            "medianGap": 11.900000000000091,
+            "score": {
+              "HOME": 4,
+              "AWAY": 7
+            }
+          }
+        ],
+        "avgChoices": 216,
+        "avgEpisodes": 56,
+        "avgSub2sGaps": 6.33,
+        "avgSub3sGaps": 31.67,
+        "maxBurst5s": 3,
+        "maxChoicesInEpisode": 3
+      },
+      "GK": {
+        "rows": [
+          {
+            "choices": 6,
+            "pauses": 6,
+            "episodes": 6,
+            "maxChoicesInEpisode": 1,
+            "maxBurst5s": 2,
+            "sub2sGaps": 0,
+            "sub3sGaps": 1,
+            "medianGap": 244.20000000000005,
+            "score": {
+              "HOME": 6,
+              "AWAY": 7
+            }
+          },
+          {
+            "choices": 5,
+            "pauses": 5,
+            "episodes": 5,
+            "maxChoicesInEpisode": 1,
+            "maxBurst5s": 1,
+            "sub2sGaps": 0,
+            "sub3sGaps": 0,
+            "medianGap": 1212.7000000000003,
+            "score": {
+              "HOME": 9,
+              "AWAY": 8
+            }
+          },
+          {
+            "choices": 0,
+            "pauses": 0,
+            "episodes": 0,
+            "maxChoicesInEpisode": 0,
+            "maxBurst5s": 0,
+            "sub2sGaps": 0,
+            "sub3sGaps": 0,
+            "medianGap": null,
+            "score": {
+              "HOME": 1,
+              "AWAY": 0
+            }
+          }
+        ],
+        "avgChoices": 3.67,
+        "avgEpisodes": 3.67,
+        "avgSub2sGaps": 0,
+        "avgSub3sGaps": 0.33,
+        "maxBurst5s": 2,
+        "maxChoicesInEpisode": 1
+      }
+    }
+  },
+  "validation": {
+    "parseError": "validation: Expecting value: line 1 column 1 (char 0)",
+    "raw": ""
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt050_apply.py",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_apply.py\", line 161, in <module>\n    t2,n=re.subn(pattern,replacement,t,count=1,flags=re.S)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/__init__.py\", line 197, in subn\n    return _compile(pattern, flags).subn(repl, string, count)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/__init__.py\", line 334, in _compile_template\n    return _sre.template(pattern, _parser.parse_template(repl, pattern))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/_parser.py\", line 1075, in parse_template\n    raise s.error('bad escape %s' % this, len(this)) from None\nre.error: bad escape \\s at position 2311 (line 5, column 197)\n"
+    },
+    {
+      "script": ".flr/tt050_backend_refine.py",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_backend_refine.py\", line 29, in <module>\n    t2,n=re.subn(old,new,t,count=1,flags=re.S)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/__init__.py\", line 197, in subn\n    return _compile(pattern, flags).subn(repl, string, count)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/__init__.py\", line 334, in _compile_template\n    return _sre.template(pattern, _parser.parse_template(repl, pattern))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/_parser.py\", line 1075, in parse_template\n    raise s.error('bad escape %s' % this, len(this)) from None\nre.error: bad escape \\s at position 674\n"
+    }
+  ],
+  "validationStderr": "evalmachine.<anonymous>:17\n}}};\n  ^\n\nSyntaxError: Unexpected token '}'\n    at new Script (node:vm:117:7)\n    at createScript (node:vm:269:10)\n    at Object.runInContext (node:vm:300:10)\n    at workerRoundTrip (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation.js:33:467)\n    at /home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation.js:40:577\n    at Object.<anonymous> (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation.js:40:814)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n"
+}
