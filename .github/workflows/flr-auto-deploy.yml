@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - automation/tt-deploy
+    paths:
+      - '.flr/deploy.json'
 
 permissions:
   contents: write
@@ -33,9 +35,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -f _incoming/.flr/incoming.patch
           test -f _incoming/.flr/deploy.json
-          cp _incoming/.flr/incoming.patch /tmp/incoming.patch
+          shopt -s nullglob
+          PARTS=(_incoming/.flr/incoming.patch.part*)
+          [ ${#PARTS[@]} -gt 0 ] || { echo 'PATCH_PARTS_MISSING'; exit 1; }
+          cat "${PARTS[@]}" > /tmp/incoming.patch
           python - <<'PY'
           import hashlib, json, pathlib, subprocess
           manifest=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
