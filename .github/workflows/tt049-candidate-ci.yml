@@ -7,6 +7,7 @@ on:
     paths:
       - '.flr/tt049_apply.py'
       - '.flr/tt049_validation.js'
+      - '.flr/tt049_validation_v2.js'
       - '.github/workflows/tt049-candidate-ci.yml'
   workflow_dispatch:
 
@@ -73,7 +74,7 @@ jobs:
           node --check work/runtime/action_candidate_engine.js && \
           node --check work/runtime/continuous_match_core.js && \
           node --check work/runtime/protagonist_match_controller.js && \
-          node --check candidate/.flr/tt049_validation.js
+          node --check candidate/.flr/tt049_validation_v2.js
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           exit $code
@@ -85,7 +86,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          node candidate/.flr/tt049_validation.js work > tt049-validation.json 2> tt049-validation.stderr
+          node candidate/.flr/tt049_validation_v2.js work > tt049-validation.json 2> tt049-validation.stderr
           code=$?
           cat tt049-validation.stderr || true
           cat tt049-validation.json || true
@@ -124,7 +125,7 @@ jobs:
               v=os.getenv(name,'')
               return None if v=='' else int(v)
           result={
-            'schemaVersion':'FLR_TT049_CI_RESULT_0.1',
+            'schemaVersion':'FLR_TT049_CI_RESULT_0.2',
             'baseSha':os.getenv('BASE_SHA') or None,
             'expectedBaseSha':'52e69323bbab47f7d93e0d0f1e3fa06837038afd',
             'baseCheck':code('BASE_CODE'),
