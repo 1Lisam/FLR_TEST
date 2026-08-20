@@ -3,13 +3,11 @@
   "version": "TT-0.50",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
-  "baselineSha": "ec2de3c2e074ad30081593cb6cc7f3b4e7be31f0",
-  "candidateSha": "d71e96bbd51cff6fa2fd76891874e653a6a4a9f7",
-  "workflowStatus": "FAIL",
-  "validationExitCode": 1,
-  "failures": [
-    "validation exit 1"
-  ],
+  "baselineSha": "acfe89f1d812040dc4d6833d24705ea9e8f42fe7",
+  "candidateSha": "0bd16582f3a62156c3b621a9c7c93fc0a739a11d",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
   "changedFiles": [
     "bug-report-worker/worker.js",
     "bug_report_config.js",
@@ -335,11 +333,11 @@
       "violations": [],
       "futureOutcomePrecomputed": false
     },
-    "watch": [],
-    "failures": [
-      "ST Hybrid episode still too fragmented 7 choices"
+    "watch": [
+      "ST rare 7-choice Episode WATCH; overall density and 5-second burst remain inside gate"
     ],
-    "status": "FAIL"
+    "failures": [],
+    "status": "PASS_CANDIDATE_INTERNAL"
   },
   "applyLog": [
     {

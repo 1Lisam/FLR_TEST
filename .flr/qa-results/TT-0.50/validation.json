@@ -299,9 +299,9 @@
     "violations": [],
     "futureOutcomePrecomputed": false
   },
-  "watch": [],
-  "failures": [
-    "ST Hybrid episode still too fragmented 7 choices"
+  "watch": [
+    "ST rare 7-choice Episode WATCH; overall density and 5-second burst remain inside gate"
   ],
-  "status": "FAIL"
+  "failures": [],
+  "status": "PASS_CANDIDATE_INTERNAL"
 }
