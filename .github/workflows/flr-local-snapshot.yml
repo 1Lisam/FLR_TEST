@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   snapshot:
@@ -22,6 +22,7 @@ jobs:
         run: |
           printf '{"schemaVersion":"FLR_LOCAL_DEV_SNAPSHOT_0.1","ref":"%s","sha":"%s","createdBy":"github-actions"}\n' "${GITHUB_REF_NAME}" "${GITHUB_SHA}" > FLR_LOCAL_DEV_SNAPSHOT.json
       - name: Upload complete repository snapshot
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: FLR_TT050_MAIN_SNAPSHOT
@@ -31,3 +32,16 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
+      - name: Record downloadable snapshot id
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          mkdir -p .flr
+          printf '{\n  "schemaVersion":"FLR_LOCAL_DEV_SNAPSHOT_STATUS_0.1",\n  "sourceSha":"%s",\n  "runId":%s,\n  "artifactId":%s,\n  "artifactName":"FLR_TT050_MAIN_SNAPSHOT",\n  "artifactUrl":"%s"\n}\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$ARTIFACT_ID" "$ARTIFACT_URL" > .flr/local-snapshot-status.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .flr/local-snapshot-status.json
+          git commit -m "Record local development snapshot artifact" || exit 0
+          git push
