@@ -36,6 +36,8 @@ new="""function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputS
   if(!c)return{ok:false,reason:'CANDIDATE_NOT_AVAILABLE'};
 """
 t=one(t,old,new,'frozen visible candidate execution')
+# The actual controller-owned carry duration lives in the core action executor.
+t=one(t,"m.time+2.60);owner.nextThink=intentUntil;","m.time+3.20);owner.nextThink=intentUntil;",'carry intent duration 3.2')
 write(p,t)
 
 p='runtime/protagonist_match_controller.js';t=read(p)
@@ -48,8 +50,7 @@ t=one(t,
 t=one(t,"hardUntil:s.m.time+32","hardUntil:s.m.time+20",'episode hard duration choice branch')
 t=one(t,"hardUntil:tr.startedAt+32","hardUntil:tr.startedAt+20",'episode hard duration result branch')
 t=exact_many(t,"ep.hardUntil=ep.hardUntil||ep.startedAt+32","ep.hardUntil=ep.hardUntil||ep.startedAt+20",2,'episode hard duration existing branches')
-# Give a chosen carry enough time/distance to feel like one action before another checkpoint.
-t=one(t,"m.time+2.60);owner.nextThink=intentUntil;","m.time+3.20);owner.nextThink=intentUntil;",'carry intent duration 3.2')
+# The controller owns only the decision checkpoint after the coherent carry.
 t=one(t,"ready=(critical&&now>=tr.startedAt+1.25)||(moved>=6.0&&now>=tr.startedAt+2.35)||now>=tr.minimumUntil;","ready=(critical&&now>=tr.startedAt+1.35)||(moved>=7.5&&now>=tr.startedAt+2.90)||now>=tr.minimumUntil;",'carry meaningful checkpoint')
 write(p,t)
 
