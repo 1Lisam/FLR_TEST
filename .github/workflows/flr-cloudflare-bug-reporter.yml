@@ -1,0 +1,143 @@
+name: FLR Cloudflare Bug Reporter Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/cloudflare-deploy.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-cloudflare-bug-reporter
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check Cloudflare credentials
+        id: creds
+        shell: bash
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -n "${CF_API_TOKEN:-}" ]; then echo 'token=true' >> "$GITHUB_OUTPUT"; else echo 'token=false' >> "$GITHUB_OUTPUT"; fi
+          if [ -n "${CF_ACCOUNT_ID:-}" ]; then echo 'account=true' >> "$GITHUB_OUTPUT"; else echo 'account=false' >> "$GITHUB_OUTPUT"; fi
+          if [ -n "${CF_API_TOKEN:-}" ] && [ -n "${CF_ACCOUNT_ID:-}" ]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'Cloudflare credentials are configured.'
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Cloudflare credentials are not configured; recording NEEDS_CREDENTIALS without failing the workflow.'
+          fi
+
+      - name: Setup Node
+        if: steps.creds.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Ensure R2 and deploy Worker
+        if: steps.creds.outputs.ready == 'true'
+        id: cloudflare
+        continue-on-error: true
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_OUTPUT_FILE_PATH: ${{ github.workspace }}/wrangler-output.ndjson
+        run: |
+          set -euo pipefail
+          cd bug-report-worker
+          buckets="$(npx --yes wrangler@latest r2 bucket list 2>&1)"
+          printf '%s\n' "$buckets"
+          if ! printf '%s\n' "$buckets" | grep -Fq 'flr-bug-reports'; then
+            npx --yes wrangler@latest r2 bucket create flr-bug-reports
+          fi
+          npx --yes wrangler@latest r2 bucket list | grep -Fq 'flr-bug-reports'
+          npx --yes wrangler@latest deploy --config wrangler.toml
+          cd ..
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('wrangler-output.ndjson')
+          if not p.is_file(): raise SystemExit('WRANGLER_OUTPUT_MISSING')
+          targets=[]
+          for line in p.read_text(encoding='utf-8').splitlines():
+              try: row=json.loads(line)
+              except Exception: continue
+              if row.get('type')=='deploy': targets.extend(row.get('targets') or [])
+          urls=[str(x) for x in targets if str(x).startswith('https://')]
+          if not urls: raise SystemExit('WORKER_DEPLOY_URL_NOT_FOUND')
+          pathlib.Path('/tmp/flr_worker_url.txt').write_text(urls[0].rstrip('/'),encoding='utf-8')
+          print('Worker URL captured:', urls[0])
+          PY
+          endpoint="$(cat /tmp/flr_worker_url.txt)"
+          echo "endpoint=${endpoint}" >> "$GITHUB_OUTPUT"
+          code="$(curl -sS -o /dev/null -w '%{http_code}' "${endpoint}/reports/TT-0.50/_binding_smoke_missing.json")"
+          test "$code" = '404'
+          code="$(curl -sS -o /dev/null -w '%{http_code}' -X OPTIONS "${endpoint}/report" -H 'Origin: https://1lisam.github.io' -H 'Access-Control-Request-Method: POST')"
+          test "$code" = '204'
+
+      - name: Record deployment status and wire endpoint
+        if: always()
+        shell: bash
+        env:
+          READY: ${{ steps.creds.outputs.ready }}
+          TOKEN_PRESENT: ${{ steps.creds.outputs.token }}
+          ACCOUNT_PRESENT: ${{ steps.creds.outputs.account }}
+          DEPLOY_OUTCOME: ${{ steps.cloudflare.outcome }}
+          ENDPOINT: ${{ steps.cloudflare.outputs.endpoint }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p .flr
+          python - <<'PY'
+          import json, os, pathlib
+          ready=os.environ.get('READY')=='true'
+          outcome=os.environ.get('DEPLOY_OUTCOME','skipped')
+          endpoint=(os.environ.get('ENDPOINT') or '').rstrip('/')
+          if not ready:
+              missing=[]
+              if os.environ.get('TOKEN_PRESENT')!='true': missing.append('CLOUDFLARE_API_TOKEN')
+              if os.environ.get('ACCOUNT_PRESENT')!='true': missing.append('CLOUDFLARE_ACCOUNT_ID')
+              status='NEEDS_CREDENTIALS'
+          elif outcome!='success' or not endpoint:
+              missing=[]; status='DEPLOY_FAILED'
+          else:
+              missing=[]; status='DEPLOYED'
+              pathlib.Path('bug_report_config.js').write_text(
+                  "window.FLR_BUG_REPORT_ENDPOINT = '"+endpoint+"/report'; // managed by FLR Cloudflare deploy workflow\n",
+                  encoding='utf-8')
+          obj={
+              'schemaVersion':'FLR_CLOUDFLARE_DEPLOY_STATUS_0.1',
+              'status':status,
+              'worker':'flr-bug-reporter',
+              'bucket':'flr-bug-reports',
+              'endpoint': endpoint+'/report' if status=='DEPLOYED' else None,
+              'missingSecrets':missing,
+              'deployOutcome':outcome,
+              'sourceCommit':os.environ.get('SOURCE_SHA')
+          }
+          pathlib.Path('.flr/cloudflare-deploy-status.json').write_text(json.dumps(obj,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(obj))
+          PY
+          git config user.name 'FLR Cloudflare Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          git add .flr/cloudflare-deploy-status.json bug_report_config.js
+          git diff --cached --quiet || {
+            git commit -m 'Record FLR bug reporter Cloudflare deployment status'
+            git push origin HEAD:main
+          }
