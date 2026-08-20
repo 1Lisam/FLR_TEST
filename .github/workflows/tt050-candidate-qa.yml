@@ -2,9 +2,10 @@ name: TT-0.50 candidate QA
 
 on:
   push:
-    branches: [tt050-candidate]
+    branches: [main, tt050-candidate]
     paths:
       - '.flr/tt050-qa-run-request'
+      - '.flr/tt050-qa-run-request-main'
   workflow_dispatch:
 
 permissions:
