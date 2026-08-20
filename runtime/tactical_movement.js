@@ -856,6 +856,15 @@ function enforceActualDefenderCrowdExit(m,team,owner){
   }
 }
 
+function separateRecoveringMidfieldFromStriker(m,team){
+  const st=teamPlayers(m,team).find(p=>p.slot==='ST');if(!st)return;
+  const sl=worldToLocal(team,st.x,st.y);
+  for(const p of teamPlayers(m,team).filter(p=>['LCM','RCM'].includes(p.slot)&&['RECOVER_MIDFIELD_8','BOX_EDGE_SUPPORT','SECOND_WAVE_8'].includes(p.tacticalTask))){
+    const pl=worldToLocal(team,p.x,p.y);if(Math.hypot(pl.x-sl.x,pl.y-sl.y)>7.0||Math.abs(pl.y-sl.y)>3.8)continue;
+    const sign=p.slot==='RCM'?1:-1,tl=worldToLocal(team,p.tx,p.ty),wantedY=clamp(sl.y+sign*5.2,18,50),w=localToWorld(team,Math.min(tl.x,pl.x-1.0),wantedY);p.tx=w.x;p.ty=w.y;p.action=p.tacticalTask='RECOVER_MIDFIELD_LANE';p.sprint=true;m.stats.midfieldStrikerLaneSeparations=(m.stats.midfieldStrikerLaneSeparations||0)+1;
+  }
+}
+
 function targetSeparation(m){
   // Same-team target spacing. Inside the box the minimum is wider because multiple
   // attackers being assigned the same lane creates the visible 'two markers tangled' failure.
@@ -929,7 +938,7 @@ function assign(m){
     m._lastTacticalPossession=poss;
   }
   const owner=playerById(m,m.ball.ownerId),ctx={owner};
-  assignAttack(m,poss,ctx);const defTeam=other(poss);assignDefence(m,defTeam,ctx);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceWideLaneHierarchy(m,poss);
+  assignAttack(m,poss,ctx);separateRecoveringMidfieldFromStriker(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceWideLaneHierarchy(m,poss);
   m.tactical={
     formation:{HOME:FORMATION,AWAY:FORMATION},
     profile:{HOME:PROFILES.HOME.id,AWAY:PROFILES.AWAY.id},

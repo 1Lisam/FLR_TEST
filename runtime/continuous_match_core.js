@@ -782,7 +782,7 @@ function earlyCrossDelivery(m,owner){
   return{type:'PASS',target:target.p,kind:'CROSS',option:{...target,block:0,running:true,earlyCross:true},reason:'EARLY_CROSS',candidateMeta:{targetId:target.p.id,targetOpen:target.open,boxTargets,facingAlignment:facing}};
 }
 function candidateContext(m,owner,shot,opts,pressure,space,held,deepDelivery,early,takeOn){
-  if(!CANDIDATES)return null;const l=worldToLocal(owner.team,owner.x,owner.y),runner=opts.find(o=>(o.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p.tacticalTask))&&o.block===0&&((['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p.tacticalTask)&&owner.role==='ST'&&o.leadForward>2.5&&o.score>-1.25)||(o.leadForward>6&&o.score>1.55))),progressive=opts.find(o=>o.forward>5&&o.block===0&&o.score>1.20),switchOpt=opts.find(o=>Math.abs(o.p.y-owner.y)>23&&o.block===0&&o.score>1.0),safe=opts.find(o=>o.block===0&&o.open>1.8),recycle=opts.find(o=>['CM','FB'].includes(o.p.role)&&o.block===0&&o.open>1.25&&o.forward<0&&o.forward>-16);
+  if(!CANDIDATES)return null;const l=worldToLocal(owner.team,owner.x,owner.y),runner=opts.find(o=>(o.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p.tacticalTask))&&o.block===0&&((['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p.tacticalTask)&&owner.role==='ST'&&o.leadForward>2.5&&o.score>-1.25)||(o.leadForward>6&&o.score>1.55))),progressive=opts.find(o=>o.forward>5&&o.block===0&&o.score>1.20),switchOpt=opts.find(o=>Math.abs(o.p.y-owner.y)>23&&o.block===0&&o.score>1.0),safeAny=opts.find(o=>o.block===0&&o.open>1.8),safeForward=opts.find(o=>o.block===0&&o.open>1.35&&o.forward>-2&&['ST','WF','CM'].includes(o.p.role)),safe=l.x>=80?(safeForward||safeAny):safeAny,recycle=opts.find(o=>['CM','FB'].includes(o.p.role)&&o.block===0&&o.open>1.25&&o.forward<0&&o.forward>-16);
   const runway=clearRunwayAssessment(m,owner,space,pressure);
   const recentTakeOnWin=m.time-(owner.lastTakeOnWinAt||-99)<1.6,counterActive=(m.attackRhythm?.[owner.team]?.counterUntil||0)>m.time;
   // INTERNAL V0.6 deep-entry discipline: do not let a generic CARRY cross the top of the
@@ -1141,16 +1141,15 @@ function executePass(m,owner,target,kind,option=null,actionReason=null){
   // lead point and stand still while the ball is still 15-25m away. Extend only obviously
   // under-led passes; already well-timed runs are left untouched.
   if(kind==='THROUGH'){
-    const receiverLead=dist(target,tp),roughSpeed=clamp(16.0+pd*0.30,16.5,24.0),flightTime=pd/Math.max(1,roughSpeed),desiredLead=clamp(flightTime*6.25,5.8,14.5);
-    // The receiver should still be running when the ball reaches the lane. A conservative
-    // lead made quick forwards arrive ~0.5-1.0s early and wait for the pass. Extend only
-    // along the attacking axis; keep the requested lane/side intact.
-    if(receiverLead<desiredLead*0.88){const tl=worldToLocal(target.team,target.x,target.y),tpl=worldToLocal(target.team,tp.x,tp.y),extra=clamp(desiredLead-receiverLead,0,3.6),candidate=localToWorld(target.team,clamp(tpl.x+extra,4,98.2),clamp(tpl.y,4,64)),oldBlocks=laneBlockers(m,owner,tp,other(owner.team)).length,newBlocks=laneBlockers(m,owner,candidate,other(owner.team)).length,oldOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,tp)),99),newOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,candidate)),99);if(newBlocks<=oldBlocks&&newOpen>=Math.min(1.25,oldOpen-.35))tp=candidate;pd=dist(owner,tp);}
+    const receiverLead=dist(target,tp),targetSpeed=Math.hypot(target.vx,target.vy),roughArrival=clamp(pd/Math.max(13.2,Math.min(24.5,pd/1.10)),0.82,1.62),desiredLead=clamp((targetSpeed>1.6?targetSpeed:5.0)*roughArrival,4.8,14.5);
+    // Extend an under-led pass along the runner's LIVE movement vector. The old X-only
+    // extension could turn a diagonal/wide run into a hard straight ball toward goal.
+    if(receiverLead<desiredLead*0.88){const baseDx=targetSpeed>1.6?target.vx:(tp.x-target.x),baseDy=targetSpeed>1.6?target.vy:(tp.y-target.y),nv=norm(baseDx,baseDy),extra=clamp(desiredLead-receiverLead,0,3.8),candidate={x:clamp(tp.x+nv.x*extra,1,104),y:clamp(tp.y+nv.y*extra,1,67)},oldBlocks=laneBlockers(m,owner,tp,other(owner.team)).length,newBlocks=laneBlockers(m,owner,candidate,other(owner.team)).length,oldOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,tp)),99),newOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,candidate)),99);if(newBlocks<=oldBlocks&&newOpen>=Math.min(1.25,oldOpen-.35))tp=candidate;pd=dist(owner,tp);}
   }
   const ownerSpeed=Math.hypot(owner.vx,owner.vy),underPressure=ballCarrierPressureDistance(m,owner)<2.0;if(['PASS','LONG_PASS','THROUGH'].includes(kind)&&underPressure){const err=kind==='LONG_PASS'||pd>30?1.8:1.0;tp={x:clamp(tp.x+(m.r()-0.5)*err*1.2,0,105),y:clamp(tp.y+(m.r()-0.5)*err*2.0,0,68)};pd=dist(owner,tp);}
   const longDiag=kind==='THROUGH'&&option?.longDiagonal&&pd>26,deliveryMode=choosePassDelivery(m,owner,target,kind,option,pd);
   const passSkill=kind==='LONG_PASS'?abilityValue(m,owner,'long_pass'):kind==='CROSS'?abilityValue(m,owner,'crossing'):kind==='THROUGH'?(abilityValue(m,owner,'vision')+abilityValue(m,owner,'short_pass')+abilityValue(m,owner,'long_pass'))/3:abilityValue(m,owner,'short_pass');
-  const sl=worldToLocal(owner.team,owner.x,owner.y),strike=STRIKE&&typeof STRIKE.passPlan==='function'?STRIKE.passPlan({kind,distance:pd,deliveryMode,pressure:ballCarrierPressureDistance(m,owner),targetSpeed:Math.hypot(target.vx,target.vy),forward:dir(owner.team)*(tp.x-owner.x),passSkill,sourceX:sl.x}):null;
+  const sl=worldToLocal(owner.team,owner.x,owner.y),strike=STRIKE&&typeof STRIKE.passPlan==='function'?STRIKE.passPlan({kind,distance:pd,deliveryMode,pressure:ballCarrierPressureDistance(m,owner),targetSpeed:Math.hypot(target.vx,target.vy),targetLeadDistance:dist(target,tp),forward:dir(owner.team)*(tp.x-owner.x),passSkill,sourceX:sl.x}):null;
   const speed=strike?.speed??(kind==='PASS'?clamp(12+pd*0.28,13,18):kind==='CUTBACK'?17:kind==='THROUGH'?clamp((deliveryMode==='AERIAL'?15.2:16)+pd*0.30,16.5,24):kind==='CROSS'?clamp(18+pd*0.24,19,24):clamp((deliveryMode==='AERIAL'?17:18.5)+pd*0.25,18.5,25));
   const loft=strike?.loft??(deliveryMode==='AERIAL'?(kind==='CROSS'?3.0:kind==='THROUGH'?1.55:2.25):0.10),passStyle=strike?.style||null;
   const reattacking=(m.attackRecycleUntil?.[owner.team]||0)>m.time&&dir(owner.team)*(tp.x-owner.x)>5;
@@ -1350,7 +1349,13 @@ function ownerThink(m,owner){
   // engine, but owner AI may not silently replace CARRY/HOLD/TAKE_ON with a pass/shot.
   const userControl=m.userChoiceControl;
   if(userControl&&userControl.playerId===owner.id){
-    if(userControl.controllerOwned)return;
+    if(userControl.controllerOwned){
+      if(userControl.mode==='CARRY'&&m.time<Number(userControl.until||0)-0.05&&m.ball.mode==='CONTROLLED'&&m.ball.ownerId===owner.id){
+        const remain=dist(owner,{x:owner.tx,y:owner.ty});
+        if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?dx/n:1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,clamp(l.x+ux*step,4,96.2),clamp(l.y+uy*step,4,64));owner.tx=w.x;owner.ty=w.y;owner.action=inOppPenaltyArea(owner.team,owner.x,owner.y)?'COMMITTED_BOX_CARRY':'CARRY_FORWARD';owner.tacticalTask=owner.action;owner.sprint=!inOppPenaltyArea(owner.team,owner.x,owner.y)&&step>2.4;m.stats.userCarryIntentExtensions=(m.stats.userCarryIntentExtensions||0)+1;}
+      }
+      return;
+    }
     if(m.time<=Number(userControl.until||0)+0.001)return;
     m.userChoiceControl=null;owner.nextThink=Math.max(owner.nextThink||0,m.time);return;
   }
@@ -1905,10 +1910,14 @@ function inspectChoiceState(m,playerId){
   }
   return{kind:'OFF_BALL',playerId:owner.id,team:owner.team,role:owner.role,slot:owner.slot,time:m.time};
 }
-function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='DIRECT_API'){
+function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='DIRECT_API',frozenCandidate=null){
   const frame=inspectChoiceState(m,playerId);if(!frame||frame.kind!=='ON_BALL'||!frame._frame)return{ok:false,reason:'NO_ON_BALL_CHOICE_STATE'};
   const owner=frame._frame.owner,same=frame.candidates.filter(x=>x.id===candidateId);let c=null;
-  if(targetId!=null){c=same.find(x=>x.targetId===targetId||x.meta?.targetId===targetId)||null;if(!c)return{ok:false,reason:'CHOICE_TARGET_NOT_AVAILABLE',requestedTargetId:targetId};}
+  const frozenTarget=frozenCandidate?(frozenCandidate.targetId||frozenCandidate.meta?.targetId||null):null,frozenMatches=!!(frozenCandidate&&frozenCandidate.id===candidateId&&frozenTarget===(targetId||null));
+  if(frozenMatches){
+    if(targetId!=null){const target=playerById(m,targetId);if(!target||target.team!==owner.team||target.id===owner.id)return{ok:false,reason:'FROZEN_CHOICE_TARGET_PHYSICALLY_INVALID',requestedTargetId:targetId};}
+    c=frozenCandidate;m.stats.frozenUserChoiceExecutions=(m.stats.frozenUserChoiceExecutions||0)+1;
+  }else if(targetId!=null){c=same.find(x=>x.targetId===targetId||x.meta?.targetId===targetId)||null;if(!c)return{ok:false,reason:'CHOICE_TARGET_NOT_AVAILABLE',requestedTargetId:targetId};}
   else{if(same.length>1&&same.some(x=>(x.targetId||x.meta?.targetId)!=null))return{ok:false,reason:'AMBIGUOUS_CHOICE_TARGET'};c=same[0]||null;}
   if(!c)return{ok:false,reason:'CANDIDATE_NOT_AVAILABLE'};
   const action=candidateToAction(m,owner,c,frame._frame);if(!action)return{ok:false,reason:'CANDIDATE_NOT_EXECUTABLE'};
@@ -1919,10 +1928,10 @@ function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='
   applyResolvedOwnerAction(m,owner,action);
   let intentUntil=null;
   if(c.id==='CARRY'){
-    intentUntil=Math.max(Number(owner.lockTargetUntil||0),m.time+0.90);owner.nextThink=intentUntil;
+    intentUntil=Math.max(Number(owner.lockTargetUntil||0),m.time+3.20);owner.nextThink=intentUntil;
     m.userChoiceControl={playerId:owner.id,choice:c.id,mode:'CARRY',startedAt:m.time,until:intentUntil,controllerOwned:true,futureOutcomePrecomputed:false};
   }else if(c.id==='HOLD'){
-    intentUntil=m.time+1.85;owner.nextThink=intentUntil;owner.lockTargetUntil=Math.max(owner.lockTargetUntil||0,intentUntil);
+    intentUntil=m.time+2.35;owner.nextThink=intentUntil;owner.lockTargetUntil=Math.max(owner.lockTargetUntil||0,intentUntil);
     m.userChoiceControl={playerId:owner.id,choice:c.id,mode:'HOLD',startedAt:m.time,until:intentUntil,controllerOwned:true,futureOutcomePrecomputed:false};
   }else if(c.id==='TAKE_ON'){
     intentUntil=Math.max(Number(owner.lockTargetUntil||0),Number(owner.takeOnState?.resolveAt||0)+0.55,m.time+1.05);owner.nextThink=Math.max(owner.nextThink||0,intentUntil);

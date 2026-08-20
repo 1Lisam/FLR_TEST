@@ -8,7 +8,7 @@ const VERSION='STEP72-BALL-STRIKE-0.3-FACING';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function passPlan(ctx={}){
   const kind=String(ctx.kind||'PASS'),d=Math.max(0.1,Number(ctx.distance)||1),mode=ctx.deliveryMode==='AERIAL'?'AERIAL':'GROUND';
-  const pressure=Number(ctx.pressure)||99,targetSpeed=Number(ctx.targetSpeed)||0,forward=Number(ctx.forward)||0;
+  const pressure=Number(ctx.pressure)||99,targetSpeed=Number(ctx.targetSpeed)||0,forward=Number(ctx.forward)||0,targetLeadDistance=Math.max(0,Number(ctx.targetLeadDistance)||0);
   const passSkill=clamp(Number(ctx.passSkill)||60,1,100),quality=(passSkill-60)/100;
   let style='FIRM_GROUND',arrival=0.90,speed=16,loft=0.10;
   if(kind==='CUTBACK'){
@@ -19,7 +19,7 @@ function passPlan(ctx={}){
     if(mode==='AERIAL'){
       style='LOFTED_THROUGH';arrival=clamp(0.95+d/41,1.12,1.72);speed=clamp(d/arrival+3.0+quality,16.0,23.8);loft=1.55;
     }else{
-      style='THROUGH_GROUND';arrival=clamp(0.60+d/45-(targetSpeed>4?0.07:0),0.72,1.28);speed=clamp(d/arrival+quality*1.0,16.0,24.5);loft=0.07;
+      style='THROUGH_GROUND';const runnerArrival=targetSpeed>1.6&&targetLeadDistance>1.5?targetLeadDistance/targetSpeed:0,physicsFloor=d/22.5;arrival=runnerArrival>0?clamp(Math.max(physicsFloor,runnerArrival),0.82,2.85):clamp(0.72+d/41-(targetSpeed>4?0.03:0),0.84,1.55);speed=runnerArrival>0?clamp(d/arrival+quality*0.12,5.6,22.5):clamp(d/arrival+quality*0.35,11.5,22.5);loft=0.07;
     }
   }else if(kind==='LONG_PASS'){
     if(mode==='AERIAL'){

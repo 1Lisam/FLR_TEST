@@ -358,7 +358,7 @@ function applyPerformanceImpact(s,tr,result){
   s.performance.lastImpact=impact;s.performance.history.push(deep(impact));if(s.performance.history.length>60)s.performance.history.shift();return impact;
 }
 function finalizeResult(s,terminal=null){const tr=s.resultTracker;if(!tr||tr.done)return null;tr.done=true;const r={sceneId:tr.sceneId,at:Number(s.m.time.toFixed(2)),choiceId:tr.choiceId,label:tr.label,targetId:tr.targetId||null,targetName:tr.targetName||null,family:tr.family,selectedChoice:{id:tr.choiceId,label:tr.label,targetId:tr.targetId||null,targetName:tr.targetName||null},...resultNarrative(s,tr,terminal),events:tr.newEvents.map(deep),score:{...s.m.score},possession:s.m.possession};r.performanceImpact=applyPerformanceImpact(s,tr,r);s.lastResult=r;s.choiceHistory.push(deep(r));if(s.choiceHistory.length>60)s.choiceHistory.shift();if(s.currentScene){s.currentScene.postEvents=tr.newEvents.map(deep);s.currentScene.result=deep(r);}const h=hero(s),heroOwn=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId,ownRestart=!!h&&s.m.restart&&s.m.restart.team===h.team&&['CORNER','FREE_KICK','THROW_IN'].includes(s.m.restart.kind),sameTeam=!!h&&(s.m.possession===h.team||ownRestart);
-  if(sameTeam){const ep=s.activeEpisode||{id:`EP-${++s.episodeSeq}`,team:h.team,startedAt:tr.startedAt,hardUntil:tr.startedAt+32};ep.team=h.team;ep.lastSceneId=tr.sceneId;ep.lastChoiceAt=tr.startedAt;ep.hardUntil=ep.hardUntil||ep.startedAt+32;ep.until=Math.min(ep.hardUntil,Math.max(ep.until||0,s.m.time+(ownRestart?8.0:6.5)));ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
+  if(sameTeam){const ep=s.activeEpisode||{id:`EP-${++s.episodeSeq}`,team:h.team,startedAt:tr.startedAt,hardUntil:tr.startedAt+20};ep.team=h.team;ep.lastSceneId=tr.sceneId;ep.lastChoiceAt=tr.startedAt;ep.hardUntil=ep.hardUntil||ep.startedAt+20;ep.until=Math.min(ep.hardUntil,Math.max(ep.until||0,s.m.time+(ownRestart?8.0:6.5)));ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
   else if(s.activeEpisode)s.activeEpisode=null;
   if(s.m.userChoiceControl?.playerId===s.heroPlayerId)s.m.userChoiceControl=null;if(heroOwn){s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;if(h)h.nextThink=Math.max(h.nextThink||0,s.m.time);}s.resultTracker=null;return r;}
 function updateResultTracker(s){
@@ -414,6 +414,7 @@ function updateResultTracker(s){
   else if(tr.choiceId==='TAKE_ON'&&tt==='DRIBBLE_BEAT'){const settledHero=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;ready=settledHero&&now>=Math.max(tr.minimumUntil,(tr.terminalAt||now)+0.88);if(!settledHero&&now>=(tr.terminalAt||now)+2.10&&ballSettled)ready=true;}
   else if(['CARRY','HOLD'].includes(tr.choiceId)){
     if(tr.possessionChangedAt!=null)ready=now-tr.possessionChangedAt>=1.20&&ballSettled;
+    else if(tr.choiceId==='CARRY'&&heroOwnNow){const q=inspect(s),f=q?.frame||{},moved=protagonistMovement(s.currentScene)||0,critical=!!(f.shot?.oneVOne||(f.shot?.inBox&&f.shot?.openWindow&&(f.shot?.blockers??9)<=1));ready=(critical&&now>=tr.startedAt+1.35)||(moved>=7.5&&now>=tr.startedAt+2.90)||now>=tr.minimumUntil;}
     else ready=now>=tr.minimumUntil;
   }else if(tr.family==='패스'||tr.family==='크로스'){
     const heroOwn=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
@@ -455,13 +456,13 @@ function applyChoice(s,choiceId,targetId=null,inputMeta={}){
   if(!opt)return{ok:false,reason:'CHOICE_NOT_AVAILABLE'};
   const before=(s.m.events||[]).map(eventKey);let res;
   if(s.pending.kind==='ON_BALL'&&['SHORT_DISTRIBUTION','LONG_DISTRIBUTION'].includes(opt.id))res=R38.apply(s.m,{playerId:s.heroPlayerId,choice:opt.id,targetId:opt.targetId||null});
-  else if(s.pending.kind==='ON_BALL')res=C().applyCandidate(s.m,s.heroPlayerId,opt.id,opt.targetId||null,inputSource);
+  else if(s.pending.kind==='ON_BALL')res=C().applyCandidate(s.m,s.heroPlayerId,opt.id,opt.targetId||null,inputSource,opt);
   else res=R38.apply(s.m,{playerId:s.heroPlayerId,choice:opt.id,targetId:opt.targetId||null});
   if(res.ok){
     res.inputSource=inputSource;res.requestedTargetId=opt.targetId||null;
     if(opt.targetId!=null&&(res.targetId||null)!==opt.targetId)return{ok:false,reason:'CHOICE_TARGET_RESOLUTION_MISMATCH',requestedTargetId:opt.targetId,resolvedTargetId:res.targetId||null};
     s.lastChoiceAt=s.m.time;s.lastChoice={at:Number(s.m.time.toFixed(2)),choice:opt.id,label:opt.label,targetId:opt.targetId||null,targetName:opt.targetName||null,family:opt.family||family(opt.id),kind:s.pending.kind,inputSource,futureOutcomePrecomputed:false};
-    const h=hero(s),pendingEpisode=s.pending?.episodeId||null;if(h){let ep=s.activeEpisode;if(!ep||ep.team!==h.team||s.m.time>(ep.hardUntil||ep.until||0))ep={id:pendingEpisode||`EP-${++s.episodeSeq}`,team:h.team,startedAt:s.m.time,hardUntil:s.m.time+32};ep.id=pendingEpisode||ep.id;ep.hardUntil=ep.hardUntil||ep.startedAt+32;ep.lastSceneId=s.currentScene?.sceneId||ep.lastSceneId;ep.lastChoiceAt=s.m.time;ep.until=Math.min(ep.hardUntil,s.m.time+7.0);ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
+    const h=hero(s),pendingEpisode=s.pending?.episodeId||null;if(h){let ep=s.activeEpisode;if(!ep||ep.team!==h.team||s.m.time>(ep.hardUntil||ep.until||0))ep={id:pendingEpisode||`EP-${++s.episodeSeq}`,team:h.team,startedAt:s.m.time,hardUntil:s.m.time+20};ep.id=pendingEpisode||ep.id;ep.hardUntil=ep.hardUntil||ep.startedAt+20;ep.lastSceneId=s.currentScene?.sceneId||ep.lastSceneId;ep.lastChoiceAt=s.m.time;ep.until=Math.min(ep.hardUntil,s.m.time+7.0);ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
     if(s.currentScene)s.currentScene.choicePendingSnapshot=deep(s.pending);s.pending=null;beginResultTracker(s,opt,res,before);updateResultTracker(s);
   }
   return res;
