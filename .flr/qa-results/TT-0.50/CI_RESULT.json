@@ -3,8 +3,8 @@
   "version": "TT-0.50",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
-  "baselineSha": "ec5add5c0c16691dc744bb209b66db648393e427",
-  "candidateSha": "aea4c167bfe60bb87ac4ebd2cd5933b81b0afcf5",
+  "baselineSha": "d0fdd807707ab556cf666a1500ff07279fa60661",
+  "candidateSha": "eb32f04b7521327a57dfbcb6f9ce92c1e20bc939",
   "workflowStatus": "FAIL",
   "validationExitCode": 1,
   "failures": [
@@ -35,8 +35,348 @@
   "patchSha256": "d556b5e440cf8bbe6c43fd869a955dc5161e97e0dbc014241d870acccce3b727",
   "baseline": null,
   "validation": {
-    "parseError": "validation: Expecting value: line 1 column 1 (char 0)",
-    "raw": ""
+    "schemaVersion": "FLR_TT050_VALIDATION_0.2",
+    "build": "TT-0.50 TEST_ONLY",
+    "step79Started": false,
+    "canonical": {
+      "futureChoicePrecomputed": false,
+      "futureOutcomePrecomputed": false,
+      "v06OwnsLiveChoiceDiscovery": true,
+      "v06OwnsPostChoiceResolution": true,
+      "choiceIdAndExactTargetIdImmutable": true,
+      "protagonistUnchosenMaterialActionForbidden": true
+    },
+    "throughTrajectory": {
+      "target": {
+        "x": 86,
+        "y": 23.7
+      },
+      "leadDistance": 10.653,
+      "runnerSpeed": 3.774,
+      "vectorCosine": 1,
+      "ballArrival": 1.114,
+      "runnerArrival": 2.823,
+      "arrivalDelta": 1.709
+    },
+    "finalThirdDecision": {
+      "trials": 120,
+      "backward": 0,
+      "forwardPass": 0,
+      "shot": 56,
+      "carry": 64,
+      "takeOn": 0,
+      "other": 0,
+      "backwardRate": 0,
+      "attackContinuationRate": 1,
+      "samples": [
+        {
+          "decision": "CARRY",
+          "event": null
+        },
+        {
+          "decision": "CARRY",
+          "event": null
+        },
+        {
+          "decision": "SHOT",
+          "event": {
+            "type": "SHOT",
+            "targetId": null
+          }
+        },
+        {
+          "decision": "SHOT",
+          "event": {
+            "type": "SHOT",
+            "targetId": null
+          }
+        },
+        {
+          "decision": "SHOT",
+          "event": {
+            "type": "SHOT",
+            "targetId": null
+          }
+        },
+        {
+          "decision": "SHOT",
+          "event": {
+            "type": "SHOT",
+            "targetId": null
+          }
+        },
+        {
+          "decision": "SHOT",
+          "event": {
+            "type": "SHOT",
+            "targetId": null
+          }
+        },
+        {
+          "decision": "SHOT",
+          "event": {
+            "type": "SHOT",
+            "targetId": null
+          }
+        }
+      ]
+    },
+    "hybridCadence": {
+      "ST": {
+        "rows": [
+          {
+            "heroWindows": 28,
+            "choiceEpisodes": 19,
+            "totalChoices": 38,
+            "first30Choices": 12,
+            "maxBurst5s": 3,
+            "maxEpisodeChoices": 8,
+            "avgChoicesPerEpisode": 2,
+            "score": {
+              "HOME": 2,
+              "AWAY": 3
+            }
+          },
+          {
+            "heroWindows": 31,
+            "choiceEpisodes": 23,
+            "totalChoices": 63,
+            "first30Choices": 18,
+            "maxBurst5s": 3,
+            "maxEpisodeChoices": 12,
+            "avgChoicesPerEpisode": 2.74,
+            "score": {
+              "HOME": 1,
+              "AWAY": 1
+            }
+          }
+        ],
+        "avgHeroWindows": 29.5,
+        "avgChoiceEpisodes": 21,
+        "avgTotalChoices": 50.5,
+        "avgFirst30Choices": 15,
+        "maxBurst5s": 3,
+        "maxEpisodeChoices": 12
+      },
+      "CM": {
+        "rows": [
+          {
+            "heroWindows": 10,
+            "choiceEpisodes": 8,
+            "totalChoices": 9,
+            "first30Choices": 3,
+            "maxBurst5s": 2,
+            "maxEpisodeChoices": 2,
+            "avgChoicesPerEpisode": 1.13,
+            "score": {
+              "HOME": 3,
+              "AWAY": 1
+            }
+          },
+          {
+            "heroWindows": 16,
+            "choiceEpisodes": 10,
+            "totalChoices": 13,
+            "first30Choices": 7,
+            "maxBurst5s": 2,
+            "maxEpisodeChoices": 2,
+            "avgChoicesPerEpisode": 1.3,
+            "score": {
+              "HOME": 1,
+              "AWAY": 1
+            }
+          }
+        ],
+        "avgHeroWindows": 13,
+        "avgChoiceEpisodes": 9,
+        "avgTotalChoices": 11,
+        "avgFirst30Choices": 5,
+        "maxBurst5s": 2,
+        "maxEpisodeChoices": 2
+      },
+      "CB": {
+        "rows": [
+          {
+            "heroWindows": 8,
+            "choiceEpisodes": 6,
+            "totalChoices": 6,
+            "first30Choices": 1,
+            "maxBurst5s": 1,
+            "maxEpisodeChoices": 1,
+            "avgChoicesPerEpisode": 1,
+            "score": {
+              "HOME": 1,
+              "AWAY": 2
+            }
+          },
+          {
+            "heroWindows": 5,
+            "choiceEpisodes": 1,
+            "totalChoices": 1,
+            "first30Choices": 0,
+            "maxBurst5s": 1,
+            "maxEpisodeChoices": 1,
+            "avgChoicesPerEpisode": 1,
+            "score": {
+              "HOME": 3,
+              "AWAY": 2
+            }
+          }
+        ],
+        "avgHeroWindows": 6.5,
+        "avgChoiceEpisodes": 3.5,
+        "avgTotalChoices": 3.5,
+        "avgFirst30Choices": 0.5,
+        "maxBurst5s": 1,
+        "maxEpisodeChoices": 1
+      },
+      "GK": {
+        "rows": [
+          {
+            "heroWindows": 15,
+            "choiceEpisodes": 4,
+            "totalChoices": 4,
+            "first30Choices": 2,
+            "maxBurst5s": 1,
+            "maxEpisodeChoices": 1,
+            "avgChoicesPerEpisode": 1,
+            "score": {
+              "HOME": 2,
+              "AWAY": 3
+            }
+          },
+          {
+            "heroWindows": 21,
+            "choiceEpisodes": 2,
+            "totalChoices": 2,
+            "first30Choices": 0,
+            "maxBurst5s": 1,
+            "maxEpisodeChoices": 1,
+            "avgChoicesPerEpisode": 1,
+            "score": {
+              "HOME": 0,
+              "AWAY": 2
+            }
+          }
+        ],
+        "avgHeroWindows": 18,
+        "avgChoiceEpisodes": 3,
+        "avgTotalChoices": 3,
+        "avgFirst30Choices": 1,
+        "maxBurst5s": 1,
+        "maxEpisodeChoices": 1
+      }
+    },
+    "hybridApplyFailures": [
+      {
+        "role": "ST",
+        "boundaryType": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "HW0027",
+        "atSecond": 5061,
+        "choiceId": "SAFE_PASS",
+        "targetId": "H-CM",
+        "error": "CHOICE_TARGET_NOT_AVAILABLE",
+        "pending": [
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RW",
+            "label": "안전한 패스 → 같은 팀 RW"
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기"
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-CM",
+            "label": "안전한 패스 → 같은 팀 CM"
+          }
+        ]
+      }
+    ],
+    "highResStress": {
+      "ST": {
+        "choices": 206,
+        "episodes": 36,
+        "maxBurst5s": 3,
+        "sub2s": 19,
+        "sub3s": 42,
+        "maxEpisodeChoices": 5
+      },
+      "CM": {
+        "choices": 141,
+        "episodes": 58,
+        "maxBurst5s": 2,
+        "sub2s": 3,
+        "sub3s": 8,
+        "maxEpisodeChoices": 2
+      },
+      "CB": {
+        "choices": 176,
+        "episodes": 56,
+        "maxBurst5s": 3,
+        "sub2s": 7,
+        "sub3s": 34,
+        "maxEpisodeChoices": 2
+      },
+      "GK": {
+        "choices": 5,
+        "episodes": 5,
+        "maxBurst5s": 1,
+        "sub2s": 0,
+        "sub3s": 0,
+        "maxEpisodeChoices": 1
+      }
+    },
+    "midfieldStrikerOverlap": {
+      "matches": 4,
+      "frames": 44073,
+      "overlaps": 313,
+      "overlapRate": 0.0071,
+      "laneSeparationCorrections": 210
+    },
+    "bugReportStatic": {
+      "postsFullDebug": true,
+      "configLoaded": true,
+      "fallbackPresent": true
+    },
+    "bugReportWorker": {
+      "status": 201,
+      "jsonUrl": "https://worker.example/reports/TT-0.50/tt050-123456789012.json",
+      "sizeBytes": 4075,
+      "storedKey": "reports/TT-0.50/tt050-123456789012.json",
+      "exactDebug": true
+    },
+    "authority": {
+      "tested": 2,
+      "violations": [],
+      "futureOutcomePrecomputed": false
+    },
+    "watch": [],
+    "failures": [
+      "through arrival mismatch ball=1.1142803744948528 runner=2.8230840176633993",
+      "ST Hybrid avg choices excessive 50.5",
+      "ST Hybrid first30 choices excessive 15",
+      "ST Hybrid single-match choices excessive",
+      "Hybrid visible choice application failures [{\"role\":\"ST\",\"boundaryType\":\"PROTAGONIST_2D_WINDOW\",\"sceneId\":\"HW0027\",\"atSecond\":5061,\"choiceId\":\"SAFE_PASS\",\"targetId\":\"H-CM\",\"error\":\"CHOICE_TARGET_NOT_AVAILABLE\",\"pending\":[{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RW\",\"label\":\"안전한 패스 → 같은 팀 RW\"},{\"id\":\"HOLD\",\"targetId\":null,\"label\":\"볼 지키기\"},{\"id\":\"SHOT\",\"targetId\":null,\"label\":\"슈팅\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"label\":\"안전한 패스 → 같은 팀 LCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RCM\",\"label\":\"안전한 패스 → 같은 팀 RCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-CM\",\"label\":\"안전한 패스 → 같은 팀 CM\"}]}]"
+    ],
+    "status": "FAIL"
   },
   "applyLog": [
     {
@@ -58,5 +398,5 @@
       "stderr": ""
     }
   ],
-  "validationStderr": "/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation_v3.js:11\n  let opened;if(boundary.type==='FINAL_2D_WINDOW')opened=A.runFinalWindow(boundary,{runtimeDir:RUNTIME,targetSecond:5400,seed:`TT050-HYB-FINAL-${role}-${seedIndex}`});else if(boundary.type==='SET_PIECE_2D_WINDOW')opened=A.runSetPieceWindow(boundary,{runtimeDir:RUNTIME,seed:`TT050-HYB-SP-${role}-${seedIndex}`});else opened=A.runToChoice(boundary,{runtimeDir:RUNTIME,seed:`TT050-HYB-${role}-${seedIndex}-${boundary.sceneId}`});\n                                                                                                                               ^^^^^\n\nSyntaxError: Unexpected identifier 'TT050'\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\n    at Module._compile (node:internal/modules/cjs/loader:1755:20)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49\n\nNode.js v22.23.2\n"
+  "validationStderr": ""
 }
