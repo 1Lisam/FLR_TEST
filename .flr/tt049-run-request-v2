@@ -1,3 +1,3 @@
-TT-0.49 V5 validation requested intentionally at 2026-08-20 15:45 KST.
-Trigger revision: 4
-Scope: clean 1v1 separated from broad open chance; TT-0.48 tactics unchanged; Issue #3/#4; 600-shot calibration; 32 full matches; authority regression.
+TT-0.49 supplemental V6 validation requested intentionally at 2026-08-20 15:55 KST.
+Trigger revision: 5
+Scope: local references, ST/CM/CB/GK startup, choice + exact target + replay continuity, MF attacking decisions, canonical authority regression; V5 core PASS preserved.
