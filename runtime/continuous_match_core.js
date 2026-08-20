@@ -414,7 +414,11 @@ function movePlayers(m,dt){
     const pathFacing=Math.atan2(n.y,n.x),explicitFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing,desiredFacing=(d<0.95&&Number.isFinite(explicitFacing))?explicitFacing:pathFacing,beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:desiredFacing,facingError=Math.abs(angleDiff(beforeFacing,desiredFacing));p.bodyAngle=approachAngle(beforeFacing,desiredFacing,turnRate*dt);
     // STEP39 V0.3: body orientation now has a visible physical cost.  A player facing
     // the wrong way must pivot before reaching full acceleration; agility shortens that delay.
-    const alignment=clamp(1-facingError/Math.PI,0,1),turnMoveScale=0.38+0.62*alignment;vmax*=turnMoveScale;
+    const alignment=clamp(1-facingError/Math.PI,0,1),turnMoveScale=0.18+0.82*Math.pow(alignment,1.25);vmax*=turnMoveScale;
+    // TT-0.48 anti-skating: when the tactical target changes sharply, bleed the old
+    // sideways velocity faster than forward velocity. Players still curve naturally, but
+    // they no longer keep gliding laterally while the body is visibly turning.
+    if(facingError>Math.PI*.19){const along=p.vx*n.x+p.vy*n.y,side=-p.vx*n.y+p.vy*n.x,sideDamp=clamp(1-dt*(2.4+2.8*facingError/Math.PI),.38,.93),backDamp=along<0?clamp(1-dt*3.8,.42,.90):1,na=along*backDamp,ns=side*sideDamp;p.vx=n.x*na-n.y*ns;p.vy=n.y*na+n.x*ns;}
     if(finalThirdPaceMode){
       if(p.hasBall)vmax=Math.min((ROLE_SPEED[p.role]||7)*0.87,6.40);
       else if(p.team===owner.team&&p.sprint)vmax=Math.min(vmax,4.85);
@@ -1034,6 +1038,11 @@ function chooseOwnerActionLegacy(m,owner,pre=null){
 function chooseOwnerAction(m,owner){
   const local=worldToLocal(owner.team,owner.x,owner.y),pressure=ballCarrierPressureDistance(m,owner),space=forwardSpace(m,owner,13),shot=shotAssessment(m,owner),opts=passOptions(m,owner,true),held=Math.max(0,m.time-(owner.controlledSince||m.time)),deep=finalThirdDelivery(m,owner),early=earlyCrossDelivery(m,owner),takeOn=takeOnOpportunity(m,owner,shot,held);
   const pre={local,pressure,space,shot,opts,held,delivery:deep};
+  // TT-0.48 decisive-receive finishing: NPC attackers should sometimes finish the chance
+  // created by a teammate instead of automatically recycling until the ball returns to the
+  // protagonist. This is still live/stochastic and uses the actual lane, pressure and body state.
+  const receiveAge=m.time-(owner.lastReceivedAt||-99),decisiveReceive=receiveAge>=.22&&receiveAge<=1.25&&shot.inBox&&shot.dGoal<=19.2&&shot.blockers.length<=1&&shot.facingAlignment>=.55&&['ST','WF','CM'].includes(owner.role);
+  if(decisiveReceive){const open=shot.blockers.length===0,baseP=shot.oneVOne?.62:open?.32:.16,roleP=owner.role==='ST'?0.06:owner.role==='WF'?0.02:-0.02,pressureP=pressure>=3.2?.08:pressure>=2.0?.03:pressure<1.2?-.10:0,p=clamp(baseP+roleP+pressureP,.28,.96),roll=(hash32(`${m.seed}|DECISIVE_RECEIVE_SHOT|${Math.floor((owner.controlledSince||m.time)*10)}|${owner.id}`)%10000)/10000;if(roll<p){m.stats.decisiveReceiveShots=(m.stats.decisiveReceiveShots||0)+1;return{type:'SHOT',reason:'DECISIVE_RECEIVE_FINISH'};}}
   const rhythmAction=rhythmBuildUpAction(m,owner,pre);if(rhythmAction)return rhythmAction;
   // Keep restart-sensitive goalkeeper and kick-off behaviour on the proven path. Candidate ownership begins once normal attacking play is established.
   if(owner.role==='GK'||(m.kickoffBuildUntil||0)>m.time)return chooseOwnerActionLegacy(m,owner,pre);

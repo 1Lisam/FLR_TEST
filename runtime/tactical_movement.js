@@ -452,14 +452,13 @@ function buildDeepMarkAssignments(m,team,press,cover,owner,ball){
   // STEP40 V0.5.1: the old hard ball.x>=31 cutoff let same-side wide runners enter
   // dangerous half-spaces while the FB simply held the touchline. Between 31-38 only
   // the FB->same-side WF hand-off is active; full deep marking still starts below 31.
-  if(ball.x>=38)return new Map();
+  if(ball.x>=52)return new Map();
   const fullDeep=ball.x<31;
   if(!m._markLocks)m._markLocks={};
   const state=m._markLocks[team]||(m._markLocks[team]={until:0,pairs:{}});
   const defenders=outfield(m,team).filter(p=>p.id!==press?.id&&p.id!==cover?.id&&['CB','FB','CM'].includes(p.role));
-  const attackers=outfield(m,other(team)).filter(a=>a.id!==owner?.id).map(a=>({a,l:worldToLocal(team,a.x,a.y)}))
-    .filter(o=>o.l.x<=34&&o.l.y>=7&&o.l.y<=61)
-    .sort((u,v)=>u.l.x-v.l.x);
+  const allAttackers=outfield(m,other(team)).filter(a=>a.id!==owner?.id).map(a=>({a,l:worldToLocal(team,a.x,a.y)})).filter(o=>o.l.x<=44&&o.l.y>=7&&o.l.y<=61).sort((u,v)=>u.l.x-v.l.x);
+  const attackers=allAttackers.filter(o=>o.l.x<=34);
   const eligibleIds=new Set(attackers.map(o=>o.a.id)),defIds=new Set(defenders.map(d=>d.id));
   const pairs={};const usedA=new Set(),usedD=new Set();
   // V0.5: in a settled/deep block, a full-back owns the dangerous winger on his own
@@ -474,10 +473,18 @@ function buildDeepMarkAssignments(m,team,press,cover,owner,ball){
     const wf=attackers.find(o=>o.a.role==='WF'&&(o.l.y<34?-1:1)===side&&!usedA.has(o.a.id)&&(fullDeep||(owner?.role==='ST'&&o.l.x<=31.5)));
     if(wf&&dist(fb,wf.a)<=15.5){pairs[fb.id]=wf.a.id;usedD.add(fb.id);usedA.add(wf.a.id);}
   }
-  // In the pre-box channel window only the full-back responsibility is activated.
-  // This narrows the FB with the runner without waking the full CB/CM greedy matcher,
-  // avoiding a return of the earlier 3-4 defenders-on-one-attacker crowding bug.
-  if(!fullDeep){state.pairs=pairs;state.until=m.time+0.65;return new Map(Object.entries(pairs));}
+  // TT-0.48 zone/man hybrid: before the box is reached, one centre-back keeps a loose
+  // goal-side shoulder reference on a central ST between the lines. The partner CB stays in
+  // the back-line/cover zone. This prevents the repeated untouched 'walk between two CBs'
+  // route without converting both centre-backs into sticky man-markers.
+  if(!fullDeep){
+    const st=allAttackers.find(o=>o.a.role==='ST'&&Math.abs(o.l.y-34)<=12.5&&o.l.x<=43);
+    if(st&&!usedA.has(st.a.id)){
+      const cb=defenders.filter(d=>d.role==='CB'&&!usedD.has(d.id)).map(d=>({d,dl:worldToLocal(team,d.x,d.y),dd:dist(d,st.a)})).sort((a,b)=>a.dd-b.dd)[0];
+      if(cb&&cb.dd<=15.5){pairs[cb.d.id]=st.a.id;usedD.add(cb.d.id);usedA.add(st.a.id);}
+    }
+    state.pairs=pairs;state.until=m.time+0.80;return new Map(Object.entries(pairs));
+  }
   // Preserve valid previous assignments for about a second so markers do not switch every frame.
   function compatible(d,a,al){
     if(!d||!a||!al)return false;
@@ -680,7 +687,10 @@ function assignDefence(m,team,ctx){
         const shotX=al.x+toGoalX/dg*shotGap,shotY=al.y+toGoalY/dg*shotGap;
         const shotWeight=p.role==='CB'?0.64:p.role==='FB'?0.54:0.46;
         const screenX=lerp(passX,shotX,shotWeight),screenY=lerp(passY,shotY,shotWeight);
-        const deepWeight=ball.x<23?0.94:0.86;
+        // TT-0.48 zonal priority: marking is a reference inside the player's zone, not
+        // an instruction to copy the attacker body-for-body. CBs may shoulder a central
+        // striker more tightly; midfielders stay primarily in the cutback/second-ball layer.
+        const deepWeight=p.role==='CB'?(ball.x>=31?0.58:(ball.x<23?0.84:0.76)):p.role==='FB'?(ball.x<23?0.76:0.68):(ball.x<23?0.62:0.54);
         lx=lerp(base.x,screenX,deepWeight);ly=lerp(base.y,screenY,deepWeight);
         // A marking midfielder still belongs to the recovery layer. Keep the screen
         // goal-side enough to protect cutbacks and second balls.
@@ -732,17 +742,17 @@ function enforceDefensiveLayering(m,team,owner){
     const t=worldToLocal(team,p.tx,p.ty);let tx=t.x,ty=t.y,dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy);
     // Midfielders/FBs remain a screen, not extra tacklers. CBs can stay a little closer
     // because they still own the box line, but do not all collapse on the same ball point.
-    const min=ball.x<30?(p.role==='CB'?5.1:5.9):(p.role==='CB'?5.6:6.5);
+    const min=ball.x<30?(p.role==='CB'?5.8:6.8):(p.role==='CB'?6.2:7.2);
     if(d<min){if(d<.001){dy=sideSign(p.slot)||1;d=1;}const k=(min-d)/d;tx+=dx*k;ty+=dy*k;}
     if(p.role==='CM')tx=Math.max(tx,ball.x+1.8);
     secondary.push({p,tx,ty,d:Math.hypot(tx-o.x,ty-o.y)});
   }
   // STEP75 defensive floor: press + cover are the two direct ball responsibilities. At most
-  // ONE additional non-primary defender may occupy the immediate ring; everyone else must
-  // protect a runner, lane, cutback or second ball. This applies throughout the defensive
+  // No non-primary defender should occupy the immediate carrier ring; press + cover own
+  // that space while the next defender protects a runner, lane, cutback or second ball. This applies throughout the defensive
   // final third, not only inside 30m, so tactics can vary without permitting swarm defence.
-  const ring=ball.x<30?8.2:8.8,close=secondary.filter(x=>x.d<ring).sort((a,b)=>a.d-b.d);
-  for(let i=1;i<close.length;i++){
+  const ring=ball.x<30?9.0:9.6,close=secondary.filter(x=>x.d<ring).sort((a,b)=>a.d-b.d);
+  for(let i=0;i<close.length;i++){
     const z=close[i];let dx=z.tx-o.x,dy=z.ty-o.y,d=Math.hypot(dx,dy);if(d<.001){dy=sideSign(z.p.slot)||1;d=1;}
     const need=ring+0.45,k=(need-d)/d;z.tx+=dx*k;z.ty+=dy*k;z.d=need;
   }

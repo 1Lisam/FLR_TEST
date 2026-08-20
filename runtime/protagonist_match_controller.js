@@ -160,6 +160,17 @@ function onBallOptions(frame){
     if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='CARRY'||o.id==='AVAILABLE_PASS');if(ix>=0)out.splice(ix,1);}
     if(out.length<6){const row={id:safe.id,targetId:safe.targetId||null,targetName:safe.targetName||null,family:'패스',label:labelFor(safe),meta:safe.meta?deep(safe.meta):null};row.hint=tooltipFor(safe,frame);row.tooltip=row.hint;out.push(row);}
   }
+  // TT-0.48 player-option floor: candidate ranking is allowed to prefer a shot, but it may
+  // not erase a physically open support teammate sitting directly behind/lateral to the
+  // protagonist. This reads the live pass geometry (not a synthetic target) and exposes at
+  // most one extra SAFE_PASS to feet.
+  const rawSupport=(frame?._frame?.opts||[]).filter(o=>o?.p&&o.p.role!=='GK'&&o.block===0&&o.d>=3&&o.d<=28&&o.open>=3.0&&o.forward>=-20&&o.forward<=4)
+    .sort((a,b)=>(b.open-a.open)+(a.d-b.d)*.035);
+  const support=rawSupport.find(o=>!out.some(x=>x.targetId===o.p.id&&x.family==='패스'));
+  if(support){
+    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='CARRY'||o.id==='AVAILABLE_PASS');if(ix>=0)out.splice(ix,1);}
+    if(out.length<6){const c={id:'SAFE_PASS',targetId:support.p.id,targetName:`같은 팀 ${support.p.slot}`,meta:{targetId:support.p.id,targetSlot:support.p.slot,forward:support.forward,d:support.d,receiverPressure:support.open,directSafe:true}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
+  }
   // STEP78: an obviously open lead-space pass is a PLAYER option even when NPC ranking
   // prefers a safer/closer action. The same teammate may legitimately expose both a SAFE_PASS
   // to feet and a THROUGH_PASS into space; those are physically different instructions.
@@ -222,7 +233,11 @@ function readyForOnBallPause(s,f,importance){
   if(h.action==='FIRST_TOUCH_FLOW'&&Number.isFinite(h.faceTargetAngle)&&Number.isFinite(h.bodyAngle)){
     const facingGap=Math.abs(angleDiff(h.bodyAngle,h.faceTargetAngle));
     const controlAge=Math.max(0,s.m.time-(h.controlledSince||s.m.time));
-    if(facingGap>Math.PI*.36&&controlAge<1.45)return false;
+    // TT-0.48 authority chain: after the protagonist re-acquires the ball inside an
+    // already-interactive episode, posture settling may delay the visual checkpoint only
+    // briefly. It may never hand the episode back to owner AI / Hybrid without a choice.
+    const forcedChain=!!s.forceNextChoice||episodeContinuation(s,f);
+    if(facingGap>Math.PI*.36&&controlAge<(forcedChain?.90:1.45))return false;
   }
   // STEP74: do not pause on a stale backwards scan posture. A tightly-marked ST in the
   // attacking lane is allowed a real back-to-goal stance, but even that is capped near 105°.
@@ -230,13 +245,19 @@ function readyForOnBallPause(s,f,importance){
   if(f.shot&&Number.isFinite(f.shot.bodyAngleDiff)&&['HOLD_BALL','SCAN_WITH_BALL','PROTECT_SCAN','SHIELD_SCAN','PROBE_WITH_BALL','CARRY_SCAN','WIDE_CARRY_SCAN'].includes(h.action)){
     const legitBack=h.role==='ST'&&f.pressure<1.50&&f.localX>=64&&f.localX<=91;
     const maxDiff=legitBack?Math.PI*.49:Math.PI*.46;
-    if(f.shot.bodyAngleDiff>maxDiff)return false;
+    const forcedChain=!!s.forceNextChoice||episodeContinuation(s,f),controlAge=Math.max(0,s.m.time-(h.controlledSince||s.m.time));
+    // TT-0.48: a chained/re-acquired protagonist may visually settle for a moment,
+    // but posture can never suppress the next user decision until the Episode expires.
+    if(f.shot.bodyAngleDiff>maxDiff&&!(forcedChain&&controlAge>=1.15))return false;
   }
   // STEP76: never freeze the user decision while the protagonist is still visibly rotating
   // through a >90-degree stale receiving/carry posture. Waiting here advances only live body
   // orientation; it does not select or resolve any action. A turning shot remains possible in
   // the narrow ~85-90 degree band after the posture settles.
-  if(f.shot&&Number.isFinite(f.shot.bodyAngleDiff)&&f.shot.bodyAngleDiff>Math.PI*.49)return false;
+  if(f.shot&&Number.isFinite(f.shot.bodyAngleDiff)&&f.shot.bodyAngleDiff>Math.PI*.49){
+    const controlAge=Math.max(0,s.m.time-(h.controlledSince||s.m.time));
+    if(!(s.forceNextChoice||episodeContinuation(s,f))||controlAge<1.05)return false;
+  }
   if(s.forceNextChoice||episodeContinuation(s,f))return true;
   const critical=!!(f.shot?.oneVOne||(f.shot?.inBox&&f.shot?.openWindow&&(f.shot?.blockers??9)<=1));
   const newControl=Math.abs((h.controlledSince||-1)-s.lastPauseControlledSince)>.001;

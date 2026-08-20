@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "FLR_TT048_INTERNAL_VALIDATION_0.1",
+  "stage": "STEP78",
+  "testBuild": "TT-0.48 TEST_ONLY",
+  "status": "PASS_FOR_USER_VISUAL_RETEST",
+  "step79Started": false,
+  "canonical": {
+    "hybridPrecomputesChoice": false,
+    "hybridPrecomputesOutcome": false,
+    "v06OwnsLiveChoiceDiscovery": true,
+    "v06OwnsPostChoiceResolution": true,
+    "protagonistUnchosenMaterialActionForbidden": true,
+    "choiceIdAndExactTargetIdImmutable": true
+  },
+  "tt047FeedbackFixes": {
+    "47_1_47_5_authority": {
+      "classification": "PERMANENT_CANONICAL_REGRESSION",
+      "fix": "chained/reacquired protagonist control cannot be released because of first-touch/body-posture settling; live Episode continues until a new user checkpoint or genuine end of possession.",
+      "retests": {
+        "47_1_cross_reacquisition": "PASS_NEW_CHOICE_BEFORE_MATERIAL_ACTION",
+        "47_5_two_carries": "PASS_EACH_CARRY_OPENS_NEXT_CHOICE",
+        "unchosenMaterialBeforePending": 0
+      }
+    },
+    "zoneDefence": {
+      "fix": "one CB may keep a loose goal-side shoulder reference on a central ST while partner stays line/cover; midfield protects lane/cutback zones; surplus third+ carrier collapse peeled away.",
+      "sample": {
+        "seeds": 4,
+        "secondsPerSeed": 900,
+        "tt047_defendersWithin8m_ge3_rate": 0.278976,
+        "tt048_rate": 0.036875,
+        "tt047_nearestCB_over8m_rate": 0.072223,
+        "tt047_openWindow_rate": 0.04084,
+        "tt048_openWindow_rate": 0.042134
+      }
+    },
+    "47_3_supportTarget": {
+      "fix": "physically open back/lateral support floor can expose one SAFE_PASS even when raw NPC ranking omits it.",
+      "retest": "H-RCM SAFE_PASS PRESENT",
+      "receiverPressureDistance": 8.898
+    },
+    "47_4_npcFinish": {
+      "fix": "NPC receiver may shoot decisively after a high-quality final pass; outcome remains live physics.",
+      "fixedSceneRuns": 120,
+      "tt047_immediateShotRate": 0.325,
+      "tt048_immediateShotRate": 0.65
+    },
+    "skating": {
+      "fix": "large heading changes damp stale sideways velocity and reduce movement speed while body/movement alignment is poor; no teleport."
+    },
+    "bugReport": {
+      "fix": "browser popup captures category/priority/description and compact current scene snapshot, then opens prefilled GitHub Issue; full JSON download retained as emergency fallback; no GitHub token embedded in page."
+    },
+    "preservedUX": [
+      "smaller 105:68 pitch presentation",
+      "automatic next-play countdown/advance"
+    ]
+  },
+  "tests": {
+    "syntax": {
+      "files": [
+        "runtime/continuous_match_core.js",
+        "runtime/tactical_movement.js",
+        "runtime/protagonist_match_controller.js",
+        "live_v06_scene_authority_browser.js",
+        "step71_hybrid_v06_ui.js",
+        "live_hybrid_session_v02.js"
+      ],
+      "result": "PASS"
+    },
+    "htmlLocalReferences": {
+      "count": 25,
+      "missing": [],
+      "result": "PASS"
+    },
+    "authority47_1": {
+      "result": "PASS",
+      "reacquiredAt": 93.5,
+      "newPending": true,
+      "materialActionsBeforePending": 0
+    },
+    "authority47_5": {
+      "result": "PASS",
+      "carryChoicesTested": 2,
+      "nextPendingAfterEach": true,
+      "materialActionsBetweenChoices": 0
+    },
+    "support47_3": {
+      "result": "PASS",
+      "choiceId": "SAFE_PASS",
+      "targetId": "H-RCM"
+    },
+    "npcFinish47_4": {
+      "result": "PASS",
+      "runs": 120,
+      "shots": 78,
+      "passes": 41,
+      "other": 1
+    },
+    "defenceSample": {
+      "result": "PASS_DIRECTIONAL",
+      "note": "same fixed seeds but trajectories diverge after logic changes; rates are directional regression signals, not statistical proof."
+    },
+    "bugReportUrl": {
+      "result": "PASS_DESIGN",
+      "compactSnapshot": "relevant players only + last 8 events to avoid oversized issue URL"
+    }
+  }
+}
