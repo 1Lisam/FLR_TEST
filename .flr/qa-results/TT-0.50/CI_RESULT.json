@@ -3,8 +3,8 @@
   "version": "TT-0.50",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
-  "baselineSha": "196aad4e031886a5cd829f508d7aa5210dc5cbe1",
-  "candidateSha": "c1ad9603fd5decaeefe73359f0bc4a647fb7fd2e",
+  "baselineSha": "02fa943f10b6b683d03c9773e5c37eab8fcc7c0d",
+  "candidateSha": "837ef67fe40f0431bb143cf3b424fb12e42e6dc8",
   "workflowStatus": "FAIL",
   "validationExitCode": 1,
   "failures": [
@@ -412,7 +412,7 @@
       "script": ".flr/tt050_final_refine.py",
       "exitCode": 1,
       "stdout": "",
-      "stderr": "TT050_FINAL_REPLACE episode hard duration existing expected=1 actual=2\n"
+      "stderr": "TT050_FINAL_REPLACE carry intent duration 3.2 expected=1 actual=0\n"
     }
   ],
   "validationStderr": ""
