@@ -3,8 +3,8 @@
   "version": "TT-0.50",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
-  "baselineSha": "7dce37c88908e6dccd7ba00a2f6eea6f20e33a36",
-  "candidateSha": "92b6a77cf3df7f8ad9399f3b9acd277c75b9d603",
+  "baselineSha": "ec5add5c0c16691dc744bb209b66db648393e427",
+  "candidateSha": "aea4c167bfe60bb87ac4ebd2cd5933b81b0afcf5",
   "workflowStatus": "FAIL",
   "validationExitCode": 1,
   "failures": [
@@ -58,5 +58,5 @@
       "stderr": ""
     }
   ],
-  "validationStderr": "Error: CHOICE_TARGET_NOT_AVAILABLE\n    at Object.applyChoiceAndAdvance (/home/runner/work/FLR_TEST/FLR_TEST/qa-work/live_v06_scene_authority_browser.js:36:696)\n    at runHighResBoundary (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation_v2.js:37:156)\n    at hybridCadence (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation_v2.js:47:240)\n    at /home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation_v2.js:63:452\n    at Object.<anonymous> (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation_v2.js:63:855)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n"
+  "validationStderr": "/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt050_validation_v3.js:11\n  let opened;if(boundary.type==='FINAL_2D_WINDOW')opened=A.runFinalWindow(boundary,{runtimeDir:RUNTIME,targetSecond:5400,seed:`TT050-HYB-FINAL-${role}-${seedIndex}`});else if(boundary.type==='SET_PIECE_2D_WINDOW')opened=A.runSetPieceWindow(boundary,{runtimeDir:RUNTIME,seed:`TT050-HYB-SP-${role}-${seedIndex}`});else opened=A.runToChoice(boundary,{runtimeDir:RUNTIME,seed:`TT050-HYB-${role}-${seedIndex}-${boundary.sceneId}`});\n                                                                                                                               ^^^^^\n\nSyntaxError: Unexpected identifier 'TT050'\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\n    at Module._compile (node:internal/modules/cjs/loader:1755:20)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49\n\nNode.js v22.23.2\n"
 }
