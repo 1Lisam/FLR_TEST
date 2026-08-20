@@ -1,30 +1,26 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51",
-  "candidateBranch": "tt051-v14-candidate",
+  "version": "TT-0.51-PREDISTRIBUTION",
+  "candidateBranch": "tt051-predistribution-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt051_apply_v14.py"
+    ".flr/tt051_predistribution_apply.py"
   ],
-  "validationScript": ".flr/tt051_transfer_validation.js",
+  "validationScript": ".flr/tt051_predistribution_validation.js",
   "changedFiles": [
-    "CHANGELOG.md",
     "index.html",
     "live_hybrid_session_v02.js",
-    "runtime/ball_strike_model.js",
-    "runtime/continuous_match_core.js",
-    "runtime/protagonist_match_controller.js",
-    "runtime/tactical_movement.js",
-    "step71_hybrid_v06_ui.js"
+    "live_v06_scene_authority_browser.js",
+    "step71_hybrid_v06_ui.js",
+    "bug-report-worker/worker.js",
+    "bug-report-worker/README.md"
   ],
   "syntaxChecks": [
     "live_hybrid_session_v02.js",
-    "runtime/ball_strike_model.js",
-    "runtime/continuous_match_core.js",
-    "runtime/protagonist_match_controller.js",
-    "runtime/tactical_movement.js",
-    "step71_hybrid_v06_ui.js"
+    "live_v06_scene_authority_browser.js",
+    "step71_hybrid_v06_ui.js",
+    "bug-report-worker/worker.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-v14",
-  "runNonce": "2026-08-21T02:00+09:00-v14-final-local-pass"
+  "resultDir": ".flr/qa-results/TT-0.51-predistribution",
+  "runNonce": "2026-08-21T08:36+09:00-goal2d-anonymous-r1"
 }
