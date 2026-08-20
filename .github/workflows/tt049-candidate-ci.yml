@@ -1,182 +1,112 @@
-name: TT-0.49 candidate validation (legacy manual only)
+name: TT-0.49 candidate validation V3
 
 on:
+  push:
+    branches: [tt049-candidate]
+    paths:
+      - '.flr/tt049-run-request-v2'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: tt049-candidate-validation
+  group: tt049-candidate-validation-v3
   cancel-in-progress: true
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
-      - name: Checkout candidate instructions
+      - name: Checkout candidate
         uses: actions/checkout@v4
         with:
           ref: tt049-candidate
           path: candidate
           fetch-depth: 1
 
-      - name: Checkout protected main baseline
+      - name: Checkout protected baseline
         uses: actions/checkout@v4
         with:
           ref: main
           path: work
           fetch-depth: 1
 
-      - name: Confirm exact V13 base
-        id: base
+      - name: Validate and test
+        id: test
         continue-on-error: true
         shell: bash
         run: |
           set +e
-          actual=$(git -C work rev-parse HEAD)
           expected=52e69323bbab47f7d93e0d0f1e3fa06837038afd
-          if [ "$actual" = "$expected" ]; then code=0; else echo "BASE_COMMIT_MISMATCH expected=$expected actual=$actual"; code=1; fi
-          echo "actual=$actual" >> "$GITHUB_OUTPUT"
+          actual=$(git -C work rev-parse HEAD)
+          echo "$actual" > base-sha.txt
+          if [ "$actual" != "$expected" ]; then
+            echo "BASE_COMMIT_MISMATCH expected=$expected actual=$actual" > tt049-validation.stderr
+            code=20
+          else
+            python candidate/.flr/tt049_apply.py work > tt049-apply.log 2>&1
+            code=$?
+            if [ $code -eq 0 ]; then python candidate/.flr/tt049_defence_apply.py work >> tt049-apply.log 2>&1; code=$?; fi
+            if [ $code -eq 0 ]; then git -C work diff --check; code=$?; fi
+            if [ $code -eq 0 ]; then
+              node --check work/runtime/action_candidate_engine.js && \
+              node --check work/runtime/continuous_match_core.js && \
+              node --check work/runtime/tactical_movement.js && \
+              node --check work/runtime/protagonist_match_controller.js && \
+              node --check candidate/.flr/tt049_validation_v3.js
+              code=$?
+            fi
+            if [ $code -eq 0 ]; then
+              node candidate/.flr/tt049_validation_v3.js work > tt049-validation.json 2> tt049-validation.stderr
+              code=$?
+            fi
+          fi
+          if [ -f work/runtime/continuous_match_core.js ]; then
+            git -C work diff -- runtime/action_candidate_engine.js runtime/continuous_match_core.js runtime/tactical_movement.js > tt049-candidate.patch
+            if [ -s tt049-candidate.patch ]; then sha256sum tt049-candidate.patch > tt049-candidate.patch.sha256; fi
+          fi
           echo "code=$code" >> "$GITHUB_OUTPUT"
           exit $code
 
-      - name: Apply TT-0.49 TEST_ONLY candidate
-        id: apply
-        if: always() && steps.base.outputs.code == '0'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          python candidate/.flr/tt049_apply.py work > tt049-apply.log 2>&1
-          code=$?
-          cat tt049-apply.log
-          if [ $code -eq 0 ]; then git -C work diff --check; code=$?; fi
-          echo "code=$code" >> "$GITHUB_OUTPUT"
-          exit $code
-
-      - name: JavaScript syntax checks
-        id: syntax
-        if: always() && steps.apply.outputs.code == '0'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          node --check work/runtime/action_candidate_engine.js && \
-          node --check work/runtime/continuous_match_core.js && \
-          node --check work/runtime/protagonist_match_controller.js && \
-          node --check candidate/.flr/tt049_validation_v2.js
-          code=$?
-          echo "code=$code" >> "$GITHUB_OUTPUT"
-          exit $code
-
-      - name: Run TT-0.49 engine regressions
-        id: regress
-        if: always() && steps.syntax.outputs.code == '0'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          node candidate/.flr/tt049_validation_v2.js work > tt049-validation.json 2> tt049-validation.stderr
-          code=$?
-          cat tt049-validation.stderr || true
-          cat tt049-validation.json || true
-          echo "code=$code" >> "$GITHUB_OUTPUT"
-          exit $code
-
-      - name: Build deployable candidate patch
-        id: patch
-        if: always() && steps.apply.outputs.code == '0'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          git -C work diff -- runtime/action_candidate_engine.js runtime/continuous_match_core.js > tt049-candidate.patch
-          test -s tt049-candidate.patch
-          code=$?
-          if [ $code -eq 0 ]; then sha256sum tt049-candidate.patch | tee tt049-candidate.patch.sha256; fi
-          echo "code=$code" >> "$GITHUB_OUTPUT"
-          exit $code
-
-      - name: Persist CI result on candidate branch
+      - name: Persist result
         if: always()
         shell: bash
         env:
-          BASE_CODE: ${{ steps.base.outputs.code }}
-          APPLY_CODE: ${{ steps.apply.outputs.code }}
-          SYNTAX_CODE: ${{ steps.syntax.outputs.code }}
-          REGRESS_CODE: ${{ steps.regress.outputs.code }}
-          PATCH_CODE: ${{ steps.patch.outputs.code }}
-          BASE_SHA: ${{ steps.base.outputs.actual }}
+          TEST_CODE: ${{ steps.test.outputs.code }}
         run: |
           set -euo pipefail
           python - <<'PY'
           import json, os, pathlib, shutil
-          def code(name):
-              v=os.getenv(name,'')
-              return None if v=='' else int(v)
-          result={
-            'schemaVersion':'FLR_TT049_CI_RESULT_0.2',
-            'baseSha':os.getenv('BASE_SHA') or None,
-            'expectedBaseSha':'52e69323bbab47f7d93e0d0f1e3fa06837038afd',
-            'baseCheck':code('BASE_CODE'),
-            'applyCheck':code('APPLY_CODE'),
-            'syntaxCheck':code('SYNTAX_CODE'),
-            'regressionCheck':code('REGRESS_CODE'),
-            'patchCheck':code('PATCH_CODE'),
-          }
+          expected='52e69323bbab47f7d93e0d0f1e3fa06837038afd'
+          base=pathlib.Path('base-sha.txt').read_text().strip() if pathlib.Path('base-sha.txt').exists() else None
+          result={'schemaVersion':'FLR_TT049_CI_RESULT_V3_0.1','expectedBaseSha':expected,'baseSha':base,'exitCode':int(os.getenv('TEST_CODE') or 99)}
           p=pathlib.Path('tt049-validation.json')
           if p.exists():
               try: result['validation']=json.loads(p.read_text(encoding='utf-8'))
               except Exception as e: result['validationParseError']=str(e)
-          log=pathlib.Path('tt049-apply.log')
-          if log.exists(): result['applyLog']=log.read_text(encoding='utf-8',errors='replace')[-8000:]
-          err=pathlib.Path('tt049-validation.stderr')
-          if err.exists(): result['validationStderr']=err.read_text(encoding='utf-8',errors='replace')[-8000:]
-          codes=[result[k] for k in ['baseCheck','applyCheck','syntaxCheck','regressionCheck','patchCheck']]
-          result['workflowStatus']='PASS' if all(x==0 for x in codes) else 'FAIL'
-          out=pathlib.Path('candidate/TT049_CI_RESULT.json');out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          if p.exists(): shutil.copyfile(p,'candidate/TT049_VALIDATION_RESULT.json')
-          if pathlib.Path('tt049-candidate.patch').exists(): shutil.copyfile('tt049-candidate.patch','candidate/.flr/tt049-candidate.patch')
-          if pathlib.Path('tt049-candidate.patch.sha256').exists(): shutil.copyfile('tt049-candidate.patch.sha256','candidate/.flr/tt049-candidate.patch.sha256')
+          for key,file in [('applyLog','tt049-apply.log'),('stderr','tt049-validation.stderr')]:
+              q=pathlib.Path(file)
+              if q.exists(): result[key]=q.read_text(encoding='utf-8',errors='replace')[-14000:]
+          result['workflowStatus']='PASS' if result['exitCode']==0 else 'FAIL'
+          pathlib.Path('candidate/TT049_CI_RESULT_V3.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if p.exists(): shutil.copyfile(p,'candidate/TT049_VALIDATION_RESULT_V3.json')
+          if pathlib.Path('tt049-candidate.patch').exists(): shutil.copyfile('tt049-candidate.patch','candidate/.flr/tt049-candidate-v3.patch')
+          if pathlib.Path('tt049-candidate.patch.sha256').exists(): shutil.copyfile('tt049-candidate.patch.sha256','candidate/.flr/tt049-candidate-v3.patch.sha256')
           print(json.dumps(result,ensure_ascii=False,indent=2))
           PY
           git -C candidate config user.name "FLR Candidate CI"
           git -C candidate config user.email "actions@users.noreply.github.com"
-          git -C candidate add -- TT049_CI_RESULT.json
-          [ ! -f candidate/TT049_VALIDATION_RESULT.json ] || git -C candidate add -- TT049_VALIDATION_RESULT.json
-          [ ! -f candidate/.flr/tt049-candidate.patch ] || git -C candidate add -- .flr/tt049-candidate.patch
-          [ ! -f candidate/.flr/tt049-candidate.patch.sha256 ] || git -C candidate add -- .flr/tt049-candidate.patch.sha256
-          if git -C candidate diff --cached --quiet; then echo NO_RESULT_CHANGE; exit 0; fi
-          git -C candidate commit -m "Record TT-0.49 candidate CI result"
-          git -C candidate push origin HEAD:tt049-candidate
+          git -C candidate add -- TT049_CI_RESULT_V3.json
+          [ ! -f candidate/TT049_VALIDATION_RESULT_V3.json ] || git -C candidate add -- TT049_VALIDATION_RESULT_V3.json
+          [ ! -f candidate/.flr/tt049-candidate-v3.patch ] || git -C candidate add -- .flr/tt049-candidate-v3.patch
+          [ ! -f candidate/.flr/tt049-candidate-v3.patch.sha256 ] || git -C candidate add -- .flr/tt049-candidate-v3.patch.sha256
+          git -C candidate diff --cached --quiet || { git -C candidate commit -m "Record TT-0.49 V3 CI result"; git -C candidate push origin HEAD:tt049-candidate; }
 
-      - name: Upload validation evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: tt049-candidate-evidence
-          path: |
-            tt049-apply.log
-            tt049-validation.json
-            tt049-validation.stderr
-            tt049-candidate.patch
-            tt049-candidate.patch.sha256
-          if-no-files-found: warn
-
-      - name: Enforce candidate gate
+      - name: Enforce gate
         if: always()
         shell: bash
         env:
-          BASE_CODE: ${{ steps.base.outputs.code }}
-          APPLY_CODE: ${{ steps.apply.outputs.code }}
-          SYNTAX_CODE: ${{ steps.syntax.outputs.code }}
-          REGRESS_CODE: ${{ steps.regress.outputs.code }}
-          PATCH_CODE: ${{ steps.patch.outputs.code }}
-        run: |
-          test "${BASE_CODE:-1}" = 0
-          test "${APPLY_CODE:-1}" = 0
-          test "${SYNTAX_CODE:-1}" = 0
-          test "${REGRESS_CODE:-1}" = 0
-          test "${PATCH_CODE:-1}" = 0
+          TEST_CODE: ${{ steps.test.outputs.code }}
+        run: test "${TEST_CODE:-99}" = 0
