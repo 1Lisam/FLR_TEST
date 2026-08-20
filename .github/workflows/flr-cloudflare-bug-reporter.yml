@@ -85,10 +85,25 @@ jobs:
           PY
           endpoint="$(cat /tmp/flr_worker_url.txt)"
           echo "endpoint=${endpoint}" >> "$GITHUB_OUTPUT"
-          code="$(curl -sS -o /dev/null -w '%{http_code}' "${endpoint}/reports/TT-0.50/_binding_smoke_missing.json")"
-          test "$code" = '404'
-          code="$(curl -sS -o /dev/null -w '%{http_code}' -X OPTIONS "${endpoint}/report" -H 'Origin: https://1lisam.github.io' -H 'Access-Control-Request-Method: POST')"
-          test "$code" = '204'
+
+          smoke_ok=false
+          get_code=000
+          options_code=000
+          for attempt in 1 2 3 4 5; do
+            get_code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' "${endpoint}/reports/TT-0.50/_binding_smoke_missing.json" || true)"
+            options_code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -X OPTIONS "${endpoint}/report" -H 'Origin: https://1lisam.github.io' -H 'Access-Control-Request-Method: POST' || true)"
+            echo "Smoke attempt ${attempt}: GET=${get_code} OPTIONS=${options_code}"
+            if [ "$get_code" = '404' ] && [ "$options_code" = '204' ]; then
+              smoke_ok=true
+              break
+            fi
+            sleep 3
+          done
+          echo "smoke_ok=${smoke_ok}" >> "$GITHUB_OUTPUT"
+          echo "smoke_get=${get_code}" >> "$GITHUB_OUTPUT"
+          echo "smoke_options=${options_code}" >> "$GITHUB_OUTPUT"
+          # A transient/unverified public route is recorded below rather than failing the workflow.
+          exit 0
 
       - name: Record deployment status and wire endpoint
         if: always()
@@ -99,15 +114,23 @@ jobs:
           ACCOUNT_PRESENT: ${{ steps.creds.outputs.account }}
           DEPLOY_OUTCOME: ${{ steps.cloudflare.outcome }}
           ENDPOINT: ${{ steps.cloudflare.outputs.endpoint }}
+          SMOKE_OK: ${{ steps.cloudflare.outputs.smoke_ok }}
+          SMOKE_GET: ${{ steps.cloudflare.outputs.smoke_get }}
+          SMOKE_OPTIONS: ${{ steps.cloudflare.outputs.smoke_options }}
           SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          git config user.name 'FLR Cloudflare Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          # Update the checkout before creating local status/config changes.
+          git pull --rebase origin main
           mkdir -p .flr
           python - <<'PY'
           import json, os, pathlib
           ready=os.environ.get('READY')=='true'
           outcome=os.environ.get('DEPLOY_OUTCOME','skipped')
           endpoint=(os.environ.get('ENDPOINT') or '').rstrip('/')
+          smoke_ok=os.environ.get('SMOKE_OK')=='true'
           if not ready:
               missing=[]
               if os.environ.get('TOKEN_PRESENT')!='true': missing.append('CLOUDFLARE_API_TOKEN')
@@ -115,27 +138,32 @@ jobs:
               status='NEEDS_CREDENTIALS'
           elif outcome!='success' or not endpoint:
               missing=[]; status='DEPLOY_FAILED'
+          elif not smoke_ok:
+              missing=[]; status='DEPLOYED_UNVERIFIED'
           else:
               missing=[]; status='DEPLOYED'
               pathlib.Path('bug_report_config.js').write_text(
                   "window.FLR_BUG_REPORT_ENDPOINT = '"+endpoint+"/report'; // managed by FLR Cloudflare deploy workflow\n",
                   encoding='utf-8')
           obj={
-              'schemaVersion':'FLR_CLOUDFLARE_DEPLOY_STATUS_0.1',
+              'schemaVersion':'FLR_CLOUDFLARE_DEPLOY_STATUS_0.2',
               'status':status,
               'worker':'flr-bug-reporter',
               'bucket':'flr-bug-reports',
+              'workerUrl': endpoint or None,
               'endpoint': endpoint+'/report' if status=='DEPLOYED' else None,
               'missingSecrets':missing,
               'deployOutcome':outcome,
+              'smoke':{
+                  'ok':smoke_ok,
+                  'getMissingReport':os.environ.get('SMOKE_GET') or None,
+                  'optionsReport':os.environ.get('SMOKE_OPTIONS') or None
+              },
               'sourceCommit':os.environ.get('SOURCE_SHA')
           }
           pathlib.Path('.flr/cloudflare-deploy-status.json').write_text(json.dumps(obj,indent=2)+'\n',encoding='utf-8')
           print(json.dumps(obj))
           PY
-          git config user.name 'FLR Cloudflare Deploy Bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git pull --rebase origin main
           git add .flr/cloudflare-deploy-status.json bug_report_config.js
           git diff --cached --quiet || {
             git commit -m 'Record FLR bug reporter Cloudflare deployment status'
