@@ -1,0 +1,373 @@
+{
+  "schemaVersion": "FLR_TT049_CI_RESULT_V5_0.1",
+  "expectedBaseSha": "52e69323bbab47f7d93e0d0f1e3fa06837038afd",
+  "baseSha": "52e69323bbab47f7d93e0d0f1e3fa06837038afd",
+  "exitCode": 0,
+  "validation": {
+    "schemaVersion": "FLR_TT049_CANDIDATE_VALIDATION_0.5",
+    "build": "TT-0.49 TEST_ONLY",
+    "step79Started": false,
+    "canonical": {
+      "hybridPrecomputesChoice": false,
+      "hybridPrecomputesOutcome": false,
+      "v06OwnsLiveChoiceDiscovery": true,
+      "v06OwnsPostChoiceResolution": true,
+      "protagonistUnchosenMaterialActionForbidden": true,
+      "choiceIdAndExactTargetIdImmutable": true
+    },
+    "tacticalMovementChanged": false,
+    "issue4": {
+      "through": [
+        "H-RW",
+        "H-LW"
+      ],
+      "trace": {
+        "at": 100,
+        "sourceId": "H-ST",
+        "choiceId": "THROUGH_PASS",
+        "requestedTargetId": "H-RW",
+        "resolvedTargetId": "H-RW",
+        "intendedReceiverId": "H-RW",
+        "firstControllerId": "H-RW",
+        "outcome": "SELECTED_TARGET_CONTROL",
+        "resolvedAt": 100.96
+      },
+      "falseLead": 0
+    },
+    "shootingCalibration": {
+      "trials": 600,
+      "goal": 230,
+      "save": 200,
+      "miss": 170,
+      "distribution": {
+        "goal": 0.3833,
+        "save": 0.3333,
+        "miss": 0.2833
+      },
+      "referenceBandExact": true,
+      "targetHit": true,
+      "samplingGuard": "goal 34-46 / save 28.5-36.5 / miss 23.5-31.5"
+    },
+    "issue3": {
+      "trials": 180,
+      "decisive": 165,
+      "shot": 109,
+      "pass": 56,
+      "carryThenDecisive": 107,
+      "takeOn": 0,
+      "turnover": 5,
+      "noDecision": 15,
+      "decisiveRate": 0.9167,
+      "shotRate": 0.6056,
+      "takeOnRate": 0,
+      "earlyTurnoverRate": 0.0278,
+      "samples": [
+        {
+          "kind": "SHOT",
+          "sawCarry": false,
+          "elapsed": 0.02,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "SHOT",
+          "sawCarry": false,
+          "elapsed": 0.02,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "SHOT",
+          "sawCarry": false,
+          "elapsed": 0.02,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "PASS",
+          "sawCarry": true,
+          "elapsed": 1.56,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "PASS",
+          "sawCarry": true,
+          "elapsed": 2.72,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "SHOT",
+          "sawCarry": true,
+          "elapsed": 1.96,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "SHOT",
+          "sawCarry": true,
+          "elapsed": 1.56,
+          "takeOn": false,
+          "lost": false
+        },
+        {
+          "kind": "SHOT",
+          "sawCarry": true,
+          "elapsed": 1.56,
+          "takeOn": false,
+          "lost": false
+        }
+      ]
+    },
+    "fullMatch": {
+      "matches": 32,
+      "strict": 5,
+      "clean": 57,
+      "broadOpenChance": 66,
+      "shots": 1978,
+      "goals": 424,
+      "strictPerMatch": 0.1563,
+      "cleanOneVOnePerMatch": 1.7813,
+      "broadOpenChancePerMatch": 2.0625,
+      "targetFrequencyHit": true,
+      "reference": "clean 1v1 1.2-1.8 average; 2-3 allowed in open/mismatched matches",
+      "per": [
+        {
+          "strict": 0,
+          "clean": 4,
+          "broad": 5,
+          "shots": 86,
+          "goals": 23
+        },
+        {
+          "strict": 1,
+          "clean": 1,
+          "broad": 1,
+          "shots": 30,
+          "goals": 5
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 0,
+          "shots": 75,
+          "goals": 18
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 1,
+          "shots": 20,
+          "goals": 5
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 1,
+          "shots": 52,
+          "goals": 12
+        },
+        {
+          "strict": 1,
+          "clean": 3,
+          "broad": 3,
+          "shots": 80,
+          "goals": 19
+        },
+        {
+          "strict": 0,
+          "clean": 4,
+          "broad": 5,
+          "shots": 80,
+          "goals": 18
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "broad": 3,
+          "shots": 72,
+          "goals": 10
+        },
+        {
+          "strict": 0,
+          "clean": 5,
+          "broad": 5,
+          "shots": 37,
+          "goals": 7
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "broad": 2,
+          "shots": 81,
+          "goals": 15
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 1,
+          "shots": 72,
+          "goals": 16
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "broad": 3,
+          "shots": 73,
+          "goals": 15
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "broad": 2,
+          "shots": 66,
+          "goals": 13
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 1,
+          "shots": 20,
+          "goals": 7
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 1,
+          "shots": 83,
+          "goals": 17
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 0,
+          "shots": 4,
+          "goals": 0
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 0,
+          "shots": 81,
+          "goals": 15
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 0,
+          "shots": 36,
+          "goals": 7
+        },
+        {
+          "strict": 1,
+          "clean": 3,
+          "broad": 4,
+          "shots": 73,
+          "goals": 27
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "broad": 3,
+          "shots": 87,
+          "goals": 13
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 2,
+          "shots": 82,
+          "goals": 16
+        },
+        {
+          "strict": 1,
+          "clean": 2,
+          "broad": 2,
+          "shots": 83,
+          "goals": 22
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 1,
+          "shots": 69,
+          "goals": 12
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 0,
+          "shots": 1,
+          "goals": 1
+        },
+        {
+          "strict": 0,
+          "clean": 1,
+          "broad": 1,
+          "shots": 70,
+          "goals": 16
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "broad": 4,
+          "shots": 79,
+          "goals": 23
+        },
+        {
+          "strict": 1,
+          "clean": 3,
+          "broad": 3,
+          "shots": 80,
+          "goals": 17
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "broad": 3,
+          "shots": 76,
+          "goals": 15
+        },
+        {
+          "strict": 0,
+          "clean": 0,
+          "broad": 0,
+          "shots": 29,
+          "goals": 3
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "broad": 3,
+          "shots": 75,
+          "goals": 9
+        },
+        {
+          "strict": 0,
+          "clean": 3,
+          "broad": 3,
+          "shots": 66,
+          "goals": 15
+        },
+        {
+          "strict": 0,
+          "clean": 2,
+          "broad": 3,
+          "shots": 60,
+          "goals": 13
+        }
+      ]
+    },
+    "authority": {
+      "tested": 2,
+      "violations": [],
+      "futureOutcomePrecomputed": false
+    },
+    "failures": [],
+    "status": "PASS_FOR_USER_VISUAL_RETEST"
+  },
+  "applyLog": "patched runtime/action_candidate_engine.js: const VERSION='STEP78-ACTION-CANDIDATE-1.1-RUN-INTENT';\npatched runtime/action_candidate_engine.js: if(!inBox)s-=role==='CM'?4.2:2.9;if(attackingReceive&&(shot.blockers||0)===0&&shot.dGoal<=26)s+=\npatched runtime/action_candidate_engine.js: if(clearRunway)carry+=3.4;if(space>5.2&&pressure>1.6)carry+=0.68;if(role==='WF'&&wide)carry+=0.4\npatched runtime/action_candidate_engine.js: if(dd<1.15)s-=0.75;if(attackingReceive)s+=1.15;if(ctx.recentTakeOn)s-=2.20;if(inBox&&shot.openWi\npatched runtime/action_candidate_engine.js: if(ctx.recentTakeOnWin)p+=0.22;\npatched runtime/action_candidate_engine.js: case 'TAKE_ON': return clamp(0.065+(candidate.meta?.skillAdvantage||0)*0.0028+(candidate.meta?.s\npatched runtime/continuous_match_core.js: const targetLead=taskCommitted?{x:p.tx,y:p.ty}:null,speed=Math.hypot(p.vx,p.vy),motionLead=taskR\npatched runtime/continuous_match_core.js: const receiveAge=m.time-(owner.lastReceivedAt||-99),decisiveReceive=receiveAge>=.22&&receiveAge<\npatched runtime/continuous_match_core.js: const floor=clamp(0.855+(finishing-60)*0.0026-Math.max(0,assess.dGoal-9)*0.008-(assess.pressure<\npatched runtime/continuous_match_core.js: const floor=clamp(0.800+(finishing-60)*0.0023-Math.max(0,assess.dGoal-14)*0.012-(assess.pressure\npatched runtime/continuous_match_core.js: m.stats.shots++;m.stats.shotsByTeam[team]=(m.stats.shotsByTeam[team]||0)+1;m.stats.shotReasons[r\npatched runtime/continuous_match_core.js: if(isShot){if(p.role==='GK'){setControlled(m,p);m.stats.saves++;event(m,'SAVE',`${subjectName(p.\npatched runtime/continuous_match_core.js: const saveRoll=(hash32(shotKey)%10000)/10000;if(saveRoll>saveP)return false;m.stats.saves=(m.sta\npatched runtime/continuous_match_core.js: const team=m.ball.shotTeam,description=goalDescription(m,team,cross);m.score[team]++;m.stats.goa\npatched runtime/continuous_match_core.js:   const defendingGoalTeam=cross.side==='GOAL_LEFT'?HOME:AWAY;\npatched runtime/continuous_match_core.js:   const resolvedTargetId=c.meta?.targetId||c.targetId||null;\npatched runtime/continuous_match_core.js: if(m.r()<cleanTake){setControlled(m,p,false);p.nextThink=m.time+0.75;m.stats.turnovers++;m.stats\npatched runtime/continuous_match_core.js:   const oldTeam=m.possession,sourceId=m.ball.lastTouchPlayer,passTeam=m.ball.lastTouchTeam,deliv\npatched runtime/continuous_match_core.js: actionCandidates:m.actionCandidateTelemetry?JSON.parse(JSON.stringify(m.actionCandidateTelemetry\nTT049_APPLY_OK\npatched runtime/action_candidate_engine.js: through receive shot score\npatched runtime/action_candidate_engine.js: through receive carry balance\npatched runtime/action_candidate_engine.js: through receive take-on restraint\npatched runtime/action_candidate_engine.js: shot commitment balance\npatched runtime/continuous_match_core.js: keeper lane defender guard\npatched runtime/continuous_match_core.js: separate clean 1v1 from broad clear chance\npatched runtime/continuous_match_core.js: expose clean 1v1\npatched runtime/continuous_match_core.js: clean 1v1 shot instrumentation\nTT049_REFINE_APPLY_OK\n",
+  "stderr": "",
+  "workflowStatus": "PASS"
+}

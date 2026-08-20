@@ -1,0 +1,364 @@
+{
+  "schemaVersion": "FLR_TT049_CANDIDATE_VALIDATION_0.5",
+  "build": "TT-0.49 TEST_ONLY",
+  "step79Started": false,
+  "canonical": {
+    "hybridPrecomputesChoice": false,
+    "hybridPrecomputesOutcome": false,
+    "v06OwnsLiveChoiceDiscovery": true,
+    "v06OwnsPostChoiceResolution": true,
+    "protagonistUnchosenMaterialActionForbidden": true,
+    "choiceIdAndExactTargetIdImmutable": true
+  },
+  "tacticalMovementChanged": false,
+  "issue4": {
+    "through": [
+      "H-RW",
+      "H-LW"
+    ],
+    "trace": {
+      "at": 100,
+      "sourceId": "H-ST",
+      "choiceId": "THROUGH_PASS",
+      "requestedTargetId": "H-RW",
+      "resolvedTargetId": "H-RW",
+      "intendedReceiverId": "H-RW",
+      "firstControllerId": "H-RW",
+      "outcome": "SELECTED_TARGET_CONTROL",
+      "resolvedAt": 100.96
+    },
+    "falseLead": 0
+  },
+  "shootingCalibration": {
+    "trials": 600,
+    "goal": 230,
+    "save": 200,
+    "miss": 170,
+    "distribution": {
+      "goal": 0.3833,
+      "save": 0.3333,
+      "miss": 0.2833
+    },
+    "referenceBandExact": true,
+    "targetHit": true,
+    "samplingGuard": "goal 34-46 / save 28.5-36.5 / miss 23.5-31.5"
+  },
+  "issue3": {
+    "trials": 180,
+    "decisive": 165,
+    "shot": 109,
+    "pass": 56,
+    "carryThenDecisive": 107,
+    "takeOn": 0,
+    "turnover": 5,
+    "noDecision": 15,
+    "decisiveRate": 0.9167,
+    "shotRate": 0.6056,
+    "takeOnRate": 0,
+    "earlyTurnoverRate": 0.0278,
+    "samples": [
+      {
+        "kind": "SHOT",
+        "sawCarry": false,
+        "elapsed": 0.02,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "SHOT",
+        "sawCarry": false,
+        "elapsed": 0.02,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "SHOT",
+        "sawCarry": false,
+        "elapsed": 0.02,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "PASS",
+        "sawCarry": true,
+        "elapsed": 1.56,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "PASS",
+        "sawCarry": true,
+        "elapsed": 2.72,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "SHOT",
+        "sawCarry": true,
+        "elapsed": 1.96,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "SHOT",
+        "sawCarry": true,
+        "elapsed": 1.56,
+        "takeOn": false,
+        "lost": false
+      },
+      {
+        "kind": "SHOT",
+        "sawCarry": true,
+        "elapsed": 1.56,
+        "takeOn": false,
+        "lost": false
+      }
+    ]
+  },
+  "fullMatch": {
+    "matches": 32,
+    "strict": 5,
+    "clean": 57,
+    "broadOpenChance": 66,
+    "shots": 1978,
+    "goals": 424,
+    "strictPerMatch": 0.1563,
+    "cleanOneVOnePerMatch": 1.7813,
+    "broadOpenChancePerMatch": 2.0625,
+    "targetFrequencyHit": true,
+    "reference": "clean 1v1 1.2-1.8 average; 2-3 allowed in open/mismatched matches",
+    "per": [
+      {
+        "strict": 0,
+        "clean": 4,
+        "broad": 5,
+        "shots": 86,
+        "goals": 23
+      },
+      {
+        "strict": 1,
+        "clean": 1,
+        "broad": 1,
+        "shots": 30,
+        "goals": 5
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 0,
+        "shots": 75,
+        "goals": 18
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 1,
+        "shots": 20,
+        "goals": 5
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 1,
+        "shots": 52,
+        "goals": 12
+      },
+      {
+        "strict": 1,
+        "clean": 3,
+        "broad": 3,
+        "shots": 80,
+        "goals": 19
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "broad": 5,
+        "shots": 80,
+        "goals": 18
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "broad": 3,
+        "shots": 72,
+        "goals": 10
+      },
+      {
+        "strict": 0,
+        "clean": 5,
+        "broad": 5,
+        "shots": 37,
+        "goals": 7
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "broad": 2,
+        "shots": 81,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 1,
+        "shots": 72,
+        "goals": 16
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "broad": 3,
+        "shots": 73,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "broad": 2,
+        "shots": 66,
+        "goals": 13
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 1,
+        "shots": 20,
+        "goals": 7
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 1,
+        "shots": 83,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 0,
+        "shots": 4,
+        "goals": 0
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 0,
+        "shots": 81,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 0,
+        "shots": 36,
+        "goals": 7
+      },
+      {
+        "strict": 1,
+        "clean": 3,
+        "broad": 4,
+        "shots": 73,
+        "goals": 27
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "broad": 3,
+        "shots": 87,
+        "goals": 13
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 2,
+        "shots": 82,
+        "goals": 16
+      },
+      {
+        "strict": 1,
+        "clean": 2,
+        "broad": 2,
+        "shots": 83,
+        "goals": 22
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 1,
+        "shots": 69,
+        "goals": 12
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 0,
+        "shots": 1,
+        "goals": 1
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "broad": 1,
+        "shots": 70,
+        "goals": 16
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "broad": 4,
+        "shots": 79,
+        "goals": 23
+      },
+      {
+        "strict": 1,
+        "clean": 3,
+        "broad": 3,
+        "shots": 80,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "broad": 3,
+        "shots": 76,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "broad": 0,
+        "shots": 29,
+        "goals": 3
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "broad": 3,
+        "shots": 75,
+        "goals": 9
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "broad": 3,
+        "shots": 66,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "broad": 3,
+        "shots": 60,
+        "goals": 13
+      }
+    ]
+  },
+  "authority": {
+    "tested": 2,
+    "violations": [],
+    "futureOutcomePrecomputed": false
+  },
+  "failures": [],
+  "status": "PASS_FOR_USER_VISUAL_RETEST"
+}
