@@ -4,7 +4,7 @@
   else root.FLRPG_ACTION_CANDIDATE_ENGINE=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION='STEP78-ACTION-CANDIDATE-1.1-RUN-INTENT';
+const VERSION='TT049-CANDIDATE-ACTION-1.2-RUN-DECISION';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function c(id,score,reason,meta={}){return{id,score:Number(score.toFixed(3)),reason,meta};}
 function generate(ctx){
@@ -16,11 +16,11 @@ function generate(ctx){
     let s=(shot.score||0)*0.68+(shot.oneVOne?7.5:0)+(shot.openWindow?1.8:0)-(shot.blockers||0)*0.55;
     if(inBox&&shot.openWindow&&(shot.blockers||0)===0&&(shot.centrality??99)<=10.5)s+=0.75;
     if(ctx.recentTakeOnWin&&inBox&&(shot.oneVOne||shot.openWindow))s+=2.1;
-    if(!inBox)s-=role==='CM'?4.2:2.9;if(attackingReceive&&(shot.blockers||0)===0&&shot.dGoal<=26)s+=0.55;if(ctx.recentTeamShot)s-=2.2;
+    if(!inBox)s-=role==='CM'?4.2:2.9;if(attackingReceive&&(shot.blockers||0)===0&&shot.dGoal<=26)s+=0.85;if(ctx.recentTeamShot)s-=2.2;
     const longRange=!inBox&&shot.dGoal>27; if(longRange)s-=2.1;if(shot.turningRequired)s-=1.35+(shot.backToGoal?0.65:0)+(longRange?0.55:0);out.push(c('SHOT',s,longRange?'long_range_open_window':'spatial_shot_window',{dGoal:shot.dGoal,inBox,oneVOne:shot.oneVOne,openWindow:shot.openWindow,longRange,turningRequired:!!shot.turningRequired,backToGoal:!!shot.backToGoal,facingAlignment:shot.facingAlignment}));
   }
   let carry=0.82+clamp(space,0,8)*0.22+(pressure>2.6?0.55:0)+(x>72?0.50:0)-(pressure<1.05?0.55:0);
-  if(clearRunway)carry+=3.4;if(space>5.2&&pressure>1.6)carry+=0.68;if(role==='WF'&&wide)carry+=0.42;if(inBox)carry+=0.30;if(wide&&x>=80&&x<92&&['WF','FB'].includes(role))carry+=1.35;if(x>94)carry-=2.4;if(frontChain>=2&&['ST','WF'].includes(role))carry+=1.25;if(attackingReceive)carry+=0.85;
+  if(clearRunway)carry+=3.4;if(space>5.2&&pressure>1.6)carry+=0.68;if(role==='WF'&&wide)carry+=0.42;if(inBox)carry+=0.30;if(wide&&x>=80&&x<92&&['WF','FB'].includes(role))carry+=1.35;if(x>94)carry-=2.4;if(frontChain>=2&&['ST','WF'].includes(role))carry+=1.25;if(attackingReceive)carry+=0.55;
   if(ctx.deepEntryRestricted){
     let entryPenalty=1.15;if(pressure<1.5)entryPenalty+=1.35;else if(pressure<2.2)entryPenalty+=0.75;if(space<2.0)entryPenalty+=0.80;else if(space<4.5)entryPenalty+=0.35;carry-=entryPenalty;
   }
@@ -29,7 +29,7 @@ function generate(ctx){
   if(takeOn){
     const adv=clamp(takeOn.skillAdvantage??0,-35,35),behind=clamp(takeOn.spaceBehind||0,0,12),dd=clamp(takeOn.defenderDistance||2.5,0.8,5.5);
     let s=1.95+behind*0.060+adv*0.022+(role==='WF'?0.42:role==='ST'?0.18:0.05)+(wide?0.22:0)+(x>62?0.12:0);
-    if(dd<1.15)s-=0.75;if(attackingReceive)s+=1.15;if(ctx.recentTakeOn)s-=2.20;if(inBox&&shot.openWindow)s-=1.6;
+    if(dd<1.15)s-=0.75;if(attackingReceive)s+=0.25;if(ctx.recentTakeOn)s-=2.20;if(inBox&&shot.openWindow)s-=1.6;
     out.push(c('TAKE_ON',s,'beat_front_defender',{defenderId:takeOn.defenderId,defenderDistance:dd,spaceBehind:behind,skillAdvantage:adv,wide:!!wide}));
   }
   if(pass.runner){let s=2.65+pass.runner.score*0.46+clamp(pass.runner.leadForward,0,18)*0.085;if(frontChain>=2&&['ST','WF'].includes(role))s-=1.45;if(recycle)s+=0.45;if(['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(pass.runner.task)&&role==='ST')s+=0.65;if(pass.runner.offsideRisk)s-=0.20;out.push(c('THROUGH_PASS',s,'runner_lane',{targetId:pass.runner.targetId,leadForward:pass.runner.leadForward,offsideRisk:!!pass.runner.offsideRisk,offsideMargin:pass.runner.offsideMargin||0,runnerTask:pass.runner.task||null,running:!!pass.runner.running,leadX:pass.runner.leadX??null,leadY:pass.runner.leadY??null}));}
@@ -73,6 +73,7 @@ function commitment(candidate,ctx){
         if(ctx.role==='WF'&&centrality>11.5)p*=0.78;
         p+=Math.min(2.0,Math.max(0,held))*0.020;
         if(ctx.recentTakeOnWin)p+=0.22;
+        if(ctx.attackingThroughReceive)p+=0.05;
         if(ctx.recentTeamShot)p*=0.55;
         return clamp(p,0.070,0.48);
       }
@@ -88,7 +89,7 @@ function commitment(candidate,ctx){
     case 'SWITCH_PASS': return held>1.1?0.62:0.42;
     case 'SAFE_PASS': return 0.58;
     case 'RECYCLE': return 0.48;
-    case 'TAKE_ON': return clamp(0.065+(candidate.meta?.skillAdvantage||0)*0.0028+(candidate.meta?.spaceBehind||0)*0.005+(candidate.meta?.wide?0.020:0)+(ctx.attackingThroughReceive?0.20:0),0.045,0.40);
+    case 'TAKE_ON': return clamp(0.065+(candidate.meta?.skillAdvantage||0)*0.0028+(candidate.meta?.spaceBehind||0)*0.005+(candidate.meta?.wide?0.020:0)+(ctx.attackingThroughReceive?0.08:0),0.045,0.32);
     case 'CARRY':{const chain=ctx.boxCarryChain||0;if(ctx.deepEntryRestricted)return pressure<1.5?0.14:0.24;if((ctx.shot||{}).inBox&&chain>=2)return ctx.clearRunway?0.46:0.28;if((ctx.shot||{}).inBox&&chain===1)return ctx.clearRunway?0.70:0.42;return ctx.clearRunway?1:0.62;}
     case 'HOLD': case 'TURN_BACK': return 1;
     default:return 0.8;
