@@ -1,0 +1,223 @@
+{
+  "schemaVersion": "FLR_TT049_CANDIDATE_VALIDATION_0.2",
+  "build": "TT-0.49 TEST_ONLY",
+  "step79Started": false,
+  "canonical": {
+    "hybridPrecomputesChoice": false,
+    "hybridPrecomputesOutcome": false,
+    "v06OwnsLiveChoiceDiscovery": true,
+    "v06OwnsPostChoiceResolution": true,
+    "protagonistUnchosenMaterialActionForbidden": true,
+    "choiceIdAndExactTargetIdImmutable": true
+  },
+  "issue4": {
+    "through": [
+      "H-RW",
+      "H-LW"
+    ],
+    "safe": [
+      "H-RW",
+      "H-LW"
+    ],
+    "trace": {
+      "at": 100,
+      "sourceId": "H-ST",
+      "choiceId": "THROUGH_PASS",
+      "requestedTargetId": "H-RW",
+      "resolvedTargetId": "H-RW",
+      "intendedReceiverId": "H-RW",
+      "firstControllerId": "H-RW",
+      "outcome": "SELECTED_TARGET_CONTROL",
+      "resolvedAt": 100.96
+    },
+    "falseLead": 0
+  },
+  "shootingCalibration": {
+    "trials": 600,
+    "goal": 247,
+    "save": 185,
+    "miss": 168,
+    "distribution": {
+      "goal": 0.4117,
+      "save": 0.3083,
+      "miss": 0.28
+    },
+    "targetHit": true
+  },
+  "npcDecision": {
+    "trials": 160,
+    "shot": 0,
+    "pass": 0,
+    "carry": 160,
+    "takeOn": 0,
+    "other": 0,
+    "distantRecycle": 0,
+    "decisiveRate": 0,
+    "distantRecycleRate": 0
+  },
+  "fullMatch": {
+    "matches": 24,
+    "strict": 6,
+    "clean": 61,
+    "shots": 1455,
+    "goals": 329,
+    "strictPerMatch": 0.25,
+    "cleanPerMatch": 2.5417,
+    "targetFrequencyHit": false,
+    "per": [
+      {
+        "strict": 1,
+        "clean": 1,
+        "shots": 74,
+        "goals": 16
+      },
+      {
+        "strict": 0,
+        "clean": 5,
+        "shots": 49,
+        "goals": 15
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 72,
+        "goals": 14
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 49,
+        "goals": 10
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 8,
+        "goals": 2
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 18,
+        "goals": 1
+      },
+      {
+        "strict": 1,
+        "clean": 2,
+        "shots": 27,
+        "goals": 6
+      },
+      {
+        "strict": 0,
+        "clean": 0,
+        "shots": 49,
+        "goals": 10
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 72,
+        "goals": 24
+      },
+      {
+        "strict": 1,
+        "clean": 1,
+        "shots": 77,
+        "goals": 11
+      },
+      {
+        "strict": 1,
+        "clean": 4,
+        "shots": 68,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "shots": 14,
+        "goals": 2
+      },
+      {
+        "strict": 0,
+        "clean": 5,
+        "shots": 71,
+        "goals": 22
+      },
+      {
+        "strict": 0,
+        "clean": 1,
+        "shots": 82,
+        "goals": 14
+      },
+      {
+        "strict": 2,
+        "clean": 3,
+        "shots": 82,
+        "goals": 13
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 75,
+        "goals": 18
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 70,
+        "goals": 20
+      },
+      {
+        "strict": 0,
+        "clean": 6,
+        "shots": 69,
+        "goals": 17
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 61,
+        "goals": 14
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 76,
+        "goals": 19
+      },
+      {
+        "strict": 0,
+        "clean": 4,
+        "shots": 74,
+        "goals": 12
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 68,
+        "goals": 14
+      },
+      {
+        "strict": 0,
+        "clean": 2,
+        "shots": 70,
+        "goals": 18
+      },
+      {
+        "strict": 0,
+        "clean": 3,
+        "shots": 80,
+        "goals": 20
+      }
+    ]
+  },
+  "authority": {
+    "tested": 2,
+    "violations": [],
+    "futureOutcomePrecomputed": false
+  },
+  "failures": [
+    "NPC decisive rate 0"
+  ],
+  "status": "FAIL"
+}
