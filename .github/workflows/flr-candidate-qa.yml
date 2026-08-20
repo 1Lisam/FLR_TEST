@@ -1,0 +1,103 @@
+name: FLR Candidate QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/candidate-qa-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-candidate-qa
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout QA control
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+
+      - name: Read QA request
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,re
+          p='control/.flr/candidate-qa-request.json'
+          c=json.load(open(p,encoding='utf-8'))
+          vals={'version':c['version'],'branch':c['candidateBranch'],'baseline':c.get('baselineRef','main'),'result_dir':c['resultDir']}
+          pat=re.compile(r'^[A-Za-z0-9._/\-]+$')
+          for k,v in vals.items():
+              if not isinstance(v,str) or not v or not pat.fullmatch(v) or '..' in v.split('/'):
+                  raise SystemExit(f'unsafe config {k}={v!r}')
+              print(f'{k}={v}')
+          PY
+
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.cfg.outputs.branch }}
+          path: candidate
+          fetch-depth: 1
+
+      - name: Checkout baseline
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.cfg.outputs.baseline }}
+          path: baseline
+          fetch-depth: 1
+
+      - name: Run candidate QA
+        id: qa
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python control/.flr/candidate_qa_runner.py \
+            --config control/.flr/candidate-qa-request.json \
+            --candidate candidate \
+            --baseline baseline \
+            --work qa-work \
+            --out qa-out
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      - name: Persist QA result on candidate branch
+        if: always()
+        shell: bash
+        env:
+          RESULT_DIR: ${{ steps.cfg.outputs.result_dir }}
+          VERSION: ${{ steps.cfg.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p "candidate/$RESULT_DIR"
+          cp -f qa-out/CI_RESULT.json "candidate/$RESULT_DIR/CI_RESULT.json" 2>/dev/null || true
+          cp -f qa-out/validation.json "candidate/$RESULT_DIR/validation.json" 2>/dev/null || true
+          cp -f qa-out/baseline.json "candidate/$RESULT_DIR/baseline.json" 2>/dev/null || true
+          cp -f qa-out/candidate.patch "candidate/$RESULT_DIR/candidate.patch" 2>/dev/null || true
+          cp -f qa-out/candidate.patch.sha256 "candidate/$RESULT_DIR/candidate.patch.sha256" 2>/dev/null || true
+          git -C candidate config user.name "FLR Candidate QA"
+          git -C candidate config user.email "actions@users.noreply.github.com"
+          git -C candidate add "$RESULT_DIR"
+          git -C candidate diff --cached --quiet || {
+            git -C candidate commit -m "Record ${VERSION} candidate QA result"
+            git -C candidate push origin "HEAD:${{ steps.cfg.outputs.branch }}"
+          }
+
+      - name: Enforce QA gate
+        if: always()
+        shell: bash
+        env:
+          QA_CODE: ${{ steps.qa.outputs.code }}
+        run: test "${QA_CODE:-99}" = 0
