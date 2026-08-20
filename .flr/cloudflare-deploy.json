@@ -4,6 +4,6 @@
   "worker": "flr-bug-reporter",
   "bucket": "flr-bug-reports",
   "purpose": "Store full integrated Episode JSON and wire the public bug-report endpoint",
-  "requestedAt": "2026-08-20T21:48:00+09:00",
-  "attemptNonce": "tt050-full-json-live-20260820-2148-verified"
+  "requestedAt": "2026-08-20T21:52:00+09:00",
+  "attemptNonce": "tt050-full-json-live-20260820-2152-roundtrip"
 }
