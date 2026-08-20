@@ -24,48 +24,69 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Checkout incoming patch
+      - name: Checkout incoming payload
         uses: actions/checkout@v4
         with:
           ref: automation/tt-deploy
           path: _incoming
           fetch-depth: 1
 
-      - name: Validate patch metadata
+      - name: Validate deploy metadata
         shell: bash
         run: |
           set -euo pipefail
           test -f _incoming/.flr/deploy.json
-          shopt -s nullglob
-          PARTS=(_incoming/.flr/incoming.patch.part*)
-          [ ${#PARTS[@]} -gt 0 ] || { echo 'PATCH_PARTS_MISSING'; exit 1; }
-          cat "${PARTS[@]}" > /tmp/incoming.patch
           python - <<'PY'
-          import hashlib, json, pathlib, subprocess
-          manifest=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
-          patch=pathlib.Path('/tmp/incoming.patch').read_bytes()
-          actual=hashlib.sha256(patch).hexdigest()
-          if actual != manifest['patchSha256']:
-              raise SystemExit(f"PATCH_SHA_MISMATCH expected={manifest['patchSha256']} actual={actual}")
+          import json, pathlib, subprocess
+          m=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
           head=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
-          if head != manifest['baseCommit']:
-              raise SystemExit(f"BASE_COMMIT_MISMATCH expected={manifest['baseCommit']} actual={head}")
-          if manifest.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
+          if head != m['baseCommit']:
+              raise SystemExit(f"BASE_COMMIT_MISMATCH expected={m['baseCommit']} actual={head}")
+          if m.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
               raise SystemExit('VALIDATION_STATUS_NOT_PASS')
-          if manifest.get('step79Started') is not False:
+          if m.get('step79Started') is not False:
               raise SystemExit('STEP79_MUST_REMAIN_FALSE')
-          if not manifest.get('changedFiles'):
+          if not m.get('changedFiles'):
               raise SystemExit('CHANGED_FILES_EMPTY')
-          pathlib.Path('/tmp/flr_deploy.json').write_text(json.dumps(manifest), encoding='utf-8')
-          print(f"Validated {manifest['fromBuild']} -> {manifest['toBuild']}")
+          if not m.get('patchSha256') and not m.get('assembledFiles'):
+              raise SystemExit('NO_DEPLOY_PAYLOAD')
+          pathlib.Path('/tmp/flr_deploy.json').write_text(json.dumps(m), encoding='utf-8')
+          print(f"Validated {m['fromBuild']} -> {m['toBuild']}")
           PY
 
-      - name: Apply validated patch
+      - name: Apply validated payload
         shell: bash
         run: |
           set -euo pipefail
-          git apply --check /tmp/incoming.patch
-          git apply /tmp/incoming.patch
+          python - <<'PY'
+          import hashlib, json, pathlib, subprocess
+          m=json.load(open('/tmp/flr_deploy.json'))
+          if m.get('patchSha256'):
+              parts=sorted(pathlib.Path('_incoming/.flr').glob('incoming.patch.part*'))
+              if not parts:
+                  raise SystemExit('PATCH_PARTS_MISSING')
+              data=b''.join(p.read_bytes() for p in parts)
+              actual=hashlib.sha256(data).hexdigest()
+              if actual != m['patchSha256']:
+                  raise SystemExit(f"PATCH_SHA_MISMATCH expected={m['patchSha256']} actual={actual}")
+              patch=pathlib.Path('/tmp/incoming.patch')
+              patch.write_bytes(data)
+              subprocess.check_call(['git','apply','--check',str(patch)])
+              subprocess.check_call(['git','apply',str(patch)])
+          for spec in m.get('assembledFiles', []):
+              dest=pathlib.Path(spec['path'])
+              parts=[pathlib.Path('_incoming')/x for x in spec['parts']]
+              missing=[str(p) for p in parts if not p.is_file()]
+              if missing:
+                  raise SystemExit('ASSEMBLED_PART_MISSING:'+','.join(missing))
+              data=b''.join(p.read_bytes() for p in parts)
+              actual=hashlib.sha256(data).hexdigest()
+              if actual != spec['sha256']:
+                  raise SystemExit(f"ASSEMBLED_SHA_MISMATCH path={dest} expected={spec['sha256']} actual={actual}")
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              dest.write_bytes(data)
+              print(f"Assembled {dest} bytes={len(data)} sha256={actual}")
+          PY
           rm -rf _incoming
 
       - name: Syntax check changed JavaScript
