@@ -40,6 +40,7 @@ jobs:
       - name: Apply TT-0.50 candidate
         run: |
           python candidate/.flr/tt050_apply.py work | tee tt050-apply.log
+          python candidate/.flr/tt050_backend_refine.py work | tee -a tt050-apply.log
           git -C work add -N bug_report_config.js
           git -C work diff --check
       - name: Syntax checks
