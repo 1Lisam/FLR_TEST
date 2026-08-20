@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "FLR_TT051_TRANSFER_VALIDATION_1.0",
+  "version": "TT-0.51",
+  "status": "PASS",
+  "checks": [
+    {
+      "path": "CHANGELOG.md",
+      "status": "PASS",
+      "sha256": "d2c0558072d994b9a7a105ef57cf64b64614c377bdaa8ee94c6edc9f1557d357"
+    },
+    {
+      "path": "index.html",
+      "status": "PASS",
+      "sha256": "22ebc7fa862f478a5042bd3845d98602e8ed5c4ba71b41ff6c4ff6365f0bf87e"
+    },
+    {
+      "path": "live_hybrid_session_v02.js",
+      "status": "PASS",
+      "sha256": "e1abd5bf72bd2fb1f0fe70a50e956cf9ea0c99f0c34d8625072d4b174221e6e4"
+    },
+    {
+      "path": "runtime/ball_strike_model.js",
+      "status": "PASS",
+      "sha256": "0869abab667661d30957e2baf04487f4cdb22f4658eadb3b34389476f7097594"
+    },
+    {
+      "path": "runtime/continuous_match_core.js",
+      "status": "PASS",
+      "sha256": "e8ab4c9dfcd0b11507d4dc6d540063df4f9132344fe4d809b0b279a824a2b239"
+    },
+    {
+      "path": "runtime/protagonist_match_controller.js",
+      "status": "PASS",
+      "sha256": "ed355522fac60b96d0060d53f77b176ab431a2a8ed9b4262ca7352c7a1853e51"
+    },
+    {
+      "path": "runtime/tactical_movement.js",
+      "status": "PASS",
+      "sha256": "8ed7b1ccd471e7fef04ee7556af438c24ca2519e1ebdd1c4a837f81c4a5a598b"
+    },
+    {
+      "path": "step71_hybrid_v06_ui.js",
+      "status": "PASS",
+      "sha256": "da5d6a79a398dd60fbbde2232265440aa514512296bef3aa02a9c3dcbd3b4949"
+    },
+    {
+      "path": "semantic-transfer-guard",
+      "status": "PASS"
+    }
+  ]
+}
