@@ -1,4 +1,4 @@
-name: TT-0.49 candidate validation V4
+name: TT-0.49 candidate validation V5
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: tt049-candidate-validation-v4
+  group: tt049-candidate-validation-v5
   cancel-in-progress: true
 
 jobs:
@@ -53,11 +53,11 @@ jobs:
               node --check work/runtime/action_candidate_engine.js && \
               node --check work/runtime/continuous_match_core.js && \
               node --check work/runtime/protagonist_match_controller.js && \
-              node --check candidate/.flr/tt049_validation_v4.js
+              node --check candidate/.flr/tt049_validation_v5.js
               code=$?
             fi
             if [ $code -eq 0 ]; then
-              node candidate/.flr/tt049_validation_v4.js work > tt049-validation.json 2> tt049-validation.stderr
+              node candidate/.flr/tt049_validation_v5.js work > tt049-validation.json 2> tt049-validation.stderr
               code=$?
             fi
           fi
@@ -78,7 +78,7 @@ jobs:
           import json,os,pathlib,shutil
           expected='52e69323bbab47f7d93e0d0f1e3fa06837038afd'
           base=pathlib.Path('base-sha.txt').read_text().strip() if pathlib.Path('base-sha.txt').exists() else None
-          result={'schemaVersion':'FLR_TT049_CI_RESULT_V4_0.1','expectedBaseSha':expected,'baseSha':base,'exitCode':int(os.getenv('TEST_CODE') or 99)}
+          result={'schemaVersion':'FLR_TT049_CI_RESULT_V5_0.1','expectedBaseSha':expected,'baseSha':base,'exitCode':int(os.getenv('TEST_CODE') or 99)}
           p=pathlib.Path('tt049-validation.json')
           if p.exists():
               try: result['validation']=json.loads(p.read_text(encoding='utf-8'))
@@ -87,18 +87,18 @@ jobs:
               q=pathlib.Path(file)
               if q.exists(): result[key]=q.read_text(encoding='utf-8',errors='replace')[-14000:]
           result['workflowStatus']='PASS' if result['exitCode']==0 else 'FAIL'
-          pathlib.Path('candidate/TT049_CI_RESULT_V4.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          if p.exists(): shutil.copyfile(p,'candidate/TT049_VALIDATION_RESULT_V4.json')
-          if pathlib.Path('tt049-candidate.patch').exists(): shutil.copyfile('tt049-candidate.patch','candidate/.flr/tt049-candidate-v4.patch')
-          if pathlib.Path('tt049-candidate.patch.sha256').exists(): shutil.copyfile('tt049-candidate.patch.sha256','candidate/.flr/tt049-candidate-v4.patch.sha256')
+          pathlib.Path('candidate/TT049_CI_RESULT_V5.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if p.exists(): shutil.copyfile(p,'candidate/TT049_VALIDATION_RESULT_V5.json')
+          if pathlib.Path('tt049-candidate.patch').exists(): shutil.copyfile('tt049-candidate.patch','candidate/.flr/tt049-candidate-v5.patch')
+          if pathlib.Path('tt049-candidate.patch.sha256').exists(): shutil.copyfile('tt049-candidate.patch.sha256','candidate/.flr/tt049-candidate-v5.patch.sha256')
           PY
           git -C candidate config user.name "FLR Candidate CI"
           git -C candidate config user.email "actions@users.noreply.github.com"
-          git -C candidate add -- TT049_CI_RESULT_V4.json
-          [ ! -f candidate/TT049_VALIDATION_RESULT_V4.json ] || git -C candidate add -- TT049_VALIDATION_RESULT_V4.json
-          [ ! -f candidate/.flr/tt049-candidate-v4.patch ] || git -C candidate add -- .flr/tt049-candidate-v4.patch
-          [ ! -f candidate/.flr/tt049-candidate-v4.patch.sha256 ] || git -C candidate add -- .flr/tt049-candidate-v4.patch.sha256
-          git -C candidate diff --cached --quiet || { git -C candidate commit -m "Record TT-0.49 V4 CI result"; git -C candidate push origin HEAD:tt049-candidate; }
+          git -C candidate add -- TT049_CI_RESULT_V5.json
+          [ ! -f candidate/TT049_VALIDATION_RESULT_V5.json ] || git -C candidate add -- TT049_VALIDATION_RESULT_V5.json
+          [ ! -f candidate/.flr/tt049-candidate-v5.patch ] || git -C candidate add -- .flr/tt049-candidate-v5.patch
+          [ ! -f candidate/.flr/tt049-candidate-v5.patch.sha256 ] || git -C candidate add -- .flr/tt049-candidate-v5.patch.sha256
+          git -C candidate diff --cached --quiet || { git -C candidate commit -m "Record TT-0.49 V5 CI result"; git -C candidate push origin HEAD:tt049-candidate; }
       - name: Enforce gate
         if: always()
         shell: bash
