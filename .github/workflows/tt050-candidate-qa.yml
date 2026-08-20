@@ -6,6 +6,7 @@ on:
     paths:
       - '.flr/tt050-qa-run-request'
       - '.flr/tt050-qa-run-request-main'
+      - '.github/workflows/tt050-candidate-qa.yml'
   workflow_dispatch:
 
 permissions:
