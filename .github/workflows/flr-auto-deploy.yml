@@ -29,13 +29,13 @@ jobs:
           path: _incoming
           fetch-depth: 1
 
-      - name: Decode and validate patch metadata
+      - name: Validate patch metadata
         shell: bash
         run: |
           set -euo pipefail
-          test -f _incoming/.flr/incoming.patch.gz.b64
+          test -f _incoming/.flr/incoming.patch
           test -f _incoming/.flr/deploy.json
-          base64 -d _incoming/.flr/incoming.patch.gz.b64 | gzip -d > /tmp/incoming.patch
+          cp _incoming/.flr/incoming.patch /tmp/incoming.patch
           python - <<'PY'
           import hashlib, json, pathlib, subprocess
           manifest=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
