@@ -1,36 +1,19 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.50",
+  "version": "TT-0.50-LABELS",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt050_apply.py",
-    ".flr/tt050_backend_refine.py",
-    ".flr/tt050_cadence_refine.py",
-    ".flr/tt050_final_refine.py"
+    ".flr/tt050_label_finalize.py"
   ],
-  "validationScript": ".flr/tt050_validation_v4.js",
+  "validationScript": ".flr/tt050_label_validation.js",
   "changedFiles": [
-    "runtime/ball_strike_model.js",
-    "runtime/continuous_match_core.js",
-    "runtime/protagonist_match_controller.js",
-    "runtime/tactical_movement.js",
-    "live_hybrid_session_v02.js",
-    "bug-report-worker/worker.js",
-    "step71_hybrid_v06_ui.js",
     "index.html",
-    "bug_report_config.js"
+    "step71_hybrid_v06_ui.js"
   ],
   "syntaxChecks": [
-    "runtime/ball_strike_model.js",
-    "runtime/continuous_match_core.js",
-    "runtime/protagonist_match_controller.js",
-    "runtime/tactical_movement.js",
-    "live_hybrid_session_v02.js",
-    "step71_hybrid_v06_ui.js",
-    "bug_report_config.js",
-    {"kind": "node-esm", "path": "bug-report-worker/worker.js"}
+    "step71_hybrid_v06_ui.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.50",
-  "runNonce": "2026-08-20T18:21+09:00-final-gate-r9"
+  "resultDir": ".flr/qa-results/TT-0.50-labels",
+  "runNonce": "2026-08-20T19:10+09:00-exact-label-patch-r1"
 }
