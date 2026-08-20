@@ -8,6 +8,39 @@ This file records Football Life RPG technical-test versions that were actually p
 - Do not invent missing history. Older entries are backfilled only when GitHub commits, validation files, or project Handoff/Bridge artifacts provide evidence.
 - Intermediate candidate iterations are normally summarized under the promoted TT version rather than treated as separate releases.
 
+## TT-0.50 — 2026-08-20 — USER_VISUAL_RETEST
+**Engine deployment commit:** `791d0059af4fd479f92a11983b4b422ae7685537`  
+**Public-label finalization commit:** `cdea5af9eedb4c1ded606348b1df55abd4c0fcdb`  
+**Validation:** `.flr/qa-results/TT-0.50/CI_RESULT.json` on `tt050-candidate` — `workflowStatus: PASS`, `PASS_CANDIDATE_INTERNAL`
+
+### Changes
+- Reduced excessive ST intervention density while preserving meaningful linked decisions. The goal is fewer stop-start checkpoints, not automatic protagonist play.
+- Extended a selected `CARRY` into one coherent movement intent before reopening another checkpoint, unless a materially new critical state appears.
+- Reworked ground through-ball execution so the ball follows the runner's live movement vector and its arrival time is weighted toward the runner's reachable lead point rather than behaving like a hard straight pass at the current position.
+- Made the option shown at a frozen user checkpoint authoritative for execution. A displayed `choiceId + exact targetId` is no longer re-ranked away between display and click; it is rejected only if the target is physically invalid.
+- Reduced premature final-third recycling by preferring meaningful forward support when the attacking continuation is still available.
+- Added a light midfield/striker lane-separation correction for recovering LCM/RCM support so they do not repeatedly occupy the ST's central path.
+- Refined ST Hybrid promotion cadence so direct dangerous involvement is favored over every broad attacking involvement.
+- Prepared the browser bug-report path to upload the full integrated Episode JSON to a configured endpoint, while retaining the manual GitHub/fallback path when no endpoint is live.
+- Public page and compact bug-report metadata now identify the build as `TT-0.50`.
+
+### Validation highlights
+- Through-ball timing test: ball arrival `2.627s`, runner arrival `2.823s`, difference `0.197s`; lead vector cosine `1.0`.
+- Final-third decision fixture: `120` trials, premature backward pass `0`, attack-continuation rate `100%`.
+- Hybrid cadence sample: ST average `22.5` choices/match and `2` choices in the first 30 minutes; CM `8`, CB `2`, GK `1.5` choices/match on the tested sample.
+- A rare ST Episode reached `7` linked choices and remains a WATCH item; the 5-second burst stayed at `3` or fewer and overall density remained inside the gate.
+- Frozen visible-target regression: `40` targeted choices, `0` execution/target failures. Hybrid visible-choice application failures: `0`.
+- Protagonist authority regression: `0` violations; future choice/outcome precomputation remains `false`.
+- RCM/ST measured overlap rate in the retained 4-match test was approximately `0.75%`.
+- Bug-report Worker unit round-trip stored the integrated debug object exactly in the test harness; this does **not** claim a live Cloudflare deployment.
+
+### Not yet live / deferred
+- The Cloudflare Worker/R2 endpoint is not yet connected to the public page; `bug_report_config.js` therefore still falls back until a real endpoint is configured.
+- Match perceived-time compression to the later ~5–6 minute target remains deferred.
+- Position Experience Layer remains deferred.
+
+---
+
 ## TT-0.49 — 2026-08-20 — USER_VISUAL_RETEST
 **Engine deployment commit:** `7dda7e1a8fec7fadba99de1c05643f9f4f9bc519`  
 **Validation:** `TT049_CI_RESULT_V5.json` on `tt049-candidate` — `PASS_FOR_USER_VISUAL_RETEST`
