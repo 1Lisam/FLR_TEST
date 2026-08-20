@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "FLR_TT049_SUPPLEMENTAL_VALIDATION_0.1",
+  "build": "TT-0.49 TEST_ONLY",
+  "step79Started": false,
+  "canonical": {
+    "hybridPrecomputesChoice": false,
+    "hybridPrecomputesOutcome": false,
+    "v06OwnsLiveChoiceDiscovery": true,
+    "v06OwnsPostChoiceResolution": true,
+    "protagonistUnchosenMaterialActionForbidden": true,
+    "choiceIdAndExactTargetIdImmutable": true
+  },
+  "workerDeploymentDeferred": true,
+  "localReferences": {
+    "count": 25,
+    "missing": []
+  },
+  "startup": [
+    {
+      "hero": "H-ST",
+      "time": 45,
+      "pending": false,
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      }
+    },
+    {
+      "hero": "H-CM",
+      "time": 45,
+      "pending": false,
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      }
+    },
+    {
+      "hero": "H-LCB",
+      "time": 45,
+      "pending": false,
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      }
+    },
+    {
+      "hero": "H-GK",
+      "time": 45,
+      "pending": false,
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      }
+    }
+  ],
+  "choiceReplay": {
+    "found": true,
+    "choiceId": "THROUGH_PASS",
+    "requestedTargetId": "H-RW",
+    "resolvedTargetId": "H-RW",
+    "preFrames": 101,
+    "latestFrames": 101,
+    "sceneCount": 2,
+    "futureOutcomePrecomputed": false
+  },
+  "mfDecision": {
+    "trials": 160,
+    "forwardPass": 42,
+    "shot": 41,
+    "carry": 77,
+    "farBackward": 0,
+    "other": 0,
+    "meaningfulRate": 1,
+    "farBackwardRate": 0,
+    "samples": [
+      {
+        "decision": "SHOT",
+        "class": "SHOT",
+        "targetId": null
+      },
+      {
+        "decision": "PASS",
+        "class": "ATTACK_PASS",
+        "targetId": "H-ST"
+      },
+      {
+        "decision": "SHOT",
+        "class": "SHOT",
+        "targetId": null
+      },
+      {
+        "decision": "SHOT",
+        "class": "SHOT",
+        "targetId": null
+      },
+      {
+        "decision": "CARRY",
+        "class": "CARRY",
+        "targetId": null
+      },
+      {
+        "decision": "CARRY",
+        "class": "CARRY",
+        "targetId": null
+      },
+      {
+        "decision": "CARRY",
+        "class": "CARRY",
+        "targetId": null
+      },
+      {
+        "decision": "CARRY",
+        "class": "CARRY",
+        "targetId": null
+      },
+      {
+        "decision": "CARRY",
+        "class": "CARRY",
+        "targetId": null
+      },
+      {
+        "decision": "CARRY",
+        "class": "CARRY",
+        "targetId": null
+      }
+    ]
+  },
+  "failures": [],
+  "status": "PASS"
+}
