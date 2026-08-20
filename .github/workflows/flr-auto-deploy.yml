@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - automation/tt-deploy
-    paths:
-      - '.flr/deploy.json'
 
 permissions:
   contents: write
@@ -35,6 +33,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -f _incoming/.flr/incoming.patch.gz.b64
+          test -f _incoming/.flr/deploy.json
           base64 -d _incoming/.flr/incoming.patch.gz.b64 | gzip -d > /tmp/incoming.patch
           python - <<'PY'
           import hashlib, json, pathlib, subprocess
