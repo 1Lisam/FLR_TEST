@@ -1,3 +1,15 @@
+# TT-0.51 — Meaningful Choice / One-touch / Live Movement
+
+- Meaningless single-option protagonist checkpoints no longer stop play or auto-execute a material protagonist action.
+- Physical CARRY availability is preserved independently from NPC action preference.
+- Ground through-balls use a firmer initial strike with calibrated deceleration.
+- FAR_SIDE_RUN remains a live run only while the target is actually forward and moving; otherwise it becomes FAR_SIDE_HOLD.
+- CM carrier / ST lane collision avoidance and free-kick wall role-zone recovery are reinforced.
+- Reception flow separates the run-to-ball vector from the first-touch attacking vector and adds pre-contact body opening.
+- Incoming-ball decisions now support trap/control, one-touch pass, direct shot, volley, header pass and header shot where physically available. Outcomes are still resolved only at real contact.
+- HIGH_RES events preserve causal event-time frame context instead of inheriting unrelated hand-back state.
+- Bug reports are labelled TT-0.51 and continue uploading the full integrated Episode JSON to the configured Cloudflare endpoint before opening the GitHub issue screen.
+
 # FLR_TEST Version History
 
 This file records Football Life RPG technical-test versions that were actually promoted or otherwise have verifiable GitHub history.

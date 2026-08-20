@@ -63,7 +63,7 @@ function safeForwardLocal(m,p,wanted){
   return clamp(Math.min(wanted,safeLocal,96.5),5,96.5);
 }
 function releaseForwardLocal(m,p,wanted){
-  const entering=!['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(p.tacticalTask)||!Number.isFinite(p.releaseRunBiasAt)||m.time-p.releaseRunBiasAt>6.0;
+  const entering=!['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','FAR_SIDE_RUN'].includes(p.tacticalTask)||!Number.isFinite(p.releaseRunBiasAt)||m.time-p.releaseRunBiasAt>6.0;
   if(entering){
     p.releaseRunBiasAt=m.time;
     // Most runs hold the line. A minority deliberately live on the shoulder and can drift
@@ -163,6 +163,10 @@ function attackTask(m,p,ctx){
     return{lx:clamp(p.postPassSupportLocalX,4,96),ly:clamp(p.postPassSupportLocalY,4,64),task:p.postPassSupportTask||'POST_SAFE_PASS_SUPPORT',sprint:false};
   }else if((p.postPassSupportUntil||0)>0&&m.time>=p.postPassSupportUntil){p.postPassSupportUntil=0;p.postPassSupportLocalX=null;p.postPassSupportLocalY=null;p.postPassSupportTask=null;}
   if(owner&&p.id===owner.id){
+    // TT-0.51 1_1/1_6: while a one-option protagonist state is being deferred, team shape may
+    // continue to change around the carrier but the engine must not invent an unchosen carry.
+    // Holding this exact live location lets pressure/new lanes create the next meaningful choice.
+    if(m.protagonistDeferredChoice?.playerId===p.id)return{lx:local.x,ly:local.y,task:'WAIT_MEANINGFUL_CHOICE',sprint:false};
     if((p.lockTargetUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);return{lx:q.x,ly:q.y,task:p.action||'CARRY',sprint:p.sprint};}
     const space=forwardSpace(m,p,10),opp=nearestOppDistance(m,p),step=space>5?2.15:space>3?1.15:space>1.8?0.45:0;
     // A winger who receives in the outer half-space before entering the box may carry back toward
@@ -344,10 +348,10 @@ function attackTask(m,p,ctx){
       return{lx:x,ly:y,task:'WIDE_DELIVERY_HOLD',sprint:Math.abs(local.y-y)>4.0||Math.abs(local.x-x)>4.0};
     }
     if(phase==='FINAL_THIRD'&&!ss){
-      const x=safeForwardLocal(m,p,clamp(progress+8,82,91.5)),y=34+sg*16.0;
-      return{lx:x,ly:y,task:'FAR_SIDE_RUN',sprint:true};
+      const x=releaseForwardLocal(m,p,clamp(progress+8,82,91.5)),y=34+sg*16.0,runAlive=x>local.x+.85;
+      return{lx:runAlive?x:Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':'FAR_SIDE_HOLD',sprint:runAlive};
     }
-    if(!ss&&progress>48){return{lx:safeForwardLocal(m,p,Math.max(front+5,progress+8)),ly:34+sg*(18.5*pr.wingerWidth),task:'FAR_SIDE_RUN',sprint:true};}
+    if(!ss&&progress>48){const x=releaseForwardLocal(m,p,Math.max(front+5,progress+8)),y=34+sg*(18.5*pr.wingerWidth),runAlive=x>local.x+.85;return{lx:runAlive?x:Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':'FAR_SIDE_HOLD',sprint:runAlive};}
     if(ss&&progress>66&&pr.width<1){return{lx:safeForwardLocal(m,p,Math.max(front+2,progress+4)),ly:34+sg*17.0,task:'INSIDE_CHANNEL',sprint:true};}
     return{lx:safeForwardLocal(m,p,Math.max(front,progress+4)),ly:targetWide,task:ss?'WIDE_COMBINE':'HOLD_WIDTH',sprint:ss&&progress>52};
   }
@@ -828,11 +832,15 @@ function assignAttack(m,team,ctx){
         if((nearMeeting||ballPast)&&ballGap){const pred=worldToLocal(team,m.ball.x+(m.ball.vx||0)*0.20,m.ball.y+(m.ball.vy||0)*0.20);tx=clamp(Math.max(nominal.x,pred.x),2,101.5);ty=clamp(lerp(nominal.y,pred.y,0.78),2,66);}
       }
       const target=localToWorld(team,tx,ty);p.tx=target.x;p.ty=target.y;p.action=m.ball.kind==='THROUGH'?'CHASE_THROUGH':'MOVE_TO_RECEIVE';p.tacticalTask=p.action;p.sprint=m.ball.kind==='THROUGH'?dist(p,m.ball)>1.35:dist(p,target)>2.2;
-      // STEP74: close to the meeting point, orient to the actual incoming ball instead of
-      // carrying stale locomotion facing into the first touch. Through-ball runners keep
-      // their run-facing until the ball is close because turning back would be equally false.
+      // TT-0.51 1_8: scan before contact and arrive half-open. Facing the ball 100% created
+      // the baseball-catch look and then coupled the meeting run to the next attacking step.
+      // Through-ball runners keep their run-facing; ordinary/long receivers blend the incoming
+      // ball view with the attacking goal before the touch.
       const ballGap=dist(p,m.ball),targetGap=dist(p,target);
-      if(m.ball.kind!=='THROUGH'&&(ballGap<4.8||targetGap<0.85))p.faceTargetAngle=Math.atan2(m.ball.y-p.y,m.ball.x-p.x);
+      if(m.ball.kind!=='THROUGH'&&(ballGap<5.8||targetGap<1.25)){
+        const incomingA=Math.atan2(m.ball.y-p.y,m.ball.x-p.x),goalX=team===HOME?105:0,goalA=Math.atan2(34-p.y,goalX-p.x),fx=Math.cos(incomingA)*.44+Math.cos(goalA)*.56,fy=Math.sin(incomingA)*.44+Math.sin(goalA)*.56;
+        p.faceTargetAngle=Math.atan2(fy,fx);p.receiveFacingUntil=Math.max(p.receiveFacingUntil||0,m.time+1.15);
+      }
       continue;
     }
     const t=attackTask(m,p,c);applyTarget(p,t.lx,t.ly,t.task,t.sprint,m);
@@ -863,6 +871,22 @@ function separateRecoveringMidfieldFromStriker(m,team){
     const pl=worldToLocal(team,p.x,p.y);if(Math.hypot(pl.x-sl.x,pl.y-sl.y)>7.0||Math.abs(pl.y-sl.y)>3.8)continue;
     const sign=p.slot==='RCM'?1:-1,tl=worldToLocal(team,p.tx,p.ty),wantedY=clamp(sl.y+sign*5.2,18,50),w=localToWorld(team,Math.min(tl.x,pl.x-1.0),wantedY);p.tx=w.x;p.ty=w.y;p.action=p.tacticalTask='RECOVER_MIDFIELD_LANE';p.sprint=true;m.stats.midfieldStrikerLaneSeparations=(m.stats.midfieldStrikerLaneSeparations||0)+1;
   }
+}
+
+function enforceAttackingCarrierLane(m,team){
+  const owner=playerById(m,m.ball.ownerId);if(!owner||owner.team!==team||m.ball.mode!=='CONTROLLED'||owner.role!=='CM')return;
+  if(!['CARRY_FORWARD','CARRY_SCAN','COMMITTED_BOX_CARRY','DRIBBLE_EVADE','TAKE_ON'].includes(owner.action))return;
+  const ol=worldToLocal(team,owner.x,owner.y);if(ol.x<48)return;
+  const st=teamPlayers(m,team).find(p=>p.slot==='ST');if(!st||st.id===owner.id||(st.lockTargetUntil||0)>m.time)return;
+  const sl=worldToLocal(team,st.x,st.y),ahead=sl.x-ol.x,lateral=sl.y-ol.y;if(ahead<-1.0||ahead>10.5||Math.abs(lateral)>3.4)return;
+  const opps=outfield(m,other(team)),scoreSide=sg=>{const cy=clamp(ol.y+sg*6.2,12,56),cx=clamp(Math.max(sl.x,ol.x+5.5),55,95);return opps.filter(q=>{const l=worldToLocal(team,q.x,q.y);return Math.hypot(l.x-cx,l.y-cy)<5.0;}).length;};
+  let sg=scoreSide(-1)<scoreSide(1)?-1:scoreSide(1)<scoreSide(-1)?1:(sl.y<=34?-1:1),tx=clamp(Math.max(sl.x,ol.x+5.5),55,95),ty=clamp(ol.y+sg*6.2,12,56),w=localToWorld(team,tx,ty);
+  st.tx=w.x;st.ty=w.y;st.action=st.tacticalTask='CLEAR_CARRIER_LANE';st.sprint=true;m.stats.attackingCarrierLaneSeparations=(m.stats.attackingCarrierLaneSeparations||0)+1;
+}
+function recoverFreeKickWall(m,team){
+  const rec=m.setPieceWallRecovery;if(!rec||rec.team!==team)return;if(m.time>=rec.until){delete m.setPieceWallRecovery;return;}
+  const pr=profile(m,team),ball=worldToLocal(team,m.ball.x,m.ball.y),ids=new Set(rec.wallIds||[]);
+  for(const p of teamPlayers(m,team)){if(!ids.has(p.id)||p.role==='GK')continue;const base=defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role),w=localToWorld(team,base.x,base.y);p.tx=w.x;p.ty=w.y;p.action=p.tacticalTask='FREE_KICK_WALL_RECOVERY';p.sprint=dist(p,w)>2.0;p.markTargetId=null;p.pressCommitUntil=0;p.pressRecoverUntil=Math.max(p.pressRecoverUntil||0,Math.min(rec.until,m.time+.55));}
 }
 
 function targetSeparation(m){
@@ -938,7 +962,7 @@ function assign(m){
     m._lastTacticalPossession=poss;
   }
   const owner=playerById(m,m.ball.ownerId),ctx={owner};
-  assignAttack(m,poss,ctx);separateRecoveringMidfieldFromStriker(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceWideLaneHierarchy(m,poss);
+  assignAttack(m,poss,ctx);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceWideLaneHierarchy(m,poss);
   m.tactical={
     formation:{HOME:FORMATION,AWAY:FORMATION},
     profile:{HOME:PROFILES.HOME.id,AWAY:PROFILES.AWAY.id},

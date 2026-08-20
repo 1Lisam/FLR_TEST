@@ -4,8 +4,15 @@
   else root.FLRPG_BALL_STRIKE_MODEL=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION='STEP72-BALL-STRIKE-0.3-FACING';
+const VERSION='TT051-BALL-STRIKE-0.4-THROUGH-DECEL';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function groundDragFor(distance,arrival,initialSpeed){
+  const d=Math.max(0.1,Number(distance)||0.1),t=Math.max(0.1,Number(arrival)||0.1),v=Math.max(0.1,Number(initialSpeed)||0.1);
+  if(v*t<=d*1.015)return 0.11;
+  let lo=0.001,hi=4.0;
+  for(let i=0;i<36;i++){const k=(lo+hi)/2,travel=v/k*(1-Math.exp(-k*t));if(travel>d)lo=k;else hi=k;}
+  return Number(((lo+hi)/2).toFixed(4));
+}
 function passPlan(ctx={}){
   const kind=String(ctx.kind||'PASS'),d=Math.max(0.1,Number(ctx.distance)||1),mode=ctx.deliveryMode==='AERIAL'?'AERIAL':'GROUND';
   const pressure=Number(ctx.pressure)||99,targetSpeed=Number(ctx.targetSpeed)||0,forward=Number(ctx.forward)||0,targetLeadDistance=Math.max(0,Number(ctx.targetLeadDistance)||0);
@@ -19,7 +26,7 @@ function passPlan(ctx={}){
     if(mode==='AERIAL'){
       style='LOFTED_THROUGH';arrival=clamp(0.95+d/41,1.12,1.72);speed=clamp(d/arrival+3.0+quality,16.0,23.8);loft=1.55;
     }else{
-      style='THROUGH_GROUND';const runnerArrival=targetSpeed>1.6&&targetLeadDistance>1.5?targetLeadDistance/targetSpeed:0,physicsFloor=d/22.5;arrival=runnerArrival>0?clamp(Math.max(physicsFloor,runnerArrival),0.82,2.85):clamp(0.72+d/41-(targetSpeed>4?0.03:0),0.84,1.55);speed=runnerArrival>0?clamp(d/arrival+quality*0.12,5.6,22.5):clamp(d/arrival+quality*0.35,11.5,22.5);loft=0.07;
+      style='THROUGH_GROUND';const runnerArrival=targetSpeed>1.6&&targetLeadDistance>1.5?targetLeadDistance/targetSpeed:0,physicsFloor=d/22.5;arrival=runnerArrival>0?clamp(Math.max(physicsFloor,runnerArrival),0.82,2.85):clamp(0.72+d/41-(targetSpeed>4?0.03:0),0.84,1.55);const avg=d/arrival;speed=clamp(Math.max(avg*1.42,runnerArrival>0?13.2:12.4)+quality*0.18,12.4,24.8);loft=0.07;
     }
   }else if(kind==='LONG_PASS'){
     if(mode==='AERIAL'){
@@ -36,7 +43,8 @@ function passPlan(ctx={}){
   }
   // A pressured ball-carrier tends to punch a ground pass more firmly; aerial balls are not sped up artificially.
   if(mode==='GROUND'&&pressure<1.55&&kind!=='CUTBACK')speed=clamp(speed+0.8,9.5,26.0);
-  return{style,speed:Number(speed.toFixed(3)),loft:Number(loft.toFixed(3)),arrival:Number(arrival.toFixed(3))};
+  const groundDragK=mode==='GROUND'&&kind==='THROUGH'?groundDragFor(d,arrival,speed):null;
+  return{style,speed:Number(speed.toFixed(3)),loft:Number(loft.toFixed(3)),arrival:Number(arrival.toFixed(3)),groundDragK};
 }
 function shotPlan(ctx={}){
   const d=Number(ctx.dGoal)||18,oneVOne=!!ctx.oneVOne,open=!!ctx.openWindow,centrality=Math.abs(Number(ctx.centrality)||0),pressure=Number(ctx.pressure)||2;
