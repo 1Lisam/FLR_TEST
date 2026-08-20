@@ -3,11 +3,12 @@
   "version": "TT-0.50",
   "candidateBranch": "tt050-candidate",
   "baselineRef": "main",
-  "baselineSha": "d0fdd807707ab556cf666a1500ff07279fa60661",
-  "candidateSha": "eb32f04b7521327a57dfbcb6f9ce92c1e20bc939",
+  "baselineSha": "196aad4e031886a5cd829f508d7aa5210dc5cbe1",
+  "candidateSha": "c1ad9603fd5decaeefe73359f0bc4a647fb7fd2e",
   "workflowStatus": "FAIL",
   "validationExitCode": 1,
   "failures": [
+    "apply script failed: .flr/tt050_final_refine.py",
     "validation exit 1"
   ],
   "changedFiles": [
@@ -32,7 +33,7 @@
     "index.html",
     "bug_report_config.js"
   ],
-  "patchSha256": "d556b5e440cf8bbe6c43fd869a955dc5161e97e0dbc014241d870acccce3b727",
+  "patchSha256": "01c90e47555080d87796de31ac2eb0bee4e53d3a45e93ad11f6bacdfec162641",
   "baseline": null,
   "validation": {
     "schemaVersion": "FLR_TT050_VALIDATION_0.2",
@@ -310,6 +311,15 @@
         ]
       }
     ],
+    "frozenTargetRegression": {
+      "tested": 40,
+      "kinds": {
+        "BLOCK_LANE": 11,
+        "SAFE_PASS": 28,
+        "AVAILABLE_PASS": 1
+      },
+      "failures": []
+    },
     "highResStress": {
       "ST": {
         "choices": 206,
@@ -374,6 +384,7 @@
       "ST Hybrid avg choices excessive 50.5",
       "ST Hybrid first30 choices excessive 15",
       "ST Hybrid single-match choices excessive",
+      "ST Hybrid episode still too fragmented 12 choices",
       "Hybrid visible choice application failures [{\"role\":\"ST\",\"boundaryType\":\"PROTAGONIST_2D_WINDOW\",\"sceneId\":\"HW0027\",\"atSecond\":5061,\"choiceId\":\"SAFE_PASS\",\"targetId\":\"H-CM\",\"error\":\"CHOICE_TARGET_NOT_AVAILABLE\",\"pending\":[{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RW\",\"label\":\"안전한 패스 → 같은 팀 RW\"},{\"id\":\"HOLD\",\"targetId\":null,\"label\":\"볼 지키기\"},{\"id\":\"SHOT\",\"targetId\":null,\"label\":\"슈팅\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"label\":\"안전한 패스 → 같은 팀 LCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RCM\",\"label\":\"안전한 패스 → 같은 팀 RCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-CM\",\"label\":\"안전한 패스 → 같은 팀 CM\"}]}]"
     ],
     "status": "FAIL"
@@ -396,6 +407,12 @@
       "exitCode": 0,
       "stdout": "TT050_CADENCE_REFINE_OK\n",
       "stderr": ""
+    },
+    {
+      "script": ".flr/tt050_final_refine.py",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "TT050_FINAL_REPLACE episode hard duration existing expected=1 actual=2\n"
     }
   ],
   "validationStderr": ""

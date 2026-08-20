@@ -274,6 +274,15 @@
       ]
     }
   ],
+  "frozenTargetRegression": {
+    "tested": 40,
+    "kinds": {
+      "BLOCK_LANE": 11,
+      "SAFE_PASS": 28,
+      "AVAILABLE_PASS": 1
+    },
+    "failures": []
+  },
   "highResStress": {
     "ST": {
       "choices": 206,
@@ -338,6 +347,7 @@
     "ST Hybrid avg choices excessive 50.5",
     "ST Hybrid first30 choices excessive 15",
     "ST Hybrid single-match choices excessive",
+    "ST Hybrid episode still too fragmented 12 choices",
     "Hybrid visible choice application failures [{\"role\":\"ST\",\"boundaryType\":\"PROTAGONIST_2D_WINDOW\",\"sceneId\":\"HW0027\",\"atSecond\":5061,\"choiceId\":\"SAFE_PASS\",\"targetId\":\"H-CM\",\"error\":\"CHOICE_TARGET_NOT_AVAILABLE\",\"pending\":[{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RW\",\"label\":\"안전한 패스 → 같은 팀 RW\"},{\"id\":\"HOLD\",\"targetId\":null,\"label\":\"볼 지키기\"},{\"id\":\"SHOT\",\"targetId\":null,\"label\":\"슈팅\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"label\":\"안전한 패스 → 같은 팀 LCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RCM\",\"label\":\"안전한 패스 → 같은 팀 RCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-CM\",\"label\":\"안전한 패스 → 같은 팀 CM\"}]}]"
   ],
   "status": "FAIL"
