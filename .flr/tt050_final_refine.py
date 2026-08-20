@@ -9,6 +9,10 @@ def one(t,old,new,label):
     n=t.count(old)
     if n!=1: raise SystemExit(f'TT050_FINAL_REPLACE {label} expected=1 actual={n}')
     return t.replace(old,new,1)
+def exact_many(t,old,new,count,label):
+    n=t.count(old)
+    if n!=count: raise SystemExit(f'TT050_FINAL_REPLACE {label} expected={count} actual={n}')
+    return t.replace(old,new)
 
 # A visible pending option is the authoritative current-state user input.
 # Do not re-rank it away between menu display and the click that executes it.
@@ -41,8 +45,9 @@ t=one(t,
 'controller passes frozen option')
 # One football episode should not remain interactive for half a minute just because the hero
 # repeatedly retains possession. This is a temporal episode boundary, not a choice-count cap.
-t=one(t,"hardUntil:s.m.time+32","hardUntil:s.m.time+20",'episode hard duration new')
-t=one(t,"ep.hardUntil=ep.hardUntil||ep.startedAt+32","ep.hardUntil=ep.hardUntil||ep.startedAt+20",'episode hard duration existing')
+t=one(t,"hardUntil:s.m.time+32","hardUntil:s.m.time+20",'episode hard duration choice branch')
+t=one(t,"hardUntil:tr.startedAt+32","hardUntil:tr.startedAt+20",'episode hard duration result branch')
+t=exact_many(t,"ep.hardUntil=ep.hardUntil||ep.startedAt+32","ep.hardUntil=ep.hardUntil||ep.startedAt+20",2,'episode hard duration existing branches')
 # Give a chosen carry enough time/distance to feel like one action before another checkpoint.
 t=one(t,"m.time+2.60);owner.nextThink=intentUntil;","m.time+3.20);owner.nextThink=intentUntil;",'carry intent duration 3.2')
 t=one(t,"ready=(critical&&now>=tr.startedAt+1.25)||(moved>=6.0&&now>=tr.startedAt+2.35)||now>=tr.minimumUntil;","ready=(critical&&now>=tr.startedAt+1.35)||(moved>=7.5&&now>=tr.startedAt+2.90)||now>=tr.minimumUntil;",'carry meaningful checkpoint')
