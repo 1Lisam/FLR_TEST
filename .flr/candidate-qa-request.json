@@ -28,5 +28,6 @@
     "bug_report_config.js",
     {"kind": "node-esm", "path": "bug-report-worker/worker.js"}
   ],
-  "resultDir": ".flr/qa-results/TT-0.50"
+  "resultDir": ".flr/qa-results/TT-0.50",
+  "runNonce": "2026-08-20T17:29+09:00-r2"
 }
