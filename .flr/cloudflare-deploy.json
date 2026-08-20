@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_REQUEST_0.1",
+  "version": "TT-0.50",
+  "worker": "flr-bug-reporter",
+  "bucket": "flr-bug-reports",
+  "purpose": "Store full integrated Episode JSON and wire the public bug-report endpoint",
+  "requestedAt": "2026-08-20T19:15:00+09:00"
+}
