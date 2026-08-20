@@ -1,0 +1,86 @@
+name: FLR validated TT auto deploy
+
+on:
+  push:
+    branches:
+      - automation/tt-deploy
+    paths:
+      - '.flr/deploy.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-validated-tt-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Checkout incoming patch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/tt-deploy
+          path: _incoming
+          fetch-depth: 1
+
+      - name: Validate patch metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, pathlib, subprocess, sys
+          manifest=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
+          patch=pathlib.Path('_incoming/.flr/incoming.patch').read_bytes()
+          actual=hashlib.sha256(patch).hexdigest()
+          if actual != manifest['patchSha256']:
+              raise SystemExit(f"PATCH_SHA_MISMATCH expected={manifest['patchSha256']} actual={actual}")
+          head=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+          if head != manifest['baseCommit']:
+              raise SystemExit(f"BASE_COMMIT_MISMATCH expected={manifest['baseCommit']} actual={head}")
+          if manifest.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
+              raise SystemExit('VALIDATION_STATUS_NOT_PASS')
+          if manifest.get('step79Started') is not False:
+              raise SystemExit('STEP79_MUST_REMAIN_FALSE')
+          print(f"Validated {manifest['fromBuild']} -> {manifest['toBuild']}")
+          PY
+
+      - name: Apply validated patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check _incoming/.flr/incoming.patch
+          git apply _incoming/.flr/incoming.patch
+          rm -rf _incoming
+
+      - name: Syntax check changed JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            if [[ "$f" == *.js && -f "$f" ]]; then node --check "$f"; fi
+          done < <(git diff --name-only)
+
+      - name: Commit TT build to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "FLR Test Deploy Bot"
+          git config user.email "actions@users.noreply.github.com"
+          MSG=$(python -c "import json; print(json.load(open('_incoming/.flr/deploy.json'))['commitMessage'])" 2>/dev/null || true)
+          if [ -z "$MSG" ]; then
+            # _incoming is removed after apply; derive version from validation filename.
+            BUILD=$(ls TT*_INTERNAL_VALIDATION.json | sort | tail -1 | sed -E 's/TT([0-9]{3})_.*/TT-0.\1/' | sed 's/TT-0.048/TT-0.48/;s/TT-0.049/TT-0.49/')
+            MSG="Deploy ${BUILD} TEST_ONLY validated"
+          fi
+          git add -- live_v06_scene_authority_browser.js runtime/continuous_match_core.js runtime/protagonist_match_controller.js runtime/tactical_movement.js step71_hybrid_v06_ui.js TT*_INTERNAL_VALIDATION.json
+          git commit -m "$MSG"
+          git push origin main
