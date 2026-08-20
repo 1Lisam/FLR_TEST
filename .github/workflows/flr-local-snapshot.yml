@@ -1,0 +1,33 @@
+name: FLR local development snapshot
+
+on:
+  push:
+    paths:
+      - '.github/workflows/flr-local-snapshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Record snapshot metadata
+        shell: bash
+        run: |
+          printf '{"schemaVersion":"FLR_LOCAL_DEV_SNAPSHOT_0.1","ref":"%s","sha":"%s","createdBy":"github-actions"}\n' "${GITHUB_REF_NAME}" "${GITHUB_SHA}" > FLR_LOCAL_DEV_SNAPSHOT.json
+      - name: Upload complete repository snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: FLR_TT050_MAIN_SNAPSHOT
+          path: |
+            .
+            !.git/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
