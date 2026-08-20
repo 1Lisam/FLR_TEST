@@ -6,9 +6,10 @@
   "applyScripts": [
     ".flr/tt050_apply.py",
     ".flr/tt050_backend_refine.py",
-    ".flr/tt050_cadence_refine.py"
+    ".flr/tt050_cadence_refine.py",
+    ".flr/tt050_final_refine.py"
   ],
-  "validationScript": ".flr/tt050_validation_v3.js",
+  "validationScript": ".flr/tt050_validation_v4.js",
   "changedFiles": [
     "runtime/ball_strike_model.js",
     "runtime/continuous_match_core.js",
@@ -31,5 +32,5 @@
     {"kind": "node-esm", "path": "bug-report-worker/worker.js"}
   ],
   "resultDir": ".flr/qa-results/TT-0.50",
-  "runNonce": "2026-08-20T17:45+09:00-r5-target-diagnostic-fixed"
+  "runNonce": "2026-08-20T17:58+09:00-final-refine-r6"
 }
