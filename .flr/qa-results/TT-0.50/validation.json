@@ -1,4 +1,213 @@
 {
-  "parseError": "validation: Expecting value: line 1 column 1 (char 0)",
-  "raw": ""
+  "schemaVersion": "FLR_TT050_VALIDATION_0.1",
+  "build": "TT-0.50 TEST_ONLY",
+  "step79Started": false,
+  "canonical": {
+    "futureChoicePrecomputed": false,
+    "futureOutcomePrecomputed": false,
+    "v06OwnsLiveChoiceDiscovery": true,
+    "v06OwnsPostChoiceResolution": true,
+    "choiceIdAndExactTargetIdImmutable": true,
+    "protagonistUnchosenMaterialActionForbidden": true
+  },
+  "throughTrajectory": {},
+  "finalThirdDecision": {
+    "trials": 120,
+    "backward": 0,
+    "forwardPass": 0,
+    "shot": 56,
+    "carry": 64,
+    "takeOn": 0,
+    "other": 0,
+    "backwardRate": 0,
+    "attackContinuationRate": 1,
+    "samples": [
+      {
+        "decision": "CARRY",
+        "event": null
+      },
+      {
+        "decision": "CARRY",
+        "event": null
+      },
+      {
+        "decision": "SHOT",
+        "event": {
+          "type": "SHOT",
+          "targetId": null
+        }
+      },
+      {
+        "decision": "SHOT",
+        "event": {
+          "type": "SHOT",
+          "targetId": null
+        }
+      },
+      {
+        "decision": "SHOT",
+        "event": {
+          "type": "SHOT",
+          "targetId": null
+        }
+      },
+      {
+        "decision": "SHOT",
+        "event": {
+          "type": "SHOT",
+          "targetId": null
+        }
+      },
+      {
+        "decision": "SHOT",
+        "event": {
+          "type": "SHOT",
+          "targetId": null
+        }
+      },
+      {
+        "decision": "SHOT",
+        "event": {
+          "type": "SHOT",
+          "targetId": null
+        }
+      }
+    ]
+  },
+  "roleCadence": {
+    "ST": {
+      "rows": [
+        {
+          "choices": 253,
+          "episodes": 36,
+          "maxBurst5s": 3,
+          "sub2s": 28,
+          "sub3s": 65,
+          "maxEpisodeChoices": 5
+        },
+        {
+          "choices": 218,
+          "episodes": 38,
+          "maxBurst5s": 3,
+          "sub2s": 25,
+          "sub3s": 40,
+          "maxEpisodeChoices": 5
+        }
+      ],
+      "avgChoices": 235.5,
+      "avgEpisodes": 37,
+      "avgSub2s": 26.5,
+      "avgSub3s": 52.5,
+      "maxBurst5s": 3,
+      "maxEpisodeChoices": 5
+    },
+    "CM": {
+      "rows": [
+        {
+          "choices": 127,
+          "episodes": 59,
+          "maxBurst5s": 3,
+          "sub2s": 5,
+          "sub3s": 11,
+          "maxEpisodeChoices": 2
+        },
+        {
+          "choices": 148,
+          "episodes": 55,
+          "maxBurst5s": 3,
+          "sub2s": 9,
+          "sub3s": 18,
+          "maxEpisodeChoices": 2
+        }
+      ],
+      "avgChoices": 137.5,
+      "avgEpisodes": 57,
+      "avgSub2s": 7,
+      "avgSub3s": 14.5,
+      "maxBurst5s": 3,
+      "maxEpisodeChoices": 2
+    },
+    "CB": {
+      "rows": [
+        {
+          "choices": 139,
+          "episodes": 58,
+          "maxBurst5s": 3,
+          "sub2s": 2,
+          "sub3s": 15,
+          "maxEpisodeChoices": 2
+        },
+        {
+          "choices": 70,
+          "episodes": 57,
+          "maxBurst5s": 3,
+          "sub2s": 3,
+          "sub3s": 12,
+          "maxEpisodeChoices": 2
+        }
+      ],
+      "avgChoices": 104.5,
+      "avgEpisodes": 57.5,
+      "avgSub2s": 2.5,
+      "avgSub3s": 13.5,
+      "maxBurst5s": 3,
+      "maxEpisodeChoices": 2
+    },
+    "GK": {
+      "rows": [
+        {
+          "choices": 6,
+          "episodes": 6,
+          "maxBurst5s": 1,
+          "sub2s": 0,
+          "sub3s": 0,
+          "maxEpisodeChoices": 1
+        },
+        {
+          "choices": 5,
+          "episodes": 5,
+          "maxBurst5s": 1,
+          "sub2s": 0,
+          "sub3s": 0,
+          "maxEpisodeChoices": 1
+        }
+      ],
+      "avgChoices": 5.5,
+      "avgEpisodes": 5.5,
+      "avgSub2s": 0,
+      "avgSub3s": 0,
+      "maxBurst5s": 1,
+      "maxEpisodeChoices": 1
+    }
+  },
+  "midfieldStrikerOverlap": {
+    "matches": 6,
+    "frames": 65516,
+    "overlaps": 519,
+    "overlapRate": 0.0079,
+    "laneSeparationCorrections": 182
+  },
+  "bugReportStatic": {
+    "postsFullDebug": true,
+    "configLoaded": true,
+    "fallbackPresent": false
+  },
+  "bugReportWorker": {
+    "status": 201,
+    "jsonUrl": "https://worker.example/reports/TT-0.50/tt050-123456789012.json",
+    "sizeBytes": 4075,
+    "storedKey": "reports/TT-0.50/tt050-123456789012.json",
+    "exactDebug": true
+  },
+  "authority": {
+    "tested": 2,
+    "violations": [],
+    "futureOutcomePrecomputed": false
+  },
+  "watch": [],
+  "failures": [
+    "moving diagonal LW THROUGH_PASS missing",
+    "browser endpoint config missing"
+  ],
+  "status": "FAIL"
 }

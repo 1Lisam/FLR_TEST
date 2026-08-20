@@ -1,5 +1,5 @@
 diff --git a/bug-report-worker/worker.js b/bug-report-worker/worker.js
-index dc5b1b4..60338c5 100644
+index dc5b1b4..e48b7f6 100644
 --- a/bug-report-worker/worker.js
 +++ b/bug-report-worker/worker.js
 @@ -1,21 +1,17 @@
@@ -29,7 +29,8 @@ index dc5b1b4..60338c5 100644
 +  await env.BUG_REPORTS.put(key,raw,{httpMetadata:{contentType:'application/json'},customMetadata:{reportId,build,sizeBytes:String(sizeBytes)}});
 +  const publicUrl=`${u.origin}/${key}`,meta={reportId,jsonUrl:publicUrl,sizeBytes,build,createdAt:new Date().toISOString()};await env.BUG_REPORTS.put(metaKey,JSON.stringify(meta),{httpMetadata:{contentType:'application/json'}});
    return json({ok:true,...meta},201,ch);
- }}};
+-}}};
++}};
 diff --git a/bug_report_config.js b/bug_report_config.js
 new file mode 100644
 index 0000000..e554b55
@@ -37,6 +38,18 @@ index 0000000..e554b55
 +++ b/bug_report_config.js
 @@ -0,0 +1 @@
 +window.FLR_BUG_REPORT_ENDPOINT = window.FLR_BUG_REPORT_ENDPOINT || ''; // set to https://<worker>/report after one-time Worker deployment
+diff --git a/index.html b/index.html
+index bc7a3c7..56db841 100644
+--- a/index.html
++++ b/index.html
+@@ -9,4 +9,4 @@
+ <section class="log-panel replay-history-panel"><div class="panel-head"><strong>선택 Episode 기록</strong><span class="muted">Hybrid 복귀 후에도 다시보기/버그 리포트 유지</span></div><div id="heroSceneHistory" class="scene-history"><div class="muted">아직 선택 장면이 없습니다.</div></div></section>
+ <section class="log-panel"><div class="panel-head"><strong>경기 진행</strong><span id="heroPauseCount" class="muted">선택 0회</span></div><div id="heroEventLog" class="event-log">경기 시작 대기</div></section>
+ <details class="developer-panel"><summary>개발 디버그 · 통합 JSON</summary><p>Hybrid 직전 상태 + V0.6 pre-action + 선택 + 실제 post-action + Hybrid hand-back을 한 파일로 저장합니다.</p><div class="debug-controls"><label class="inline-check"><input type="checkbox" id="heroShowOffside"> 오프사이드 기준선 표시</label><button id="heroBugReport" class="secondary" disabled>버그 리포트 등록</button><button id="heroDownloadScene" class="secondary" disabled>전체 JSON 저장(비상용)</button><button id="heroCopyDebug" class="secondary" disabled>요약 복사</button></div><pre id="heroDebugSummary" class="debug-summary">아직 선택 장면 없음</pre></details>
+-<div id="heroBugModal" class="bug-modal" hidden><div class="bug-dialog"><h3>현재 장면 버그 리포트</h3><div class="bug-form-grid"><label>분류<select id="heroBugCategory"><option>조작권/선택</option><option>수비/전술</option><option>패스/공격</option><option>슈팅/GK</option><option>2D 움직임</option><option>UI/다시보기</option><option>기타</option></select></label><label>중요도<select id="heroBugPriority"><option value="5">5 - 치명적/최우선</option><option value="4">4 - 중요</option><option value="3" selected>3 - 보통</option><option value="2">2 - 낮음</option><option value="1">1 - 사소함</option></select></label></div><label style="margin-top:10px">문제 설명<textarea id="heroBugDescription" placeholder="지금 화면에서 무엇이 이상했는지 적어주세요."></textarea></label><p class="muted">현재 TT 버전, 경기 시간, seed, 선택 choiceId + exact targetId, 선수/공 위치와 최근 이벤트가 자동 첨부됩니다. GitHub 등록 화면에서 마지막 Submit만 누르면 됩니다.</p><div class="bug-actions"><button id="heroBugCancel" class="secondary">취소</button><button id="heroBugOpenIssue">GitHub에 등록</button></div></div></div></main><script src="runtime/match_flow_resolution.js"></script><script src="runtime/tactical_movement.js"></script><script src="runtime/restart_movement.js"></script><script src="runtime/match_choice_telemetry.js"></script><script src="runtime/attribute_match_adapter.js"></script><script src="runtime/action_candidate_engine.js"></script><script src="runtime/match_academy.js"></script><script src="runtime/aerial_contest.js"></script><script src="runtime/take_on_duel.js"></script><script src="runtime/ball_strike_model.js"></script><script src="runtime/continuous_match_core.js"></script><script src="runtime/choice_action_resolver.js"></script><script src="runtime/choice_resolution_harness.js"></script><script src="runtime/choice_action_resolver_step38.js"></script><script src="runtime/manager_tendency_adapter.js"></script><script src="runtime/step38_influence_harness.js"></script><script src="runtime/protagonist_match_controller.js"></script><script src="live_hybrid_session_v02.js"></script><script src="live_v06_scene_authority_browser.js"></script><script src="scene_debug_export.js"></script><script src="full_time_presentation.js"></script><script src="in_pitch_choice_ui.js"></script><script src="step71_hybrid_v06_ui.js"></script></body></html>
+\ No newline at end of file
++<div id="heroBugModal" class="bug-modal" hidden><div class="bug-dialog"><h3>현재 장면 버그 리포트</h3><div class="bug-form-grid"><label>분류<select id="heroBugCategory"><option>조작권/선택</option><option>수비/전술</option><option>패스/공격</option><option>슈팅/GK</option><option>2D 움직임</option><option>UI/다시보기</option><option>기타</option></select></label><label>중요도<select id="heroBugPriority"><option value="5">5 - 치명적/최우선</option><option value="4">4 - 중요</option><option value="3" selected>3 - 보통</option><option value="2">2 - 낮음</option><option value="1">1 - 사소함</option></select></label></div><label style="margin-top:10px">문제 설명<textarea id="heroBugDescription" placeholder="지금 화면에서 무엇이 이상했는지 적어주세요."></textarea></label><p class="muted">등록 버튼을 누르면 현재 Episode의 전체 통합 JSON 원본을 자동 저장하고 GitHub Issue에 링크합니다. 서버가 아직 연결되지 않았거나 업로드에 실패하면 기존 수동 GitHub 등록 방식으로 안전하게 전환됩니다.</p><div class="bug-actions"><button id="heroBugCancel" class="secondary">취소</button><button id="heroBugOpenIssue">GitHub에 등록</button></div></div></div></main><script src="runtime/match_flow_resolution.js"></script><script src="runtime/tactical_movement.js"></script><script src="runtime/restart_movement.js"></script><script src="runtime/match_choice_telemetry.js"></script><script src="runtime/attribute_match_adapter.js"></script><script src="runtime/action_candidate_engine.js"></script><script src="runtime/match_academy.js"></script><script src="runtime/aerial_contest.js"></script><script src="runtime/take_on_duel.js"></script><script src="runtime/ball_strike_model.js"></script><script src="runtime/continuous_match_core.js"></script><script src="runtime/choice_action_resolver.js"></script><script src="runtime/choice_resolution_harness.js"></script><script src="runtime/choice_action_resolver_step38.js"></script><script src="runtime/manager_tendency_adapter.js"></script><script src="runtime/step38_influence_harness.js"></script><script src="runtime/protagonist_match_controller.js"></script><script src="live_hybrid_session_v02.js"></script><script src="live_v06_scene_authority_browser.js"></script><script src="scene_debug_export.js"></script><script src="full_time_presentation.js"></script><script src="in_pitch_choice_ui.js"></script><script src="bug_report_config.js"></script><script src="step71_hybrid_v06_ui.js"></script></body></html>
+\ No newline at end of file
 diff --git a/runtime/ball_strike_model.js b/runtime/ball_strike_model.js
 index a2bf156..eabab3a 100644
 --- a/runtime/ball_strike_model.js
@@ -60,7 +73,7 @@ index a2bf156..eabab3a 100644
    }else if(kind==='LONG_PASS'){
      if(mode==='AERIAL'){
 diff --git a/runtime/continuous_match_core.js b/runtime/continuous_match_core.js
-index 5a52a0d..b560b4c 100644
+index 5a52a0d..9cb20bf 100644
 --- a/runtime/continuous_match_core.js
 +++ b/runtime/continuous_match_core.js
 @@ -782,7 +782,7 @@ function earlyCrossDelivery(m,owner){
@@ -82,8 +95,8 @@ index 5a52a0d..b560b4c 100644
 -    // along the attacking axis; keep the requested lane/side intact.
 -    if(receiverLead<desiredLead*0.88){const tl=worldToLocal(target.team,target.x,target.y),tpl=worldToLocal(target.team,tp.x,tp.y),extra=clamp(desiredLead-receiverLead,0,3.6),candidate=localToWorld(target.team,clamp(tpl.x+extra,4,98.2),clamp(tpl.y,4,64)),oldBlocks=laneBlockers(m,owner,tp,other(owner.team)).length,newBlocks=laneBlockers(m,owner,candidate,other(owner.team)).length,oldOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,tp)),99),newOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,candidate)),99);if(newBlocks<=oldBlocks&&newOpen>=Math.min(1.25,oldOpen-.35))tp=candidate;pd=dist(owner,tp);}
 +    const receiverLead=dist(target,tp),targetSpeed=Math.hypot(target.vx,target.vy),roughArrival=clamp(pd/Math.max(13.2,Math.min(24.5,pd/1.10)),0.82,1.62),desiredLead=clamp((targetSpeed>1.6?targetSpeed:5.0)*roughArrival,4.8,14.5);
-+    // Extend an under-led pass ALONG the runner's live movement vector. The previous X-axis-only
-+    // extension made diagonal/wide runs look like a hard straight shot toward the goal line.
++    // Extend an under-led pass along the runner's LIVE movement vector. The old X-only
++    // extension could turn a diagonal/wide run into a hard straight ball toward goal.
 +    if(receiverLead<desiredLead*0.88){const baseDx=targetSpeed>1.6?target.vx:(tp.x-target.x),baseDy=targetSpeed>1.6?target.vy:(tp.y-target.y),nv=norm(baseDx,baseDy),extra=clamp(desiredLead-receiverLead,0,3.8),candidate={x:clamp(tp.x+nv.x*extra,1,104),y:clamp(tp.y+nv.y*extra,1,67)},oldBlocks=laneBlockers(m,owner,tp,other(owner.team)).length,newBlocks=laneBlockers(m,owner,candidate,other(owner.team)).length,oldOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,tp)),99),newOpen=outfield(m,other(owner.team)).reduce((best,q)=>Math.min(best,dist(q,candidate)),99);if(newBlocks<=oldBlocks&&newOpen>=Math.min(1.25,oldOpen-.35))tp=candidate;pd=dist(owner,tp);}
    }
    const ownerSpeed=Math.hypot(owner.vx,owner.vy),underPressure=ballCarrierPressureDistance(m,owner)<2.0;if(['PASS','LONG_PASS','THROUGH'].includes(kind)&&underPressure){const err=kind==='LONG_PASS'||pd>30?1.8:1.0;tp={x:clamp(tp.x+(m.r()-0.5)*err*1.2,0,105),y:clamp(tp.y+(m.r()-0.5)*err*2.0,0,68)};pd=dist(owner,tp);}
