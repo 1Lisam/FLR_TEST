@@ -1,6 +1,9 @@
 const fs=require('fs');
 const cp=require('child_process');
-const src=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+const path=require('path');
+const root=process.argv[2]?path.resolve(process.argv[2]):process.cwd();
+const file=path.join(root,'step71_hybrid_v06_ui.js');
+const src=fs.readFileSync(file,'utf8');
 const checks=[];
 function ok(name,cond,detail=''){checks.push({name,status:cond?'PASS':'FAIL',detail});if(!cond)process.exitCode=1;}
 ok('rolling-ring-two',src.includes('while(recentCompletedSituations.length>2)recentCompletedSituations.shift()'));
@@ -8,8 +11,10 @@ ok('scope-current',src.includes("currentSituation:scopeSituationDebug(d)"));
 ok('scope-previous',src.includes("previousSituation:scopeSituationDebug(prev)"));
 ok('scope-no-older',src.includes("olderSituationsIncluded:false"));
 ok('scope-rule-label',src.includes("IMMEDIATE_PREVIOUS_SITUATION_START_TO_END"));
+ok('range-null-safe',src.includes('num=v=>v==null?NaN:Number(v)'));
 ok('trim-resolved-events',src.includes('st.resolvedEvents=st.resolvedEvents.filter'));
 ok('trim-scene-candidates',src.includes('st.sceneCandidates=st.sceneCandidates.filter'));
+ok('trim-chain',src.includes('st.chain=st.chain.filter'));
 ok('keep-full-situation-frames',src.includes('keepsFullSituationFrames:true'));
 ok('choice-episode-remembered',src.includes("rememberCompletedSituation(latestIntegratedDebug,'CHOICE_EPISODE')"));
 ok('goal-scene-remembered',src.includes("rememberCompletedSituation(latestIntegratedDebug,'GOAL_SCENE')"));
@@ -21,9 +26,7 @@ ok('payload-uses-bundle',src.includes('debug:reportBundle'));
 ok('raw-current-not-sent',!src.includes('summary:snap,debug:d,client'));
 ok('fallback-uses-bundle',src.includes('bugFallbackUrl(desc,cat,prio,snap,reportBundle)'));
 ok('ring-reset-on-setup',src.includes('episodeHistory=[];recentCompletedSituations=[];'));
-try{cp.execFileSync('node',['--check','step71_hybrid_v06_ui.js'],{stdio:'pipe'});ok('syntax-step71',true);}catch(e){ok('syntax-step71',false,String(e.stderr||e.message));}
+try{cp.execFileSync('node',['--check',file],{stdio:'pipe'});ok('syntax-step71',true);}catch(e){ok('syntax-step71',false,String(e.stderr||e.message));}
 const out={schemaVersion:'FLR_TT051_REPORT_SCOPE_VALIDATION_1.0',status:checks.every(x=>x.status==='PASS')?'PASS':'FAIL',checks};
-fs.mkdirSync('.flr/qa-results/TT-0.51-report-scope',{recursive:true});
-fs.writeFileSync('.flr/qa-results/TT-0.51-report-scope/validation.json',JSON.stringify(out,null,2)+'\n');
 console.log(JSON.stringify(out));
 if(out.status!=='PASS')process.exit(1);
