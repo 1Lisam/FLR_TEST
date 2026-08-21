@@ -1,0 +1,41 @@
+diff --git a/runtime/continuous_match_core.js b/runtime/continuous_match_core.js
+index 668fc9d..17568a3 100644
+--- a/runtime/continuous_match_core.js
++++ b/runtime/continuous_match_core.js
+@@ -549,7 +549,7 @@ function resolveSpacing(m){
+   const ownerId=m.ball.ownerId,insideBox=(p)=>(p.x<16.8||p.x>88.2)&&p.y>13.4&&p.y<54.6;
+   for(let pass=0;pass<2;pass++)for(let i=0;i<m.players.length;i++)for(let j=i+1;j<m.players.length;j++){
+     const a=m.players[i],b=m.players[j];let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);const same=a.team===b.team,duel=!same&&ownerId&&((a.id===ownerId&&['ENGAGE','CLOSE_DOWN','PRESS_CONTAIN'].includes(b.tacticalTask||b.action))||(b.id===ownerId&&['ENGAGE','CLOSE_DOWN','PRESS_CONTAIN'].includes(a.tacticalTask||a.action)));
+-    const bothBox=insideBox(a)&&insideBox(b),min=a.role==='GK'||b.role==='GK'?0.82:same?(bothBox?1.18:0.88):(duel?1.02:1.05);if(d>=min)continue;
++    const bothBox=insideBox(a)&&insideBox(b),min=a.role==='GK'||b.role==='GK'?0.82:same?(bothBox?1.18:0.88):(duel?1.02:1.30);if(d>=min)continue;
+     if(d<0.001){const ang=((hash32(a.id+'|'+b.id)%6283)/1000),eps=0.01;dx=Math.cos(ang)*eps;dy=Math.sin(ang)*eps;d=eps;}
+     const n=norm(dx,dy);
+     if(duel){
+diff --git a/runtime/manager_tendency_adapter.js b/runtime/manager_tendency_adapter.js
+index 352d2f7..77db9d5 100644
+--- a/runtime/manager_tendency_adapter.js
++++ b/runtime/manager_tendency_adapter.js
+@@ -65,6 +65,10 @@ function choosePresser(ps,owner,team,pr){
+     if(p.role==='CB'&&highZone)penalty=pr.pressing>.72?5.5:9.0;
+     else if(p.role==='FB'&&highZone)penalty=2.0;
+     else if(['ST','WF','CM'].includes(p.role))penalty=-.7;
++    // A centre-back already responsible for a different attacker should not be repeatedly
++    // stolen from that off-ball mark by the manager press layer. Keep it possible only when
++    // no better presser exists; the added cost is preference, not a hard prohibition.
++    if(p.role==='CB'&&p.markTargetId&&p.markTargetId!==owner.id)penalty+=8.5;
+     // High press means earlier pressure, not chasing from the wrong side. Prefer a
+     // slightly farther goal-side player over one the carrier has already beaten.
+     if(gap<-.20)penalty+=13.5+Math.min(8.0,Math.abs(gap)*2.4);
+diff --git a/runtime/tactical_movement.js b/runtime/tactical_movement.js
+index 0cd04f7..658d036 100644
+--- a/runtime/tactical_movement.js
++++ b/runtime/tactical_movement.js
+@@ -760,7 +760,7 @@ function enforceDefensiveLayering(m,team,owner){
+     const z=close[i];let dx=z.tx-o.x,dy=z.ty-o.y,d=Math.hypot(dx,dy);if(d<.001){dy=sideSign(z.p.slot)||1;d=1;}
+     const need=ring+0.45,k=(need-d)/d;z.tx+=dx*k;z.ty+=dy*k;z.d=need;
+   }
+-  for(const z of secondary){const w=localToWorld(team,clamp(z.tx,3,98),clamp(z.ty,4,64));z.p.tx=w.x;z.p.ty=w.y;if(['CUTBACK_TRACK','SECOND_BALL_TUCK','BOX_EDGE_SCREEN','MARK_LANE_SCREEN','DEEP_SCREEN','EMERGENCY_TRACK','DEEP_TUCK'].includes(z.p.tacticalTask))z.p.action=z.p.tacticalTask=z.p.tacticalTask==='MARK_LANE_SCREEN'?'MIDFIELD_LANE_SCREEN':z.p.tacticalTask;}
++  for(const z of secondary){const w=localToWorld(team,clamp(z.tx,3,98),clamp(z.ty,4,64));z.p.tx=w.x;z.p.ty=w.y;if(['CUTBACK_TRACK','SECOND_BALL_TUCK','BOX_EDGE_SCREEN','MARK_LANE_SCREEN','DEEP_SCREEN','EMERGENCY_TRACK','DEEP_TUCK'].includes(z.p.tacticalTask))z.p.action=z.p.tacticalTask=z.p.tacticalTask==='MARK_LANE_SCREEN'?(z.p.role==='CM'?'MIDFIELD_LANE_SCREEN':'MARK_LANE_SCREEN'):z.p.tacticalTask;}
+   // STEP75 universal last-cover floor. Tactical profiles may change line height, pressure and
+   // compactness, but they may not spend both centre-backs on the same carrier and leave no
+   // goal-side defender. Keep one non-pressing CB between the carrier and goal whenever the

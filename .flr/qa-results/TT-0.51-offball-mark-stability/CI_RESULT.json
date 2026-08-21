@@ -1,0 +1,669 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-OFFBALL-MARK-STABILITY",
+  "candidateBranch": "tt051-offball-mark-jitter-candidate",
+  "baselineRef": "main",
+  "baselineSha": "7b42788ee5a46ca6332e70d3688071e559d0f3e9",
+  "candidateSha": "fb38af884b59c9867e26bb51b6f11147d08cc3e3",
+  "workflowStatus": "FAIL",
+  "validationExitCode": 1,
+  "failures": [
+    "validation exit 1"
+  ],
+  "changedFiles": [
+    "runtime/continuous_match_core.js",
+    "runtime/manager_tendency_adapter.js",
+    "runtime/tactical_movement.js"
+  ],
+  "allowedChangedFiles": [
+    "runtime/continuous_match_core.js",
+    "runtime/tactical_movement.js",
+    "runtime/manager_tendency_adapter.js"
+  ],
+  "patchSha256": "2f64960f57a16d993af885cf82b33b4e46b914952d887f91e5cdaa5ec0673ca0",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_OFFBALL_MARK_JITTER_VALIDATION_1.0",
+    "pass": false,
+    "checks": [
+      {
+        "name": "offball-physical-floor-raised-only-nonduel",
+        "ok": true,
+        "detail": {}
+      },
+      {
+        "name": "cb-mark-role-not-renamed-midfield",
+        "ok": true,
+        "detail": {}
+      },
+      {
+        "name": "manager-respects-existing-cb-offball-mark",
+        "ok": true,
+        "detail": {}
+      },
+      {
+        "name": "dynamic-no-offball-body-rubbing-floor",
+        "ok": false,
+        "detail": {
+          "minD": 1.1961556673496558,
+          "cases": [
+            {
+              "seed": "MARK-CONFLICT-H-LCM-A",
+              "ownerId": "H-LCM",
+              "minD": 1.2999999999999972,
+              "under12": 0,
+              "under16": 3,
+              "pathToNet": 1.6170927242112898,
+              "taskSwitches": 6,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-LCM-B",
+              "ownerId": "H-LCM",
+              "minD": 1.2999999999999972,
+              "under12": 0,
+              "under16": 3,
+              "pathToNet": 1.5493907508534899,
+              "taskSwitches": 3,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-LW-A",
+              "ownerId": "H-LW",
+              "minD": 1.3000000000000063,
+              "under12": 0,
+              "under16": 5,
+              "pathToNet": 1.0009349626198545,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-LW-B",
+              "ownerId": "H-LW",
+              "minD": 1.2999999999999987,
+              "under12": 0,
+              "under16": 4,
+              "pathToNet": 1.0010559382641504,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      },
+      {
+        "name": "dynamic-no-sub-1.2m-offball-overlap",
+        "ok": false,
+        "detail": {
+          "maxUnder12": 1
+        }
+      },
+      {
+        "name": "dynamic-marked-cb-path-not-pingpong",
+        "ok": false,
+        "detail": {
+          "maxMarkedPath": 16.11836594825651,
+          "marked": [
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      },
+      {
+        "name": "dynamic-marked-cb-role-switches-bounded",
+        "ok": true,
+        "detail": {
+          "maxMarkedTask": 9,
+          "marked": [
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      },
+      {
+        "name": "dynamic-mark-ownership-switches-bounded",
+        "ok": false,
+        "detail": {
+          "maxMarkedSwitch": 7,
+          "marked": [
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      },
+      {
+        "name": "future-outcome-still-runtime",
+        "ok": true,
+        "detail": {}
+      }
+    ],
+    "failures": [
+      {
+        "name": "dynamic-no-offball-body-rubbing-floor",
+        "ok": false,
+        "detail": {
+          "minD": 1.1961556673496558,
+          "cases": [
+            {
+              "seed": "MARK-CONFLICT-H-LCM-A",
+              "ownerId": "H-LCM",
+              "minD": 1.2999999999999972,
+              "under12": 0,
+              "under16": 3,
+              "pathToNet": 1.6170927242112898,
+              "taskSwitches": 6,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-LCM-B",
+              "ownerId": "H-LCM",
+              "minD": 1.2999999999999972,
+              "under12": 0,
+              "under16": 3,
+              "pathToNet": 1.5493907508534899,
+              "taskSwitches": 3,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-LW-A",
+              "ownerId": "H-LW",
+              "minD": 1.3000000000000063,
+              "under12": 0,
+              "under16": 5,
+              "pathToNet": 1.0009349626198545,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-LW-B",
+              "ownerId": "H-LW",
+              "minD": 1.2999999999999987,
+              "under12": 0,
+              "under16": 4,
+              "pathToNet": 1.0010559382641504,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": false,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      },
+      {
+        "name": "dynamic-no-sub-1.2m-offball-overlap",
+        "ok": false,
+        "detail": {
+          "maxUnder12": 1
+        }
+      },
+      {
+        "name": "dynamic-marked-cb-path-not-pingpong",
+        "ok": false,
+        "detail": {
+          "maxMarkedPath": 16.11836594825651,
+          "marked": [
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      },
+      {
+        "name": "dynamic-mark-ownership-switches-bounded",
+        "ok": false,
+        "detail": {
+          "maxMarkedSwitch": 7,
+          "marked": [
+            {
+              "seed": "MARK-CONFLICT-H-RCM-A",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 20,
+              "pathToNet": 1.0636979594387266,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RCM-B",
+              "ownerId": "H-RCM",
+              "minD": 1.299999999999996,
+              "under12": 0,
+              "under16": 24,
+              "pathToNet": 6.35885927521626,
+              "taskSwitches": 9,
+              "markSwitches": 7,
+              "markSeen": true,
+              "possession": "HOME"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-A",
+              "ownerId": "H-RW",
+              "minD": 1.2999999999999958,
+              "under12": 0,
+              "under16": 9,
+              "pathToNet": 1.048888808628445,
+              "taskSwitches": 0,
+              "markSwitches": 0,
+              "markSeen": true,
+              "possession": "AWAY"
+            },
+            {
+              "seed": "MARK-CONFLICT-H-RW-B",
+              "ownerId": "H-RW",
+              "minD": 1.1961556673496558,
+              "under12": 1,
+              "under16": 63,
+              "pathToNet": 16.11836594825651,
+              "taskSwitches": 4,
+              "markSwitches": 4,
+              "markSeen": true,
+              "possession": "HOME"
+            }
+          ]
+        }
+      }
+    ],
+    "cases": [
+      {
+        "seed": "MARK-CONFLICT-H-LCM-A",
+        "ownerId": "H-LCM",
+        "minD": 1.2999999999999972,
+        "under12": 0,
+        "under16": 3,
+        "pathToNet": 1.6170927242112898,
+        "taskSwitches": 6,
+        "markSwitches": 0,
+        "markSeen": false,
+        "possession": "HOME"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-LCM-B",
+        "ownerId": "H-LCM",
+        "minD": 1.2999999999999972,
+        "under12": 0,
+        "under16": 3,
+        "pathToNet": 1.5493907508534899,
+        "taskSwitches": 3,
+        "markSwitches": 0,
+        "markSeen": false,
+        "possession": "HOME"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-RCM-A",
+        "ownerId": "H-RCM",
+        "minD": 1.299999999999996,
+        "under12": 0,
+        "under16": 20,
+        "pathToNet": 1.0636979594387266,
+        "taskSwitches": 0,
+        "markSwitches": 0,
+        "markSeen": true,
+        "possession": "AWAY"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-RCM-B",
+        "ownerId": "H-RCM",
+        "minD": 1.299999999999996,
+        "under12": 0,
+        "under16": 24,
+        "pathToNet": 6.35885927521626,
+        "taskSwitches": 9,
+        "markSwitches": 7,
+        "markSeen": true,
+        "possession": "HOME"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-LW-A",
+        "ownerId": "H-LW",
+        "minD": 1.3000000000000063,
+        "under12": 0,
+        "under16": 5,
+        "pathToNet": 1.0009349626198545,
+        "taskSwitches": 0,
+        "markSwitches": 0,
+        "markSeen": false,
+        "possession": "HOME"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-LW-B",
+        "ownerId": "H-LW",
+        "minD": 1.2999999999999987,
+        "under12": 0,
+        "under16": 4,
+        "pathToNet": 1.0010559382641504,
+        "taskSwitches": 0,
+        "markSwitches": 0,
+        "markSeen": false,
+        "possession": "HOME"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-RW-A",
+        "ownerId": "H-RW",
+        "minD": 1.2999999999999958,
+        "under12": 0,
+        "under16": 9,
+        "pathToNet": 1.048888808628445,
+        "taskSwitches": 0,
+        "markSwitches": 0,
+        "markSeen": true,
+        "possession": "AWAY"
+      },
+      {
+        "seed": "MARK-CONFLICT-H-RW-B",
+        "ownerId": "H-RW",
+        "minD": 1.1961556673496558,
+        "under12": 1,
+        "under16": 63,
+        "pathToNet": 16.11836594825651,
+        "taskSwitches": 4,
+        "markSwitches": 4,
+        "markSeen": true,
+        "possession": "HOME"
+      }
+    ]
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt051_offball_mark_jitter_apply.py",
+      "exitCode": 0,
+      "stdout": "TT-0.51 off-ball marker stability patch applied\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": ""
+}
