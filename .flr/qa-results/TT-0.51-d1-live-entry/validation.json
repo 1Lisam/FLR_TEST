@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_TT051_D1_LIVE_ENTRY_VALIDATION_1.0",
+  "schemaVersion": "FLR_TT051_D1_LIVE_ENTRY_VALIDATION_1.1",
   "pass": true,
   "checks": [
     {
@@ -113,18 +113,46 @@
       "detail": ""
     },
     {
-      "name": "dynamic-no-forced-fake-choice",
+      "name": "dynamic-choice-found",
       "ok": true,
-      "detail": "No choice found in search window; no result was fabricated."
+      "detail": "choiceRuns=2/3"
+    },
+    {
+      "name": "dynamic-choice-has-visible-lead",
+      "ok": true,
+      "detail": "[{\"sceneId\":\"QA-LIVE-A\",\"moving\":22,\"liveTasks\":22,\"hadChoice\":true,\"preSpan\":9.3,\"searchSeconds\":9.4,\"futureOutcomePrecomputed\":false},{\"sceneId\":\"QA-LIVE-B\",\"moving\":22,\"liveTasks\":22,\"hadChoice\":true,\"preSpan\":5.1,\"searchSeconds\":5.2,\"futureOutcomePrecomputed\":false}]"
     }
   ],
   "dynamic": {
-    "moving": 22,
-    "liveTasks": 22,
-    "hadChoice": false,
-    "preSpan": 10,
-    "searchSeconds": 18,
-    "futureOutcomePrecomputed": false
+    "runs": [
+      {
+        "sceneId": "QA-LIVE-A",
+        "moving": 22,
+        "liveTasks": 22,
+        "hadChoice": true,
+        "preSpan": 9.3,
+        "searchSeconds": 9.4,
+        "futureOutcomePrecomputed": false
+      },
+      {
+        "sceneId": "QA-LIVE-B",
+        "moving": 22,
+        "liveTasks": 22,
+        "hadChoice": true,
+        "preSpan": 5.1,
+        "searchSeconds": 5.2,
+        "futureOutcomePrecomputed": false
+      },
+      {
+        "sceneId": "QA-LIVE-C",
+        "moving": 22,
+        "liveTasks": 22,
+        "hadChoice": false,
+        "preSpan": 10,
+        "searchSeconds": 35,
+        "futureOutcomePrecomputed": false
+      }
+    ]
   },
   "failures": []
 }

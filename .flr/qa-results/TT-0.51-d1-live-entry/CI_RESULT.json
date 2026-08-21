@@ -3,8 +3,8 @@
   "version": "TT-0.51-D1-LIVE-ENTRY",
   "candidateBranch": "tt051-d1-live-entry-candidate",
   "baselineRef": "main",
-  "baselineSha": "cd17d09c6c1bfdf975bd312307465ac438f91281",
-  "candidateSha": "debec508231e065d6943c5aca86e730be50848df",
+  "baselineSha": "626e9203191ffd353f7b99e0099d203b16877a6a",
+  "candidateSha": "f250c4a43c163e0576c41c0ce14848ac2d69e3fd",
   "workflowStatus": "PASS",
   "validationExitCode": 0,
   "failures": [],
@@ -25,7 +25,7 @@
   "patchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
   "baseline": null,
   "validation": {
-    "schemaVersion": "FLR_TT051_D1_LIVE_ENTRY_VALIDATION_1.0",
+    "schemaVersion": "FLR_TT051_D1_LIVE_ENTRY_VALIDATION_1.1",
     "pass": true,
     "checks": [
       {
@@ -139,18 +139,46 @@
         "detail": ""
       },
       {
-        "name": "dynamic-no-forced-fake-choice",
+        "name": "dynamic-choice-found",
         "ok": true,
-        "detail": "No choice found in search window; no result was fabricated."
+        "detail": "choiceRuns=2/3"
+      },
+      {
+        "name": "dynamic-choice-has-visible-lead",
+        "ok": true,
+        "detail": "[{\"sceneId\":\"QA-LIVE-A\",\"moving\":22,\"liveTasks\":22,\"hadChoice\":true,\"preSpan\":9.3,\"searchSeconds\":9.4,\"futureOutcomePrecomputed\":false},{\"sceneId\":\"QA-LIVE-B\",\"moving\":22,\"liveTasks\":22,\"hadChoice\":true,\"preSpan\":5.1,\"searchSeconds\":5.2,\"futureOutcomePrecomputed\":false}]"
       }
     ],
     "dynamic": {
-      "moving": 22,
-      "liveTasks": 22,
-      "hadChoice": false,
-      "preSpan": 10,
-      "searchSeconds": 18,
-      "futureOutcomePrecomputed": false
+      "runs": [
+        {
+          "sceneId": "QA-LIVE-A",
+          "moving": 22,
+          "liveTasks": 22,
+          "hadChoice": true,
+          "preSpan": 9.3,
+          "searchSeconds": 9.4,
+          "futureOutcomePrecomputed": false
+        },
+        {
+          "sceneId": "QA-LIVE-B",
+          "moving": 22,
+          "liveTasks": 22,
+          "hadChoice": true,
+          "preSpan": 5.1,
+          "searchSeconds": 5.2,
+          "futureOutcomePrecomputed": false
+        },
+        {
+          "sceneId": "QA-LIVE-C",
+          "moving": 22,
+          "liveTasks": 22,
+          "hadChoice": false,
+          "preSpan": 10,
+          "searchSeconds": 35,
+          "futureOutcomePrecomputed": false
+        }
+      ]
     },
     "failures": []
   },
