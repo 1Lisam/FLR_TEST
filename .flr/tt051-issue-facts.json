@@ -1,0 +1,1375 @@
+{
+  "schemaVersion": "FLR_TT051_ISSUE_FACTS_1.0",
+  "reports": [
+    {
+      "id": "tt051-259e1218-0586-4693-af88-7adfb22b6fc3",
+      "description": "이 부분에서는 원터치 상황이 나오는데 원터치로 돌려주는 상황과 내가 볼을 간수한다 두가지 선택 뿐인게 최선인가? 날아오는걸 바로 다시 되돌려 주는 리턴도 가능은 하긴 한데 확률상 다른쪽으로 전달하는것도 가능해지는거라서.",
+      "current": {
+        "selected": [
+          "ONE_TOUCH_PASS",
+          "H-LCM"
+        ],
+        "options": [
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "원터치 패스 → 같은 팀 LCM 결과"
+        ],
+        "motion": {
+          "t0": 1687.3,
+          "t1": 1708.6,
+          "heroStart": [
+            89.55,
+            34.76
+          ],
+          "heroEnd": [
+            78.92,
+            30.63
+          ],
+          "heroXRange": [
+            77.83,
+            91.29
+          ],
+          "heroYRange": [
+            30.63,
+            39.57
+          ],
+          "heroMeanSpeed": 2.33,
+          "minOpponentDistance": 1.02,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 37,
+          "spanUnder1_2m": 18.3,
+          "samplesUnder1_6m": 73,
+          "spanUnder1_6m": 18.8,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 1.75,
+            "task": "MARK_LANE_SCREEN"
+          }
+        },
+        "heroSequence": [
+          [
+            1691.2,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            1691.2,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SAFE_PASS -> H-LCM"
+          ],
+          [
+            1697.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: ONE_TOUCH_PASS -> H-LCM"
+          ],
+          [
+            1698.6,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          "SHOT",
+          null
+        ],
+        "options": [
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-CM",
+            "안전한 패스 → 같은 팀 CM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ]
+        ],
+        "result": [
+          "GOAL",
+          "슈팅 → 득점"
+        ],
+        "motion": {
+          "t0": 960.2,
+          "t1": 980.5,
+          "heroStart": [
+            75.17,
+            30.69
+          ],
+          "heroEnd": [
+            43.04,
+            34.01
+          ],
+          "heroXRange": [
+            43.04,
+            102.17
+          ],
+          "heroYRange": [
+            5.01,
+            39.83
+          ],
+          "heroMeanSpeed": 3.17,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 4,
+          "spanUnder1_2m": 0.3,
+          "samplesUnder1_6m": 36,
+          "spanUnder1_6m": 9.9,
+          "lastNearest": {
+            "id": "A-CM",
+            "d": 9.41,
+            "task": "CARRY_SCAN"
+          }
+        },
+        "heroSequence": [
+          [
+            965.7,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: CARRY"
+          ],
+          [
+            968.9,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          ],
+          [
+            968.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: THROUGH_PASS -> H-LW"
+          ],
+          [
+            974.9,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            974.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ],
+          [
+            975.5,
+            "GOAL",
+            "H-ST",
+            null,
+            "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
+      "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
+      "current": {
+        "selected": [
+          "TAKE_ON",
+          null
+        ],
+        "options": [
+          [
+            "TAKE_ON",
+            null,
+            "1대1 돌파"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "TACKLED",
+          "1대1 돌파 실패"
+        ],
+        "motion": {
+          "t0": 5267.2,
+          "t1": 5277.6,
+          "heroStart": [
+            67.84,
+            35.25
+          ],
+          "heroEnd": [
+            81.48,
+            31.97
+          ],
+          "heroXRange": [
+            67.84,
+            86.64
+          ],
+          "heroYRange": [
+            30.82,
+            36.55
+          ],
+          "heroMeanSpeed": 2.66,
+          "minOpponentDistance": 1.03,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 20,
+          "spanUnder1_2m": 5.6,
+          "samplesUnder1_6m": 31,
+          "spanUnder1_6m": 5.9,
+          "lastNearest": {
+            "id": "A-LCB",
+            "d": 2.79,
+            "task": "BUILD_PLATFORM"
+          }
+        },
+        "heroSequence": [
+          [
+            5274.5,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: TAKE_ON"
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          "TRAP_CONTROL",
+          null
+        ],
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW",
+            "공간 침투 패스 → 같은 팀 LW"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-RW",
+            "전진 패스 → 같은 팀 RW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "트래핑 후 컨트롤 결과"
+        ],
+        "motion": {
+          "t0": 5164.1,
+          "t1": 5194.1,
+          "heroStart": [
+            53.28,
+            18.25
+          ],
+          "heroEnd": [
+            75.37,
+            37.99
+          ],
+          "heroXRange": [
+            53.28,
+            86.68
+          ],
+          "heroYRange": [
+            16.53,
+            40.53
+          ],
+          "heroMeanSpeed": 2.56,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 59,
+          "spanUnder1_2m": 29.1,
+          "samplesUnder1_6m": 144,
+          "spanUnder1_6m": 29.2,
+          "lastNearest": {
+            "id": "A-LCB",
+            "d": 1.05,
+            "task": "MARK_LANE_SCREEN"
+          }
+        },
+        "heroSequence": [
+          [
+            5163.9,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          ],
+          [
+            5174.1,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          ],
+          [
+            5174.1,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: THROUGH_PASS -> H-LW"
+          ],
+          [
+            5181.3,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: TRAP_CONTROL"
+          ],
+          [
+            5184.5,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-53de8a05-f3f4-465c-9780-e51d381d66f8",
+      "description": "이전 선택지에서 '볼 트래핑' 이후 다시 ST에게 공이 들어왔으나 플레이어가 전혀 관여 하지 않은 패스가 나왔어. 이 부분 확인 해줘",
+      "current": {
+        "selected": [
+          null,
+          null
+        ],
+        "options": [
+          [
+            "TAKE_ON",
+            null,
+            "1대1 돌파"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          null,
+          null
+        ],
+        "motion": {
+          "t0": 5267.2,
+          "t1": 5274.5,
+          "heroStart": [
+            67.84,
+            35.25
+          ],
+          "heroEnd": [
+            85.03,
+            31.02
+          ],
+          "heroXRange": [
+            67.84,
+            85.03
+          ],
+          "heroYRange": [
+            30.95,
+            36.55
+          ],
+          "heroMeanSpeed": 2.83,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 10,
+          "spanUnder1_2m": 0.9,
+          "samplesUnder1_6m": 15,
+          "spanUnder1_6m": 3.2,
+          "lastNearest": {
+            "id": "A-LCB",
+            "d": 1.53,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": []
+      },
+      "previous": {
+        "selected": [
+          "TRAP_CONTROL",
+          null
+        ],
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW",
+            "공간 침투 패스 → 같은 팀 LW"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-RW",
+            "전진 패스 → 같은 팀 RW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "트래핑 후 컨트롤 결과"
+        ],
+        "motion": {
+          "t0": 5164.1,
+          "t1": 5194.1,
+          "heroStart": [
+            53.28,
+            18.25
+          ],
+          "heroEnd": [
+            75.37,
+            37.99
+          ],
+          "heroXRange": [
+            53.28,
+            86.68
+          ],
+          "heroYRange": [
+            16.53,
+            40.53
+          ],
+          "heroMeanSpeed": 2.56,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 59,
+          "spanUnder1_2m": 29.1,
+          "samplesUnder1_6m": 144,
+          "spanUnder1_6m": 29.2,
+          "lastNearest": {
+            "id": "A-LCB",
+            "d": 1.05,
+            "task": "MARK_LANE_SCREEN"
+          }
+        },
+        "heroSequence": [
+          [
+            5163.9,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          ],
+          [
+            5174.1,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          ],
+          [
+            5174.1,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: THROUGH_PASS -> H-LW"
+          ],
+          [
+            5181.3,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: TRAP_CONTROL"
+          ],
+          [
+            5184.5,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-81ee7089-fc98-4f05-99d2-b7f1b1fa7a3e",
+      "description": "여전히 선택지 이후 ST와 CB가 서로 비비면서 시간을 보내다 선택지 창이 뜸",
+      "current": {
+        "selected": [
+          "TRAP_CONTROL",
+          null
+        ],
+        "options": [
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "트래핑 후 컨트롤 결과"
+        ],
+        "motion": {
+          "t0": 1698.6,
+          "t1": 1713.9,
+          "heroStart": [
+            78.22,
+            35.17
+          ],
+          "heroEnd": [
+            79.76,
+            30.68
+          ],
+          "heroXRange": [
+            77.83,
+            84.2
+          ],
+          "heroYRange": [
+            30.29,
+            38.78
+          ],
+          "heroMeanSpeed": 1.59,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 26,
+          "spanUnder1_2m": 6.0,
+          "samplesUnder1_6m": 98,
+          "spanUnder1_6m": 12.1,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 1.36,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": [
+          [
+            1691.2,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            1691.2,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SAFE_PASS -> H-LCM"
+          ],
+          [
+            1697.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: ONE_TOUCH_PASS -> H-LCM"
+          ],
+          [
+            1698.6,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            1708.6,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: TRAP_CONTROL"
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          "SHOT",
+          null
+        ],
+        "options": [
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-CM",
+            "안전한 패스 → 같은 팀 CM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ]
+        ],
+        "result": [
+          "GOAL",
+          "슈팅 → 득점"
+        ],
+        "motion": {
+          "t0": 960.2,
+          "t1": 980.5,
+          "heroStart": [
+            75.17,
+            30.69
+          ],
+          "heroEnd": [
+            43.04,
+            34.01
+          ],
+          "heroXRange": [
+            43.04,
+            102.17
+          ],
+          "heroYRange": [
+            5.01,
+            39.83
+          ],
+          "heroMeanSpeed": 3.17,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 4,
+          "spanUnder1_2m": 0.3,
+          "samplesUnder1_6m": 36,
+          "spanUnder1_6m": 9.9,
+          "lastNearest": {
+            "id": "A-CM",
+            "d": 9.41,
+            "task": "CARRY_SCAN"
+          }
+        },
+        "heroSequence": [
+          [
+            965.7,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: CARRY"
+          ],
+          [
+            968.9,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          ],
+          [
+            968.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: THROUGH_PASS -> H-LW"
+          ],
+          [
+            974.9,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            974.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ],
+          [
+            975.5,
+            "GOAL",
+            "H-ST",
+            null,
+            "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-ac85275c-b6a0-465c-851f-53296142d471",
+      "description": "이건 왜 ST가 수비진영에서 나오고 있는건지 도저히 이해가 안됨. 수비 가담을 했다고 하기엔 모든 포메이션이 정상 포메이션이거든",
+      "current": {
+        "selected": [
+          null,
+          null
+        ],
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW",
+            "공간 침투 패스 → 같은 팀 LW"
+          ],
+          [
+            "SWITCH_PASS",
+            "H-LW",
+            "전환 패스 → 같은 팀 LW"
+          ],
+          [
+            "THROUGH_PASS",
+            "H-CM",
+            "공간 침투 패스 → 같은 팀 CM"
+          ],
+          [
+            "THROUGH_PASS",
+            "H-LCM",
+            "공간 침투 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LB",
+            "안전한 패스 → 같은 팀 LB"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RB",
+            "안전한 패스 → 같은 팀 RB"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          null,
+          null
+        ],
+        "motion": {
+          "t0": 2352.3,
+          "t1": 2353.8,
+          "heroStart": [
+            17.69,
+            33.96
+          ],
+          "heroEnd": [
+            23.58,
+            33.91
+          ],
+          "heroXRange": [
+            17.69,
+            23.58
+          ],
+          "heroYRange": [
+            33.91,
+            33.96
+          ],
+          "heroMeanSpeed": 3.83,
+          "minOpponentDistance": 5.23,
+          "minOpponentId": "A-ST",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 0,
+          "spanUnder1_6m": 0,
+          "lastNearest": {
+            "id": "A-ST",
+            "d": 5.23,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": []
+      },
+      "previous": {
+        "selected": [
+          "ONE_TOUCH_PASS",
+          "H-LCM"
+        ],
+        "options": [
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-RW",
+            "전진 패스 → 같은 팀 RW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "POSSESSION_LOST",
+          "원터치 패스 → 같은 팀 LCM 결과"
+        ],
+        "motion": {
+          "t0": 1931.5,
+          "t1": 1951.1,
+          "heroStart": [
+            72.79,
+            32.8
+          ],
+          "heroEnd": [
+            74.72,
+            34.28
+          ],
+          "heroXRange": [
+            72.79,
+            93.55
+          ],
+          "heroYRange": [
+            29.62,
+            35.51
+          ],
+          "heroMeanSpeed": 2.66,
+          "minOpponentDistance": 0.96,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 27,
+          "spanUnder1_2m": 7.8,
+          "samplesUnder1_6m": 34,
+          "spanUnder1_6m": 8.0,
+          "lastNearest": {
+            "id": "A-CM",
+            "d": 4.06,
+            "task": "CARRY_FORWARD"
+          }
+        },
+        "heroSequence": [
+          [
+            1940.9,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            1940.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SAFE_PASS -> H-LCM"
+          ],
+          [
+            1949.2,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: ONE_TOUCH_PASS -> H-LCM"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-cc852f58-6718-4b71-9e39-bc67abd66574",
+      "description": "선수단 라커룸 복귀는 지금 속도보다 20% 정도 더 빨라져도 좋을거 같아.",
+      "current": {
+        "selected": [
+          "TAKE_ON",
+          null
+        ],
+        "options": [
+          [
+            "TAKE_ON",
+            null,
+            "1대1 돌파"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "TACKLED",
+          "1대1 돌파 실패"
+        ],
+        "motion": {
+          "t0": 5267.2,
+          "t1": 5277.6,
+          "heroStart": [
+            67.84,
+            35.25
+          ],
+          "heroEnd": [
+            81.48,
+            31.97
+          ],
+          "heroXRange": [
+            67.84,
+            86.64
+          ],
+          "heroYRange": [
+            30.82,
+            36.55
+          ],
+          "heroMeanSpeed": 2.66,
+          "minOpponentDistance": 1.03,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 20,
+          "spanUnder1_2m": 5.6,
+          "samplesUnder1_6m": 31,
+          "spanUnder1_6m": 5.9,
+          "lastNearest": {
+            "id": "A-LCB",
+            "d": 2.79,
+            "task": "BUILD_PLATFORM"
+          }
+        },
+        "heroSequence": [
+          [
+            5274.5,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: TAKE_ON"
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          "TRAP_CONTROL",
+          null
+        ],
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW",
+            "공간 침투 패스 → 같은 팀 LW"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-RW",
+            "전진 패스 → 같은 팀 RW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "트래핑 후 컨트롤 결과"
+        ],
+        "motion": {
+          "t0": 5164.1,
+          "t1": 5194.1,
+          "heroStart": [
+            53.28,
+            18.25
+          ],
+          "heroEnd": [
+            75.37,
+            37.99
+          ],
+          "heroXRange": [
+            53.28,
+            86.68
+          ],
+          "heroYRange": [
+            16.53,
+            40.53
+          ],
+          "heroMeanSpeed": 2.56,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-LCB",
+          "samplesUnder1_2m": 59,
+          "spanUnder1_2m": 29.1,
+          "samplesUnder1_6m": 144,
+          "spanUnder1_6m": 29.2,
+          "lastNearest": {
+            "id": "A-LCB",
+            "d": 1.05,
+            "task": "MARK_LANE_SCREEN"
+          }
+        },
+        "heroSequence": [
+          [
+            5163.9,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          ],
+          [
+            5174.1,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          ],
+          [
+            5174.1,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: THROUGH_PASS -> H-LW"
+          ],
+          [
+            5181.3,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: TRAP_CONTROL"
+          ],
+          [
+            5184.5,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-e418816c-7d1e-434e-9c09-1c740879b08e",
+      "description": "공간 전진을 했는데 서로 막힌 상태로 다음 선택까지 대치만 하고 있어 움직임이 전혀 없는건 의도하는 상황이 아니야 그래서도 안되고 완전히 막혔다면 상대가 내 공을 뺏던지 곧바로 다음 선택지가 뜨던지 해야 할거 같아.",
+      "current": {
+        "selected": [
+          "CARRY",
+          null
+        ],
+        "options": [
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-CM",
+            "안전한 패스 → 같은 팀 CM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "전진 결과"
+        ],
+        "motion": {
+          "t0": 960.2,
+          "t1": 968.9,
+          "heroStart": [
+            75.17,
+            30.69
+          ],
+          "heroEnd": [
+            80.09,
+            34.09
+          ],
+          "heroXRange": [
+            75.17,
+            82.74
+          ],
+          "heroYRange": [
+            30.53,
+            34.14
+          ],
+          "heroMeanSpeed": 1.88,
+          "minOpponentDistance": 1.36,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 25,
+          "spanUnder1_6m": 2.4,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 1.36,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": [
+          [
+            965.7,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: CARRY"
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          "SHOT",
+          null
+        ],
+        "options": [
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SHOT",
+            null,
+            "중거리 슛"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "MISS",
+          "슈팅 → 빗나감"
+        ],
+        "motion": {
+          "t0": 762.9,
+          "t1": 777.1,
+          "heroStart": [
+            77.7,
+            36.28
+          ],
+          "heroEnd": [
+            63.97,
+            29.54
+          ],
+          "heroXRange": [
+            63.97,
+            79.66
+          ],
+          "heroYRange": [
+            29.54,
+            36.28
+          ],
+          "heroMeanSpeed": 2.13,
+          "minOpponentDistance": 1.38,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 9,
+          "spanUnder1_6m": 1.8,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 4.85,
+            "task": "LONG_GOAL_KICK_ATTACK_SETUP"
+          }
+        },
+        "heroSequence": [
+          [
+            746.4,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 공중 롱패스했습니다."
+          ],
+          [
+            772.9,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            772.9,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ]
+        ]
+      }
+    }
+  ]
+}
