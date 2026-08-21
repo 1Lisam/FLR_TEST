@@ -6,6 +6,6 @@
   "database": "flr-bug-reports",
   "purpose": "Anonymous tester bug intake with reportId metadata and chunked current+previous situation JSON, without R2",
   "sourceCommit": "0128dff29ca0ad53f3026751cbd6e8332086bd66",
-  "requestedAt": "2026-08-21T11:31:00+09:00",
-  "attemptNonce": "tt051-d1-live-entry-20260821-1131-valid-yaml"
+  "requestedAt": "2026-08-21T11:08:00+09:00",
+  "attemptNonce": "tt051-d1-live-entry-20260821-token-replaced-retry"
 }
