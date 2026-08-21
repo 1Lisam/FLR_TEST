@@ -24,21 +24,15 @@ function scenario({lwX=79.0,contested=false}={}){
   const s=P.create('QA-PLAYER-RISK',{heroPlayerId:'H-ST',mode:'PLAYER_ALL'}),m=s.m;
   m.time=1200;m.phase='OPEN_PLAY';m.restart=null;m.completed=false;m.possession='HOME';m.protagonistExplicitActionRequired=true;
   const ps=m.playersById,hero=ps['H-ST'];
-  for(const p of m.players){
-    if(p.team==='HOME')setPlayer(p,55,34);
-    else setPlayer(p,70,60);
-  }
-  // Defensive line: second-last outfield defender x=78.0 -> user threshold 78.25.
+  for(const p of m.players){if(p.team==='HOME')setPlayer(p,55,34);else setPlayer(p,70,60);}
   setPlayer(ps['A-LCB'],78.2,61);setPlayer(ps['A-RCB'],78.0,58);
   setPlayer(hero,72,34);hero.hasBall=true;hero.controlledSince=m.time-1.2;hero.nextThink=m.time;hero.action='HOLD_BALL';hero.tacticalTask='HOLD_BALL';
   m.ball={...m.ball,mode:'CONTROLLED',x:72.45,y:34,z:0,vx:0,vy:0,vz:0,ownerId:hero.id,intendedReceiverId:null,kind:'CONTROL',lastTouchTeam:'HOME',lastTouchPlayer:hero.id,age:0};m.ballOwner=hero.id;m.lastTouchTeam='HOME';m.lastTouchPlayer=hero.id;
   const lw=ps['H-LW'];setPlayer(lw,lwX,12);lw.vx=1.8;lw.tx=lwX+2;lw.runUntil=m.time+2;lw.tacticalTask='FAR_SIDE_RUN';lw.action='FAR_SIDE_RUN';
   const rw=ps['H-RW'];setPlayer(rw,76,46);rw.tacticalTask='MOVE_TO_RECEIVE';rw.action='MOVE_TO_RECEIVE';
-  // Keep other HOME players out of the direct test lanes.
   for(const id of ['H-LCM','H-CM','H-RCM','H-LB','H-RB','H-LCB','H-RCB']){const p=ps[id];if(p){p.x=58;p.y=id.includes('L')?24:54;p.tx=p.x;p.ty=p.y;}}
   if(contested)setPlayer(ps['A-CM'],74,40);else setPlayer(ps['A-CM'],70,60);
-  const q=P.inspect(s);
-  return{s,m,q,lw,rw};
+  const q=P.inspect(s);return{s,m,q,lw,rw};
 }
 try{
   const marginal=scenario({lwX:79.0,contested:false});
@@ -53,14 +47,15 @@ try{
   const uiExtreme=extreme.q?.options?.find(o=>o.targetId==='H-LW');
   add('dynamic-obvious-offside-still-filtered',!rawExtreme&&!uiExtreme,JSON.stringify(extreme.q?.options?.map(o=>({id:o.id,targetId:o.targetId}))));
 
-  const contested=scenario({lwX:79.0,contested:true});
+  // Keep LW clearly outside the player margin so this scenario tests the blocked RW independently.
+  const contested=scenario({lwX:80.7,contested:true});
   const rawRw=contested.q?.frame?._frame?.opts?.find(o=>o.p?.id==='H-RW');
   const uiRw=contested.q?.options?.find(o=>o.targetId==='H-RW');
-  add('dynamic-contested-geometry-created',!!rawRw&&rawRw.block<=1&&rawRw.block>=1,JSON.stringify(rawRw&&{block:rawRw.block,open:rawRw.open,forward:rawRw.forward}));
+  add('dynamic-contested-geometry-created',!!rawRw&&rawRw.block===1,JSON.stringify(rawRw&&{block:rawRw.block,open:rawRw.open,forward:rawRw.forward}));
   add('dynamic-high-risk-pass-remains-choice',!!uiRw,JSON.stringify(contested.q?.options?.map(o=>({id:o.id,targetId:o.targetId,meta:o.meta}))));
   add('dynamic-future-not-precomputed',marginal.q?.futureOutcomePrecomputed===false&&contested.q?.futureOutcomePrecomputed===false);
 }catch(e){add('dynamic-player-risk-scenarios',false,String(e&&e.stack||e));}
 
 const failures=checks.filter(x=>!x.ok);
-const out={schemaVersion:'FLR_TT051_PLAYER_RISK_CHOICE_VALIDATION_1.0',pass:failures.length===0,checks,failures};
+const out={schemaVersion:'FLR_TT051_PLAYER_RISK_CHOICE_VALIDATION_1.1',pass:failures.length===0,checks,failures};
 console.log(JSON.stringify(out,null,2));process.exit(failures.length?1:0);
