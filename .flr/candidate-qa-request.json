@@ -4,7 +4,7 @@
   "candidateBranch": "tt051-player-risk-choice-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt051_player_risk_choice_apply_v3.py"
+    ".flr/tt051_player_risk_choice_apply_v4.py"
   ],
   "validationScript": ".flr/tt051_player_risk_choice_validation_v2.js",
   "changedFiles": [
@@ -18,5 +18,5 @@
     "runtime/tactical_movement.js"
   ],
   "resultDir": ".flr/qa-results/TT-0.51-player-risk-choice",
-  "runNonce": "2026-08-21T12:48+09:00-player-risk-v3-raw-floor"
+  "runNonce": "2026-08-21T12:51+09:00-player-risk-v4-protect-risky-pass"
 }
