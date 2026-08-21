@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_JSON_STORAGE_ANALYSIS_1.0",
+  "schemaVersion": "FLR_JSON_STORAGE_ANALYSIS_1.1",
   "reports": [
     {
       "label": "old-ui",
@@ -8,10 +8,11 @@
       "gzipRatio": 0.103,
       "compactFramesBytes": 978982,
       "compactFramesGzipBytes": 139163,
-      "dropEpisodeBytes": 445381,
-      "dropEpisodeGzipBytes": 47279,
-      "compactDropEpisodeBytes": 414980,
-      "compactDropEpisodeGzipBytes": 47142,
+      "safeDedupBytes": 1449885,
+      "safeDedupGzipBytes": 149339,
+      "compactSafeDedupBytes": 978982,
+      "compactSafeDedupGzipBytes": 139163,
+      "safeDedupRemoved": [],
       "frameArrays": [
         {
           "path": "root.currentSituation.highResolution.preActionFrames",
@@ -64,10 +65,17 @@
       "gzipRatio": 0.0924,
       "compactFramesBytes": 1735609,
       "compactFramesGzipBytes": 199277,
-      "dropEpisodeBytes": 672466,
-      "dropEpisodeGzipBytes": 60575,
-      "compactDropEpisodeBytes": 623849,
-      "compactDropEpisodeGzipBytes": 60404,
+      "safeDedupBytes": 1677005,
+      "safeDedupGzipBytes": 162813,
+      "compactSafeDedupBytes": 1187886,
+      "compactSafeDedupGzipBytes": 152791,
+      "safeDedupRemoved": [
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames",
+          "count": 88,
+          "bytes": 596377
+        }
+      ],
       "frameArrays": [
         {
           "path": "root.currentSituation.highResolution.preActionFrames",
@@ -200,10 +208,11 @@
       "gzipRatio": 0.1029,
       "compactFramesBytes": 978699,
       "compactFramesGzipBytes": 138935,
-      "dropEpisodeBytes": 445098,
-      "dropEpisodeGzipBytes": 47042,
-      "compactDropEpisodeBytes": 414697,
-      "compactDropEpisodeGzipBytes": 46909,
+      "safeDedupBytes": 1449602,
+      "safeDedupGzipBytes": 149102,
+      "compactSafeDedupBytes": 978699,
+      "compactSafeDedupGzipBytes": 138935,
+      "safeDedupRemoved": [],
       "frameArrays": [
         {
           "path": "root.currentSituation.highResolution.preActionFrames",
@@ -256,10 +265,17 @@
       "gzipRatio": 0.0867,
       "compactFramesBytes": 3229462,
       "compactFramesGzipBytes": 302293,
-      "dropEpisodeBytes": 2151897,
-      "dropEpisodeGzipBytes": 189719,
-      "compactDropEpisodeBytes": 1986413,
-      "compactDropEpisodeGzipBytes": 188814,
+      "safeDedupBytes": 2151854,
+      "safeDedupGzipBytes": 189655,
+      "compactSafeDedupBytes": 1986370,
+      "compactSafeDedupGzipBytes": 188753,
+      "safeDedupRemoved": [
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames",
+          "count": 199,
+          "bytes": 1352963
+        }
+      ],
       "frameArrays": [
         {
           "path": "root.currentSituation.highResolution.preActionFrames",
@@ -391,16 +407,16 @@
     "gzipBytes": 812189,
     "compactFramesBytes": 6922752,
     "compactFramesGzipBytes": 779668,
-    "dropEpisodeBytes": 3714842,
-    "dropEpisodeGzipBytes": 344615,
-    "compactDropEpisodeBytes": 3439939,
-    "compactDropEpisodeGzipBytes": 343269,
+    "safeDedupBytes": 6728346,
+    "safeDedupGzipBytes": 650909,
+    "compactSafeDedupBytes": 5131937,
+    "compactSafeDedupGzipBytes": 619642,
     "gzipBytesVsRaw": 0.0936,
     "compactFramesBytesVsRaw": 0.7978,
     "compactFramesGzipBytesVsRaw": 0.0898,
-    "dropEpisodeBytesVsRaw": 0.4281,
-    "dropEpisodeGzipBytesVsRaw": 0.0397,
-    "compactDropEpisodeBytesVsRaw": 0.3964,
-    "compactDropEpisodeGzipBytesVsRaw": 0.0396
+    "safeDedupBytesVsRaw": 0.7754,
+    "safeDedupGzipBytesVsRaw": 0.075,
+    "compactSafeDedupBytesVsRaw": 0.5914,
+    "compactSafeDedupGzipBytesVsRaw": 0.0714
   }
 }
