@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-REPORT-SCOPE",
+  "candidateBranch": "tt051-report-scope-candidate",
+  "baselineRef": "main",
+  "baselineSha": "35aa799d8afe406938f533ee182766e4614ac552",
+  "candidateSha": "8f258b45c360402dae0c88602341dd53ac647a5b",
+  "workflowStatus": "FAIL",
+  "validationExitCode": 1,
+  "failures": [
+    "apply script failed: .flr/tt051_report_scope_apply.py",
+    "validation exit 1"
+  ],
+  "changedFiles": [],
+  "allowedChangedFiles": [
+    "step71_hybrid_v06_ui.js"
+  ],
+  "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "baseline": null,
+  "validation": {
+    "parseError": "validation: Expecting value: line 1 column 1 (char 0)",
+    "raw": ""
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt051_report_scope_apply.py",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt051_report_scope_apply.py\", line 5, in <module>\n    s=p.read_text(encoding='utf-8')\n      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/pathlib.py\", line 1029, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors) as f:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/pathlib.py\", line 1015, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'step71_hybrid_v06_ui.js'\n"
+    }
+  ],
+  "validationStderr": "node:fs:440\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\n                   ^\n\nError: ENOENT: no such file or directory, open 'step71_hybrid_v06_ui.js'\n    at Object.readFileSync (node:fs:440:20)\n    at Object.<anonymous> (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/tt051_report_scope_validation.js:3:14)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: 'step71_hybrid_v06_ui.js'\n}\n\nNode.js v22.23.2\n"
+}
