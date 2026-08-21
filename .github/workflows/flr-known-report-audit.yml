@@ -1,0 +1,89 @@
+name: FLR Known Report Audit
+
+on:
+  push:
+    branches: ['audit/tt051-known-reports']
+    paths:
+      - '.flr/known-report-audit-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/tt051-known-reports
+          fetch-depth: 0
+      - name: Fetch known reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .flr/known-report-audit
+          python - <<'PY'
+          import json, pathlib, subprocess
+          ids=[
+            'tt051-cd014e0d-5a36-4adb-8133-77e1f536f0e1',
+            'tt051-16728bef-e746-46ca-ac22-316f269e59ed',
+            'tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469'
+          ]
+          base='https://flr-bug-reporter.sikarops.workers.dev/reports/TT-0.51'
+          out=[]
+          for rid in ids:
+              p=pathlib.Path('.flr/known-report-audit')/(rid+'.json')
+              r=subprocess.run(['curl','-fsS',f'{base}/{rid}.json','-o',str(p)],text=True,capture_output=True)
+              row={'reportId':rid,'fetchOk':r.returncode==0}
+              if r.returncode!=0:
+                  row['error']=r.stderr[-1000:]; out.append(row); continue
+              try: d=json.loads(p.read_text(encoding='utf-8'))
+              except Exception as e:
+                  row['parseError']=str(e); out.append(row); continue
+              ctx=d.get('bugReportContext') or {}
+              cur=d.get('currentSituation')
+              prev=d.get('previousSituation')
+              def summarize(s):
+                  if not isinstance(s,dict): return None
+                  hr=s.get('highResolution') or {}
+                  sc=hr.get('selectedChoice')
+                  steps=hr.get('choiceSteps') or []
+                  ev=hr.get('actualEvents') or []
+                  frames=hr.get('episodeFrames') or []
+                  scope=s.get('reportScope') or {}
+                  return {
+                    'scope':scope,
+                    'selectedChoice':sc,
+                    'choiceSteps':steps,
+                    'actualResult':hr.get('actualResult'),
+                    'actualResults':hr.get('actualResults'),
+                    'actualEventsCount':len(ev),
+                    'actualEventsTail':ev[-20:],
+                    'episodeFrameCount':len(frames),
+                    'firstFrameTime':frames[0].get('time') if frames and isinstance(frames[0],dict) else None,
+                    'lastFrameTime':frames[-1].get('time') if frames and isinstance(frames[-1],dict) else None,
+                    'boundary':(s.get('hybridBefore') or {}).get('boundary')
+                  }
+              row.update({
+                'schemaVersion':d.get('schemaVersion'),
+                'scope':d.get('scope'),
+                'bugReportContext':ctx,
+                'currentSituation':summarize(cur),
+                'previousSituation':summarize(prev),
+                'topLevelKeys':list(d.keys())
+              })
+              out.append(row)
+          pathlib.Path('.flr/known-report-audit/result.json').write_text(json.dumps({'reports':out},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Commit audit result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR Report Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/known-report-audit/result.json .flr/known-report-audit/tt051-*.json
+          git diff --cached --quiet || {
+            git commit -m 'Record known TT-0.51 report audit'
+            git push origin HEAD:audit/tt051-known-reports
+          }
