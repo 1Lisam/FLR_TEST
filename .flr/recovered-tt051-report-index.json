@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "FLR_TT051_RECOVERY_INDEX_1.0",
+  "generatedAt": "2026-08-21T01:03:40.567630+00:00",
+  "status": "NOT_FOUND",
+  "count": 0,
+  "reports": [],
+  "diagnostics": [
+    {
+      "stage": "buckets",
+      "http": 403,
+      "errors": [
+        {
+          "code": 10042,
+          "message": "Please enable R2 through the Cloudflare Dashboard."
+        }
+      ]
+    }
+  ]
+}
