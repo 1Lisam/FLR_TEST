@@ -4,7 +4,7 @@
   "candidateBranch": "tt051-player-risk-choice-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt051_player_risk_choice_apply.py"
+    ".flr/tt051_player_risk_choice_apply_wrapper.py"
   ],
   "validationScript": ".flr/tt051_player_risk_choice_validation.js",
   "changedFiles": [
@@ -18,5 +18,5 @@
     "runtime/tactical_movement.js"
   ],
   "resultDir": ".flr/qa-results/TT-0.51-player-risk-choice",
-  "runNonce": "2026-08-21T12:31+09:00-player-judges-risk-not-filter"
+  "runNonce": "2026-08-21T12:34+09:00-player-risk-workdir-retry"
 }
