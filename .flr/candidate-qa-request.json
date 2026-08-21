@@ -18,5 +18,5 @@
     "runtime/manager_tendency_adapter.js"
   ],
   "resultDir": ".flr/qa-results/TT-0.51-offball-mark-stability",
-  "runNonce": "2026-08-21T13:36+09:00-offball-st-cb-stability-fix"
+  "runNonce": "2026-08-21T13:40+09:00-offball-vs-active-duel-separated"
 }
