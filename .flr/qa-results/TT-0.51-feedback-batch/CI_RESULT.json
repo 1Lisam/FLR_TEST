@@ -3,8 +3,8 @@
   "version": "TT-0.51-FEEDBACK-BATCH",
   "candidateBranch": "tt051-feedback-batch-candidate",
   "baselineRef": "main",
-  "baselineSha": "7753292306ca353d38267d54a7386110941fa362",
-  "candidateSha": "639f79a7328505d20516b5a952b13173bb93df48",
+  "baselineSha": "73a8936abc0cb559f1e2665f71bca3ca071786b8",
+  "candidateSha": "c43fc15fc4819cc6ee87096a2b06933101a442a2",
   "workflowStatus": "PASS",
   "validationExitCode": 0,
   "failures": [],
@@ -23,7 +23,7 @@
   "patchSha256": "ace240f77e22492c20c28ccc466794b1afdfdcd00adfa5a1caace7f6150e9acc",
   "baseline": null,
   "validation": {
-    "schemaVersion": "FLR_TT051_FEEDBACK_BATCH_VALIDATION_1.0",
+    "schemaVersion": "FLR_TT051_FEEDBACK_BATCH_VALIDATION_1.1",
     "pass": true,
     "checks": [
       {
@@ -104,12 +104,12 @@
       {
         "name": "dynamic-metadata-only-post",
         "ok": true,
-        "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:58:09.593Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"chunkCount\":0,\"hasDebug\":false,\"issueCreated\":false}"
+        "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:59:54.261Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"chunkCount\":0,\"hasDebug\":false,\"issueCreated\":false}"
       },
       {
         "name": "dynamic-metadata-only-meta",
         "ok": true,
-        "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:58:09.593Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"hasDebug\":false}"
+        "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:59:54.261Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"hasDebug\":false}"
       },
       {
         "name": "dynamic-metadata-only-json-404",
@@ -135,6 +135,11 @@
         "name": "dynamic-choice-visible-context",
         "ok": true,
         "detail": "{\"moving\":22,\"hadChoice\":true,\"preSpan\":10,\"searchSeconds\":22.9,\"futureOutcomePrecomputed\":false}"
+      },
+      {
+        "name": "dynamic-wingers-recover-onside",
+        "ok": true,
+        "detail": "{\"before\":{\"lw\":78.94,\"rw\":78.91},\"after\":{\"lw\":{\"x\":78.56952293954285,\"tx\":78.31611607727812,\"task\":\"FAR_SIDE_RECOVER\"},\"rw\":{\"x\":78.53952293954285,\"tx\":78.31611607727812,\"task\":\"FAR_SIDE_RECOVER\"}}}"
       }
     ],
     "dynamic": {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_TT051_FEEDBACK_BATCH_VALIDATION_1.0",
+  "schemaVersion": "FLR_TT051_FEEDBACK_BATCH_VALIDATION_1.1",
   "pass": true,
   "checks": [
     {
@@ -80,12 +80,12 @@
     {
       "name": "dynamic-metadata-only-post",
       "ok": true,
-      "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:58:09.593Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"chunkCount\":0,\"hasDebug\":false,\"issueCreated\":false}"
+      "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:59:54.261Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"chunkCount\":0,\"hasDebug\":false,\"issueCreated\":false}"
     },
     {
       "name": "dynamic-metadata-only-meta",
       "ok": true,
-      "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:58:09.593Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"hasDebug\":false}"
+      "detail": "{\"ok\":true,\"reportId\":\"tt051-meta-only-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-meta-only-12345\",\"sizeBytes\":0,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T02:59:54.261Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"UI only\",\"summary\":{\"x\":1},\"storage\":\"D1\",\"hasDebug\":false}"
     },
     {
       "name": "dynamic-metadata-only-json-404",
@@ -111,6 +111,11 @@
       "name": "dynamic-choice-visible-context",
       "ok": true,
       "detail": "{\"moving\":22,\"hadChoice\":true,\"preSpan\":10,\"searchSeconds\":22.9,\"futureOutcomePrecomputed\":false}"
+    },
+    {
+      "name": "dynamic-wingers-recover-onside",
+      "ok": true,
+      "detail": "{\"before\":{\"lw\":78.94,\"rw\":78.91},\"after\":{\"lw\":{\"x\":78.56952293954285,\"tx\":78.31611607727812,\"task\":\"FAR_SIDE_RECOVER\"},\"rw\":{\"x\":78.53952293954285,\"tx\":78.31611607727812,\"task\":\"FAR_SIDE_RECOVER\"}}}"
     }
   ],
   "dynamic": {
