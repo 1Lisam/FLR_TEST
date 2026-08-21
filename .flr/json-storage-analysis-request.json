@@ -1,6 +1,7 @@
 {
-  "schemaVersion": "FLR_JSON_STORAGE_ANALYSIS_REQUEST_1.0",
-  "requestedAt": "2026-08-21T12:07:00+09:00",
+  "schemaVersion": "FLR_JSON_STORAGE_ANALYSIS_REQUEST_1.1",
+  "requestedAt": "2026-08-21T12:09:00+09:00",
   "scope": "3 legacy TT-0.51 reports plus latest D1 report",
-  "purpose": "Measure raw, gzip and structural dedup storage options before retention-policy implementation"
+  "purpose": "Recalculate lossless gzip and exact-safe episode frame dedup only",
+  "runNonce": "safe-dedup-20260821-1209"
 }
