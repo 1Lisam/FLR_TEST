@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "FLR_REPORT_AUDIT_REQUEST_1.0",
+  "build": "TT-0.51",
+  "purpose": "Inspect newly submitted anonymous bug reports",
+  "requestedAt": "2026-08-21T09:40:00+09:00"
+}
