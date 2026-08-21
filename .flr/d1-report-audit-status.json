@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_D1_REPORT_AUDIT_1.2",
+  "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
   "count": 8,
   "reports": [
@@ -84,6 +84,7 @@
       "chunk_count": 3
     }
   ],
+  "latestAttachedReportId": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
