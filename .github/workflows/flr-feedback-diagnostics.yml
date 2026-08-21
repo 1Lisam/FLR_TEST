@@ -34,6 +34,7 @@ jobs:
           git show origin/audit/tt051-known-reports:.flr/known-report-audit/tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469.json > /tmp/flr_old_jitter.json
           curl --max-time 30 -fsS 'https://flr-bug-reporter.sikarops.workers.dev/reports/TT-0.51/tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb.json' > /tmp/flr_new_choice.json
           python .flr/feedback_diagnostics.py /tmp/flr_old_jitter.json /tmp/flr_new_choice.json /tmp/flr_feedback_diagnostics.json
+          node .flr/current_engine_feedback_diag.js /tmp/flr_old_jitter.json /tmp/flr_new_choice.json /tmp/flr_current_engine_feedback.json
 
       - name: Record diagnostics without failure mail
         if: always()
@@ -46,13 +47,17 @@ jobs:
           if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_feedback_diagnostics.json ]; then
             printf '{"schemaVersion":"FLR_FEEDBACK_DIAGNOSTICS_1.0","status":"FAILED"}\n' > /tmp/flr_feedback_diagnostics.json
           fi
+          if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_current_engine_feedback.json ]; then
+            printf '{"schemaVersion":"FLR_CURRENT_ENGINE_FEEDBACK_DIAG_1.0","status":"FAILED"}\n' > /tmp/flr_current_engine_feedback.json
+          fi
           git config user.name 'FLR Feedback Diagnostics Bot'
           git config user.email 'actions@users.noreply.github.com'
           git reset --hard HEAD
           git pull --rebase origin main || git reset --hard origin/main
           mkdir -p .flr
           cp /tmp/flr_feedback_diagnostics.json .flr/feedback-diagnostics.json
-          git add .flr/feedback-diagnostics.json
+          cp /tmp/flr_current_engine_feedback.json .flr/current-engine-feedback.json
+          git add .flr/feedback-diagnostics.json .flr/current-engine-feedback.json
           git diff --cached --quiet && exit 0
           git commit -m 'Record FLR feedback diagnostics' || exit 0
           git push origin HEAD:main || { echo '::warning::Diagnostics push failed; suppressing workflow failure email.'; exit 0; }
