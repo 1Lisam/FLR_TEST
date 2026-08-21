@@ -18,12 +18,10 @@ async function main(){
   add('far-side-recovery-targets-onside',tactics.includes('recover=local.x>safeX+.18')&&tactics.includes('runAlive?x:recover?safeX:Math.max(local.x,x)'));
   add('far-side-hold-stable-timing',tactics.includes("'FAR_SIDE_RUN','FAR_SIDE_HOLD','FAR_SIDE_RECOVER'"));
   add('old-offside-freeze-pattern-removed',!tactics.includes("return{lx:runAlive?x:Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':'FAR_SIDE_HOLD'"));
-  // Preserve previous live-entry and one-touch-context fixes.
   add('live-entry-contextual-preserved',auth.includes('function contextualEntry')&&auth.includes("tacticalTask='HYBRID_ENTRY_LIVE'"));
   add('one-touch-context-lead-preserved',auth.includes('contextLead=clamp(Number(opts.contextLeadSeconds)||1.6,1.2,2.4)'));
   add('future-precompute-contract-preserved',auth.includes('futureOutcomePrecomputed:false'));
 
-  // Real D1 Worker semantics against an in-memory minimal D1 mock.
   try{
     const b64=Buffer.from(worker,'utf8').toString('base64');
     const mod=await import('data:text/javascript;base64,'+b64); const handler=mod.default;
@@ -45,7 +43,6 @@ async function main(){
     add('dynamic-full-json-roundtrip',fr.status===201&&fj.hasDebug===true&&!!fj.jsonUrl&&fg.status===200&&JSON.stringify(fgj)===JSON.stringify(fullDebug),`post=${fr.status} get=${fg.status}`);
   }catch(e){add('dynamic-worker-mock',false,String(e&&e.stack||e));}
 
-  // Repeat the live-entry regression proof used by the previous passing candidate.
   let dynamic={};
   try{
     const A=require(path.join(root,'live_v06_scene_authority_browser.js'));
@@ -57,7 +54,25 @@ async function main(){
     add('dynamic-choice-visible-context',!r.hadChoice||(r.searchSeconds>=1.19&&r.preSpan>=1.0),JSON.stringify(dynamic));
   }catch(e){add('dynamic-live-entry-regression',false,String(e&&e.stack||e));}
 
-  const failures=checks.filter(x=>!x.ok),out={schemaVersion:'FLR_TT051_FEEDBACK_BATCH_VALIDATION_1.0',pass:!failures.length,checks,dynamic,failures};
+  // Recreate the reported geometry: both wingers are ~0.7m beyond the current legal line and stationary.
+  // A tactical update must give them a backward/on-side recovery target, not freeze them offside.
+  try{
+    const E=require(path.join(root,'runtime/continuous_match_core.js'));
+    const m=E.createMatch('QA-WINGER-ONSIDE-RECOVERY');m.time=772.9;m.possession='HOME';m.phase='OPEN_PLAY';m.transitionUntil=0;m.nextShape=0;
+    for(const p of m.players){p.hasBall=false;p.runUntil=0;p.releaseRunBiasAt=770;p.releaseRunTimingBias=-0.02;}
+    const st=m.playersById['H-ST'];st.x=76.51;st.y=30.62;st.hasBall=true;st.controlledSince=772.1;
+    const lw=m.playersById['H-LW'],rw=m.playersById['H-RW'];lw.x=78.94;lw.y=18;lw.tx=78.94;lw.ty=18;lw.vx=lw.vy=0;lw.tacticalTask=lw.action='FAR_SIDE_HOLD';rw.x=78.91;rw.y=50;rw.tx=78.91;rw.ty=50;rw.vx=rw.vy=0;rw.tacticalTask=rw.action='FAR_SIDE_HOLD';
+    // Put second-last opponent near the reported 77.93 line.
+    const xs={'A-LB':82,'A-LCB':79.2,'A-RCB':77.93,'A-RB':76.5,'A-LCM':68,'A-CM':66,'A-RCM':67,'A-LW':62,'A-ST':60,'A-RW':61};for(const [id,x] of Object.entries(xs)){m.playersById[id].x=x;}
+    m.ball.mode='CONTROLLED';m.ball.ownerId='H-ST';m.ball.x=76.93;m.ball.y=30.63;m.ball.z=0;m.ball.vx=m.ball.vy=m.ball.vz=0;m.ball.lastTouchTeam='HOME';m.ball.lastTouchPlayer='H-ST';m.ballOwner='H-ST';m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';
+    const before={lw:lw.x,rw:rw.x};
+    for(let i=0;i<4;i++)E.step(m,.1);
+    const after={lw:{x:lw.x,tx:lw.tx,task:lw.tacticalTask},rw:{x:rw.x,tx:rw.tx,task:rw.tacticalTask}};
+    const recovering=[lw,rw].every(p=>p.tacticalTask==='FAR_SIDE_RECOVER'&&p.tx<p.x-.1);
+    add('dynamic-wingers-recover-onside',recovering,JSON.stringify({before,after}));
+  }catch(e){add('dynamic-winger-recovery-run',false,String(e&&e.stack||e));}
+
+  const failures=checks.filter(x=>!x.ok),out={schemaVersion:'FLR_TT051_FEEDBACK_BATCH_VALIDATION_1.1',pass:!failures.length,checks,dynamic,failures};
   console.log(JSON.stringify(out,null,2)); process.exit(failures.length?1:0);
 }
 main().catch(e=>{console.error(e);process.exit(2)});
