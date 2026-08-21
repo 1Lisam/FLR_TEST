@@ -611,7 +611,7 @@ function passOptions(m,owner,offsideMode=false){
   for(const p of teamPlayers(m,team)){
     if(p.id===owner.id||p.role==='GK'&&ownerLocal.x>45)continue;
     const d=dist(owner,p);if(d<3||d>52)continue;
-    const runTasks=new Set(['CHASE_THROUGH','MOVE_TO_RECEIVE','OVERLAP','UNDERLAP','BALANCED_OVERLAP','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','BOX_EDGE_ARRIVAL','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','PENALTY_SPOT_RUN','ATTACK_NEAR_POST','ATTACK_BACK_POST','ATTACK_OPEN_CHANNEL','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','ST_WALL_SUPPORT','POST_PASS_CONTINUE_RUN']);
+    const runTasks=new Set(['CHASE_THROUGH','MOVE_TO_RECEIVE','OVERLAP','UNDERLAP','BALANCED_OVERLAP','THIRD_MAN_RUN','FAR_SIDE_RUN','FAR_SIDE_SHOULDER','PIN_AND_RUN','INSIDE_CHANNEL','BOX_EDGE_ARRIVAL','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','PENALTY_SPOT_RUN','ATTACK_NEAR_POST','ATTACK_BACK_POST','ATTACK_OPEN_CHANNEL','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','ST_WALL_SUPPORT','POST_PASS_CONTINUE_RUN']);
     const taskCommitted=runTasks.has(p.tacticalTask)&&dist(p,{x:p.tx,y:p.ty})>1.8;
     const taskRun=taskCommitted&&Math.hypot(p.vx,p.vy)>1.15;
     const plannedRun=(p.runUntil||0)>m.time;
@@ -621,9 +621,6 @@ function passOptions(m,owner,offsideMode=false){
     if(offsideMargin>0){
       const playerChoice=offsideMode==='PLAYER';
       if(playerChoice){
-        // The player, not candidate filtering, judges a close offside line. A moving runner may
-        // be a little farther over the shoulder than a stationary receiver; clearly detached
-        // attackers are still removed so the menu does not fill with physically absurd passes.
         const playerMargin=running?1.75:1.15,roleEligible=['ST','WF','CM','FB'].includes(p.role);
         if(!roleEligible||offsideMargin>playerMargin)continue;
         marginalTimingError=true;
@@ -1959,7 +1956,6 @@ function inspectChoiceState(m,playerId){
   if(m.ball.mode==='CONTROLLED'&&m.ball.ownerId===owner.id){
     const local=worldToLocal(owner.team,owner.x,owner.y),pressure=ballCarrierPressureDistance(m,owner),space=forwardSpace(m,owner,13),shot=shotAssessment(m,owner),opts=passOptions(m,owner,'PLAYER'),held=Math.max(0,m.time-(owner.controlledSince||m.time)),deep=finalThirdDelivery(m,owner),early=earlyCrossDelivery(m,owner),takeOn=takeOnOpportunity(m,owner,shot,held),ctx=candidateContext(m,owner,shot,opts,pressure,space,held,deep,early,takeOn),ranked=candidateRank(m,owner,ctx);
     const nameById=id=>playerById(m,id)?.name||id||null,represented=new Set(ranked.filter(c=>['THROUGH_PASS','PROGRESSIVE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE'].includes(c.id)&&c.meta?.targetId).map(c=>c.meta.targetId));
-    // PLAYER choice floor: low expected success does not erase a physically plausible pass.
     const oRisk=o=>(o.offsideRisk?3:0)+(o.running?1.5:0)+(['ST','WF'].includes(o.p.role)?1:0)+(o.block>0?0.5:0);
     const physicalPasses=opts.filter(o=>o.block<=1&&!represented.has(o.p.id)&&o.d<=42&&o.forward>-6.0&&o.open>=0.35&&['ST','WF','CM','FB'].includes(o.p.role)).sort((a,b)=>{const ar=oRisk(a),br=oRisk(b);return br-ar||(b.forward-a.forward)||(b.score-a.score)}).slice(0,3).map(o=>({id:'AVAILABLE_PASS',score:Number((o.score-0.45).toFixed(3)),reason:'physically_available_receiver',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,contested:o.open<1.8||o.block>0,laneBlockers:o.block,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0)}}));
     const existingThroughTargets=new Set(ranked.filter(c=>c.id==='THROUGH_PASS'&&c.meta?.targetId).map(c=>c.meta.targetId)),openSpacePasses=syntheticLeadPassCandidates(m,owner,opts,existingThroughTargets);
