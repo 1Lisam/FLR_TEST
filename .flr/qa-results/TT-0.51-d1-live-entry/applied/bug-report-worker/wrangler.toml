@@ -1,0 +1,7 @@
+name = "flr-bug-reporter"
+main = "worker.js"
+compatibility_date = "2026-08-21"
+
+[vars]
+GITHUB_REPO = "1Lisam/FLR_TEST"
+ALLOWED_ORIGIN = "https://1lisam.github.io"
