@@ -1,24 +1,23 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-D1-LIVE-ENTRY",
-  "candidateBranch": "tt051-d1-live-entry-candidate",
+  "version": "TT-0.51-FEEDBACK-BATCH",
+  "candidateBranch": "tt051-feedback-batch-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt051_d1_live_entry_apply.py"
+    ".flr/tt051_feedback_batch_apply.py"
   ],
-  "validationScript": ".flr/tt051_d1_live_entry_validation.js",
+  "validationScript": ".flr/tt051_feedback_batch_validation.js",
   "changedFiles": [
-    ".github/workflows/flr-cloudflare-bug-reporter.yml",
-    "bug-report-worker/worker.js",
-    "bug-report-worker/wrangler.toml",
-    "bug-report-worker/schema.sql",
-    "live_v06_scene_authority_browser.js"
+    "runtime/tactical_movement.js",
+    "step71_hybrid_v06_ui.js",
+    "index.html",
+    "bug-report-worker/worker.js"
   ],
   "syntaxChecks": [
-    {"kind":"node-esm","path":"bug-report-worker/worker.js"},
-    "live_v06_scene_authority_browser.js"
+    "runtime/tactical_movement.js",
+    "step71_hybrid_v06_ui.js",
+    {"kind":"node-esm","path":"bug-report-worker/worker.js"}
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-d1-live-entry",
-  "expectedPatchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
-  "runNonce": "2026-08-21T11:16+09:00-persist-exact-applied-files"
+  "resultDir": ".flr/qa-results/TT-0.51-feedback-batch",
+  "runNonce": "2026-08-21T12:01+09:00-feedback-batch"
 }
