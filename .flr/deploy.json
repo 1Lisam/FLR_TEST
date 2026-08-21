@@ -13,5 +13,6 @@
     "bug-report-worker/wrangler.toml",
     "live_v06_scene_authority_browser.js"
   ],
-  "commitMessage": "Deploy TT-0.51 D1 reports and live entry context"
+  "commitMessage": "Deploy TT-0.51 D1 reports and live entry context",
+  "requestNonce": "2026-08-21T10:46+09:00"
 }
