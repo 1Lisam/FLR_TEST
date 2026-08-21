@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-D1-LIVE-ENTRY",
+  "candidateBranch": "tt051-d1-live-entry-candidate",
+  "baselineRef": "main",
+  "baselineSha": "cd17d09c6c1bfdf975bd312307465ac438f91281",
+  "candidateSha": "debec508231e065d6943c5aca86e730be50848df",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
+  "changedFiles": [
+    ".github/workflows/flr-cloudflare-bug-reporter.yml",
+    "bug-report-worker/schema.sql",
+    "bug-report-worker/worker.js",
+    "bug-report-worker/wrangler.toml",
+    "live_v06_scene_authority_browser.js"
+  ],
+  "allowedChangedFiles": [
+    ".github/workflows/flr-cloudflare-bug-reporter.yml",
+    "bug-report-worker/worker.js",
+    "bug-report-worker/wrangler.toml",
+    "bug-report-worker/schema.sql",
+    "live_v06_scene_authority_browser.js"
+  ],
+  "patchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_D1_LIVE_ENTRY_VALIDATION_1.0",
+    "pass": true,
+    "checks": [
+      {
+        "name": "worker-d1-binding",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "worker-chunking",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "worker-report-id-metadata",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "worker-d1-roundtrip-read",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "worker-size-cap-preserved",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "schema-report-table",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "schema-chunk-table",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "schema-build-time-index",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wrangler-no-r2",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "workflow-d1-list",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "workflow-d1-create",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "workflow-d1-schema",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "workflow-live-roundtrip",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "entry-contextual-helper",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "entry-live-task",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "entry-no-zero-all-velocity",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "entry-no-hero-teleport-safe-position",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "choice-context-lead",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "choice-no-immediate-zero-span-return",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "dynamic-entry-moving-majority",
+        "ok": true,
+        "detail": "moving=22"
+      },
+      {
+        "name": "dynamic-entry-live-task-majority",
+        "ok": true,
+        "detail": "liveTasks=22"
+      },
+      {
+        "name": "dynamic-future-not-precomputed",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "dynamic-no-forced-fake-choice",
+        "ok": true,
+        "detail": "No choice found in search window; no result was fabricated."
+      }
+    ],
+    "dynamic": {
+      "moving": 22,
+      "liveTasks": 22,
+      "hadChoice": false,
+      "preSpan": 10,
+      "searchSeconds": 18,
+      "futureOutcomePrecomputed": false
+    },
+    "failures": []
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt051_d1_live_entry_apply.py",
+      "exitCode": 0,
+      "stdout": "TT-0.51 D1 + live entry patch applied\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": ""
+}
