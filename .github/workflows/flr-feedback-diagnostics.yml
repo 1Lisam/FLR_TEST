@@ -1,0 +1,58 @@
+name: FLR Feedback Diagnostics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/feedback-diagnostics-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-feedback-diagnostics
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Extract compact diagnostics
+        id: diag
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin audit/tt051-known-reports:refs/remotes/origin/audit/tt051-known-reports
+          git show origin/audit/tt051-known-reports:.flr/known-report-audit/tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469.json > /tmp/flr_old_jitter.json
+          curl --max-time 30 -fsS 'https://flr-bug-reporter.sikarops.workers.dev/reports/TT-0.51/tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb.json' > /tmp/flr_new_choice.json
+          python .flr/feedback_diagnostics.py /tmp/flr_old_jitter.json /tmp/flr_new_choice.json /tmp/flr_feedback_diagnostics.json
+
+      - name: Record diagnostics without failure mail
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.diag.outcome }}
+        run: |
+          set +e
+          if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_feedback_diagnostics.json ]; then
+            printf '{"schemaVersion":"FLR_FEEDBACK_DIAGNOSTICS_1.0","status":"FAILED"}\n' > /tmp/flr_feedback_diagnostics.json
+          fi
+          git config user.name 'FLR Feedback Diagnostics Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          mkdir -p .flr
+          cp /tmp/flr_feedback_diagnostics.json .flr/feedback-diagnostics.json
+          git add .flr/feedback-diagnostics.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record FLR feedback diagnostics' || exit 0
+          git push origin HEAD:main || { echo '::warning::Diagnostics push failed; suppressing workflow failure email.'; exit 0; }
