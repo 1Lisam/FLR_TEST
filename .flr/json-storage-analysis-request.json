@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "FLR_JSON_STORAGE_ANALYSIS_REQUEST_1.0",
+  "requestedAt": "2026-08-21T12:07:00+09:00",
+  "scope": "3 legacy TT-0.51 reports plus latest D1 report",
+  "purpose": "Measure raw, gzip and structural dedup storage options before retention-policy implementation"
+}
