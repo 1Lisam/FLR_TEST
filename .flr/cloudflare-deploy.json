@@ -1,9 +1,11 @@
 {
-  "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_REQUEST_0.1",
-  "version": "TT-0.51-PREDISTRIBUTION",
+  "schemaVersion": "FLR_CLOUDFLARE_D1_DEPLOY_REQUEST_1.0",
+  "version": "TT-0.51-D1-LIVE-ENTRY",
   "worker": "flr-bug-reporter",
-  "bucket": "flr-bug-reports",
-  "purpose": "Anonymous tester bug intake: store full integrated Episode JSON plus description/meta without requiring GitHub login",
-  "requestedAt": "2026-08-21T08:52:00+09:00",
-  "attemptNonce": "tt051-predistribution-anonymous-intake-20260821-0852-retry1"
+  "storage": "D1",
+  "database": "flr-bug-reports",
+  "purpose": "Anonymous tester bug intake with reportId metadata and chunked current+previous situation JSON, without R2",
+  "sourceCommit": "0128dff29ca0ad53f3026751cbd6e8332086bd66",
+  "requestedAt": "2026-08-21T11:22:00+09:00",
+  "attemptNonce": "tt051-d1-live-entry-20260821-1122"
 }
