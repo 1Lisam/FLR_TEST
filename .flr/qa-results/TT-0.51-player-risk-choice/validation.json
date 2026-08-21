@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_TT051_PLAYER_RISK_CHOICE_VALIDATION_1.1",
+  "schemaVersion": "FLR_TT051_PLAYER_RISK_CHOICE_VALIDATION_1.2",
   "pass": false,
   "checks": [
     {
@@ -43,7 +43,7 @@
       "detail": ""
     },
     {
-      "name": "risk-floor-survives-six-menu",
+      "name": "raw-risk-floor-survives-six-menu",
       "ok": true,
       "detail": ""
     },

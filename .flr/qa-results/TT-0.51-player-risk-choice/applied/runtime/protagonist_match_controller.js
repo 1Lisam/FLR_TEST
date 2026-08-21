@@ -194,12 +194,14 @@ function onBallOptions(frame){
     if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='CARRY');if(ix>=0)out.splice(ix,1);}
     if(out.length<6){const row={id:release.id,targetId:release.targetId||null,targetName:release.targetName||null,family:'패스',label:labelFor(release),meta:release.meta?deep(release.meta):null};row.hint=tooltipFor(release,frame);row.tooltip=row.hint;out.push(row);}
   }
-  // PLAYER risk floor: preserve a marginal-offside / contested attacking pass when the geometry is executable.
-  const riskyPhysical=ranked.filter(c=>(c.id==='AVAILABLE_PASS'||(c.id==='THROUGH_PASS'&&c.meta?.offsideRisk))&&(c.meta?.offsideRisk||c.meta?.laneBlockers>0||c.meta?.contested)&&Number(c.meta?.forward??c.meta?.leadForward??-99)>0).sort((a,b)=>(Number(b.meta?.offsideRisk)-Number(a.meta?.offsideRisk))+(Number(b.meta?.forward??b.meta?.leadForward??0)-Number(a.meta?.forward??a.meta?.leadForward??0))*.03).slice(0,2);
-  for(const risky of riskyPhysical){
-    if(out.some(o=>o.family==='패스'&&o.targetId===risky.targetId))continue;
-    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||o.id==='CARRY');if(ix>=0)out.splice(ix,1);}
-    if(out.length<6){const row={id:risky.id,targetId:risky.targetId||null,targetName:risky.targetName||null,family:'패스',label:labelFor(risky),meta:risky.meta?deep(risky.meta):null};row.hint=tooltipFor(risky,frame);row.tooltip=row.hint;out.push(row);}
+  // PLAYER risk floor: the raw live pass geometry, not NPC ranking, decides whether a risky
+  // pass can be shown. One blocker / tight pressure / a marginal offside shoulder remains a
+  // player choice; the live engine still decides interception or OFFSIDE after execution.
+  const riskyRaw=(frame?._frame?.opts||[]).filter(o=>o?.p&&['ST','WF','CM','FB'].includes(o.p.role)&&o.block<=1&&o.d<=42&&o.forward>0&&o.open>=0.35&&(o.offsideRisk||o.block>0||o.open<1.8)).sort((a,b)=>(Number(b.offsideRisk)-Number(a.offsideRisk))+(b.forward-a.forward)*.03+(Number(b.running)-Number(a.running))*.5).slice(0,2);
+  for(const o of riskyRaw){
+    if(out.some(x=>x.family==='패스'&&x.targetId===o.p.id))continue;
+    if(out.length>=6){const ix=out.findIndex(x=>x.id==='HOLD'||x.id==='RECYCLE'||x.id==='CARRY');if(ix>=0)out.splice(ix,1);}
+    if(out.length<6){const c={id:'AVAILABLE_PASS',targetId:o.p.id,targetName:`같은 팀 ${o.p.slot}`,meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,contested:o.open<1.8||o.block>0,laneBlockers:o.block,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0)}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
   }
   // A real, unblocked pass option must not disappear merely because the NPC score
   // strongly prefers shooting/carrying. Player choice availability != NPC preference.

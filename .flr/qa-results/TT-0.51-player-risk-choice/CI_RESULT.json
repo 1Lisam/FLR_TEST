@@ -3,8 +3,8 @@
   "version": "TT-0.51-PLAYER-RISK-CHOICE",
   "candidateBranch": "tt051-player-risk-choice-candidate",
   "baselineRef": "main",
-  "baselineSha": "b95fd324197d309634fb49a9fb01a8289dd13a81",
-  "candidateSha": "0e2f5f3932cb2665baaad6575e636dcf9cdab782",
+  "baselineSha": "26045a71db0859e28932454a28ef321264a61069",
+  "candidateSha": "bcc7525d7863801b238d693aaa76754962751660",
   "workflowStatus": "FAIL",
   "validationExitCode": 1,
   "failures": [
@@ -20,10 +20,10 @@
     "runtime/protagonist_match_controller.js",
     "runtime/tactical_movement.js"
   ],
-  "patchSha256": "7dbc06a240b77ade1503f05ad3d378fbc4eef901373ae523b9d2ad95e82e6eb1",
+  "patchSha256": "9dfe2237a16de0bf0a1a8f2aa7cb520d24c28c01b345bcc576561ff3ea0611a5",
   "baseline": null,
   "validation": {
-    "schemaVersion": "FLR_TT051_PLAYER_RISK_CHOICE_VALIDATION_1.1",
+    "schemaVersion": "FLR_TT051_PLAYER_RISK_CHOICE_VALIDATION_1.2",
     "pass": false,
     "checks": [
       {
@@ -67,7 +67,7 @@
         "detail": ""
       },
       {
-        "name": "risk-floor-survives-six-menu",
+        "name": "raw-risk-floor-survives-six-menu",
         "ok": true,
         "detail": ""
       },
@@ -122,9 +122,9 @@
   },
   "applyLog": [
     {
-      "script": ".flr/tt051_player_risk_choice_apply_v2.py",
+      "script": ".flr/tt051_player_risk_choice_apply_v3.py",
       "exitCode": 0,
-      "stdout": "TT-0.51 player-risk choice v2 applied\n",
+      "stdout": "TT-0.51 player-risk choice v2 applied\nTT-0.51 player-risk choice v3 applied\n",
       "stderr": ""
     }
   ],
