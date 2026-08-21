@@ -1,26 +1,31 @@
 {
-  "schemaVersion": "FLR_TT051_TRAP_AUTHORITY_VALIDATION_1.0",
-  "pass": false,
+  "schemaVersion": "FLR_TT051_TRAP_AUTHORITY_VALIDATION_1.1",
+  "pass": true,
   "checks": [
     {
+      "name": "incoming-inspect-found",
+      "ok": true,
+      "detail": "{\"kind\":\"INCOMING_BALL\",\"eta\":0.282,\"options\":[[\"TRAP_CONTROL\",null],[\"ONE_TOUCH_PASS\",\"H-LCM\"],[\"ONE_TOUCH_PASS\",\"H-LB\"]]}"
+    },
+    {
       "name": "incoming-checkpoint-found",
-      "ok": false,
-      "detail": "null"
+      "ok": true,
+      "detail": "{\"kind\":\"INCOMING_BALL\",\"options\":[[\"TRAP_CONTROL\",null],[\"ONE_TOUCH_PASS\",\"H-LCM\"],[\"ONE_TOUCH_PASS\",\"H-LB\"]]}"
     },
     {
       "name": "trap-option-present",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
       "name": "trap-choice-applied",
-      "ok": false,
-      "detail": "null"
+      "ok": true,
+      "detail": "{\"ok\":true,\"kind\":\"INCOMING_BALL\",\"choice\":\"TRAP_CONTROL\",\"requestedTargetId\":null,\"targetId\":null,\"inputSource\":\"QA\",\"action\":{\"type\":\"INCOMING_INTENT\",\"kind\":\"TRAP_CONTROL\"},\"intentUntil\":1800.762,\"intentProtected\":true,\"futureOutcomePrecomputed\":false}"
     },
     {
       "name": "hero-receives-after-trap",
-      "ok": false,
-      "detail": "{\"time\":1814.0499999999872,\"ball\":{\"mode\":\"FLIGHT\",\"ownerId\":null},\"resultTracker\":false,\"interactive\":null}"
+      "ok": true,
+      "detail": "{\"controlAt\":1800.2999999999997,\"time\":1805.2499999999952,\"ball\":{\"mode\":\"CONTROLLED\",\"ownerId\":\"H-ST\"}}"
     },
     {
       "name": "no-unchosen-material-action-after-trap",
@@ -29,45 +34,14 @@
     },
     {
       "name": "next-user-choice-or-live-protection",
-      "ok": false,
-      "detail": "{\"nextPending\":false,\"interactive\":null,\"deferred\":null,\"resultTracker\":false}"
+      "ok": true,
+      "detail": "{\"nextPending\":true,\"interactive\":{\"active\":true,\"playerId\":\"H-ST\",\"episodeId\":\"STEP40-1\",\"sceneId\":\"STEP40-2\",\"armedAt\":1805.2499999999952},\"deferred\":null,\"resultTracker\":false}"
     },
     {
       "name": "future-not-precomputed",
-      "ok": false,
+      "ok": true,
       "detail": ""
     }
   ],
-  "failures": [
-    {
-      "name": "incoming-checkpoint-found",
-      "ok": false,
-      "detail": "null"
-    },
-    {
-      "name": "trap-option-present",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "trap-choice-applied",
-      "ok": false,
-      "detail": "null"
-    },
-    {
-      "name": "hero-receives-after-trap",
-      "ok": false,
-      "detail": "{\"time\":1814.0499999999872,\"ball\":{\"mode\":\"FLIGHT\",\"ownerId\":null},\"resultTracker\":false,\"interactive\":null}"
-    },
-    {
-      "name": "next-user-choice-or-live-protection",
-      "ok": false,
-      "detail": "{\"nextPending\":false,\"interactive\":null,\"deferred\":null,\"resultTracker\":false}"
-    },
-    {
-      "name": "future-not-precomputed",
-      "ok": false,
-      "detail": ""
-    }
-  ]
+  "failures": []
 }
