@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "FLR_TT051_NPC_ONE_TOUCH_VALIDATION_1.0",
+  "pass": true,
+  "checks": [
+    {
+      "name": "npc-touch-after-miscontrol-contest",
+      "ok": true,
+      "detail": {
+        "iBob": 165945,
+        "iNpc": 166911
+      }
+    },
+    {
+      "name": "protagonist-excluded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anti-pingpong-cooldown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "npc-one-touch-observed",
+      "ok": true,
+      "detail": {
+        "observed": 9,
+        "examples": [
+          {
+            "seed": 5,
+            "time": 1200.2999999999997,
+            "ball": "PASS",
+            "source": "H-CM",
+            "target": "H-RW"
+          },
+          {
+            "seed": 7,
+            "time": 1200.2999999999997,
+            "ball": "PASS",
+            "source": "H-CM",
+            "target": "H-RW"
+          },
+          {
+            "seed": 10,
+            "time": 1200.2999999999997,
+            "ball": "PASS",
+            "source": "H-CM",
+            "target": "H-RW"
+          }
+        ]
+      }
+    },
+    {
+      "name": "hero-never-npc-one-touch",
+      "ok": true,
+      "detail": {
+        "heroAuto": 0
+      }
+    },
+    {
+      "name": "miscontrol-preempts-one-touch",
+      "ok": true,
+      "detail": {
+        "mis": 0
+      }
+    },
+    {
+      "name": "no-immediate-one-touch-chain",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "failures": []
+}
