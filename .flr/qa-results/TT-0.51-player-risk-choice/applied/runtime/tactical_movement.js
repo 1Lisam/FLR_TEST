@@ -63,7 +63,7 @@ function safeForwardLocal(m,p,wanted){
   return clamp(Math.min(wanted,safeLocal,96.5),5,96.5);
 }
 function releaseForwardLocal(m,p,wanted){
-  const entering=!['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','FAR_SIDE_RUN','FAR_SIDE_HOLD','FAR_SIDE_RECOVER'].includes(p.tacticalTask)||!Number.isFinite(p.releaseRunBiasAt)||m.time-p.releaseRunBiasAt>6.0;
+  const entering=!['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','FAR_SIDE_RUN','FAR_SIDE_HOLD','FAR_SIDE_SHOULDER','FAR_SIDE_RECOVER'].includes(p.tacticalTask)||!Number.isFinite(p.releaseRunBiasAt)||m.time-p.releaseRunBiasAt>6.0;
   if(entering){
     p.releaseRunBiasAt=m.time;
     // Most runs hold the line. A minority deliberately live on the shoulder and can drift
@@ -348,10 +348,10 @@ function attackTask(m,p,ctx){
       return{lx:x,ly:y,task:'WIDE_DELIVERY_HOLD',sprint:Math.abs(local.y-y)>4.0||Math.abs(local.x-x)>4.0};
     }
     if(phase==='FINAL_THIRD'&&!ss){
-      const wanted=clamp(progress+8,82,91.5),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*16.0,runAlive=x>local.x+.85,recover=local.x>safeX+.18;
-      return{lx:runAlive?x:recover?safeX:Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':'FAR_SIDE_HOLD',sprint:runAlive||recover};
+      const wanted=clamp(progress+8,82,91.5),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*16.0,runAlive=x>local.x+.85,over=local.x-safeX,marginalShoulder=over>.18&&over<=1.55,recover=over>1.55;
+      return{lx:runAlive?x:recover?safeX:marginalShoulder?Math.min(local.x,safeX+1.35):Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':marginalShoulder?'FAR_SIDE_SHOULDER':'FAR_SIDE_HOLD',sprint:runAlive||recover};
     }
-    if(!ss&&progress>48){const wanted=Math.max(front+5,progress+8),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*(18.5*pr.wingerWidth),runAlive=x>local.x+.85,recover=local.x>safeX+.18;return{lx:runAlive?x:recover?safeX:Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':'FAR_SIDE_HOLD',sprint:runAlive||recover};}
+    if(!ss&&progress>48){const wanted=Math.max(front+5,progress+8),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*(18.5*pr.wingerWidth),runAlive=x>local.x+.85,over=local.x-safeX,marginalShoulder=over>.18&&over<=1.55,recover=over>1.55;return{lx:runAlive?x:recover?safeX:marginalShoulder?Math.min(local.x,safeX+1.35):Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':marginalShoulder?'FAR_SIDE_SHOULDER':'FAR_SIDE_HOLD',sprint:runAlive||recover};}
     if(ss&&progress>66&&pr.width<1){return{lx:safeForwardLocal(m,p,Math.max(front+2,progress+4)),ly:34+sg*17.0,task:'INSIDE_CHANNEL',sprint:true};}
     return{lx:safeForwardLocal(m,p,Math.max(front,progress+4)),ly:targetWide,task:ss?'WIDE_COMBINE':'HOLD_WIDTH',sprint:ss&&progress>52};
   }

@@ -4,17 +4,17 @@
   "checks": [
     {
       "name": "player-offside-mode",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
       "name": "marginal-moving-window",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
       "name": "ai-offside-timing-preserved",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
@@ -24,12 +24,12 @@
     },
     {
       "name": "physically-risky-pass-floor",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
       "name": "risky-pass-executable",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
@@ -49,23 +49,23 @@
     },
     {
       "name": "marginal-runner-not-immediate-recover",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
       "name": "dynamic-marginal-raw-admitted",
-      "ok": false,
-      "detail": ""
+      "ok": true,
+      "detail": "{\"margin\":0.75,\"block\":0,\"running\":true}"
     },
     {
       "name": "dynamic-marginal-user-choice-visible",
-      "ok": false,
-      "detail": "[{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"label\":\"안전한 패스 → 같은 팀 LB\"},{\"id\":\"SHOT\",\"targetId\":null,\"label\":\"중거리 슛\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"label\":\"안전한 패스 → 같은 팀 LCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RB\",\"label\":\"안전한 패스 → 같은 팀 RB\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"label\":\"안전한 패스 → 같은 팀 LCB\"},{\"id\":\"CARRY\",\"targetId\":null,\"label\":\"공간 전진\"}]"
+      "ok": true,
+      "detail": "[{\"id\":\"THROUGH_PASS\",\"targetId\":\"H-LW\",\"label\":\"공간 침투 패스 → 같은 팀 LW\"},{\"id\":\"SHOT\",\"targetId\":null,\"label\":\"중거리 슛\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"label\":\"안전한 패스 → 같은 팀 LB\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"label\":\"안전한 패스 → 같은 팀 LCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"label\":\"안전한 패스 → 같은 팀 LCB\"},{\"id\":\"CARRY\",\"targetId\":null,\"label\":\"공간 전진\"}]"
     },
     {
       "name": "dynamic-no-answer-key-label",
       "ok": false,
-      "detail": ""
+      "detail": "의도: 전방 동료 (같은 팀 LW)의 발이 아니라, 달려갈 앞 공간으로 공을 먼저 보냅니다.\n관련 능력: 시야, 패스, 타이밍\n위험: 높음\n성공하면: 수비 라인 뒤 공간에서 달리며 바로 다음 플레이를 만들 수 있음\n실패하면: 침투 타이밍이 경계선에 있어 실제 패스 순간 오프사이드가 될 위험이 큼"
     },
     {
       "name": "dynamic-obvious-offside-still-filtered",
@@ -80,7 +80,7 @@
     {
       "name": "dynamic-high-risk-pass-remains-choice",
       "ok": false,
-      "detail": "[{\"id\":\"CARRY\",\"targetId\":null,\"meta\":{\"space\":13,\"pressure\":6.324555320336759,\"clearRunway\":false}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"meta\":{\"targetId\":\"H-LB\",\"targetSlot\":\"LB\"}},{\"id\":\"SHOT\",\"targetId\":null,\"meta\":{\"dGoal\":33,\"inBox\":false,\"oneVOne\":false,\"openWindow\":false,\"longRange\":true,\"turningRequired\":false,\"backToGoal\":false,\"facingAlignment\":1}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"meta\":{\"targetId\":\"H-LCM\",\"targetSlot\":\"LCM\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RB\",\"meta\":{\"targetId\":\"H-RB\",\"targetSlot\":\"RB\",\"forward\":-14,\"d\":24.413111231467404,\"receiverPressure\":13.416407864998739,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"meta\":{\"targetId\":\"H-LCB\",\"targetSlot\":\"LCB\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}}]"
+      "detail": "[{\"id\":\"THROUGH_PASS\",\"targetId\":\"H-LW\",\"meta\":{\"targetId\":\"H-LW\",\"leadForward\":9.969999999999999,\"offsideRisk\":true,\"offsideMargin\":0.75,\"runnerTask\":\"FAR_SIDE_RUN\",\"running\":true,\"leadX\":81.97,\"leadY\":12,\"targetSlot\":\"LW\"}},{\"id\":\"SHOT\",\"targetId\":null,\"meta\":{\"dGoal\":33,\"inBox\":false,\"oneVOne\":false,\"openWindow\":false,\"longRange\":true,\"turningRequired\":false,\"backToGoal\":false,\"facingAlignment\":1}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"meta\":{\"targetId\":\"H-LB\",\"targetSlot\":\"LB\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"meta\":{\"targetId\":\"H-LCM\",\"targetSlot\":\"LCM\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"meta\":{\"targetId\":\"H-LCB\",\"targetSlot\":\"LCB\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"CARRY\",\"targetId\":null,\"meta\":{\"space\":13,\"pressure\":6.324555320336759,\"clearRunway\":false}}]"
     },
     {
       "name": "dynamic-future-not-precomputed",
@@ -89,31 +89,6 @@
     }
   ],
   "failures": [
-    {
-      "name": "player-offside-mode",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "marginal-moving-window",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "ai-offside-timing-preserved",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "physically-risky-pass-floor",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "risky-pass-executable",
-      "ok": false,
-      "detail": ""
-    },
     {
       "name": "no-explicit-offside-answer-risk",
       "ok": false,
@@ -130,29 +105,14 @@
       "detail": ""
     },
     {
-      "name": "marginal-runner-not-immediate-recover",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "dynamic-marginal-raw-admitted",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "dynamic-marginal-user-choice-visible",
-      "ok": false,
-      "detail": "[{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"label\":\"안전한 패스 → 같은 팀 LB\"},{\"id\":\"SHOT\",\"targetId\":null,\"label\":\"중거리 슛\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"label\":\"안전한 패스 → 같은 팀 LCM\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RB\",\"label\":\"안전한 패스 → 같은 팀 RB\"},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"label\":\"안전한 패스 → 같은 팀 LCB\"},{\"id\":\"CARRY\",\"targetId\":null,\"label\":\"공간 전진\"}]"
-    },
-    {
       "name": "dynamic-no-answer-key-label",
       "ok": false,
-      "detail": ""
+      "detail": "의도: 전방 동료 (같은 팀 LW)의 발이 아니라, 달려갈 앞 공간으로 공을 먼저 보냅니다.\n관련 능력: 시야, 패스, 타이밍\n위험: 높음\n성공하면: 수비 라인 뒤 공간에서 달리며 바로 다음 플레이를 만들 수 있음\n실패하면: 침투 타이밍이 경계선에 있어 실제 패스 순간 오프사이드가 될 위험이 큼"
     },
     {
       "name": "dynamic-high-risk-pass-remains-choice",
       "ok": false,
-      "detail": "[{\"id\":\"CARRY\",\"targetId\":null,\"meta\":{\"space\":13,\"pressure\":6.324555320336759,\"clearRunway\":false}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"meta\":{\"targetId\":\"H-LB\",\"targetSlot\":\"LB\"}},{\"id\":\"SHOT\",\"targetId\":null,\"meta\":{\"dGoal\":33,\"inBox\":false,\"oneVOne\":false,\"openWindow\":false,\"longRange\":true,\"turningRequired\":false,\"backToGoal\":false,\"facingAlignment\":1}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"meta\":{\"targetId\":\"H-LCM\",\"targetSlot\":\"LCM\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-RB\",\"meta\":{\"targetId\":\"H-RB\",\"targetSlot\":\"RB\",\"forward\":-14,\"d\":24.413111231467404,\"receiverPressure\":13.416407864998739,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"meta\":{\"targetId\":\"H-LCB\",\"targetSlot\":\"LCB\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}}]"
+      "detail": "[{\"id\":\"THROUGH_PASS\",\"targetId\":\"H-LW\",\"meta\":{\"targetId\":\"H-LW\",\"leadForward\":9.969999999999999,\"offsideRisk\":true,\"offsideMargin\":0.75,\"runnerTask\":\"FAR_SIDE_RUN\",\"running\":true,\"leadX\":81.97,\"leadY\":12,\"targetSlot\":\"LW\"}},{\"id\":\"SHOT\",\"targetId\":null,\"meta\":{\"dGoal\":33,\"inBox\":false,\"oneVOne\":false,\"openWindow\":false,\"longRange\":true,\"turningRequired\":false,\"backToGoal\":false,\"facingAlignment\":1}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LB\",\"meta\":{\"targetId\":\"H-LB\",\"targetSlot\":\"LB\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCM\",\"meta\":{\"targetId\":\"H-LCM\",\"targetSlot\":\"LCM\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"SAFE_PASS\",\"targetId\":\"H-LCB\",\"meta\":{\"targetId\":\"H-LCB\",\"targetSlot\":\"LCB\",\"forward\":-14,\"d\":17.204650534085253,\"receiverPressure\":22.627416997969522,\"directSafe\":true}},{\"id\":\"CARRY\",\"targetId\":null,\"meta\":{\"space\":13,\"pressure\":6.324555320336759,\"clearRunway\":false}}]"
     }
   ]
 }
