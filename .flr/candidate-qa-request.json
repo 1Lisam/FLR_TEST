@@ -1,22 +1,18 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-OFFBALL-MARK-STABILITY",
-  "candidateBranch": "tt051-offball-mark-jitter-candidate",
+  "version": "TT-0.51-SHOOT-NPC-TOUCH-AUDIT",
+  "candidateBranch": "tt051-shoot-npc-touch-audit",
   "baselineRef": "main",
-  "applyScripts": [
-    ".flr/tt051_offball_mark_jitter_apply.py"
-  ],
-  "validationScript": ".flr/tt051_offball_mark_jitter_validation.js",
+  "applyScripts": [],
+  "validationScript": ".flr/tt051_shoot_npc_touch_audit.js",
   "changedFiles": [
     "runtime/continuous_match_core.js",
-    "runtime/tactical_movement.js",
-    "runtime/manager_tendency_adapter.js"
+    "runtime/protagonist_match_controller.js"
   ],
   "syntaxChecks": [
     "runtime/continuous_match_core.js",
-    "runtime/tactical_movement.js",
-    "runtime/manager_tendency_adapter.js"
+    "runtime/protagonist_match_controller.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-offball-mark-stability",
-  "runNonce": "2026-08-21T13:40+09:00-offball-vs-active-duel-separated"
+  "resultDir": ".flr/qa-results/TT-0.51-shoot-npc-touch-audit",
+  "runNonce": "2026-08-21T13:42+09:00-shoot-priority-100"
 }
