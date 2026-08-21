@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-NPC-ONE-TOUCH",
+  "candidateBranch": "tt051-npc-one-touch-candidate",
+  "baselineRef": "main",
+  "baselineSha": "cf8fab694d31ce2b1807e707719134567847c499",
+  "candidateSha": "d796394440d47279a7c97523dca93f29c56d3439",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
+  "changedFiles": [
+    "runtime/continuous_match_core.js"
+  ],
+  "allowedChangedFiles": [
+    "runtime/continuous_match_core.js"
+  ],
+  "patchSha256": "39ed81b1a06dbf4f5f1f032d4c6eeac18ac91ad2f40946b7690bba443087a723",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_NPC_ONE_TOUCH_VALIDATION_1.0",
+    "pass": true,
+    "checks": [
+      {
+        "name": "npc-touch-after-miscontrol-contest",
+        "ok": true,
+        "detail": {
+          "iBob": 165945,
+          "iNpc": 166911
+        }
+      },
+      {
+        "name": "protagonist-excluded",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "anti-pingpong-cooldown",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "npc-one-touch-observed",
+        "ok": true,
+        "detail": {
+          "observed": 9,
+          "examples": [
+            {
+              "seed": 5,
+              "time": 1200.2999999999997,
+              "ball": "PASS",
+              "source": "H-CM",
+              "target": "H-RW"
+            },
+            {
+              "seed": 7,
+              "time": 1200.2999999999997,
+              "ball": "PASS",
+              "source": "H-CM",
+              "target": "H-RW"
+            },
+            {
+              "seed": 10,
+              "time": 1200.2999999999997,
+              "ball": "PASS",
+              "source": "H-CM",
+              "target": "H-RW"
+            }
+          ]
+        }
+      },
+      {
+        "name": "hero-never-npc-one-touch",
+        "ok": true,
+        "detail": {
+          "heroAuto": 0
+        }
+      },
+      {
+        "name": "miscontrol-preempts-one-touch",
+        "ok": true,
+        "detail": {
+          "mis": 0
+        }
+      },
+      {
+        "name": "no-immediate-one-touch-chain",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "failures": []
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt051_npc_one_touch_apply.py",
+      "exitCode": 0,
+      "stdout": "TT-0.51 NPC one-touch patch applied\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": ""
+}

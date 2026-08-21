@@ -1,0 +1,37 @@
+diff --git a/runtime/continuous_match_core.js b/runtime/continuous_match_core.js
+index 668fc9d..f02f3f9 100644
+--- a/runtime/continuous_match_core.js
++++ b/runtime/continuous_match_core.js
+@@ -1626,6 +1626,24 @@ function resolveGoalKickAerialContest(m){
+   const baseDir=winner?dir(winner.team):dir(kickTeam),lateral=(m.r()-0.5)*7.0,n=norm(baseDir*8.5,lateral);setLoose(m,m.ball.x,m.ball.y,n.x*(8.0+m.r()*3.5),n.y*(8.0+m.r()*3.5),lastTeam,lastPlayer);m.stats.looseBalls++;m.stats.goalKickAerialContests=(m.stats.goalKickAerialContests||0)+1;event(m,'AERIAL_DUEL',winner?`${winner.name} 선수가 롱 골킥 첫 공중볼을 따내 세컨드볼로 연결했습니다.`:'롱 골킥 경합 뒤 세컨드볼이 발생했습니다.');return true;
+ }
+ 
++function tryNpcOneTouchPass(m,p,flightKind,sourceId,passTeam,incomingSpeed){
++  // NPC-only live first-touch action. This runs at the actual contact frame, after
++  // miscontrol/receive-contest resolution and before normal FIRST_TOUCH_FLOW control.
++  // The protagonist is never eligible: their incoming touch remains an explicit user choice.
++  if(!p||p.role==='GK'||p.id===m.protagonistControllerId||p.team!==passTeam)return false;
++  if(!['PASS','LONG_PASS','THROUGH','CUTBACK'].includes(flightKind)||(m.ball.z||0)>.72||incomingSpeed>24.5)return false;
++  if((m.npcOneTouchChainUntil||0)>m.time)return false;
++  const skill=(abilityValue(m,p,'short_pass')+abilityValue(m,p,'vision')+abilityValue(m,p,'ball_control'))/3,pressure=nearestOppDistance(m,p);
++  if(skill<44)return false;
++  const opts=passOptions(m,p,false).filter(o=>o.p.id!==sourceId&&o.block===0&&o.d>=3&&o.d<=29&&o.open>=1.20&&o.forward>=-4.5);
++  if(!opts.length)return false;
++  const targetOpt=opts.sort((a,b)=>(b.forward-a.forward)+(b.open-a.open)*.18+(a.d-b.d)*.025)[0];
++  const chance=clamp(.075+(skill-50)*.0022+(pressure<2.0?.035:0)+(p.role==='CM'?.025:0),.055,.21),roll=(hash32(`${m.seed}|NPC_ONE_TOUCH|${Math.floor(m.time*10)}|${p.id}|${sourceId}`)%10000)/10000;
++  if(roll>=chance)return false;
++  recordInboundCompletion(m,p,flightKind,sourceId,passTeam);p.x=clamp(p.x,1,104);p.y=clamp(p.y,1,67);p.hasBall=false;m.ballOwner=null;m.lastTouchTeam=p.team;m.lastTouchPlayer=p.id;
++  executePass(m,p,targetOpt.p,'PASS',{...targetOpt,running:false},'NPC_ONE_TOUCH');p.lastDecision='NPC_ONE_TOUCH_PASS';m.stats.npcOneTouchPasses=(m.stats.npcOneTouchPasses||0)+1;m.npcOneTouchChainUntil=m.time+.72;return true;
++}
++
+ function captureLooseOrFlight(m){
+   if(!['LOOSE','FLIGHT'].includes(m.ball.mode))return;
+   // A committed shot deflection headed over the goal-line is the visible continuation of
+@@ -1653,6 +1671,7 @@ function captureLooseOrFlight(m){
+   }
+   if(isShot){if(p.role==='GK'){const strict=!!m.ball.shotOneVOne,clean=!!m.ball.shotClearKeeperChance;if(strict)m.stats.strictOneVOneSaves=(m.stats.strictOneVOneSaves||0)+1;if(clean)m.stats.cleanKeeperChanceSaves=(m.stats.cleanKeeperChanceSaves||0)+1;setControlled(m,p);m.stats.saves++;event(m,'SAVE',`${subjectName(p.name)} 슈팅을 막아냈습니다.`);p.nextThink=m.time+0.75;return;}setLoose(m,m.ball.x,m.ball.y,-m.ball.vx*0.28+(m.r()-0.5)*3,-m.ball.vy*0.28+(m.r()-0.5)*3,p.team,p.id);m.stats.blocks++;m.stats.looseBalls++;event(m,'BLOCK',`${subjectName(p.name)} 슈팅을 몸으로 막았습니다.`);return;}
+   const oldTeam=m.possession,sourceId=m.ball.lastTouchPlayer,passTeam=m.ball.lastTouchTeam,deliveryMode=m.ball.deliveryMode||((m.ball.z||0)>0.2?'AERIAL':'GROUND'),incomingVx=m.ball.vx||0,incomingVy=m.ball.vy||0,incomingZ=m.ball.z||0,incomingSpeed=Math.hypot(incomingVx,incomingVy);
++  if(passFlight&&flightKind!=='CROSS'&&tryNpcOneTouchPass(m,p,flightKind,sourceId,passTeam,incomingSpeed))return;
+   const trace=m.lastUserDirectedPassTrace;if(passFlight&&trace&&trace.outcome==='IN_FLIGHT'&&trace.sourceId===sourceId){trace.firstControllerId=p.id;trace.outcome=p.team===passTeam?(p.id===trace.resolvedTargetId?'SELECTED_TARGET_CONTROL':'OTHER_TEAMMATE_CONTROL'):'OPPONENT_CONTROL';trace.resolvedAt=Number(m.time.toFixed(3));}
+   const sameTeamFlow=transferFlight&&flightKind!=='CROSS'&&p.team===passTeam;
+   setControlled(m,p,false,sameTeamFlow?{flow:true,flightKind,deliveryMode,sourceId,incomingVx,incomingVy,incomingZ,incomingSpeed}:null);p.lastReceivedFromId=sourceId;p.lastReceivedFlightKind=sameTeamFlow?flightKind:null;p.lastReceivedPassAt=sameTeamFlow?m.time:-99;if(passFlight&&flightKind==='CROSS'){if(p.team===passTeam)m.stats.crossesCompleted++;else m.stats.crossesDefended++;}if(oldTeam!==p.team){m.stats.turnovers++;m.stats.interceptions++;m.transitionUntil=m.time+1.8;event(m,'INTERCEPT',`${subjectName(p.name)} 공을 가로챘습니다.`);if(TELEMETRY&&m.telemetry&&typeof TELEMETRY.onInterception==='function')TELEMETRY.onInterception(m,{team:p.team,playerId:p.id});}else if(passFlight){m.stats.completedPasses++;if(p.role==='CM'&&['CUTBACK','CROSS'].includes(flightKind))m.stats.midfieldFinalReceipts=(m.stats.midfieldFinalReceipts||0)+1;}
