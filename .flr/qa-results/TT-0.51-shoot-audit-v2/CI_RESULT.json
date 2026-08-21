@@ -1,0 +1,1041 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-SHOOT-AUDIT-V2",
+  "candidateBranch": "tt051-shoot-audit-v2",
+  "baselineRef": "main",
+  "baselineSha": "5d584dcdd4fa4445d83a303e805f853354d5eb98",
+  "candidateSha": "b0a2eee7af22aa89f5bebbe2f9f02692f9da3a54",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
+  "changedFiles": [],
+  "allowedChangedFiles": [
+    "runtime/continuous_match_core.js"
+  ],
+  "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_SHOOT_AUDIT_2.0",
+    "matches": 100,
+    "policy": "Whenever H-ST has a live explicit choice and any shot-family choice exists, choose a shot; otherwise choose the first live candidate. No future outcome precompute.",
+    "summary": {
+      "teamGoals": 954,
+      "heroGoals": 29,
+      "conceded": 1663,
+      "avgTeamGoals": 9.54,
+      "avgHeroGoals": 0.29,
+      "avgConceded": 16.63,
+      "choices": 17247,
+      "shotChoices": 8378,
+      "shotWindows": 8378,
+      "shotChoiceRate": 0.4858,
+      "npcPasses": 5306,
+      "npcOneTouches": 7211,
+      "avgNpcOneTouches": 72.11
+    },
+    "rows": [
+      {
+        "match": 1,
+        "home": 7,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 211,
+        "shotChoices": 99,
+        "shotWindows": 99,
+        "npcOneTouches": 81
+      },
+      {
+        "match": 2,
+        "home": 15,
+        "away": 23,
+        "heroGoals": 0,
+        "choices": 189,
+        "shotChoices": 95,
+        "shotWindows": 95,
+        "npcOneTouches": 72
+      },
+      {
+        "match": 3,
+        "home": 18,
+        "away": 23,
+        "heroGoals": 0,
+        "choices": 210,
+        "shotChoices": 106,
+        "shotWindows": 106,
+        "npcOneTouches": 100
+      },
+      {
+        "match": 4,
+        "home": 7,
+        "away": 22,
+        "heroGoals": 0,
+        "choices": 221,
+        "shotChoices": 94,
+        "shotWindows": 94,
+        "npcOneTouches": 86
+      },
+      {
+        "match": 5,
+        "home": 13,
+        "away": 18,
+        "heroGoals": 1,
+        "choices": 211,
+        "shotChoices": 107,
+        "shotWindows": 107,
+        "npcOneTouches": 74
+      },
+      {
+        "match": 6,
+        "home": 11,
+        "away": 15,
+        "heroGoals": 1,
+        "choices": 220,
+        "shotChoices": 97,
+        "shotWindows": 97,
+        "npcOneTouches": 99
+      },
+      {
+        "match": 7,
+        "home": 14,
+        "away": 22,
+        "heroGoals": 0,
+        "choices": 229,
+        "shotChoices": 114,
+        "shotWindows": 114,
+        "npcOneTouches": 86
+      },
+      {
+        "match": 8,
+        "home": 15,
+        "away": 15,
+        "heroGoals": 0,
+        "choices": 223,
+        "shotChoices": 114,
+        "shotWindows": 114,
+        "npcOneTouches": 92
+      },
+      {
+        "match": 9,
+        "home": 13,
+        "away": 25,
+        "heroGoals": 0,
+        "choices": 199,
+        "shotChoices": 99,
+        "shotWindows": 99,
+        "npcOneTouches": 76
+      },
+      {
+        "match": 10,
+        "home": 8,
+        "away": 9,
+        "heroGoals": 1,
+        "choices": 101,
+        "shotChoices": 46,
+        "shotWindows": 46,
+        "npcOneTouches": 56
+      },
+      {
+        "match": 11,
+        "home": 7,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 220,
+        "shotChoices": 117,
+        "shotWindows": 117,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 12,
+        "home": 13,
+        "away": 25,
+        "heroGoals": 0,
+        "choices": 190,
+        "shotChoices": 86,
+        "shotWindows": 86,
+        "npcOneTouches": 72
+      },
+      {
+        "match": 13,
+        "home": 12,
+        "away": 26,
+        "heroGoals": 0,
+        "choices": 183,
+        "shotChoices": 88,
+        "shotWindows": 88,
+        "npcOneTouches": 69
+      },
+      {
+        "match": 14,
+        "home": 13,
+        "away": 14,
+        "heroGoals": 0,
+        "choices": 216,
+        "shotChoices": 110,
+        "shotWindows": 110,
+        "npcOneTouches": 94
+      },
+      {
+        "match": 15,
+        "home": 15,
+        "away": 21,
+        "heroGoals": 0,
+        "choices": 204,
+        "shotChoices": 97,
+        "shotWindows": 97,
+        "npcOneTouches": 86
+      },
+      {
+        "match": 16,
+        "home": 8,
+        "away": 17,
+        "heroGoals": 1,
+        "choices": 241,
+        "shotChoices": 117,
+        "shotWindows": 117,
+        "npcOneTouches": 79
+      },
+      {
+        "match": 17,
+        "home": 8,
+        "away": 19,
+        "heroGoals": 0,
+        "choices": 208,
+        "shotChoices": 100,
+        "shotWindows": 100,
+        "npcOneTouches": 93
+      },
+      {
+        "match": 18,
+        "home": 17,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 214,
+        "shotChoices": 94,
+        "shotWindows": 94,
+        "npcOneTouches": 92
+      },
+      {
+        "match": 19,
+        "home": 8,
+        "away": 21,
+        "heroGoals": 1,
+        "choices": 201,
+        "shotChoices": 96,
+        "shotWindows": 96,
+        "npcOneTouches": 76
+      },
+      {
+        "match": 20,
+        "home": 3,
+        "away": 14,
+        "heroGoals": 0,
+        "choices": 147,
+        "shotChoices": 81,
+        "shotWindows": 81,
+        "npcOneTouches": 76
+      },
+      {
+        "match": 21,
+        "home": 13,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 203,
+        "shotChoices": 96,
+        "shotWindows": 96,
+        "npcOneTouches": 97
+      },
+      {
+        "match": 22,
+        "home": 10,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 211,
+        "shotChoices": 100,
+        "shotWindows": 100,
+        "npcOneTouches": 85
+      },
+      {
+        "match": 23,
+        "home": 5,
+        "away": 12,
+        "heroGoals": 0,
+        "choices": 117,
+        "shotChoices": 60,
+        "shotWindows": 60,
+        "npcOneTouches": 48
+      },
+      {
+        "match": 24,
+        "home": 7,
+        "away": 22,
+        "heroGoals": 0,
+        "choices": 224,
+        "shotChoices": 99,
+        "shotWindows": 99,
+        "npcOneTouches": 83
+      },
+      {
+        "match": 25,
+        "home": 12,
+        "away": 20,
+        "heroGoals": 1,
+        "choices": 190,
+        "shotChoices": 90,
+        "shotWindows": 90,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 26,
+        "home": 9,
+        "away": 28,
+        "heroGoals": 0,
+        "choices": 189,
+        "shotChoices": 95,
+        "shotWindows": 95,
+        "npcOneTouches": 91
+      },
+      {
+        "match": 27,
+        "home": 10,
+        "away": 24,
+        "heroGoals": 0,
+        "choices": 212,
+        "shotChoices": 109,
+        "shotWindows": 109,
+        "npcOneTouches": 93
+      },
+      {
+        "match": 28,
+        "home": 8,
+        "away": 18,
+        "heroGoals": 1,
+        "choices": 197,
+        "shotChoices": 90,
+        "shotWindows": 90,
+        "npcOneTouches": 65
+      },
+      {
+        "match": 29,
+        "home": 8,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 187,
+        "shotChoices": 92,
+        "shotWindows": 92,
+        "npcOneTouches": 73
+      },
+      {
+        "match": 30,
+        "home": 3,
+        "away": 5,
+        "heroGoals": 0,
+        "choices": 53,
+        "shotChoices": 24,
+        "shotWindows": 24,
+        "npcOneTouches": 26
+      },
+      {
+        "match": 31,
+        "home": 11,
+        "away": 19,
+        "heroGoals": 0,
+        "choices": 169,
+        "shotChoices": 82,
+        "shotWindows": 82,
+        "npcOneTouches": 87
+      },
+      {
+        "match": 32,
+        "home": 4,
+        "away": 2,
+        "heroGoals": 0,
+        "choices": 50,
+        "shotChoices": 24,
+        "shotWindows": 24,
+        "npcOneTouches": 26
+      },
+      {
+        "match": 33,
+        "home": 8,
+        "away": 8,
+        "heroGoals": 0,
+        "choices": 88,
+        "shotChoices": 48,
+        "shotWindows": 48,
+        "npcOneTouches": 37
+      },
+      {
+        "match": 34,
+        "home": 12,
+        "away": 15,
+        "heroGoals": 0,
+        "choices": 214,
+        "shotChoices": 109,
+        "shotWindows": 109,
+        "npcOneTouches": 77
+      },
+      {
+        "match": 35,
+        "home": 15,
+        "away": 18,
+        "heroGoals": 0,
+        "choices": 219,
+        "shotChoices": 112,
+        "shotWindows": 112,
+        "npcOneTouches": 82
+      },
+      {
+        "match": 36,
+        "home": 6,
+        "away": 8,
+        "heroGoals": 1,
+        "choices": 91,
+        "shotChoices": 44,
+        "shotWindows": 44,
+        "npcOneTouches": 49
+      },
+      {
+        "match": 37,
+        "home": 14,
+        "away": 16,
+        "heroGoals": 1,
+        "choices": 198,
+        "shotChoices": 94,
+        "shotWindows": 94,
+        "npcOneTouches": 72
+      },
+      {
+        "match": 38,
+        "home": 3,
+        "away": 6,
+        "heroGoals": 0,
+        "choices": 83,
+        "shotChoices": 46,
+        "shotWindows": 46,
+        "npcOneTouches": 26
+      },
+      {
+        "match": 39,
+        "home": 0,
+        "away": 8,
+        "heroGoals": 0,
+        "choices": 61,
+        "shotChoices": 33,
+        "shotWindows": 33,
+        "npcOneTouches": 22
+      },
+      {
+        "match": 40,
+        "home": 9,
+        "away": 13,
+        "heroGoals": 0,
+        "choices": 162,
+        "shotChoices": 80,
+        "shotWindows": 80,
+        "npcOneTouches": 64
+      },
+      {
+        "match": 41,
+        "home": 8,
+        "away": 10,
+        "heroGoals": 2,
+        "choices": 101,
+        "shotChoices": 46,
+        "shotWindows": 46,
+        "npcOneTouches": 47
+      },
+      {
+        "match": 42,
+        "home": 6,
+        "away": 15,
+        "heroGoals": 0,
+        "choices": 165,
+        "shotChoices": 75,
+        "shotWindows": 75,
+        "npcOneTouches": 73
+      },
+      {
+        "match": 43,
+        "home": 11,
+        "away": 17,
+        "heroGoals": 1,
+        "choices": 204,
+        "shotChoices": 88,
+        "shotWindows": 88,
+        "npcOneTouches": 78
+      },
+      {
+        "match": 44,
+        "home": 7,
+        "away": 24,
+        "heroGoals": 0,
+        "choices": 213,
+        "shotChoices": 107,
+        "shotWindows": 107,
+        "npcOneTouches": 73
+      },
+      {
+        "match": 45,
+        "home": 7,
+        "away": 26,
+        "heroGoals": 1,
+        "choices": 188,
+        "shotChoices": 94,
+        "shotWindows": 94,
+        "npcOneTouches": 73
+      },
+      {
+        "match": 46,
+        "home": 9,
+        "away": 22,
+        "heroGoals": 1,
+        "choices": 214,
+        "shotChoices": 101,
+        "shotWindows": 101,
+        "npcOneTouches": 104
+      },
+      {
+        "match": 47,
+        "home": 2,
+        "away": 5,
+        "heroGoals": 0,
+        "choices": 27,
+        "shotChoices": 13,
+        "shotWindows": 13,
+        "npcOneTouches": 14
+      },
+      {
+        "match": 48,
+        "home": 0,
+        "away": 0,
+        "heroGoals": 0,
+        "choices": 13,
+        "shotChoices": 5,
+        "shotWindows": 5,
+        "npcOneTouches": 9
+      },
+      {
+        "match": 49,
+        "home": 14,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 224,
+        "shotChoices": 112,
+        "shotWindows": 112,
+        "npcOneTouches": 76
+      },
+      {
+        "match": 50,
+        "home": 9,
+        "away": 14,
+        "heroGoals": 0,
+        "choices": 190,
+        "shotChoices": 98,
+        "shotWindows": 98,
+        "npcOneTouches": 100
+      },
+      {
+        "match": 51,
+        "home": 13,
+        "away": 22,
+        "heroGoals": 1,
+        "choices": 223,
+        "shotChoices": 96,
+        "shotWindows": 96,
+        "npcOneTouches": 98
+      },
+      {
+        "match": 52,
+        "home": 3,
+        "away": 6,
+        "heroGoals": 0,
+        "choices": 69,
+        "shotChoices": 30,
+        "shotWindows": 30,
+        "npcOneTouches": 28
+      },
+      {
+        "match": 53,
+        "home": 13,
+        "away": 14,
+        "heroGoals": 0,
+        "choices": 225,
+        "shotChoices": 100,
+        "shotWindows": 100,
+        "npcOneTouches": 88
+      },
+      {
+        "match": 54,
+        "home": 15,
+        "away": 18,
+        "heroGoals": 1,
+        "choices": 196,
+        "shotChoices": 99,
+        "shotWindows": 99,
+        "npcOneTouches": 85
+      },
+      {
+        "match": 55,
+        "home": 8,
+        "away": 7,
+        "heroGoals": 0,
+        "choices": 124,
+        "shotChoices": 63,
+        "shotWindows": 63,
+        "npcOneTouches": 41
+      },
+      {
+        "match": 56,
+        "home": 11,
+        "away": 21,
+        "heroGoals": 0,
+        "choices": 196,
+        "shotChoices": 89,
+        "shotWindows": 89,
+        "npcOneTouches": 82
+      },
+      {
+        "match": 57,
+        "home": 7,
+        "away": 20,
+        "heroGoals": 2,
+        "choices": 187,
+        "shotChoices": 93,
+        "shotWindows": 93,
+        "npcOneTouches": 72
+      },
+      {
+        "match": 58,
+        "home": 14,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 206,
+        "shotChoices": 108,
+        "shotWindows": 108,
+        "npcOneTouches": 95
+      },
+      {
+        "match": 59,
+        "home": 11,
+        "away": 16,
+        "heroGoals": 1,
+        "choices": 218,
+        "shotChoices": 111,
+        "shotWindows": 111,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 60,
+        "home": 6,
+        "away": 20,
+        "heroGoals": 0,
+        "choices": 169,
+        "shotChoices": 81,
+        "shotWindows": 81,
+        "npcOneTouches": 91
+      },
+      {
+        "match": 61,
+        "home": 0,
+        "away": 1,
+        "heroGoals": 0,
+        "choices": 12,
+        "shotChoices": 5,
+        "shotWindows": 5,
+        "npcOneTouches": 6
+      },
+      {
+        "match": 62,
+        "home": 13,
+        "away": 9,
+        "heroGoals": 1,
+        "choices": 158,
+        "shotChoices": 89,
+        "shotWindows": 89,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 63,
+        "home": 11,
+        "away": 22,
+        "heroGoals": 0,
+        "choices": 230,
+        "shotChoices": 114,
+        "shotWindows": 114,
+        "npcOneTouches": 95
+      },
+      {
+        "match": 64,
+        "home": 9,
+        "away": 21,
+        "heroGoals": 0,
+        "choices": 217,
+        "shotChoices": 103,
+        "shotWindows": 103,
+        "npcOneTouches": 98
+      },
+      {
+        "match": 65,
+        "home": 10,
+        "away": 30,
+        "heroGoals": 0,
+        "choices": 179,
+        "shotChoices": 85,
+        "shotWindows": 85,
+        "npcOneTouches": 91
+      },
+      {
+        "match": 66,
+        "home": 13,
+        "away": 20,
+        "heroGoals": 1,
+        "choices": 161,
+        "shotChoices": 81,
+        "shotWindows": 81,
+        "npcOneTouches": 81
+      },
+      {
+        "match": 67,
+        "home": 7,
+        "away": 17,
+        "heroGoals": 1,
+        "choices": 139,
+        "shotChoices": 60,
+        "shotWindows": 60,
+        "npcOneTouches": 50
+      },
+      {
+        "match": 68,
+        "home": 8,
+        "away": 13,
+        "heroGoals": 0,
+        "choices": 204,
+        "shotChoices": 90,
+        "shotWindows": 90,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 69,
+        "home": 13,
+        "away": 16,
+        "heroGoals": 0,
+        "choices": 189,
+        "shotChoices": 100,
+        "shotWindows": 100,
+        "npcOneTouches": 82
+      },
+      {
+        "match": 70,
+        "home": 12,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 209,
+        "shotChoices": 103,
+        "shotWindows": 103,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 71,
+        "home": 13,
+        "away": 29,
+        "heroGoals": 0,
+        "choices": 191,
+        "shotChoices": 96,
+        "shotWindows": 96,
+        "npcOneTouches": 84
+      },
+      {
+        "match": 72,
+        "home": 14,
+        "away": 20,
+        "heroGoals": 1,
+        "choices": 213,
+        "shotChoices": 105,
+        "shotWindows": 105,
+        "npcOneTouches": 87
+      },
+      {
+        "match": 73,
+        "home": 20,
+        "away": 16,
+        "heroGoals": 0,
+        "choices": 201,
+        "shotChoices": 103,
+        "shotWindows": 103,
+        "npcOneTouches": 74
+      },
+      {
+        "match": 74,
+        "home": 11,
+        "away": 24,
+        "heroGoals": 0,
+        "choices": 195,
+        "shotChoices": 91,
+        "shotWindows": 91,
+        "npcOneTouches": 86
+      },
+      {
+        "match": 75,
+        "home": 12,
+        "away": 15,
+        "heroGoals": 1,
+        "choices": 202,
+        "shotChoices": 103,
+        "shotWindows": 103,
+        "npcOneTouches": 93
+      },
+      {
+        "match": 76,
+        "home": 2,
+        "away": 4,
+        "heroGoals": 0,
+        "choices": 56,
+        "shotChoices": 29,
+        "shotWindows": 29,
+        "npcOneTouches": 23
+      },
+      {
+        "match": 77,
+        "home": 19,
+        "away": 23,
+        "heroGoals": 0,
+        "choices": 203,
+        "shotChoices": 95,
+        "shotWindows": 95,
+        "npcOneTouches": 94
+      },
+      {
+        "match": 78,
+        "home": 12,
+        "away": 16,
+        "heroGoals": 0,
+        "choices": 208,
+        "shotChoices": 102,
+        "shotWindows": 102,
+        "npcOneTouches": 89
+      },
+      {
+        "match": 79,
+        "home": 17,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 187,
+        "shotChoices": 94,
+        "shotWindows": 94,
+        "npcOneTouches": 96
+      },
+      {
+        "match": 80,
+        "home": 11,
+        "away": 24,
+        "heroGoals": 1,
+        "choices": 196,
+        "shotChoices": 95,
+        "shotWindows": 95,
+        "npcOneTouches": 90
+      },
+      {
+        "match": 81,
+        "home": 10,
+        "away": 19,
+        "heroGoals": 0,
+        "choices": 203,
+        "shotChoices": 100,
+        "shotWindows": 100,
+        "npcOneTouches": 71
+      },
+      {
+        "match": 82,
+        "home": 11,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 205,
+        "shotChoices": 97,
+        "shotWindows": 97,
+        "npcOneTouches": 93
+      },
+      {
+        "match": 83,
+        "home": 1,
+        "away": 1,
+        "heroGoals": 0,
+        "choices": 26,
+        "shotChoices": 13,
+        "shotWindows": 13,
+        "npcOneTouches": 10
+      },
+      {
+        "match": 84,
+        "home": 8,
+        "away": 22,
+        "heroGoals": 0,
+        "choices": 200,
+        "shotChoices": 90,
+        "shotWindows": 90,
+        "npcOneTouches": 87
+      },
+      {
+        "match": 85,
+        "home": 5,
+        "away": 9,
+        "heroGoals": 1,
+        "choices": 57,
+        "shotChoices": 29,
+        "shotWindows": 29,
+        "npcOneTouches": 25
+      },
+      {
+        "match": 86,
+        "home": 8,
+        "away": 28,
+        "heroGoals": 0,
+        "choices": 204,
+        "shotChoices": 90,
+        "shotWindows": 90,
+        "npcOneTouches": 74
+      },
+      {
+        "match": 87,
+        "home": 5,
+        "away": 10,
+        "heroGoals": 1,
+        "choices": 113,
+        "shotChoices": 53,
+        "shotWindows": 53,
+        "npcOneTouches": 35
+      },
+      {
+        "match": 88,
+        "home": 10,
+        "away": 11,
+        "heroGoals": 0,
+        "choices": 217,
+        "shotChoices": 103,
+        "shotWindows": 103,
+        "npcOneTouches": 92
+      },
+      {
+        "match": 89,
+        "home": 7,
+        "away": 18,
+        "heroGoals": 0,
+        "choices": 131,
+        "shotChoices": 62,
+        "shotWindows": 62,
+        "npcOneTouches": 62
+      },
+      {
+        "match": 90,
+        "home": 16,
+        "away": 19,
+        "heroGoals": 1,
+        "choices": 221,
+        "shotChoices": 104,
+        "shotWindows": 104,
+        "npcOneTouches": 96
+      },
+      {
+        "match": 91,
+        "home": 14,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 218,
+        "shotChoices": 115,
+        "shotWindows": 115,
+        "npcOneTouches": 85
+      },
+      {
+        "match": 92,
+        "home": 10,
+        "away": 17,
+        "heroGoals": 0,
+        "choices": 210,
+        "shotChoices": 104,
+        "shotWindows": 104,
+        "npcOneTouches": 75
+      },
+      {
+        "match": 93,
+        "home": 8,
+        "away": 24,
+        "heroGoals": 0,
+        "choices": 196,
+        "shotChoices": 93,
+        "shotWindows": 93,
+        "npcOneTouches": 72
+      },
+      {
+        "match": 94,
+        "home": 17,
+        "away": 31,
+        "heroGoals": 1,
+        "choices": 206,
+        "shotChoices": 97,
+        "shotWindows": 97,
+        "npcOneTouches": 102
+      },
+      {
+        "match": 95,
+        "home": 10,
+        "away": 22,
+        "heroGoals": 0,
+        "choices": 212,
+        "shotChoices": 107,
+        "shotWindows": 107,
+        "npcOneTouches": 82
+      },
+      {
+        "match": 96,
+        "home": 2,
+        "away": 11,
+        "heroGoals": 0,
+        "choices": 88,
+        "shotChoices": 45,
+        "shotWindows": 45,
+        "npcOneTouches": 29
+      },
+      {
+        "match": 97,
+        "home": 8,
+        "away": 13,
+        "heroGoals": 0,
+        "choices": 198,
+        "shotChoices": 100,
+        "shotWindows": 100,
+        "npcOneTouches": 87
+      },
+      {
+        "match": 98,
+        "home": 11,
+        "away": 11,
+        "heroGoals": 0,
+        "choices": 212,
+        "shotChoices": 102,
+        "shotWindows": 102,
+        "npcOneTouches": 91
+      },
+      {
+        "match": 99,
+        "home": 0,
+        "away": 3,
+        "heroGoals": 0,
+        "choices": 40,
+        "shotChoices": 21,
+        "shotWindows": 21,
+        "npcOneTouches": 18
+      },
+      {
+        "match": 100,
+        "home": 0,
+        "away": 4,
+        "heroGoals": 0,
+        "choices": 32,
+        "shotChoices": 17,
+        "shotWindows": 17,
+        "npcOneTouches": 13
+      }
+    ]
+  },
+  "applyLog": [],
+  "validationStderr": ""
+}
