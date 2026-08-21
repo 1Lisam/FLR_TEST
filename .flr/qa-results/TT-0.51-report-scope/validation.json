@@ -1,4 +1,111 @@
 {
-  "parseError": "validation: Expecting value: line 1 column 1 (char 0)",
-  "raw": ""
+  "schemaVersion": "FLR_TT051_REPORT_SCOPE_VALIDATION_1.0",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "rolling-ring-two",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "scope-current",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "scope-previous",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "scope-no-older",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "scope-rule-label",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "range-null-safe",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "trim-resolved-events",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "trim-scene-candidates",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "trim-chain",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "keep-full-situation-frames",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "choice-episode-remembered",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "goal-scene-remembered",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "setpiece-goal-remembered",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "report-context-description",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "report-context-category",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "report-context-priority",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "payload-uses-bundle",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "raw-current-not-sent",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "fallback-uses-bundle",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "ring-reset-on-setup",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "syntax-step71",
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
 }
