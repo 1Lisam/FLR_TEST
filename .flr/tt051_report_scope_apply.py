@@ -1,7 +1,8 @@
 from pathlib import Path
-import re
+import re, sys
 
-p=Path('step71_hybrid_v06_ui.js')
+root=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else Path.cwd()
+p=root/'step71_hybrid_v06_ui.js'
 s=p.read_text(encoding='utf-8')
 
 def replace_once(old,new,label):
@@ -23,7 +24,7 @@ replace_once(
 )
 
 helpers=r'''function debugSituationKey(d){const b=d?.hybridBefore?.boundary||{},h=d?.highResolution||{},t=b.atSecond??h.entrySnapshot?.time??null;return`${b.sceneId||b.id||'-'}|${Number.isFinite(Number(t))?Number(t).toFixed(3):'-'}`;}
-function debugSituationRange(d){const h=d?.highResolution||{},b=d?.hybridBefore?.boundary||{},af=d?.hybridAfter?.state||{},first=a=>Array.isArray(a)&&a.length?Number(a[0]?.time):NaN,last=a=>Array.isArray(a)&&a.length?Number(a.at(-1)?.time):NaN,starts=[Number(b.atSecond),Number(h.entrySnapshot?.time),first(h.preActionFrames),first(h.episodeFrames)].filter(Number.isFinite),ends=[Number(af.second),last(h.postActionFrames),last(h.episodeFrames)].filter(Number.isFinite);return{start:starts.length?Math.min(...starts):null,end:ends.length?Math.max(...ends):null};}
+function debugSituationRange(d){const h=d?.highResolution||{},b=d?.hybridBefore?.boundary||{},af=d?.hybridAfter?.state||{},num=v=>v==null?NaN:Number(v),first=a=>Array.isArray(a)&&a.length?num(a[0]?.time):NaN,last=a=>Array.isArray(a)&&a.length?num(a.at(-1)?.time):NaN,starts=[num(b.atSecond),num(h.entrySnapshot?.time),first(h.preActionFrames),first(h.episodeFrames)].filter(Number.isFinite),ends=[num(af.second),last(h.postActionFrames),last(h.episodeFrames)].filter(Number.isFinite);return{start:starts.length?Math.min(...starts):null,end:ends.length?Math.max(...ends):null};}
 function scopeSituationDebug(d){if(!d)return null;const out=deep(d),range=debugSituationRange(out),a=range.start,b=range.end,inside=t=>!Number.isFinite(a)||!Number.isFinite(b)||(Number(t)>=a-.001&&Number(t)<=b+.001),st=out.hybridAfter?.state;if(st){if(Array.isArray(st.resolvedEvents))st.resolvedEvents=st.resolvedEvents.filter(e=>inside(e?.t));if(Array.isArray(st.chain))st.chain=st.chain.filter(e=>inside(e?.t));if(Array.isArray(st.sceneCandidates))st.sceneCandidates=st.sceneCandidates.filter(e=>inside(e?.atSecond));}out.reportScope={startSecond:a,endSecond:b,cumulativeMatchHistoryIncluded:false,keepsFullSituationFrames:true};return out;}
 function rememberCompletedSituation(d,kind='SCENE'){if(!d)return;const key=debugSituationKey(d),row={key,kind,debug:deep(d)};if(recentCompletedSituations.at(-1)?.key===key)recentCompletedSituations[recentCompletedSituations.length-1]=row;else recentCompletedSituations.push(row);while(recentCompletedSituations.length>2)recentCompletedSituations.shift();}
 function previousSituationFor(d){if(!d||bugDebugOverride)return null;const key=debugSituationKey(d),last=recentCompletedSituations.at(-1);if(!last)return null;if(last.key!==key)return last.debug||null;return recentCompletedSituations.length>1?recentCompletedSituations.at(-2)?.debug||null:null;}
@@ -34,17 +35,14 @@ if marker not in s:
     raise SystemExit('helper insertion marker missing')
 s=s.replace(marker,helpers+marker,1)
 
-# Choice episode: once fully handed back, keep only a two-situation rolling ring.
 pattern=r"(latestIntegratedDebug=X\.build\(beforeHybrid,activeBoundary,opened,\{\.\.\.hb,selectedChoice:selectedStepResults\.at\(-1\)\?\.selectedChoice\|\|null,choiceSteps:scenes\.map\(sc=>\(\{sceneId:sc\.sceneId,selectedChoice:sc\.choice,result:sc\.result\}\)\)\},world\);)(episodeHistory\.push\()"
 s,n=re.subn(pattern,r"\1rememberCompletedSituation(latestIntegratedDebug,'CHOICE_EPISODE');\2",s,count=1)
 if n!=1: raise SystemExit(f'handback remember insert failed: {n}')
 
-# Non-choice goal: preserve the actual displayed scoring situation before clearing the live handoff vars.
 old="const team=goal?(goal.team||scoreDeltaTeam(entry,out.snapshot)):null,score=out.snapshot?.score||world.state.score,detail=goal?.text||null;deferredHandback=null;"
 new="const team=goal?(goal.team||scoreDeltaTeam(entry,out.snapshot)):null,score=out.snapshot?.score||world.state.score,detail=goal?.text||null;if(goal){latestIntegratedDebug=X.build(beforeHybrid,activeBoundary,opened,{...out,selectedChoice:null,choiceSteps:[]},world);rememberCompletedSituation(latestIntegratedDebug,'GOAL_SCENE');}deferredHandback=null;"
 replace_once(old,new,'goal-scene-remember')
 
-# Set-piece goal: same rule; non-goal auto windows are not added to the user-visible previous-situation slot.
 old="const goals=flushHybridNotables(),goal=goals.find(e=>e.kind==='HIGH_RES_GOAL');$('heroPlayback').textContent='세트피스 종료 · Hybrid 경기 재개';"
 new="const goals=flushHybridNotables(),goal=goals.find(e=>e.kind==='HIGH_RES_GOAL');if(goal){latestIntegratedDebug=X.build(beforeHybrid,activeBoundary,opened,{...hb,selectedChoice:null,choiceSteps:[]},world);rememberCompletedSituation(latestIntegratedDebug,'SET_PIECE_GOAL');}$('heroPlayback').textContent='세트피스 종료 · Hybrid 경기 재개';"
 replace_once(old,new,'setpiece-goal-remember')
