@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "FLR_DIRECT_VALIDATED_PROMOTE_1.0",
+  "validatedBaselineCommit": "626e9203191ffd353f7b99e0099d203b16877a6a",
+  "candidateBranch": "tt051-d1-live-entry-candidate",
+  "patchPath": ".flr/qa-results/TT-0.51-d1-live-entry/candidate.patch",
+  "patchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
+  "changedFiles": [
+    ".github/workflows/flr-cloudflare-bug-reporter.yml",
+    "bug-report-worker/schema.sql",
+    "bug-report-worker/worker.js",
+    "bug-report-worker/wrangler.toml",
+    "live_v06_scene_authority_browser.js"
+  ],
+  "requestedAt": "2026-08-21T10:58:00+09:00"
+}
