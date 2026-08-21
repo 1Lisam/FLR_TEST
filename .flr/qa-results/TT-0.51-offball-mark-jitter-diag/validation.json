@@ -1,0 +1,250 @@
+{
+  "schemaVersion": "FLR_TT051_OFFBALL_MARK_JITTER_DIAG_1.0",
+  "issueReproduced": false,
+  "pass": true,
+  "cases": [
+    {
+      "seed": "MARK-JITTER-A",
+      "samples": 140,
+      "minD": 1.5670401174204134,
+      "under12": {
+        "n": 0,
+        "span": 0
+      },
+      "under14": {
+        "n": 0,
+        "span": 0
+      },
+      "under16": {
+        "n": 2,
+        "span": 0.09999999999990905
+      },
+      "sideFlips": 0,
+      "taskSwitches": 2,
+      "markSwitches": 0,
+      "rcbPath": 32.45188313265109,
+      "rcbNet": 20.51079035505611,
+      "pathToNet": 1.5821858919566885,
+      "last": {
+        "t": 1713.9999999999873,
+        "d": 15.791519229960791,
+        "st": [
+          92.4,
+          37.4
+        ],
+        "rcb": [
+          94.64323949993033,
+          53.031377294921064
+        ],
+        "stV": 0,
+        "rcbV": 0.9999603790401503,
+        "task": "SHOT_LANE_COVER",
+        "mark": null,
+        "targetD": 15.801481698326594
+      },
+      "taskSet": [
+        "PRESS_CONTAIN",
+        "ENGAGE",
+        "SHOT_LANE_COVER"
+      ],
+      "markSet": [
+        null
+      ]
+    },
+    {
+      "seed": "MARK-JITTER-B",
+      "samples": 140,
+      "minD": 1.5670401174204134,
+      "under12": {
+        "n": 0,
+        "span": 0
+      },
+      "under14": {
+        "n": 0,
+        "span": 0
+      },
+      "under16": {
+        "n": 2,
+        "span": 0.09999999999990905
+      },
+      "sideFlips": 0,
+      "taskSwitches": 2,
+      "markSwitches": 0,
+      "rcbPath": 31.20797417296985,
+      "rcbNet": 20.730719969074833,
+      "pathToNet": 1.5053975076371933,
+      "last": {
+        "t": 1713.9999999999873,
+        "d": 16.04428681480848,
+        "st": [
+          92.4,
+          37.4
+        ],
+        "rcb": [
+          94.63075027518182,
+          53.288451548392416
+        ],
+        "stV": 0,
+        "rcbV": 0.9999512293005457,
+        "task": "SHOT_LANE_COVER",
+        "mark": null,
+        "targetD": 16.054047857223058
+      },
+      "taskSet": [
+        "PRESS_CONTAIN",
+        "ENGAGE",
+        "SHOT_LANE_COVER"
+      ],
+      "markSet": [
+        null
+      ]
+    },
+    {
+      "seed": "MARK-JITTER-C",
+      "samples": 140,
+      "minD": 1.5670401174204134,
+      "under12": {
+        "n": 0,
+        "span": 0
+      },
+      "under14": {
+        "n": 0,
+        "span": 0
+      },
+      "under16": {
+        "n": 2,
+        "span": 0.09999999999990905
+      },
+      "sideFlips": 0,
+      "taskSwitches": 2,
+      "markSwitches": 0,
+      "rcbPath": 31.20797417296985,
+      "rcbNet": 20.730719969074833,
+      "pathToNet": 1.5053975076371933,
+      "last": {
+        "t": 1713.9999999999873,
+        "d": 16.04428681480848,
+        "st": [
+          92.4,
+          37.4
+        ],
+        "rcb": [
+          94.63075027518182,
+          53.288451548392416
+        ],
+        "stV": 0,
+        "rcbV": 0.9999512293005457,
+        "task": "SHOT_LANE_COVER",
+        "mark": null,
+        "targetD": 16.054047857223058
+      },
+      "taskSet": [
+        "PRESS_CONTAIN",
+        "ENGAGE",
+        "SHOT_LANE_COVER"
+      ],
+      "markSet": [
+        null
+      ]
+    },
+    {
+      "seed": "MARK-JITTER-D",
+      "samples": 140,
+      "minD": 1.5670401174204134,
+      "under12": {
+        "n": 0,
+        "span": 0
+      },
+      "under14": {
+        "n": 0,
+        "span": 0
+      },
+      "under16": {
+        "n": 2,
+        "span": 0.09999999999990905
+      },
+      "sideFlips": 0,
+      "taskSwitches": 2,
+      "markSwitches": 0,
+      "rcbPath": 31.20797417296985,
+      "rcbNet": 20.730719969074833,
+      "pathToNet": 1.5053975076371933,
+      "last": {
+        "t": 1713.9999999999873,
+        "d": 16.04428681480848,
+        "st": [
+          92.4,
+          37.4
+        ],
+        "rcb": [
+          94.63075027518182,
+          53.288451548392416
+        ],
+        "stV": 0,
+        "rcbV": 0.9999512293005457,
+        "task": "SHOT_LANE_COVER",
+        "mark": null,
+        "targetD": 16.054047857223058
+      },
+      "taskSet": [
+        "PRESS_CONTAIN",
+        "ENGAGE",
+        "SHOT_LANE_COVER"
+      ],
+      "markSet": [
+        null
+      ]
+    }
+  ],
+  "worst": {
+    "seed": "MARK-JITTER-A",
+    "samples": 140,
+    "minD": 1.5670401174204134,
+    "under12": {
+      "n": 0,
+      "span": 0
+    },
+    "under14": {
+      "n": 0,
+      "span": 0
+    },
+    "under16": {
+      "n": 2,
+      "span": 0.09999999999990905
+    },
+    "sideFlips": 0,
+    "taskSwitches": 2,
+    "markSwitches": 0,
+    "rcbPath": 32.45188313265109,
+    "rcbNet": 20.51079035505611,
+    "pathToNet": 1.5821858919566885,
+    "last": {
+      "t": 1713.9999999999873,
+      "d": 15.791519229960791,
+      "st": [
+        92.4,
+        37.4
+      ],
+      "rcb": [
+        94.64323949993033,
+        53.031377294921064
+      ],
+      "stV": 0,
+      "rcbV": 0.9999603790401503,
+      "task": "SHOT_LANE_COVER",
+      "mark": null,
+      "targetD": 15.801481698326594
+    },
+    "taskSet": [
+      "PRESS_CONTAIN",
+      "ENGAGE",
+      "SHOT_LANE_COVER"
+    ],
+    "markSet": [
+      null
+    ]
+  },
+  "criteria": {
+    "issue": "off-ball ST/CB stay <1.6m for >=5s and hit ~1.05m physical collision floor"
+  }
+}
