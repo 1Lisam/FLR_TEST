@@ -1,8 +1,78 @@
 {
-  "schemaVersion": "FLR_D1_REPORT_AUDIT_1.0",
+  "schemaVersion": "FLR_D1_REPORT_AUDIT_1.2",
   "status": "PASS",
-  "count": 1,
+  "count": 8,
   "reports": [
+    {
+      "report_id": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:34:27.415Z",
+      "category": "슈팅/GK",
+      "priority": 3,
+      "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
+      "size_bytes": 5647319,
+      "chunk_count": 4
+    },
+    {
+      "report_id": "tt051-cc852f58-6718-4b71-9e39-bc67abd66574",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:33:15.773Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "선수단 라커룸 복귀는 지금 속도보다 20% 정도 더 빨라져도 좋을거 같아.",
+      "size_bytes": 5647134,
+      "chunk_count": 4
+    },
+    {
+      "report_id": "tt051-53de8a05-f3f4-465c-9780-e51d381d66f8",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:32:35.837Z",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "이전 선택지에서 '볼 트래핑' 이후 다시 ST에게 공이 들어왔으나 플레이어가 전혀 관여 하지 않은 패스가 나왔어. 이 부분 확인 해줘",
+      "size_bytes": 4703496,
+      "chunk_count": 4
+    },
+    {
+      "report_id": "tt051-ac85275c-b6a0-465c-851f-53296142d471",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:29:50.178Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "이건 왜 ST가 수비진영에서 나오고 있는건지 도저히 이해가 안됨. 수비 가담을 했다고 하기엔 모든 포메이션이 정상 포메이션이거든",
+      "size_bytes": 3074822,
+      "chunk_count": 3
+    },
+    {
+      "report_id": "tt051-81ee7089-fc98-4f05-99d2-b7f1b1fa7a3e",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:28:44.880Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "여전히 선택지 이후 ST와 CB가 서로 비비면서 시간을 보내다 선택지 창이 뜸",
+      "size_bytes": 4978001,
+      "chunk_count": 4
+    },
+    {
+      "report_id": "tt051-259e1218-0586-4693-af88-7adfb22b6fc3",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:28:16.399Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "이 부분에서는 원터치 상황이 나오는데 원터치로 돌려주는 상황과 내가 볼을 간수한다 두가지 선택 뿐인게 최선인가? 날아오는걸 바로 다시 되돌려 주는 리턴도 가능은 하긴 한데 확률상 다른쪽으로 전달하는것도 가능해지는거라서.",
+      "size_bytes": 5816259,
+      "chunk_count": 4
+    },
+    {
+      "report_id": "tt051-e418816c-7d1e-434e-9c09-1c740879b08e",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:26:37.464Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "공간 전진을 했는데 서로 막힌 상태로 다음 선택까지 대치만 하고 있어 움직임이 전혀 없는건 의도하는 상황이 아니야 그래서도 안되고 완전히 막혔다면 상대가 내 공을 뺏던지 곧바로 다음 선택지가 뜨던지 해야 할거 같아.",
+      "size_bytes": 3452458,
+      "chunk_count": 3
+    },
     {
       "report_id": "tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb",
       "build": "TT-0.51",
@@ -13,5 +83,57 @@
       "size_bytes": 3504780,
       "chunk_count": 3
     }
-  ]
+  ],
+  "latestBundle": {
+    "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+    "scope": {
+      "currentSituation": true,
+      "previousSituation": true,
+      "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
+      "olderSituationsIncluded": false
+    },
+    "bugReportContext": {
+      "reportId": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
+      "build": "TT-0.51",
+      "step": 78,
+      "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
+      "category": "슈팅/GK",
+      "priority": 3,
+      "reportedAt": "2026-08-21T02:35:07.726Z"
+    },
+    "currentSituationPresent": true,
+    "previousSituationPresent": true,
+    "currentSituationKeys": [
+      "schemaVersion",
+      "canonicalContract",
+      "hybridBefore",
+      "highResolution",
+      "hybridAfter",
+      "futureOutcomePrecomputed",
+      "reportScope"
+    ],
+    "previousSituationKeys": [
+      "schemaVersion",
+      "canonicalContract",
+      "hybridBefore",
+      "highResolution",
+      "hybridAfter",
+      "futureOutcomePrecomputed",
+      "reportScope"
+    ],
+    "currentReportScope": {
+      "startSecond": 5267.100000000299,
+      "endSecond": 5277.600000000337,
+      "cumulativeMatchHistoryIncluded": false,
+      "keepsFullSituationFrames": true
+    },
+    "previousReportScope": {
+      "startSecond": 5163.3000000001575,
+      "endSecond": 5194.10000000027,
+      "cumulativeMatchHistoryIncluded": false,
+      "keepsFullSituationFrames": true
+    },
+    "currentSerializedBytes": 1659655,
+    "previousSerializedBytes": 4648921
+  }
 }
