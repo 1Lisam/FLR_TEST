@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_FEEDBACK_DIAGNOSTICS_1.0",
+  "schemaVersion": "FLR_FEEDBACK_DIAGNOSTICS_1.1",
   "oldJitter": {
     "context": {
       "reportId": "tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469",
@@ -17,379 +17,2231 @@
         "root.highResolution.episodeFrames": 88
       },
       "players": {
-        "H_ST": [],
-        "A_CB_R": [],
-        "A_RCB": [],
-        "H_LW": [],
-        "H_RW": []
+        "H-ST": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "H-ST",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                83.552,
+                34.0
+              ],
+              "end": [
+                79.751,
+                32.957
+              ],
+              "path": 14.488,
+              "net": 3.942,
+              "pathToNet": 3.68,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.2683,
+              "maxStep": 0.508,
+              "meanSpeed": 2.625,
+              "maxSpeed": 5.073
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-ST",
+              "x": 83.552,
+              "y": 34.0,
+              "vx": -0.347,
+              "vy": 0.0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "H-ST",
+              "x": 79.751,
+              "y": 32.957,
+              "vx": 2.06,
+              "vy": 0.216,
+              "action": "FIRST_TOUCH_FLOW",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "H-ST",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                83.552,
+                34.0
+              ],
+              "end": [
+                80.951,
+                33.469
+              ],
+              "path": 15.796,
+              "net": 2.655,
+              "pathToNet": 5.95,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.1816,
+              "maxStep": 0.508,
+              "meanSpeed": 1.782,
+              "maxSpeed": 5.073
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-ST",
+              "x": 83.552,
+              "y": 34.0,
+              "vx": -0.347,
+              "vy": 0.0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-ST",
+              "x": 80.951,
+              "y": 33.469,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "PROTECT_SCAN",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "H-ST",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                79.992,
+                33.018
+              ],
+              "end": [
+                80.951,
+                33.469
+              ],
+              "path": 1.06,
+              "net": 1.06,
+              "pathToNet": 1.0,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.0331,
+              "maxStep": 0.2819,
+              "meanSpeed": 0.378,
+              "maxSpeed": 2.823
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "H-ST",
+              "x": 79.992,
+              "y": 33.018,
+              "vx": 2.405,
+              "vy": 0.603,
+              "action": "DRIBBLE_EVADE",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-ST",
+              "x": 80.951,
+              "y": 33.469,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "PROTECT_SCAN",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-LW": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "H-LW",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                66.274,
+                5.59
+              ],
+              "end": [
+                77.854,
+                18.762
+              ],
+              "path": 21.095,
+              "net": 17.538,
+              "pathToNet": 1.2,
+              "xReversals": 0,
+              "yReversals": 3,
+              "meanStep": 0.3906,
+              "maxStep": 0.7313,
+              "meanSpeed": 3.832,
+              "maxSpeed": 7.315
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-LW",
+              "x": 66.274,
+              "y": 5.59,
+              "vx": 0.371,
+              "vy": 0.318,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "H-LW",
+              "x": 77.854,
+              "y": 18.762,
+              "vx": 3.317,
+              "vy": -0.258,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "H-LW",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                66.274,
+                5.59
+              ],
+              "end": [
+                83.412,
+                6.483
+              ],
+              "path": 35.18,
+              "net": 17.161,
+              "pathToNet": 2.05,
+              "xReversals": 0,
+              "yReversals": 3,
+              "meanStep": 0.4044,
+              "maxStep": 0.7313,
+              "meanSpeed": 3.977,
+              "maxSpeed": 7.315
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-LW",
+              "x": 66.274,
+              "y": 5.59,
+              "vx": 0.371,
+              "vy": 0.318,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-LW",
+              "x": 83.412,
+              "y": 6.483,
+              "vx": 3.766,
+              "vy": -2.148,
+              "action": "WIDE_RELEASE_OUTLET",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "H-LW",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                78.171,
+                18.685
+              ],
+              "end": [
+                83.412,
+                6.483
+              ],
+              "path": 13.759,
+              "net": 13.28,
+              "pathToNet": 1.04,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.43,
+              "maxStep": 0.6978,
+              "meanSpeed": 4.219,
+              "maxSpeed": 6.977
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "H-LW",
+              "x": 78.171,
+              "y": 18.685,
+              "vx": 3.169,
+              "vy": -0.769,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-LW",
+              "x": 83.412,
+              "y": 6.483,
+              "vx": 3.766,
+              "vy": -2.148,
+              "action": "WIDE_RELEASE_OUTLET",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-RW": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "H-RW",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                66.272,
+                62.408
+              ],
+              "end": [
+                75.505,
+                55.615
+              ],
+              "path": 14.905,
+              "net": 11.463,
+              "pathToNet": 1.3,
+              "xReversals": 0,
+              "yReversals": 1,
+              "meanStep": 0.276,
+              "maxStep": 0.7522,
+              "meanSpeed": 2.663,
+              "maxSpeed": 7.522
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-RW",
+              "x": 66.272,
+              "y": 62.408,
+              "vx": 0.351,
+              "vy": -0.336,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "H-RW",
+              "x": 75.505,
+              "y": 55.615,
+              "vx": 3.823,
+              "vy": -6.478,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "H-RW",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                66.272,
+                62.408
+              ],
+              "end": [
+                83.576,
+                48.0
+              ],
+              "path": 26.787,
+              "net": 22.517,
+              "pathToNet": 1.19,
+              "xReversals": 0,
+              "yReversals": 1,
+              "meanStep": 0.3079,
+              "maxStep": 0.7522,
+              "meanSpeed": 3.002,
+              "maxSpeed": 7.522
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-RW",
+              "x": 66.272,
+              "y": 62.408,
+              "vx": 0.351,
+              "vy": -0.336,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-RW",
+              "x": 83.576,
+              "y": 48.0,
+              "vx": 2.852,
+              "vy": 0.0,
+              "action": "ST_RELEASE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "H-RW",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                75.864,
+                55.016
+              ],
+              "end": [
+                83.576,
+                48.0
+              ],
+              "path": 11.184,
+              "net": 10.426,
+              "pathToNet": 1.07,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.3495,
+              "maxStep": 0.6445,
+              "meanSpeed": 3.567,
+              "maxSpeed": 6.984
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "H-RW",
+              "x": 75.864,
+              "y": 55.016,
+              "vx": 3.588,
+              "vy": -5.992,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-RW",
+              "x": 83.576,
+              "y": 48.0,
+              "vx": 2.852,
+              "vy": 0.0,
+              "action": "ST_RELEASE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-LCM": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "H-LCM",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                46.241,
+                18.726
+              ],
+              "end": [
+                61.146,
+                24.441
+              ],
+              "path": 22.364,
+              "net": 15.963,
+              "pathToNet": 1.4,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.4141,
+              "maxStep": 0.7203,
+              "meanSpeed": 4.074,
+              "maxSpeed": 7.2
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-LCM",
+              "x": 46.241,
+              "y": 18.726,
+              "vx": 0.039,
+              "vy": 0.412,
+              "action": "HALFSPACE_CONNECTOR_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "H-LCM",
+              "x": 61.146,
+              "y": 24.441,
+              "vx": 7.16,
+              "vy": -0.761,
+              "action": "SECOND_LINE_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "H-LCM",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                46.241,
+                18.726
+              ],
+              "end": [
+                69.451,
+                24.5
+              ],
+              "path": 30.683,
+              "net": 23.917,
+              "pathToNet": 1.28,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.3527,
+              "maxStep": 0.7203,
+              "meanSpeed": 3.473,
+              "maxSpeed": 7.2
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-LCM",
+              "x": 46.241,
+              "y": 18.726,
+              "vx": 0.039,
+              "vy": 0.412,
+              "action": "HALFSPACE_CONNECTOR_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-LCM",
+              "x": 69.451,
+              "y": 24.5,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "SECOND_BALL_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "H-LCM",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                61.811,
+                24.37
+              ],
+              "end": [
+                69.451,
+                24.5
+              ],
+              "path": 7.65,
+              "net": 7.641,
+              "pathToNet": 1.0,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.2391,
+              "maxStep": 0.6184,
+              "meanSpeed": 2.471,
+              "maxSpeed": 6.69
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "H-LCM",
+              "x": 61.811,
+              "y": 24.37,
+              "vx": 6.653,
+              "vy": -0.707,
+              "action": "SECOND_LINE_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-LCM",
+              "x": 69.451,
+              "y": 24.5,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "SECOND_BALL_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-RCM": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "H-RCM",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                46.273,
+                49.285
+              ],
+              "end": [
+                62.437,
+                46.009
+              ],
+              "path": 16.604,
+              "net": 16.493,
+              "pathToNet": 1.01,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.3075,
+              "maxStep": 0.7205,
+              "meanSpeed": 2.984,
+              "maxSpeed": 7.2
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-RCM",
+              "x": 46.273,
+              "y": 49.285,
+              "vx": 0.355,
+              "vy": -0.297,
+              "action": "HALFSPACE_SUPPORT_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "H-RCM",
+              "x": 62.437,
+              "y": 46.009,
+              "vx": 6.936,
+              "vy": -1.089,
+              "action": "LATE_BOX_ARRIVAL",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "H-RCM",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                46.273,
+                49.285
+              ],
+              "end": [
+                75.733,
+                36.465
+              ],
+              "path": 33.181,
+              "net": 32.129,
+              "pathToNet": 1.03,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.3814,
+              "maxStep": 0.7205,
+              "meanSpeed": 3.748,
+              "maxSpeed": 7.2
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "H-RCM",
+              "x": 46.273,
+              "y": 49.285,
+              "vx": 0.355,
+              "vy": -0.297,
+              "action": "HALFSPACE_SUPPORT_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-RCM",
+              "x": 75.733,
+              "y": 36.465,
+              "vx": 1.634,
+              "vy": -1.347,
+              "action": "ST_WALL_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "H-RCM",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                63.083,
+                45.918
+              ],
+              "end": [
+                75.733,
+                36.465
+              ],
+              "path": 15.925,
+              "net": 15.792,
+              "pathToNet": 1.01,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.4976,
+              "maxStep": 0.6885,
+              "meanSpeed": 5.022,
+              "maxSpeed": 6.89
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "H-RCM",
+              "x": 63.083,
+              "y": 45.918,
+              "vx": 6.46,
+              "vy": -0.908,
+              "action": "LATE_BOX_ARRIVAL",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "H-RCM",
+              "x": 75.733,
+              "y": 36.465,
+              "vx": 1.634,
+              "vy": -1.347,
+              "action": "ST_WALL_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "A-CB-L": [],
+        "A-CB-R": [],
+        "A-LCB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "A-LCB",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                84.188,
+                42.633
+              ],
+              "end": [
+                80.07,
+                40.914
+              ],
+              "path": 14.199,
+              "net": 4.462,
+              "pathToNet": 3.18,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.2629,
+              "maxStep": 0.5322,
+              "meanSpeed": 2.544,
+              "maxSpeed": 5.32
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-LCB",
+              "x": 84.188,
+              "y": 42.633,
+              "vx": -0.489,
+              "vy": -0.055,
+              "action": "HOLD_BLOCK",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "A-LCB",
+              "x": 80.07,
+              "y": 40.914,
+              "vx": 2.156,
+              "vy": -3.438,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "A-LCB",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                84.188,
+                42.633
+              ],
+              "end": [
+                85.1,
+                34.751
+              ],
+              "path": 22.217,
+              "net": 7.935,
+              "pathToNet": 2.8,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.2554,
+              "maxStep": 0.5666,
+              "meanSpeed": 2.462,
+              "maxSpeed": 5.32
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-LCB",
+              "x": 84.188,
+              "y": 42.633,
+              "vx": -0.489,
+              "vy": -0.055,
+              "action": "HOLD_BLOCK",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-LCB",
+              "x": 85.1,
+              "y": 34.751,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "A-LCB",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                80.262,
+                40.526
+              ],
+              "end": [
+                85.1,
+                34.751
+              ],
+              "path": 7.585,
+              "net": 7.534,
+              "pathToNet": 1.01,
+              "xReversals": 0,
+              "yReversals": 0,
+              "meanStep": 0.237,
+              "maxStep": 0.5666,
+              "meanSpeed": 2.326,
+              "maxSpeed": 5.101
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "A-LCB",
+              "x": 80.262,
+              "y": 40.526,
+              "vx": 1.927,
+              "vy": -3.881,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-LCB",
+              "x": 85.1,
+              "y": 34.751,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          }
+        ],
+        "A-RCB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "A-RCB",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                84.188,
+                25.367
+              ],
+              "end": [
+                80.431,
+                31.084
+              ],
+              "path": 16.579,
+              "net": 6.841,
+              "pathToNet": 2.42,
+              "xReversals": 1,
+              "yReversals": 2,
+              "meanStep": 0.307,
+              "maxStep": 0.5327,
+              "meanSpeed": 2.925,
+              "maxSpeed": 5.32
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-RCB",
+              "x": 84.188,
+              "y": 25.367,
+              "vx": -0.489,
+              "vy": 0.055,
+              "action": "HOLD_BLOCK",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "A-RCB",
+              "x": 80.431,
+              "y": 31.084,
+              "vx": 1.807,
+              "vy": 2.825,
+              "action": "PRESS_CONTAIN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "A-RCB",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                84.188,
+                25.367
+              ],
+              "end": [
+                82.122,
+                32.775
+              ],
+              "path": 19.63,
+              "net": 7.691,
+              "pathToNet": 2.55,
+              "xReversals": 12,
+              "yReversals": 13,
+              "meanStep": 0.2256,
+              "maxStep": 0.5327,
+              "meanSpeed": 2.132,
+              "maxSpeed": 5.32
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-RCB",
+              "x": 84.188,
+              "y": 25.367,
+              "vx": -0.489,
+              "vy": 0.055,
+              "action": "HOLD_BLOCK",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-RCB",
+              "x": 82.122,
+              "y": 32.775,
+              "vx": 0.211,
+              "vy": 0.253,
+              "action": "ENGAGE",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "A-RCB",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                80.576,
+                31.372
+              ],
+              "end": [
+                82.122,
+                32.775
+              ],
+              "path": 2.729,
+              "net": 2.088,
+              "pathToNet": 1.31,
+              "xReversals": 11,
+              "yReversals": 11,
+              "meanStep": 0.0853,
+              "maxStep": 0.3536,
+              "meanSpeed": 0.812,
+              "maxSpeed": 3.53
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "A-RCB",
+              "x": 80.576,
+              "y": 31.372,
+              "vx": 1.454,
+              "vy": 2.888,
+              "action": "PRESS_CONTAIN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-RCB",
+              "x": 82.122,
+              "y": 32.775,
+              "vx": 0.211,
+              "vy": 0.253,
+              "action": "ENGAGE",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          }
+        ],
+        "A-LB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "A-LB",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                81.186,
+                57.998
+              ],
+              "end": [
+                76.731,
+                56.771
+              ],
+              "path": 13.678,
+              "net": 4.621,
+              "pathToNet": 2.96,
+              "xReversals": 2,
+              "yReversals": 0,
+              "meanStep": 0.2533,
+              "maxStep": 0.5622,
+              "meanSpeed": 2.508,
+              "maxSpeed": 5.624
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-LB",
+              "x": 81.186,
+              "y": 57.998,
+              "vx": -0.515,
+              "vy": 0.029,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "A-LB",
+              "x": 76.731,
+              "y": 56.771,
+              "vx": 0.09,
+              "vy": -2.924,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "A-LB",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                81.186,
+                57.998
+              ],
+              "end": [
+                84.879,
+                47.666
+              ],
+              "path": 26.149,
+              "net": 10.972,
+              "pathToNet": 2.38,
+              "xReversals": 2,
+              "yReversals": 1,
+              "meanStep": 0.3006,
+              "maxStep": 0.5793,
+              "meanSpeed": 2.969,
+              "maxSpeed": 5.79
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-LB",
+              "x": 81.186,
+              "y": 57.998,
+              "vx": -0.515,
+              "vy": 0.029,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-LB",
+              "x": 84.879,
+              "y": 47.666,
+              "vx": 0.498,
+              "vy": -0.004,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "A-LB",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                76.775,
+                56.52
+              ],
+              "end": [
+                84.879,
+                47.666
+              ],
+              "path": 12.216,
+              "net": 12.003,
+              "pathToNet": 1.02,
+              "xReversals": 0,
+              "yReversals": 1,
+              "meanStep": 0.3817,
+              "maxStep": 0.5793,
+              "meanSpeed": 3.739,
+              "maxSpeed": 5.79
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "A-LB",
+              "x": 76.775,
+              "y": 56.52,
+              "vx": 0.44,
+              "vy": -2.511,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-LB",
+              "x": 84.879,
+              "y": 47.666,
+              "vx": 0.498,
+              "vy": -0.004,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            }
+          }
+        ],
+        "A-RB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 55,
+              "actualId": "A-RB",
+              "t0": 1924.7,
+              "t1": 1930.1,
+              "start": [
+                81.186,
+                10.002
+              ],
+              "end": [
+                77.24,
+                11.214
+              ],
+              "path": 11.914,
+              "net": 4.128,
+              "pathToNet": 2.89,
+              "xReversals": 1,
+              "yReversals": 0,
+              "meanStep": 0.2206,
+              "maxStep": 0.5614,
+              "meanSpeed": 2.089,
+              "maxSpeed": 5.617
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-RB",
+              "x": 81.186,
+              "y": 10.002,
+              "vx": -0.515,
+              "vy": -0.029,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1930.1,
+              "actualId": "A-RB",
+              "x": 77.24,
+              "y": 11.214,
+              "vx": 0.623,
+              "vy": 2.393,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-LW"
+            }
+          },
+          {
+            "path": "root.highResolution.episodeFrames",
+            "metrics": {
+              "samples": 88,
+              "actualId": "A-RB",
+              "t0": 1924.7,
+              "t1": 1933.4,
+              "start": [
+                81.186,
+                10.002
+              ],
+              "end": [
+                84.083,
+                13.541
+              ],
+              "path": 23.509,
+              "net": 4.574,
+              "pathToNet": 5.14,
+              "xReversals": 1,
+              "yReversals": 2,
+              "meanStep": 0.2702,
+              "maxStep": 0.5614,
+              "meanSpeed": 2.6,
+              "maxSpeed": 5.617
+            },
+            "first": {
+              "t": 1924.7,
+              "actualId": "A-RB",
+              "x": 81.186,
+              "y": 10.002,
+              "vx": -0.515,
+              "vy": -0.029,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-RB",
+              "x": 84.083,
+              "y": 13.541,
+              "vx": 0.765,
+              "vy": -2.032,
+              "action": "BOX_SIDE_RECOVERY",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          },
+          {
+            "path": "root.highResolution.postActionFrames",
+            "metrics": {
+              "samples": 33,
+              "actualId": "A-RB",
+              "t0": 1930.2,
+              "t1": 1933.4,
+              "start": [
+                77.313,
+                11.504
+              ],
+              "end": [
+                84.083,
+                13.541
+              ],
+              "path": 11.296,
+              "net": 7.07,
+              "pathToNet": 1.6,
+              "xReversals": 0,
+              "yReversals": 2,
+              "meanStep": 0.353,
+              "maxStep": 0.4819,
+              "meanSpeed": 3.452,
+              "maxSpeed": 4.811
+            },
+            "first": {
+              "t": 1930.2,
+              "actualId": "A-RB",
+              "x": 77.313,
+              "y": 11.504,
+              "vx": 0.732,
+              "vy": 2.902,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-LW"
+            },
+            "last": {
+              "t": 1933.4,
+              "actualId": "A-RB",
+              "x": 84.083,
+              "y": 13.541,
+              "vx": 0.765,
+              "vy": -2.032,
+              "action": "BOX_SIDE_RECOVERY",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          }
+        ]
       },
-      "choiceNodes": [
-        {
-          "path": "root.hybridBefore.boundary",
-          "data": {
-            "reason": "ATTACKING_INVOLVEMENT",
-            "type": "PROTAGONIST_2D_WINDOW"
+      "choiceDiagnostics": {
+        "lists": [
+          {
+            "path": "root.highResolution.decision.options",
+            "count": 5,
+            "sample": [
+              {
+                "targetId": null,
+                "id": "CARRY",
+                "label": "공간 전진",
+                "family": "돌파"
+              },
+              {
+                "targetId": "H-LCM",
+                "id": "SAFE_PASS",
+                "label": "안전한 패스 → 같은 팀 LCM",
+                "family": "패스"
+              },
+              {
+                "targetId": null,
+                "id": "SHOT",
+                "label": "슈팅",
+                "family": "슈팅"
+              },
+              {
+                "targetId": "H-RCM",
+                "id": "SAFE_PASS",
+                "label": "안전한 패스 → 같은 팀 RCM",
+                "family": "패스"
+              },
+              {
+                "targetId": null,
+                "id": "HOLD",
+                "label": "볼 지키기",
+                "family": "볼 유지"
+              }
+            ]
+          },
+          {
+            "path": "root.highResolution.choiceSteps",
+            "count": 1,
+            "sample": [
+              {}
+            ]
+          },
+          {
+            "path": "root.hybridAfter.state.sceneCandidates",
+            "count": 1,
+            "sample": [
+              {
+                "id": "HW0006",
+                "type": "PROTAGONIST_2D_WINDOW",
+                "reason": "ATTACKING_INVOLVEMENT"
+              }
+            ]
+          }
+        ],
+        "scalars": [
+          {
+            "path": "root.highResolution.choiceSteps[0].result",
+            "data": {
+              "choiceId": "CARRY",
+              "targetId": null,
+              "label": "공간 전진",
+              "family": "돌파"
+            }
+          },
+          {
+            "path": "root.highResolution.choiceSteps[0].result.performanceImpact",
+            "data": {
+              "choiceId": "CARRY",
+              "reason": "NO_PENALTY"
+            }
+          },
+          {
+            "path": "root.highResolution.actualResult",
+            "data": {
+              "choiceId": "CARRY",
+              "targetId": null,
+              "label": "공간 전진",
+              "family": "돌파"
+            }
+          },
+          {
+            "path": "root.highResolution.actualResult.performanceImpact",
+            "data": {
+              "choiceId": "CARRY",
+              "reason": "NO_PENALTY"
+            }
+          },
+          {
+            "path": "root.highResolution.actualResults[0]",
+            "data": {
+              "choiceId": "CARRY",
+              "targetId": null,
+              "label": "공간 전진",
+              "family": "돌파"
+            }
+          },
+          {
+            "path": "root.highResolution.actualResults[0].performanceImpact",
+            "data": {
+              "choiceId": "CARRY",
+              "reason": "NO_PENALTY"
+            }
+          }
+        ]
+      },
+      "bestArray": {
+        "path": "root.highResolution.preActionFrames",
+        "first": {
+          "t": 1924.7,
+          "playerIds": [
+            "H-GK",
+            "H-LB",
+            "H-LCB",
+            "H-RCB",
+            "H-RB",
+            "H-LCM",
+            "H-CM",
+            "H-RCM",
+            "H-LW",
+            "H-ST",
+            "H-RW",
+            "A-GK",
+            "A-LB",
+            "A-LCB",
+            "A-RCB",
+            "A-RB",
+            "A-LCM",
+            "A-CM",
+            "A-RCM",
+            "A-LW",
+            "A-ST",
+            "A-RW"
+          ],
+          "players": [
+            {
+              "id": "H-GK",
+              "x": 7.208,
+              "y": 34.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "GK_BUILD_SUPPORT",
+              "role": "GK",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LB",
+              "x": 26.289,
+              "y": 6.654,
+              "vx": 0.517,
+              "vy": 0.018,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCB",
+              "x": 23.286,
+              "y": 24.16,
+              "vx": 0.49,
+              "vy": 0.053,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCB",
+              "x": 23.286,
+              "y": 43.84,
+              "vx": 0.49,
+              "vy": -0.053,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RB",
+              "x": 26.289,
+              "y": 61.346,
+              "vx": 0.517,
+              "vy": -0.018,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCM",
+              "x": 46.241,
+              "y": 18.726,
+              "vx": 0.039,
+              "vy": 0.412,
+              "action": "HALFSPACE_CONNECTOR_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-CM",
+              "x": 48.841,
+              "y": 34.0,
+              "vx": 0.51,
+              "vy": 0.0,
+              "action": "CARRY_SCAN",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCM",
+              "x": 46.273,
+              "y": 49.285,
+              "vx": 0.355,
+              "vy": -0.297,
+              "action": "HALFSPACE_SUPPORT_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LW",
+              "x": 66.274,
+              "y": 5.59,
+              "vx": 0.371,
+              "vy": 0.318,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-ST",
+              "x": 83.552,
+              "y": 34.0,
+              "vx": -0.347,
+              "vy": 0.0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RW",
+              "x": 66.272,
+              "y": 62.408,
+              "vx": 0.351,
+              "vy": -0.336,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "A-GK",
+              "x": 100.19,
+              "y": 34.0,
+              "vx": -0.47,
+              "vy": 0.0,
+              "action": "GK_SET",
+              "role": "GK",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LB",
+              "x": 81.186,
+              "y": 57.998,
+              "vx": -0.515,
+              "vy": 0.029,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LCB",
+              "x": 84.188,
+              "y": 42.633,
+              "vx": -0.489,
+              "vy": -0.055,
+              "action": "HOLD_BLOCK",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCB",
+              "x": 84.188,
+              "y": 25.367,
+              "vx": -0.489,
+              "vy": 0.055,
+              "action": "HOLD_BLOCK",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RB",
+              "x": 81.186,
+              "y": 10.002,
+              "vx": -0.515,
+              "vy": -0.029,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LCM",
+              "x": 61.239,
+              "y": 47.397,
+              "vx": 0.014,
+              "vy": -0.406,
+              "action": "FAR_SIDE_BLOCK",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-CM",
+              "x": 61.188,
+              "y": 33.993,
+              "vx": -0.496,
+              "vy": -0.068,
+              "action": "PRESS_CONTAIN",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCM",
+              "x": 61.244,
+              "y": 20.602,
+              "vx": 0.072,
+              "vy": 0.391,
+              "action": "BALL_SIDE_BLOCK",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LW",
+              "x": 41.265,
+              "y": 58.929,
+              "vx": 0.283,
+              "vy": -0.261,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-ST",
+              "x": 36.272,
+              "y": 34.0,
+              "vx": 0.347,
+              "vy": 0.0,
+              "action": "SHOT_LANE_COVER",
+              "role": "ST",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RW",
+              "x": 41.265,
+              "y": 9.071,
+              "vx": 0.283,
+              "vy": 0.261,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          ]
+        },
+        "last": {
+          "t": 1930.1,
+          "playerIds": [
+            "H-GK",
+            "H-LB",
+            "H-LCB",
+            "H-RCB",
+            "H-RB",
+            "H-LCM",
+            "H-CM",
+            "H-RCM",
+            "H-LW",
+            "H-ST",
+            "H-RW",
+            "A-GK",
+            "A-LB",
+            "A-LCB",
+            "A-RCB",
+            "A-RB",
+            "A-LCM",
+            "A-CM",
+            "A-RCM",
+            "A-LW",
+            "A-ST",
+            "A-RW"
+          ],
+          "players": [
+            {
+              "id": "H-GK",
+              "x": 8.299,
+              "y": 33.915,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "GK_BUILD_SUPPORT",
+              "role": "GK",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LB",
+              "x": 44.186,
+              "y": 7.0,
+              "vx": 5.624,
+              "vy": 0.0,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCB",
+              "x": 44.493,
+              "y": 25.996,
+              "vx": 5.298,
+              "vy": -0.413,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCB",
+              "x": 44.497,
+              "y": 42.796,
+              "vx": 5.298,
+              "vy": -0.413,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RB",
+              "x": 49.68,
+              "y": 59.793,
+              "vx": 1.246,
+              "vy": 3.836,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCM",
+              "x": 61.146,
+              "y": 24.441,
+              "vx": 7.16,
+              "vy": -0.761,
+              "action": "SECOND_LINE_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-CM",
+              "x": 54.188,
+              "y": 34.322,
+              "vx": 7.181,
+              "vy": -0.503,
+              "action": "PIVOT_SCREEN",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCM",
+              "x": 62.437,
+              "y": 46.009,
+              "vx": 6.936,
+              "vy": -1.089,
+              "action": "LATE_BOX_ARRIVAL",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LW",
+              "x": 77.854,
+              "y": 18.762,
+              "vx": 3.317,
+              "vy": -0.258,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-ST",
+              "x": 79.751,
+              "y": 32.957,
+              "vx": 2.06,
+              "vy": 0.216,
+              "action": "FIRST_TOUCH_FLOW",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RW",
+              "x": 75.505,
+              "y": 55.615,
+              "vx": 3.823,
+              "vy": -6.478,
+              "action": "FAR_SIDE_RUN",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "A-GK",
+              "x": 98.724,
+              "y": 33.808,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "GK_SET",
+              "role": "GK",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LB",
+              "x": 76.731,
+              "y": 56.771,
+              "vx": 0.09,
+              "vy": -2.924,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            },
+            {
+              "id": "A-LCB",
+              "x": 80.07,
+              "y": 40.914,
+              "vx": 2.156,
+              "vy": -3.438,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCB",
+              "x": 80.431,
+              "y": 31.084,
+              "vx": 1.807,
+              "vy": 2.825,
+              "action": "PRESS_CONTAIN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RB",
+              "x": 77.24,
+              "y": 11.214,
+              "vx": 0.623,
+              "vy": 2.393,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-LW"
+            },
+            {
+              "id": "A-LCM",
+              "x": 64.141,
+              "y": 42.816,
+              "vx": 6.321,
+              "vy": -3.249,
+              "action": "DEEP_TUCK",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-CM",
+              "x": 63.018,
+              "y": 34.738,
+              "vx": 2.735,
+              "vy": -0.343,
+              "action": "DEEP_SCREEN",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCM",
+              "x": 60.923,
+              "y": 27.743,
+              "vx": 1.884,
+              "vy": -0.12,
+              "action": "EMERGENCY_TRACK",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LW",
+              "x": 53.833,
+              "y": 51.802,
+              "vx": -1.476,
+              "vy": 4.407,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-ST",
+              "x": 49.801,
+              "y": 34.164,
+              "vx": 3.976,
+              "vy": -1.137,
+              "action": "HOLD_BLOCK",
+              "role": "ST",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RW",
+              "x": 51.513,
+              "y": 13.37,
+              "vx": 4.269,
+              "vy": -2.029,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          ]
+        },
+        "firstFocus": {
+          "H-ST": {
+            "id": "H-ST",
+            "x": 83.552,
+            "y": 34.0,
+            "vx": -0.347,
+            "vy": 0.0,
+            "action": "ATTACK_OPEN_CHANNEL",
+            "role": "ST",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LW": {
+            "id": "H-LW",
+            "x": 66.274,
+            "y": 5.59,
+            "vx": 0.371,
+            "vy": 0.318,
+            "action": "FAR_SIDE_RUN",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RW": {
+            "id": "H-RW",
+            "x": 66.272,
+            "y": 62.408,
+            "vx": 0.351,
+            "vy": -0.336,
+            "action": "FAR_SIDE_RUN",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LCM": {
+            "id": "H-LCM",
+            "x": 46.241,
+            "y": 18.726,
+            "vx": 0.039,
+            "vy": 0.412,
+            "action": "HALFSPACE_CONNECTOR_8",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RCM": {
+            "id": "H-RCM",
+            "x": 46.273,
+            "y": 49.285,
+            "vx": 0.355,
+            "vy": -0.297,
+            "action": "HALFSPACE_SUPPORT_8",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "A-LCB": {
+            "id": "A-LCB",
+            "x": 84.188,
+            "y": 42.633,
+            "vx": -0.489,
+            "vy": -0.055,
+            "action": "HOLD_BLOCK",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-RCB": {
+            "id": "A-RCB",
+            "x": 84.188,
+            "y": 25.367,
+            "vx": -0.489,
+            "vy": 0.055,
+            "action": "HOLD_BLOCK",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-LB": {
+            "id": "A-LB",
+            "x": 81.186,
+            "y": 57.998,
+            "vx": -0.515,
+            "vy": 0.029,
+            "action": "HOLD_BLOCK",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-RB": {
+            "id": "A-RB",
+            "x": 81.186,
+            "y": 10.002,
+            "vx": -0.515,
+            "vy": -0.029,
+            "action": "HOLD_BLOCK",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": null
           }
         },
-        {
-          "path": "root.hybridBefore.boundary.preContext[0]",
-          "data": {
-            "kind": "TURNOVER_DANGER"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[1]",
-          "data": {
-            "kind": "PROGRESS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[1].detail",
-          "data": {
-            "targetId": "H-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[2]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[2].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[3]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[3].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[4]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[4].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[5]",
-          "data": {
-            "kind": "DANGEROUS_PASS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[5].detail",
-          "data": {
-            "targetId": "H-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[6]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[6].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[7]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[7].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[0]",
-          "data": {
-            "kind": "TURNOVER_DANGER"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[1]",
-          "data": {
-            "kind": "PROGRESS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[1].detail",
-          "data": {
-            "targetId": "H-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[2]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[2].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[3]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[3].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[4]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[4].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[5]",
-          "data": {
-            "kind": "DANGEROUS_PASS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[5].detail",
-          "data": {
-            "targetId": "H-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[6]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[6].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[7]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[7].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.ball",
-          "data": {
-            "kind": "CONTROL"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[0]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[1]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[2]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[3]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[4]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[5]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[6]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[7]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[8]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[9]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[10]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[11]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[12]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[13]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[14]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[15]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[16]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[17]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[18]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[19]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[20]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[21]",
-          "data": {
-            "action": "HYBRID_ENTRY_SHAPE"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].ball",
-          "data": {
-            "kind": "CONTROL"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[0]",
-          "data": {
-            "action": "GK_BUILD_SUPPORT"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[1]",
-          "data": {
-            "action": "REST_BALANCE"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[2]",
-          "data": {
-            "action": "REST_DEFENCE"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[3]",
-          "data": {
-            "action": "REST_DEFENCE"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[4]",
-          "data": {
-            "action": "REST_BALANCE"
+        "lastFocus": {
+          "H-ST": {
+            "id": "H-ST",
+            "x": 79.751,
+            "y": 32.957,
+            "vx": 2.06,
+            "vy": 0.216,
+            "action": "FIRST_TOUCH_FLOW",
+            "role": "ST",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LW": {
+            "id": "H-LW",
+            "x": 77.854,
+            "y": 18.762,
+            "vx": 3.317,
+            "vy": -0.258,
+            "action": "FAR_SIDE_RUN",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RW": {
+            "id": "H-RW",
+            "x": 75.505,
+            "y": 55.615,
+            "vx": 3.823,
+            "vy": -6.478,
+            "action": "FAR_SIDE_RUN",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LCM": {
+            "id": "H-LCM",
+            "x": 61.146,
+            "y": 24.441,
+            "vx": 7.16,
+            "vy": -0.761,
+            "action": "SECOND_LINE_SUPPORT",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RCM": {
+            "id": "H-RCM",
+            "x": 62.437,
+            "y": 46.009,
+            "vx": 6.936,
+            "vy": -1.089,
+            "action": "LATE_BOX_ARRIVAL",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "A-LCB": {
+            "id": "A-LCB",
+            "x": 80.07,
+            "y": 40.914,
+            "vx": 2.156,
+            "vy": -3.438,
+            "action": "SHOT_LANE_COVER",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-RCB": {
+            "id": "A-RCB",
+            "x": 80.431,
+            "y": 31.084,
+            "vx": 1.807,
+            "vy": 2.825,
+            "action": "PRESS_CONTAIN",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-LB": {
+            "id": "A-LB",
+            "x": 76.731,
+            "y": 56.771,
+            "vx": 0.09,
+            "vy": -2.924,
+            "action": "MIDFIELD_LANE_SCREEN",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": "H-RW"
+          },
+          "A-RB": {
+            "id": "A-RB",
+            "x": 77.24,
+            "y": 11.214,
+            "vx": 0.623,
+            "vy": 2.393,
+            "action": "MIDFIELD_LANE_SCREEN",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": "H-LW"
           }
         }
-      ],
-      "bestSnapshot": {
-        "path": "root.highResolution.preActionFrames",
-        "t": 1930.1,
-        "players": {}
       }
     }
   },
@@ -414,383 +2266,1280 @@
         "root.highResolution.preActionFrames": 101
       },
       "players": {
-        "H_ST": [],
-        "H_LW": [],
-        "H_RW": [],
-        "H_LCM": [],
-        "H_RCM": [],
-        "A_CB_L": [],
-        "A_CB_R": [],
-        "A_LB": [],
-        "A_RB": []
+        "H-ST": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "H-ST",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                77.701,
+                36.276
+              ],
+              "end": [
+                76.513,
+                30.625
+              ],
+              "path": 11.999,
+              "net": 5.775,
+              "pathToNet": 2.08,
+              "xReversals": 2,
+              "yReversals": 0,
+              "meanStep": 0.12,
+              "maxStep": 0.4645,
+              "meanSpeed": 1.13,
+              "maxSpeed": 4.65
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "H-ST",
+              "x": 77.701,
+              "y": 36.276,
+              "vx": -0.047,
+              "vy": -3.972,
+              "action": "PIN_AND_RUN",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "H-ST",
+              "x": 76.513,
+              "y": 30.625,
+              "vx": 2.028,
+              "vy": 0.335,
+              "action": "FIRST_TOUCH_FLOW",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-LW": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "H-LW",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                78.009,
+                13.491
+              ],
+              "end": [
+                78.942,
+                18.0
+              ],
+              "path": 10.091,
+              "net": 4.605,
+              "pathToNet": 2.19,
+              "xReversals": 0,
+              "yReversals": 1,
+              "meanStep": 0.1009,
+              "maxStep": 0.487,
+              "meanSpeed": 0.975,
+              "maxSpeed": 4.878
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "H-LW",
+              "x": 78.009,
+              "y": 13.491,
+              "vx": -0.001,
+              "vy": -0.182,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "H-LW",
+              "x": 78.942,
+              "y": 18.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-RW": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "H-RW",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                78.403,
+                50.0
+              ],
+              "end": [
+                78.911,
+                50.0
+              ],
+              "path": 5.508,
+              "net": 0.508,
+              "pathToNet": 10.84,
+              "xReversals": 0,
+              "yReversals": 1,
+              "meanStep": 0.0551,
+              "maxStep": 0.353,
+              "meanSpeed": 0.529,
+              "maxSpeed": 3.527
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "H-RW",
+              "x": 78.403,
+              "y": 50.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "H-RW",
+              "x": 78.911,
+              "y": 50.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-LCM": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "H-LCM",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                72.482,
+                32.585
+              ],
+              "end": [
+                61.922,
+                23.506
+              ],
+              "path": 35.336,
+              "net": 13.926,
+              "pathToNet": 2.54,
+              "xReversals": 1,
+              "yReversals": 2,
+              "meanStep": 0.3534,
+              "maxStep": 0.72,
+              "meanSpeed": 3.53,
+              "maxSpeed": 7.2
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "H-LCM",
+              "x": 72.482,
+              "y": 32.585,
+              "vx": -3.941,
+              "vy": -2.936,
+              "action": "RECONNECT_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "H-LCM",
+              "x": 61.922,
+              "y": 23.506,
+              "vx": 0.837,
+              "vy": -0.001,
+              "action": "SECOND_LINE_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "H-RCM": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "H-RCM",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                71.22,
+                44.262
+              ],
+              "end": [
+                63.235,
+                42.895
+              ],
+              "path": 32.986,
+              "net": 8.101,
+              "pathToNet": 4.07,
+              "xReversals": 3,
+              "yReversals": 0,
+              "meanStep": 0.3299,
+              "maxStep": 0.7207,
+              "meanSpeed": 3.28,
+              "maxSpeed": 7.2
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "H-RCM",
+              "x": 71.22,
+              "y": 44.262,
+              "vx": 2.336,
+              "vy": -0.925,
+              "action": "FIRST_TOUCH_FLOW",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "H-RCM",
+              "x": 63.235,
+              "y": 42.895,
+              "vx": 5.304,
+              "vy": 0.877,
+              "action": "LATE_BOX_ARRIVAL",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            }
+          }
+        ],
+        "A-CB-L": [],
+        "A-CB-R": [],
+        "A-LCB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "A-LCB",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                77.81,
+                40.596
+              ],
+              "end": [
+                79.051,
+                40.256
+              ],
+              "path": 15.902,
+              "net": 1.287,
+              "pathToNet": 12.36,
+              "xReversals": 0,
+              "yReversals": 2,
+              "meanStep": 0.159,
+              "maxStep": 0.4754,
+              "meanSpeed": 1.58,
+              "maxSpeed": 4.754
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "A-LCB",
+              "x": 77.81,
+              "y": 40.596,
+              "vx": -2.57,
+              "vy": 2.334,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "A-LCB",
+              "x": 79.051,
+              "y": 40.256,
+              "vx": 0.562,
+              "vy": -3.284,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          }
+        ],
+        "A-RCB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "A-RCB",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                78.338,
+                25.808
+              ],
+              "end": [
+                77.206,
+                29.228
+              ],
+              "path": 16.2,
+              "net": 3.602,
+              "pathToNet": 4.5,
+              "xReversals": 7,
+              "yReversals": 1,
+              "meanStep": 0.162,
+              "maxStep": 0.6993,
+              "meanSpeed": 1.645,
+              "maxSpeed": 7.0
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "A-RCB",
+              "x": 78.338,
+              "y": 25.808,
+              "vx": 0.11,
+              "vy": 6.117,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": "H-ST"
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "A-RCB",
+              "x": 77.206,
+              "y": 29.228,
+              "vx": 0.532,
+              "vy": 1.029,
+              "action": "PRESS_CONTAIN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          }
+        ],
+        "A-LB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "A-LB",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                78.621,
+                54.116
+              ],
+              "end": [
+                77.932,
+                56.669
+              ],
+              "path": 17.218,
+              "net": 2.644,
+              "pathToNet": 6.51,
+              "xReversals": 0,
+              "yReversals": 1,
+              "meanStep": 0.1722,
+              "maxStep": 0.5624,
+              "meanSpeed": 1.668,
+              "maxSpeed": 5.624
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "A-LB",
+              "x": 78.621,
+              "y": 54.116,
+              "vx": -0.783,
+              "vy": 4.152,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "A-LB",
+              "x": 77.932,
+              "y": 56.669,
+              "vx": 1.453,
+              "vy": -3.833,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            }
+          }
+        ],
+        "A-RB": [
+          {
+            "path": "root.highResolution.preActionFrames",
+            "metrics": {
+              "samples": 101,
+              "actualId": "A-RB",
+              "t0": 762.9,
+              "t1": 772.9,
+              "start": [
+                77.485,
+                11.05
+              ],
+              "end": [
+                77.682,
+                10.199
+              ],
+              "path": 16.78,
+              "net": 0.874,
+              "pathToNet": 19.21,
+              "xReversals": 1,
+              "yReversals": 2,
+              "meanStep": 0.1678,
+              "maxStep": 0.5574,
+              "meanSpeed": 1.535,
+              "maxSpeed": 5.575
+            },
+            "first": {
+              "t": 762.9,
+              "actualId": "A-RB",
+              "x": 77.485,
+              "y": 11.05,
+              "vx": -0.284,
+              "vy": 0.113,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            "last": {
+              "t": 772.9,
+              "actualId": "A-RB",
+              "x": 77.682,
+              "y": 10.199,
+              "vx": 1.014,
+              "vy": 2.608,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-LW"
+            }
+          }
+        ]
       },
-      "choiceNodes": [
-        {
-          "path": "root.hybridBefore.boundary",
-          "data": {
-            "reason": "ATTACKING_INVOLVEMENT",
-            "type": "PROTAGONIST_2D_WINDOW"
+      "choiceDiagnostics": {
+        "lists": [
+          {
+            "path": "root.highResolution.decision.options",
+            "count": 5,
+            "sample": [
+              {
+                "targetId": null,
+                "id": "CARRY",
+                "label": "공간 전진",
+                "family": "돌파"
+              },
+              {
+                "targetId": "H-RCM",
+                "id": "SAFE_PASS",
+                "label": "안전한 패스 → 같은 팀 RCM",
+                "family": "패스"
+              },
+              {
+                "targetId": null,
+                "id": "SHOT",
+                "label": "중거리 슛",
+                "family": "슈팅"
+              },
+              {
+                "targetId": "H-LCM",
+                "id": "SAFE_PASS",
+                "label": "안전한 패스 → 같은 팀 LCM",
+                "family": "패스"
+              },
+              {
+                "targetId": null,
+                "id": "HOLD",
+                "label": "볼 지키기",
+                "family": "볼 유지"
+              }
+            ]
+          },
+          {
+            "path": "root.highResolution.choiceSteps",
+            "count": 0,
+            "sample": []
+          },
+          {
+            "path": "root.hybridAfter.state.sceneCandidates",
+            "count": 1,
+            "sample": [
+              {
+                "id": "HW0002",
+                "type": "PROTAGONIST_2D_WINDOW",
+                "reason": "ATTACKING_INVOLVEMENT"
+              }
+            ]
+          }
+        ],
+        "scalars": []
+      },
+      "bestArray": {
+        "path": "root.highResolution.preActionFrames",
+        "first": {
+          "t": 762.9,
+          "playerIds": [
+            "H-GK",
+            "H-LB",
+            "H-LCB",
+            "H-RCB",
+            "H-RB",
+            "H-LCM",
+            "H-CM",
+            "H-RCM",
+            "H-LW",
+            "H-ST",
+            "H-RW",
+            "A-GK",
+            "A-LB",
+            "A-LCB",
+            "A-RCB",
+            "A-RB",
+            "A-LCM",
+            "A-CM",
+            "A-RCM",
+            "A-LW",
+            "A-ST",
+            "A-RW"
+          ],
+          "players": [
+            {
+              "id": "H-GK",
+              "x": 7.992,
+              "y": 34.831,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "GK_BUILD_SUPPORT",
+              "role": "GK",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LB",
+              "x": 51.18,
+              "y": 7.236,
+              "vx": -4.949,
+              "vy": -0.368,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCB",
+              "x": 46.99,
+              "y": 26.248,
+              "vx": -0.125,
+              "vy": 0.68,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCB",
+              "x": 46.99,
+              "y": 43.048,
+              "vx": -0.125,
+              "vy": 0.68,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RB",
+              "x": 47.769,
+              "y": 61.0,
+              "vx": -0.021,
+              "vy": 0.0,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCM",
+              "x": 72.482,
+              "y": 32.585,
+              "vx": -3.941,
+              "vy": -2.936,
+              "action": "RECONNECT_8",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-CM",
+              "x": 55.924,
+              "y": 34.493,
+              "vx": -3.864,
+              "vy": 1.455,
+              "action": "PIVOT_SCREEN",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCM",
+              "x": 71.22,
+              "y": 44.262,
+              "vx": 2.336,
+              "vy": -0.925,
+              "action": "FIRST_TOUCH_FLOW",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LW",
+              "x": 78.009,
+              "y": 13.491,
+              "vx": -0.001,
+              "vy": -0.182,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-ST",
+              "x": 77.701,
+              "y": 36.276,
+              "vx": -0.047,
+              "vy": -3.972,
+              "action": "PIN_AND_RUN",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RW",
+              "x": 78.403,
+              "y": 50.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "A-GK",
+              "x": 98.428,
+              "y": 35.478,
+              "vx": -0.068,
+              "vy": 2.516,
+              "action": "GK_SET",
+              "role": "GK",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LB",
+              "x": 78.621,
+              "y": 54.116,
+              "vx": -0.783,
+              "vy": 4.152,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LCB",
+              "x": 77.81,
+              "y": 40.596,
+              "vx": -2.57,
+              "vy": 2.334,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCB",
+              "x": 78.338,
+              "y": 25.808,
+              "vx": 0.11,
+              "vy": 6.117,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": "H-ST"
+            },
+            {
+              "id": "A-RB",
+              "x": 77.485,
+              "y": 11.05,
+              "vx": -0.284,
+              "vy": 0.113,
+              "action": "HOLD_BLOCK",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LCM",
+              "x": 67.277,
+              "y": 38.687,
+              "vx": 1.545,
+              "vy": 1.912,
+              "action": "PRESS_CONTAIN",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-CM",
+              "x": 69.616,
+              "y": 31.822,
+              "vx": -3.716,
+              "vy": 2.262,
+              "action": "PIVOT_SCREEN_DEF",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCM",
+              "x": 67.683,
+              "y": 25.868,
+              "vx": -5.254,
+              "vy": 1.531,
+              "action": "FAR_SIDE_TUCK",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LW",
+              "x": 51.658,
+              "y": 56.709,
+              "vx": -0.416,
+              "vy": 3.804,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-ST",
+              "x": 49.56,
+              "y": 35.51,
+              "vx": -0.134,
+              "vy": 1.922,
+              "action": "HOLD_BLOCK",
+              "role": "ST",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RW",
+              "x": 51.658,
+              "y": 14.609,
+              "vx": -0.416,
+              "vy": 3.804,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          ]
+        },
+        "last": {
+          "t": 772.9,
+          "playerIds": [
+            "H-GK",
+            "H-LB",
+            "H-LCB",
+            "H-RCB",
+            "H-RB",
+            "H-LCM",
+            "H-CM",
+            "H-RCM",
+            "H-LW",
+            "H-ST",
+            "H-RW",
+            "A-GK",
+            "A-LB",
+            "A-LCB",
+            "A-RCB",
+            "A-RB",
+            "A-LCM",
+            "A-CM",
+            "A-RCM",
+            "A-LW",
+            "A-ST",
+            "A-RW"
+          ],
+          "players": [
+            {
+              "id": "H-GK",
+              "x": 8.169,
+              "y": 33.721,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "GK_BUILD_SUPPORT",
+              "role": "GK",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LB",
+              "x": 48.36,
+              "y": 7.0,
+              "vx": 4.353,
+              "vy": 0.0,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCB",
+              "x": 47.769,
+              "y": 25.436,
+              "vx": 4.089,
+              "vy": -0.152,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCB",
+              "x": 47.769,
+              "y": 42.236,
+              "vx": 4.089,
+              "vy": -0.152,
+              "action": "REST_DEFENCE",
+              "role": "CB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RB",
+              "x": 48.36,
+              "y": 61.0,
+              "vx": 4.353,
+              "vy": 0.0,
+              "action": "REST_BALANCE",
+              "role": "FB",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LCM",
+              "x": 61.922,
+              "y": 23.506,
+              "vx": 0.837,
+              "vy": -0.001,
+              "action": "SECOND_LINE_SUPPORT",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-CM",
+              "x": 64.738,
+              "y": 36.375,
+              "vx": 3.793,
+              "vy": 2.354,
+              "action": "POST_PASS_CONTINUE_RUN",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RCM",
+              "x": 63.235,
+              "y": 42.895,
+              "vx": 5.304,
+              "vy": 0.877,
+              "action": "LATE_BOX_ARRIVAL",
+              "role": "CM",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-LW",
+              "x": 78.942,
+              "y": 18.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-ST",
+              "x": 76.513,
+              "y": 30.625,
+              "vx": 2.028,
+              "vy": 0.335,
+              "action": "FIRST_TOUCH_FLOW",
+              "role": "ST",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "H-RW",
+              "x": 78.911,
+              "y": 50.0,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "FAR_SIDE_HOLD",
+              "role": "WF",
+              "team": "HOME",
+              "markTargetId": null
+            },
+            {
+              "id": "A-GK",
+              "x": 98.594,
+              "y": 33.373,
+              "vx": 0.0,
+              "vy": 0.0,
+              "action": "GK_SET",
+              "role": "GK",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LB",
+              "x": 77.932,
+              "y": 56.669,
+              "vx": 1.453,
+              "vy": -3.833,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-RW"
+            },
+            {
+              "id": "A-LCB",
+              "x": 79.051,
+              "y": 40.256,
+              "vx": 0.562,
+              "vy": -3.284,
+              "action": "SHOT_LANE_COVER",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCB",
+              "x": 77.206,
+              "y": 29.228,
+              "vx": 0.532,
+              "vy": 1.029,
+              "action": "PRESS_CONTAIN",
+              "role": "CB",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RB",
+              "x": 77.682,
+              "y": 10.199,
+              "vx": 1.014,
+              "vy": 2.608,
+              "action": "MIDFIELD_LANE_SCREEN",
+              "role": "FB",
+              "team": "AWAY",
+              "markTargetId": "H-LW"
+            },
+            {
+              "id": "A-LCM",
+              "x": 64.641,
+              "y": 37.776,
+              "vx": 0.941,
+              "vy": 4.581,
+              "action": "FAR_SIDE_TUCK",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-CM",
+              "x": 61.913,
+              "y": 33.804,
+              "vx": 2.474,
+              "vy": 0.033,
+              "action": "PIVOT_SCREEN_DEF",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RCM",
+              "x": 61.178,
+              "y": 27.077,
+              "vx": 3.989,
+              "vy": -0.313,
+              "action": "BALL_SIDE_RECOVER",
+              "role": "CM",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-LW",
+              "x": 51.287,
+              "y": 54.365,
+              "vx": 4.04,
+              "vy": -0.69,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-ST",
+              "x": 64.985,
+              "y": 33.529,
+              "vx": -0.877,
+              "vy": -0.025,
+              "action": "HOLD_BLOCK",
+              "role": "ST",
+              "team": "AWAY",
+              "markTargetId": null
+            },
+            {
+              "id": "A-RW",
+              "x": 51.287,
+              "y": 12.266,
+              "vx": 4.04,
+              "vy": -0.69,
+              "action": "HOLD_BLOCK",
+              "role": "WF",
+              "team": "AWAY",
+              "markTargetId": null
+            }
+          ]
+        },
+        "firstFocus": {
+          "H-ST": {
+            "id": "H-ST",
+            "x": 77.701,
+            "y": 36.276,
+            "vx": -0.047,
+            "vy": -3.972,
+            "action": "PIN_AND_RUN",
+            "role": "ST",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LW": {
+            "id": "H-LW",
+            "x": 78.009,
+            "y": 13.491,
+            "vx": -0.001,
+            "vy": -0.182,
+            "action": "FAR_SIDE_HOLD",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RW": {
+            "id": "H-RW",
+            "x": 78.403,
+            "y": 50.0,
+            "vx": 0.0,
+            "vy": 0.0,
+            "action": "FAR_SIDE_HOLD",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LCM": {
+            "id": "H-LCM",
+            "x": 72.482,
+            "y": 32.585,
+            "vx": -3.941,
+            "vy": -2.936,
+            "action": "RECONNECT_8",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RCM": {
+            "id": "H-RCM",
+            "x": 71.22,
+            "y": 44.262,
+            "vx": 2.336,
+            "vy": -0.925,
+            "action": "FIRST_TOUCH_FLOW",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "A-LCB": {
+            "id": "A-LCB",
+            "x": 77.81,
+            "y": 40.596,
+            "vx": -2.57,
+            "vy": 2.334,
+            "action": "SHOT_LANE_COVER",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-RCB": {
+            "id": "A-RCB",
+            "x": 78.338,
+            "y": 25.808,
+            "vx": 0.11,
+            "vy": 6.117,
+            "action": "MIDFIELD_LANE_SCREEN",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": "H-ST"
+          },
+          "A-LB": {
+            "id": "A-LB",
+            "x": 78.621,
+            "y": 54.116,
+            "vx": -0.783,
+            "vy": 4.152,
+            "action": "HOLD_BLOCK",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-RB": {
+            "id": "A-RB",
+            "x": 77.485,
+            "y": 11.05,
+            "vx": -0.284,
+            "vy": 0.113,
+            "action": "HOLD_BLOCK",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": null
           }
         },
-        {
-          "path": "root.hybridBefore.boundary.preContext[0]",
-          "data": {
-            "kind": "DANGEROUS_PASS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[0].detail",
-          "data": {
-            "targetId": "A-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[1]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[1].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[2]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[2].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[3]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[3].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[4]",
-          "data": {
-            "kind": "TURNOVER_DANGER"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[5]",
-          "data": {
-            "kind": "DANGEROUS_PASS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[5].detail",
-          "data": {
-            "targetId": "H-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[6]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[6].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[7]",
-          "data": {
-            "kind": "PROGRESS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.boundary.preContext[7].detail",
-          "data": {
-            "targetId": "H-ST"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[0]",
-          "data": {
-            "kind": "DANGEROUS_PASS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[0].detail",
-          "data": {
-            "targetId": "A-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[1]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[1].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[2]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[2].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[3]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[3].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[4]",
-          "data": {
-            "kind": "TURNOVER_DANGER"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[5]",
-          "data": {
-            "kind": "DANGEROUS_PASS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[5].detail",
-          "data": {
-            "targetId": "H-RCM"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[6]",
-          "data": {
-            "kind": "RECYCLE"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[6].detail",
-          "data": {
-            "targetId": null
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[7]",
-          "data": {
-            "kind": "PROGRESS"
-          }
-        },
-        {
-          "path": "root.hybridBefore.preContext[7].detail",
-          "data": {
-            "targetId": "H-ST"
-          }
-        },
-        {
-          "path": "root.highResolution",
-          "data": {
-            "selectedChoice": null
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.ball",
-          "data": {
-            "kind": "CONTROL"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[0]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[1]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[2]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[3]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[4]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[5]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[6]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[7]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[8]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[9]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[10]",
-          "data": {
-            "action": "SUPPORT_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[11]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[12]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[13]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[14]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[15]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[16]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[17]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[18]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[19]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[20]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.entrySnapshot.players[21]",
-          "data": {
-            "action": "HOLD_LIVE"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].lastEvent",
-          "data": {
-            "type": "PASS"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].ball",
-          "data": {
-            "kind": "CONTROL"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[0]",
-          "data": {
-            "action": "GK_BUILD_SUPPORT"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[1]",
-          "data": {
-            "action": "REST_BALANCE"
-          }
-        },
-        {
-          "path": "root.highResolution.preActionFrames[0].players[2]",
-          "data": {
-            "action": "REST_DEFENCE"
+        "lastFocus": {
+          "H-ST": {
+            "id": "H-ST",
+            "x": 76.513,
+            "y": 30.625,
+            "vx": 2.028,
+            "vy": 0.335,
+            "action": "FIRST_TOUCH_FLOW",
+            "role": "ST",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LW": {
+            "id": "H-LW",
+            "x": 78.942,
+            "y": 18.0,
+            "vx": 0.0,
+            "vy": 0.0,
+            "action": "FAR_SIDE_HOLD",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RW": {
+            "id": "H-RW",
+            "x": 78.911,
+            "y": 50.0,
+            "vx": 0.0,
+            "vy": 0.0,
+            "action": "FAR_SIDE_HOLD",
+            "role": "WF",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-LCM": {
+            "id": "H-LCM",
+            "x": 61.922,
+            "y": 23.506,
+            "vx": 0.837,
+            "vy": -0.001,
+            "action": "SECOND_LINE_SUPPORT",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "H-RCM": {
+            "id": "H-RCM",
+            "x": 63.235,
+            "y": 42.895,
+            "vx": 5.304,
+            "vy": 0.877,
+            "action": "LATE_BOX_ARRIVAL",
+            "role": "CM",
+            "team": "HOME",
+            "markTargetId": null
+          },
+          "A-LCB": {
+            "id": "A-LCB",
+            "x": 79.051,
+            "y": 40.256,
+            "vx": 0.562,
+            "vy": -3.284,
+            "action": "SHOT_LANE_COVER",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-RCB": {
+            "id": "A-RCB",
+            "x": 77.206,
+            "y": 29.228,
+            "vx": 0.532,
+            "vy": 1.029,
+            "action": "PRESS_CONTAIN",
+            "role": "CB",
+            "team": "AWAY",
+            "markTargetId": null
+          },
+          "A-LB": {
+            "id": "A-LB",
+            "x": 77.932,
+            "y": 56.669,
+            "vx": 1.453,
+            "vy": -3.833,
+            "action": "MIDFIELD_LANE_SCREEN",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": "H-RW"
+          },
+          "A-RB": {
+            "id": "A-RB",
+            "x": 77.682,
+            "y": 10.199,
+            "vx": 1.014,
+            "vy": 2.608,
+            "action": "MIDFIELD_LANE_SCREEN",
+            "role": "FB",
+            "team": "AWAY",
+            "markTargetId": "H-LW"
           }
         }
-      ],
-      "bestSnapshot": {
-        "path": "root.highResolution.preActionFrames",
-        "t": 772.9,
-        "players": {}
       }
     }
   }
