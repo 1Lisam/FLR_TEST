@@ -1,23 +1,18 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-FEEDBACK-BATCH",
-  "candidateBranch": "tt051-feedback-batch-candidate",
+  "version": "TT-0.51-JSON-GZIP",
+  "candidateBranch": "tt051-json-gzip-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt051_feedback_batch_apply.py"
+    ".flr/tt051_json_gzip_apply.py"
   ],
-  "validationScript": ".flr/tt051_feedback_batch_validation.js",
+  "validationScript": ".flr/tt051_json_gzip_validation.js",
   "changedFiles": [
-    "runtime/tactical_movement.js",
-    "step71_hybrid_v06_ui.js",
-    "index.html",
     "bug-report-worker/worker.js"
   ],
   "syntaxChecks": [
-    "runtime/tactical_movement.js",
-    "step71_hybrid_v06_ui.js",
     {"kind":"node-esm","path":"bug-report-worker/worker.js"}
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-feedback-batch",
-  "runNonce": "2026-08-21T12:05+09:00-winger-dynamic-proof"
+  "resultDir": ".flr/qa-results/TT-0.51-json-gzip",
+  "runNonce": "2026-08-21T12:12+09:00-lossless-gzip-storage"
 }
