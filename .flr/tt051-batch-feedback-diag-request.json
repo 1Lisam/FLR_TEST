@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "FLR_TT051_BATCH_FEEDBACK_DIAG_REQUEST_1.0",
+  "requestedAt": "2026-08-21T12:22:00+09:00",
+  "reportCount": 7,
+  "purpose": "Diagnose all newly recovered TT-0.51 tester feedback before further JSON retention work"
+}
