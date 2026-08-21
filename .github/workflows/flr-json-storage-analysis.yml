@@ -1,0 +1,64 @@
+name: FLR JSON Storage Analysis
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/json-storage-analysis-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-json-storage-analysis
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fetch known reports and analyze
+        id: analyze
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin audit/tt051-known-reports:refs/remotes/origin/audit/tt051-known-reports
+          mkdir -p /tmp/flr_reports
+          for rid in \
+            tt051-16728bef-e746-46ca-ac22-316f269e59ed \
+            tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469 \
+            tt051-cd014e0d-5a36-4adb-8133-77e1f536f0e1; do
+            git show "origin/audit/tt051-known-reports:.flr/known-report-audit/${rid}.json" > "/tmp/flr_reports/${rid}.json"
+          done
+          curl --max-time 30 -fsS 'https://flr-bug-reporter.sikarops.workers.dev/reports/TT-0.51/tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb.json' > /tmp/flr_reports/d1.json
+          python .flr/json_storage_analysis.py \
+            /tmp/flr_reports/tt051-16728bef-e746-46ca-ac22-316f269e59ed.json old-ui \
+            /tmp/flr_reports/tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469.json old-jitter \
+            /tmp/flr_reports/tt051-cd014e0d-5a36-4adb-8133-77e1f536f0e1.json old-goal-label \
+            /tmp/flr_reports/d1.json d1-missing-wing-choice > /tmp/flr-json-storage-analysis.json
+      - name: Record result safely
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.analyze.outcome }}
+        run: |
+          set +e
+          if [ "${OUTCOME}" != success ] || [ ! -s /tmp/flr-json-storage-analysis.json ]; then
+            printf '{"schemaVersion":"FLR_JSON_STORAGE_ANALYSIS_1.0","status":"FAILED"}\n' > /tmp/flr-json-storage-analysis.json
+          fi
+          git config user.name 'FLR JSON Analysis Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/flr-json-storage-analysis.json .flr/json-storage-analysis.json
+          git add .flr/json-storage-analysis.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record FLR JSON storage analysis' || exit 0
+          git push origin HEAD:main || exit 0
