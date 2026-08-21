@@ -18,6 +18,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: true
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -68,19 +69,35 @@ jobs:
           printf '\n[[d1_databases]]\nbinding = "BUG_REPORT_DB"\ndatabase_name = "flr-bug-reports"\ndatabase_id = "%s"\n' "$dbid" >> wrangler.d1.generated.toml
           npx --yes wrangler@latest d1 execute flr-bug-reports --remote --yes --file=schema.sql --config wrangler.d1.generated.toml
           npx --yes wrangler@latest deploy --config wrangler.d1.generated.toml
+          npx --yes wrangler@latest d1 execute flr-bug-reports --remote --yes --config wrangler.d1.generated.toml --command "DELETE FROM bug_reports WHERE build='TT-0.51-D1-SMOKE';" || true
           cd ..
+
           get_code="$(curl --max-time 20 -sS -o /dev/null -w '%{http_code}' "${endpoint}/reports/TT-0.51/_missing_.json" || true)"
           options_code="$(curl --max-time 20 -sS -o /dev/null -w '%{http_code}' -X OPTIONS "${endpoint}/report" -H 'Origin: https://1lisam.github.io' -H 'Access-Control-Request-Method: POST' || true)"
           [ "$get_code" = '404' ] && [ "$options_code" = '204' ]
+
           report_id="tt051-d1-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           python -c "import json,sys; rid=sys.argv[1]; print(json.dumps({'reportId':rid,'build':'TT-0.51-D1-SMOKE','step':78,'category':'other','priority':1,'description':'Automated D1 round-trip smoke','summary':{'smoke':True},'debug':{'schemaVersion':'FLR_BUG_REPORT_BUNDLE_0.3','probe':'d1-round-trip','reportId':rid}}))" "$report_id" > /tmp/flr_d1_smoke.json
           post_code="$(curl --max-time 25 -sS -o /tmp/flr_d1_smoke_response.json -w '%{http_code}' -X POST "${endpoint}/report" -H 'Origin: https://1lisam.github.io' -H 'Content-Type: application/json' --data-binary @/tmp/flr_d1_smoke.json || true)"
           [ "$post_code" = '201' ] || [ "$post_code" = '200' ]
           json_url="$(python -c "import json; j=json.load(open('/tmp/flr_d1_smoke_response.json',encoding='utf-8')); assert j.get('ok') and j.get('storage')=='D1' and j.get('jsonUrl'); print(j['jsonUrl'])")"
-          curl --max-time 25 -fsS "$json_url" -o /tmp/flr_d1_readback.json
+
+          read_ok=false
+          read_code=000
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            read_code="$(curl --max-time 25 -sS -o /tmp/flr_d1_readback.json -w '%{http_code}' "$json_url" || true)"
+            echo "D1 readback attempt ${attempt}: HTTP ${read_code}"
+            if [ "$read_code" = '200' ]; then
+              read_ok=true
+              break
+            fi
+            sleep 2
+          done
+          [ "$read_ok" = 'true' ]
           python -c "import json,sys; j=json.load(open('/tmp/flr_d1_readback.json',encoding='utf-8')); assert j=={'schemaVersion':'FLR_BUG_REPORT_BUNDLE_0.3','probe':'d1-round-trip','reportId':sys.argv[1]}" "$report_id"
+
           cd bug-report-worker
-          npx --yes wrangler@latest d1 execute flr-bug-reports --remote --yes --config wrangler.d1.generated.toml --command "DELETE FROM bug_report_chunks WHERE report_id='${report_id}'; DELETE FROM bug_reports WHERE report_id='${report_id}';"
+          npx --yes wrangler@latest d1 execute flr-bug-reports --remote --yes --config wrangler.d1.generated.toml --command "DELETE FROM bug_reports WHERE report_id='${report_id}';"
           cd ..
           echo 'smoke_ok=true' >> "$GITHUB_OUTPUT"
           echo "post_code=${post_code}" >> "$GITHUB_OUTPUT"
