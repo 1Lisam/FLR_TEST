@@ -1,0 +1,65 @@
+name: FLR R2 Report Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/report-audit-request.json'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read TT-0.51 reports from R2
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          mkdir -p audit/reports
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/r2/buckets/flr-bug-reports/objects"
+          curl -fsS -G "$base" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            --data-urlencode 'prefix=reports/TT-0.51/' \
+            --data-urlencode 'per_page=1000' \
+            -o audit/list.json
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('audit/list.json')
+          j=json.loads(p.read_text(encoding='utf-8'))
+          if not j.get('success'):
+              raise SystemExit('R2_LIST_FAILED')
+          rows=sorted(j.get('result') or [], key=lambda x: x.get('uploaded') or x.get('last_modified') or '')
+          slim=[{k:r.get(k) for k in ('key','size','uploaded','last_modified','custom_metadata')} for r in rows]
+          pathlib.Path('audit/index.json').write_text(json.dumps({'count':len(slim),'objects':slim},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          pathlib.Path('audit/keys.txt').write_text('\n'.join(r['key'] for r in slim if r.get('key'))+'\n',encoding='utf-8')
+          print(f'R2 TT-0.51 reports found: {len(slim)}')
+          PY
+          while IFS= read -r key; do
+            [ -z "$key" ] && continue
+            name="${key##*/}"
+            curl -fsS "${base}/${key}" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -o "audit/reports/${name}"
+          done < audit/keys.txt
+          rm -f audit/list.json audit/keys.txt
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flr-tt051-report-audit
+          path: audit/
+          retention-days: 1
+          if-no-files-found: error
