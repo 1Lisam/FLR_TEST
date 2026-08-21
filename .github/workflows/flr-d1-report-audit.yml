@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Query recent D1 reports and inspect latest bundle
+      - name: Query recent D1 reports and inspect latest attached bundle
         id: audit
         continue-on-error: true
         shell: bash
@@ -46,14 +46,14 @@ jobs:
             -H 'Content-Type: application/json' \
             --data '{"sql":"SELECT report_id, build, created_at, category, priority, description, size_bytes, chunk_count FROM bug_reports ORDER BY created_at DESC LIMIT 50"}' \
             > /tmp/flr_d1_query.json
-          rid="$(python -c "import json; j=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); rows=((j.get('result') or [{}])[0].get('results') or []); print(rows[0]['report_id'] if rows else '')")"
-          build="$(python -c "import json; j=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); rows=((j.get('result') or [{}])[0].get('results') or []); print(rows[0]['build'] if rows else '')")"
+          rid="$(python -c "import json; j=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); rows=((j.get('result') or [{}])[0].get('results') or []); row=next((r for r in rows if int(r.get('chunk_count') or 0)>0),None); print(row['report_id'] if row else '')")"
+          build="$(python -c "import json; j=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); rows=((j.get('result') or [{}])[0].get('results') or []); row=next((r for r in rows if int(r.get('chunk_count') or 0)>0),None); print(row['build'] if row else '')")"
           if [ -n "$rid" ]; then
             curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" > /tmp/flr_latest_report.json
           else
             printf '{}\n' > /tmp/flr_latest_report.json
           fi
-          python -c "import json,pathlib; q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); assert q.get('success') is True; rows=((q.get('result') or [{}])[0].get('results') or []); d=json.load(open('/tmp/flr_latest_report.json',encoding='utf-8')); cur=d.get('currentSituation'); prev=d.get('previousSituation'); slim={'schemaVersion':'FLR_D1_REPORT_AUDIT_1.2','status':'PASS','count':len(rows),'reports':rows,'latestBundle':{'schemaVersion':d.get('schemaVersion'),'scope':d.get('scope'),'bugReportContext':d.get('bugReportContext'),'currentSituationPresent':cur is not None,'previousSituationPresent':prev is not None,'currentSituationKeys':list(cur.keys()) if isinstance(cur,dict) else [],'previousSituationKeys':list(prev.keys()) if isinstance(prev,dict) else [],'currentReportScope':cur.get('reportScope') if isinstance(cur,dict) else None,'previousReportScope':prev.get('reportScope') if isinstance(prev,dict) else None,'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0}}; pathlib.Path('/tmp/flr_d1_report_status.json').write_text(json.dumps(slim,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')"
+          python -c "import json,pathlib,os; q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); assert q.get('success') is True; rows=((q.get('result') or [{}])[0].get('results') or []); d=json.load(open('/tmp/flr_latest_report.json',encoding='utf-8')); cur=d.get('currentSituation'); prev=d.get('previousSituation'); slim={'schemaVersion':'FLR_D1_REPORT_AUDIT_1.3','status':'PASS','count':len(rows),'reports':rows,'latestAttachedReportId':os.environ.get('RID') or None,'latestBundle':{'schemaVersion':d.get('schemaVersion'),'scope':d.get('scope'),'bugReportContext':d.get('bugReportContext'),'currentSituationPresent':cur is not None,'previousSituationPresent':prev is not None,'currentSituationKeys':list(cur.keys()) if isinstance(cur,dict) else [],'previousSituationKeys':list(prev.keys()) if isinstance(prev,dict) else [],'currentReportScope':cur.get('reportScope') if isinstance(cur,dict) else None,'previousReportScope':prev.get('reportScope') if isinstance(prev,dict) else None,'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0}}; pathlib.Path('/tmp/flr_d1_report_status.json').write_text(json.dumps(slim,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')" RID="$rid"
 
       - name: Record audit result without failing notification
         if: always()
@@ -64,7 +64,7 @@ jobs:
         run: |
           set +e
           if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_d1_report_status.json ]; then
-            printf '{"schemaVersion":"FLR_D1_REPORT_AUDIT_1.2","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_d1_report_status.json
+            printf '{"schemaVersion":"FLR_D1_REPORT_AUDIT_1.3","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_d1_report_status.json
           fi
           git config user.name 'FLR D1 Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
