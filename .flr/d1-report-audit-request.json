@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.0",
+  "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
   "build": "TT-0.51",
   "limit": 50,
-  "requestedAt": "2026-08-21T11:39:00+09:00",
-  "purpose": "Collect all current tester feedback before JSON retention development",
-  "runNonce": "collect-current-feedback-20260821-113900-mail-safe"
+  "requestedAt": "2026-08-21T12:18:00+09:00",
+  "purpose": "Verify recent report discoverability after optional JSON and gzip storage changes",
+  "runNonce": "post-gzip-audit-20260821-1218"
 }
