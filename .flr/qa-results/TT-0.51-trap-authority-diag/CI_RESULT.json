@@ -1,0 +1,996 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-TRAP-AUTHORITY-DIAG",
+  "candidateBranch": "tt051-trap-authority-candidate",
+  "baselineRef": "main",
+  "baselineSha": "c10c2190680f926402956db94dcfadec34ff6153",
+  "candidateSha": "82c63c481b8a0b48f09df8ed7729cbe2c8642480",
+  "workflowStatus": "FAIL",
+  "validationExitCode": 1,
+  "failures": [
+    "validation exit 1"
+  ],
+  "changedFiles": [],
+  "allowedChangedFiles": [
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js"
+  ],
+  "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_TRAP_AUTHORITY_DIAG_1.0",
+    "pass": false,
+    "checks": [
+      {
+        "name": "interactive-episode-trap-scenario-valid",
+        "ok": true,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "interactive-episode-hero-actually-receives-after-trap",
+        "ok": false,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "interactive-episode-no-unchosen-material-action",
+        "ok": false,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "interactive-episode-next-choice-before-ai-action",
+        "ok": false,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "interactive-episode-future-not-precomputed",
+        "ok": true,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-trap-scenario-valid",
+        "ok": true,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-hero-actually-receives-after-trap",
+        "ok": false,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-no-unchosen-material-action",
+        "ok": false,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-next-choice-before-ai-action",
+        "ok": false,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-future-not-precomputed",
+        "ok": true,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      }
+    ],
+    "failures": [
+      {
+        "name": "interactive-episode-hero-actually-receives-after-trap",
+        "ok": false,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "interactive-episode-no-unchosen-material-action",
+        "ok": false,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "interactive-episode-next-choice-before-ai-action",
+        "ok": false,
+        "detail": {
+          "explicit": false,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-hero-actually-receives-after-trap",
+        "ok": false,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-no-unchosen-material-action",
+        "ok": false,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      },
+      {
+        "name": "explicit-next-choice-before-ai-action",
+        "ok": false,
+        "detail": {
+          "explicit": true,
+          "valid": true,
+          "applied": {
+            "ok": true,
+            "kind": "INCOMING_BALL",
+            "choice": "TRAP_CONTROL",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_TRAP_AUTHORITY",
+            "action": {
+              "type": "INCOMING_INTENT",
+              "kind": "TRAP_CONTROL"
+            },
+            "intentUntil": 5181.058999999999,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          },
+          "chosenAt": 5180,
+          "heroReceived": false,
+          "receiveAt": null,
+          "nextPendingAt": null,
+          "autoMaterial": null,
+          "lockAtReceive": null,
+          "pending": null,
+          "events": [
+            {
+              "t": 5180,
+              "type": "PASS",
+              "actorId": "H-LCM",
+              "targetId": "H-ST",
+              "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+            },
+            {
+              "t": 5180,
+              "type": "USER_CHOICE",
+              "actorId": null,
+              "targetId": null,
+              "text": "H-ST: TRAP_CONTROL"
+            },
+            {
+              "t": 5180.05,
+              "type": "OFFSIDE",
+              "actorId": null,
+              "targetId": null,
+              "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+            }
+          ],
+          "futureOutcomePrecomputed": false
+        }
+      }
+    ],
+    "cases": {
+      "episode": {
+        "explicit": false,
+        "valid": true,
+        "applied": {
+          "ok": true,
+          "kind": "INCOMING_BALL",
+          "choice": "TRAP_CONTROL",
+          "requestedTargetId": null,
+          "targetId": null,
+          "inputSource": "QA_TRAP_AUTHORITY",
+          "action": {
+            "type": "INCOMING_INTENT",
+            "kind": "TRAP_CONTROL"
+          },
+          "intentUntil": 5181.058999999999,
+          "intentProtected": true,
+          "futureOutcomePrecomputed": false
+        },
+        "chosenAt": 5180,
+        "heroReceived": false,
+        "receiveAt": null,
+        "nextPendingAt": null,
+        "autoMaterial": null,
+        "lockAtReceive": null,
+        "pending": null,
+        "events": [
+          {
+            "t": 5180,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-ST",
+            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 5180,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TRAP_CONTROL"
+          },
+          {
+            "t": 5180.05,
+            "type": "OFFSIDE",
+            "actorId": null,
+            "targetId": null,
+            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+          }
+        ],
+        "futureOutcomePrecomputed": false
+      },
+      "explicit": {
+        "explicit": true,
+        "valid": true,
+        "applied": {
+          "ok": true,
+          "kind": "INCOMING_BALL",
+          "choice": "TRAP_CONTROL",
+          "requestedTargetId": null,
+          "targetId": null,
+          "inputSource": "QA_TRAP_AUTHORITY",
+          "action": {
+            "type": "INCOMING_INTENT",
+            "kind": "TRAP_CONTROL"
+          },
+          "intentUntil": 5181.058999999999,
+          "intentProtected": true,
+          "futureOutcomePrecomputed": false
+        },
+        "chosenAt": 5180,
+        "heroReceived": false,
+        "receiveAt": null,
+        "nextPendingAt": null,
+        "autoMaterial": null,
+        "lockAtReceive": null,
+        "pending": null,
+        "events": [
+          {
+            "t": 5180,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-ST",
+            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 5180,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TRAP_CONTROL"
+          },
+          {
+            "t": 5180.05,
+            "type": "OFFSIDE",
+            "actorId": null,
+            "targetId": null,
+            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+          }
+        ],
+        "futureOutcomePrecomputed": false
+      }
+    }
+  },
+  "applyLog": [],
+  "validationStderr": ""
+}
