@@ -1,0 +1,797 @@
+{
+  "schemaVersion": "FLR_FEEDBACK_DIAGNOSTICS_1.0",
+  "oldJitter": {
+    "context": {
+      "reportId": "tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469",
+      "build": "TT-0.51",
+      "step": 78,
+      "description": "현재 선택 전에 공격수는 안 움직이고 공격수하고 붙은 RCB는 발작이 난것만야 부들부들 떨어",
+      "category": "패스/공격",
+      "priority": 3,
+      "reportedAt": "2026-08-21T00:48:33.501Z"
+    },
+    "summary": {
+      "arrayPaths": {
+        "root.highResolution.preActionFrames": 55,
+        "root.highResolution.postActionFrames": 33,
+        "root.highResolution.episodeFrames": 88
+      },
+      "players": {
+        "H_ST": [],
+        "A_CB_R": [],
+        "A_RCB": [],
+        "H_LW": [],
+        "H_RW": []
+      },
+      "choiceNodes": [
+        {
+          "path": "root.hybridBefore.boundary",
+          "data": {
+            "reason": "ATTACKING_INVOLVEMENT",
+            "type": "PROTAGONIST_2D_WINDOW"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[0]",
+          "data": {
+            "kind": "TURNOVER_DANGER"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[1]",
+          "data": {
+            "kind": "PROGRESS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[1].detail",
+          "data": {
+            "targetId": "H-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[2]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[2].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[3]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[3].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[4]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[4].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[5]",
+          "data": {
+            "kind": "DANGEROUS_PASS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[5].detail",
+          "data": {
+            "targetId": "H-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[6]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[6].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[7]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[7].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[0]",
+          "data": {
+            "kind": "TURNOVER_DANGER"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[1]",
+          "data": {
+            "kind": "PROGRESS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[1].detail",
+          "data": {
+            "targetId": "H-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[2]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[2].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[3]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[3].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[4]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[4].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[5]",
+          "data": {
+            "kind": "DANGEROUS_PASS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[5].detail",
+          "data": {
+            "targetId": "H-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[6]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[6].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[7]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[7].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.ball",
+          "data": {
+            "kind": "CONTROL"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[0]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[1]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[2]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[3]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[4]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[5]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[6]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[7]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[8]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[9]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[10]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[11]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[12]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[13]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[14]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[15]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[16]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[17]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[18]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[19]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[20]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[21]",
+          "data": {
+            "action": "HYBRID_ENTRY_SHAPE"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].ball",
+          "data": {
+            "kind": "CONTROL"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[0]",
+          "data": {
+            "action": "GK_BUILD_SUPPORT"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[1]",
+          "data": {
+            "action": "REST_BALANCE"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[2]",
+          "data": {
+            "action": "REST_DEFENCE"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[3]",
+          "data": {
+            "action": "REST_DEFENCE"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[4]",
+          "data": {
+            "action": "REST_BALANCE"
+          }
+        }
+      ],
+      "bestSnapshot": {
+        "path": "root.highResolution.preActionFrames",
+        "t": 1930.1,
+        "players": {}
+      }
+    }
+  },
+  "newMissingChoice": {
+    "context": {
+      "reportId": "tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb",
+      "build": "TT-0.51",
+      "step": 78,
+      "description": "이 상황에서 LW는 완전히 빈공간이고 RW도 공간침투가 가능한 상황인데 선택지 자체가 안뜨는 이유가 뭔지 모르겠어",
+      "category": "조작권/선택",
+      "priority": 3,
+      "reportedAt": "2026-08-21T02:17:27.237Z"
+    },
+    "scope": {
+      "currentSituation": true,
+      "previousSituation": true,
+      "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
+      "olderSituationsIncluded": false
+    },
+    "summary": {
+      "arrayPaths": {
+        "root.highResolution.preActionFrames": 101
+      },
+      "players": {
+        "H_ST": [],
+        "H_LW": [],
+        "H_RW": [],
+        "H_LCM": [],
+        "H_RCM": [],
+        "A_CB_L": [],
+        "A_CB_R": [],
+        "A_LB": [],
+        "A_RB": []
+      },
+      "choiceNodes": [
+        {
+          "path": "root.hybridBefore.boundary",
+          "data": {
+            "reason": "ATTACKING_INVOLVEMENT",
+            "type": "PROTAGONIST_2D_WINDOW"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[0]",
+          "data": {
+            "kind": "DANGEROUS_PASS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[0].detail",
+          "data": {
+            "targetId": "A-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[1]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[1].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[2]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[2].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[3]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[3].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[4]",
+          "data": {
+            "kind": "TURNOVER_DANGER"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[5]",
+          "data": {
+            "kind": "DANGEROUS_PASS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[5].detail",
+          "data": {
+            "targetId": "H-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[6]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[6].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[7]",
+          "data": {
+            "kind": "PROGRESS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.boundary.preContext[7].detail",
+          "data": {
+            "targetId": "H-ST"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[0]",
+          "data": {
+            "kind": "DANGEROUS_PASS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[0].detail",
+          "data": {
+            "targetId": "A-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[1]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[1].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[2]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[2].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[3]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[3].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[4]",
+          "data": {
+            "kind": "TURNOVER_DANGER"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[5]",
+          "data": {
+            "kind": "DANGEROUS_PASS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[5].detail",
+          "data": {
+            "targetId": "H-RCM"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[6]",
+          "data": {
+            "kind": "RECYCLE"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[6].detail",
+          "data": {
+            "targetId": null
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[7]",
+          "data": {
+            "kind": "PROGRESS"
+          }
+        },
+        {
+          "path": "root.hybridBefore.preContext[7].detail",
+          "data": {
+            "targetId": "H-ST"
+          }
+        },
+        {
+          "path": "root.highResolution",
+          "data": {
+            "selectedChoice": null
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.ball",
+          "data": {
+            "kind": "CONTROL"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[0]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[1]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[2]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[3]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[4]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[5]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[6]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[7]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[8]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[9]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[10]",
+          "data": {
+            "action": "SUPPORT_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[11]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[12]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[13]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[14]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[15]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[16]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[17]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[18]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[19]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[20]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.entrySnapshot.players[21]",
+          "data": {
+            "action": "HOLD_LIVE"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].lastEvent",
+          "data": {
+            "type": "PASS"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].ball",
+          "data": {
+            "kind": "CONTROL"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[0]",
+          "data": {
+            "action": "GK_BUILD_SUPPORT"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[1]",
+          "data": {
+            "action": "REST_BALANCE"
+          }
+        },
+        {
+          "path": "root.highResolution.preActionFrames[0].players[2]",
+          "data": {
+            "action": "REST_DEFENCE"
+          }
+        }
+      ],
+      "bestSnapshot": {
+        "path": "root.highResolution.preActionFrames",
+        "t": 772.9,
+        "players": {}
+      }
+    }
+  }
+}
