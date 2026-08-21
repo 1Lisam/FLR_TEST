@@ -19,5 +19,5 @@
     {"kind":"node-esm","path":"bug-report-worker/worker.js"}
   ],
   "resultDir": ".flr/qa-results/TT-0.51-feedback-batch",
-  "runNonce": "2026-08-21T12:01+09:00-feedback-batch"
+  "runNonce": "2026-08-21T12:05+09:00-winger-dynamic-proof"
 }
