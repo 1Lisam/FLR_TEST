@@ -1,21 +1,17 @@
 {
-  "schemaVersion": "FLR_CLOUDFLARE_DEPLOY_STATUS_0.3",
-  "status": "DEPLOY_FAILED",
+  "schemaVersion": "FLR_CLOUDFLARE_D1_DEPLOY_STATUS_1.0",
+  "status": "D1_DEPLOY_FAILED",
   "worker": "flr-bug-reporter",
-  "bucket": "flr-bug-reports",
-  "workerUrl": null,
+  "storage": "D1",
+  "database": "flr-bug-reports",
+  "workerUrl": "https://flr-bug-reporter.sikarops.workers.dev",
   "endpoint": null,
   "missingSecrets": [],
   "deployOutcome": "failure",
-  "smoke": {
-    "ok": false,
-    "getMissingReport": null,
-    "optionsReport": null
-  },
   "liveRoundTrip": {
     "ok": false,
-    "postReport": null,
-    "storedDebugEqualsPostedDebug": false
+    "postReport": null
   },
-  "sourceCommit": "93d714fb8aa5a51540837ce313de9b1fb9ee05cc"
+  "errorExcerpt": "\u001b[31m✘ \u001b[41;31m[\u001b[41;97mERROR\u001b[41;31m]\u001b[0m \u001b[1mA request to the Cloudflare API (/accounts/bde08859ff305da3cb9ba2d4771fe88b/d1/database) failed.\u001b[0m\n\n  Authentication error [code: 10000]\n\n\n🪵  Logs were written to \"/home/runner/.config/.wrangler/logs/wrangler-2026-08-21_01-47-29_274.log\"\n",
+  "sourceCommit": "2a40146bf55aa9b127bca230de912c70f80655a5"
 }
