@@ -1,7 +1,0 @@
-{
-  "schemaVersion": "FLR_REPORT_AUDIT_STATUS_1.0",
-  "generatedAt": "2026-08-21T00:44:45.638827+00:00",
-  "outcome": "failure",
-  "count": null,
-  "error": "[{\"code\": 10042, \"message\": \"Please enable R2 through the Cloudflare Dashboard.\"}]"
-}
