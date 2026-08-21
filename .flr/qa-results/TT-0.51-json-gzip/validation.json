@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "FLR_TT051_JSON_GZIP_VALIDATION_1.0",
+  "pass": true,
+  "checks": [
+    {
+      "name": "gzip-helper-present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "legacy-read-compatible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "metadata-only-preserved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dynamic-post-201",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reportId\":\"tt051-gzip-roundtrip-12345\",\"jsonUrl\":\"https://worker.test/reports/TT-0.51/tt051-gzip-roundtrip-12345.json\",\"reportUrl\":\"https://worker.test/report-meta/tt051-gzip-roundtrip-12345\",\"sizeBytes\":2247954,\"storedBytes\":51209,\"storageEncoding\":\"gzip-base64-v1\",\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T03:13:11.258Z\",\"category\":\"2D 움직임\",\"priority\":3,\"description\":\"gzip roundtrip\",\"summary\":{\"probe\":true},\"storage\":\"D1\",\"chunkCount\":1,\"hasDebug\":true,\"issueCreated\":false}"
+    },
+    {
+      "name": "dynamic-stored-tagged",
+      "ok": true,
+      "detail": "gz64:H4sIAAA"
+    },
+    {
+      "name": "dynamic-storage-reduction",
+      "ok": true,
+      "detail": "raw=2247954 stored=51209"
+    },
+    {
+      "name": "dynamic-roundtrip-exact-json",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "dynamic-metadata-only",
+      "ok": true,
+      "detail": "{\"ok\":true,\"reportId\":\"tt051-gzip-metaonly-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-gzip-metaonly-12345\",\"sizeBytes\":0,\"storedBytes\":0,\"storageEncoding\":null,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T03:13:11.459Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"metadata only\",\"summary\":{\"probe\":\"meta\"},\"storage\":\"D1\",\"chunkCount\":0,\"hasDebug\":false,\"issueCreated\":false}"
+    },
+    {
+      "name": "dynamic-legacy-plain-read",
+      "ok": true,
+      "detail": "status=200"
+    }
+  ],
+  "failures": []
+}

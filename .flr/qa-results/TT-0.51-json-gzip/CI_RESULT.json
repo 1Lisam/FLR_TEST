@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "TT-0.51-JSON-GZIP",
+  "candidateBranch": "tt051-json-gzip-candidate",
+  "baselineRef": "main",
+  "baselineSha": "b094342bf9f31d722d1078da637f7d292b93d523",
+  "candidateSha": "f2f65bcdd5165e7e1c43990664dbe2fcac3d4f43",
+  "workflowStatus": "PASS",
+  "validationExitCode": 0,
+  "failures": [],
+  "changedFiles": [
+    "bug-report-worker/worker.js"
+  ],
+  "allowedChangedFiles": [
+    "bug-report-worker/worker.js"
+  ],
+  "patchSha256": "7f0999092475a7ea933189df2b15a3ba6fe12014da71c3d69ea03e0a613803bd",
+  "baseline": null,
+  "validation": {
+    "schemaVersion": "FLR_TT051_JSON_GZIP_VALIDATION_1.0",
+    "pass": true,
+    "checks": [
+      {
+        "name": "gzip-helper-present",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "legacy-read-compatible",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "metadata-only-preserved",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "dynamic-post-201",
+        "ok": true,
+        "detail": "{\"ok\":true,\"reportId\":\"tt051-gzip-roundtrip-12345\",\"jsonUrl\":\"https://worker.test/reports/TT-0.51/tt051-gzip-roundtrip-12345.json\",\"reportUrl\":\"https://worker.test/report-meta/tt051-gzip-roundtrip-12345\",\"sizeBytes\":2247954,\"storedBytes\":51209,\"storageEncoding\":\"gzip-base64-v1\",\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T03:13:11.258Z\",\"category\":\"2D 움직임\",\"priority\":3,\"description\":\"gzip roundtrip\",\"summary\":{\"probe\":true},\"storage\":\"D1\",\"chunkCount\":1,\"hasDebug\":true,\"issueCreated\":false}"
+      },
+      {
+        "name": "dynamic-stored-tagged",
+        "ok": true,
+        "detail": "gz64:H4sIAAA"
+      },
+      {
+        "name": "dynamic-storage-reduction",
+        "ok": true,
+        "detail": "raw=2247954 stored=51209"
+      },
+      {
+        "name": "dynamic-roundtrip-exact-json",
+        "ok": true,
+        "detail": "status=200"
+      },
+      {
+        "name": "dynamic-metadata-only",
+        "ok": true,
+        "detail": "{\"ok\":true,\"reportId\":\"tt051-gzip-metaonly-12345\",\"jsonUrl\":null,\"reportUrl\":\"https://worker.test/report-meta/tt051-gzip-metaonly-12345\",\"sizeBytes\":0,\"storedBytes\":0,\"storageEncoding\":null,\"build\":\"TT-0.51\",\"createdAt\":\"2026-08-21T03:13:11.459Z\",\"category\":\"UI/다시보기\",\"priority\":2,\"description\":\"metadata only\",\"summary\":{\"probe\":\"meta\"},\"storage\":\"D1\",\"chunkCount\":0,\"hasDebug\":false,\"issueCreated\":false}"
+      },
+      {
+        "name": "dynamic-legacy-plain-read",
+        "ok": true,
+        "detail": "status=200"
+      }
+    ],
+    "failures": []
+  },
+  "applyLog": [
+    {
+      "script": ".flr/tt051_json_gzip_apply.py",
+      "exitCode": 0,
+      "stdout": "TT-0.51 gzip D1 storage patch applied\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": ""
+}
