@@ -12,9 +12,6 @@ def replace_once(path,old,new):
         raise SystemExit(f'NON_UNIQUE_PATTERN: {path}: count={s.count(old)}')
     p.write_text(s.replace(old,new,1),encoding='utf-8')
 
-# Player choice availability must not be the NPC's answer key. NPC timing mistakes keep their
-# existing stochastic narrow window, while PLAYER inspection deterministically exposes marginal
-# offside team-mates that are still physically plausible choices.
 replace_once(Path('runtime/continuous_match_core.js'),
 "function passOptions(m,owner,allowMarginalOffside=false){",
 "function passOptions(m,owner,offsideMode=false){")
@@ -55,17 +52,14 @@ replace_once(Path('runtime/continuous_match_core.js'),
 replace_once(Path('runtime/continuous_match_core.js'),
 """    const physicalPasses=opts.filter(o=>o.block===0&&!represented.has(o.p.id)&&o.d<=38&&o.forward>-2.0&&o.open>=0.72&&['ST','WF','CM','FB'].includes(o.p.role)).sort((a,b)=>{const aw=['ST','WF'].includes(a.p.role)?1:0,bw=['ST','WF'].includes(b.p.role)?1:0;return bw-aw||(b.forward-a.forward)||(b.score-a.score)}).slice(0,3).map(o=>({id:'AVAILABLE_PASS',score:Number((o.score-0.45).toFixed(3)),reason:'physically_available_receiver',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,contested:o.open<1.8}}));
 """,
-"""    // PLAYER choice floor: a low expected-success pass is still a choice when the lane is
-    // physically plausible. One lane blocker / tight receiver can fail in live physics; that is
-    // an outcome, not a reason to hide the button. Extreme geometry remains filtered here.
-    const physicalPasses=opts.filter(o=>o.block<=1&&!represented.has(o.p.id)&&o.d<=42&&o.forward>-6.0&&o.open>=0.35&&['ST','WF','CM','FB'].includes(o.p.role)).sort((a,b)=>{const ar=oRisk(a),br=oRisk(b);return br-ar||(b.forward-a.forward)||(b.score-a.score);}).slice(0,3).map(o=>({id:'AVAILABLE_PASS',score:Number((o.score-0.45).toFixed(3)),reason:'physically_available_receiver',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,contested:o.open<1.8||o.block>0,laneBlockers:o.block,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0)}}));
-""".replace("const physicalPasses=", "const oRisk=o=>(o.offsideRisk?3:0)+(o.running?1.5:0)+(['ST','WF'].includes(o.p.role)?1:0)+(o.block>0?.5:0);\n    const physicalPasses="))
+"""    // PLAYER choice floor: low expected success does not erase a physically plausible pass.
+    const oRisk=o=>(o.offsideRisk?3:0)+(o.running?1.5:0)+(['ST','WF'].includes(o.p.role)?1:0)+(o.block>0?0.5:0);
+    const physicalPasses=opts.filter(o=>o.block<=1&&!represented.has(o.p.id)&&o.d<=42&&o.forward>-6.0&&o.open>=0.35&&['ST','WF','CM','FB'].includes(o.p.role)).sort((a,b)=>{const ar=oRisk(a),br=oRisk(b);return br-ar||(b.forward-a.forward)||(b.score-a.score)}).slice(0,3).map(o=>({id:'AVAILABLE_PASS',score:Number((o.score-0.45).toFixed(3)),reason:'physically_available_receiver',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,contested:o.open<1.8||o.block>0,laneBlockers:o.block,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0)}}));
+""")
 replace_once(Path('runtime/continuous_match_core.js'),
 "if(c.id==='AVAILABLE_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block===0)return{type:'PASS',target:o.p,kind:o.d>31?'LONG_PASS':'PASS',option:o,reason:'USER_AVAILABLE_PASS'};}",
 "if(c.id==='AVAILABLE_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block<=1)return{type:'PASS',target:o.p,kind:o.d>31?'LONG_PASS':'PASS',option:o,reason:'USER_AVAILABLE_PASS'};}")
 
-# Keep marginal runners visually alive instead of instantly teaching the onside answer by pulling
-# them back at +0.18 m. Only a clearly detached runner is told to recover.
 replace_once(Path('runtime/tactical_movement.js'),
 "['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','FAR_SIDE_RUN','FAR_SIDE_HOLD','FAR_SIDE_RECOVER']",
 "['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','FAR_SIDE_RUN','FAR_SIDE_HOLD','FAR_SIDE_SHOULDER','FAR_SIDE_RECOVER']")
@@ -77,23 +71,16 @@ replace_once(Path('runtime/tactical_movement.js'),
 replace_once(Path('runtime/tactical_movement.js'),
 """if(!ss&&progress>48){const wanted=Math.max(front+5,progress+8),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*(18.5*pr.wingerWidth),runAlive=x>local.x+.85,recover=local.x>safeX+.18;return{lx:runAlive?x:recover?safeX:Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':'FAR_SIDE_HOLD',sprint:runAlive||recover};}""",
 """if(!ss&&progress>48){const wanted=Math.max(front+5,progress+8),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*(18.5*pr.wingerWidth),runAlive=x>local.x+.85,over=local.x-safeX,marginalShoulder=over>.18&&over<=1.55,recover=over>1.55;return{lx:runAlive?x:recover?safeX:marginalShoulder?Math.min(local.x,safeX+1.35):Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':marginalShoulder?'FAR_SIDE_SHOULDER':'FAR_SIDE_HOLD',sprint:runAlive||recover};}""")
-
-# Ensure FAR_SIDE_SHOULDER is recognized as an active receiving state by pass geometry.
 replace_once(Path('runtime/continuous_match_core.js'),
 "'THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN'",
 "'THIRD_MAN_RUN','FAR_SIDE_RUN','FAR_SIDE_SHOULDER','PIN_AND_RUN'")
 
-# User-facing UI must not announce that the runner is currently marginally offside: the 2D scene
-# is the evidence and the player judges it. We still keep internal offsideRisk for resolution/QA.
 replace_once(Path('runtime/protagonist_match_controller.js'),
 "if(c.id==='THROUGH_PASS')return c.meta?.offsideRisk?'높음':'보통';",
 "if(c.id==='THROUGH_PASS')return'보통';")
 replace_once(Path('runtime/protagonist_match_controller.js'),
 "loss=c.meta?.offsideRisk?'침투 타이밍이 경계선에 있어 실제 패스 순간 오프사이드가 될 위험이 큼':'패스가 너무 길거나 타이밍이 어긋나면 차단·오프사이드 위험이 생길 수 있음';",
 "loss='패스가 너무 길거나 타이밍이 어긋나면 차단되거나 오프사이드가 선언될 수 있음';")
-
-# Guarantee at least one physically plausible high-risk attacking pass survives a full six-option
-# menu. This does not promise success; it only prevents NPC ranking from acting as an answer key.
 needle="""  // A real, unblocked pass option must not disappear merely because the NPC score
   // strongly prefers shooting/carrying. Player choice availability != NPC preference.
 """
