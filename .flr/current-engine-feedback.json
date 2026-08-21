@@ -1,0 +1,476 @@
+{
+  "schemaVersion": "FLR_CURRENT_ENGINE_FEEDBACK_DIAG_1.0",
+  "oldJitterReplayOnCurrentEngine": {
+    "hadChoice": false,
+    "preSpan": 10,
+    "searchSeconds": 35,
+    "hero": {
+      "samples": 351,
+      "t0": 1924.5999999999378,
+      "t1": 1959.599999999906,
+      "start": [
+        71.96,
+        34.07
+      ],
+      "end": [
+        55.46,
+        32.62
+      ],
+      "path": 82.8,
+      "net": 16.57,
+      "pathToNet": 5,
+      "xReversals": 6,
+      "yReversals": 7,
+      "actions": [
+        {
+          "t": 1924.6,
+          "action": "ATTACKING_RUN_LIVE"
+        },
+        {
+          "t": 1924.7,
+          "action": "ATTACK_OPEN_CHANNEL"
+        },
+        {
+          "t": 1928.9,
+          "action": "PIN_CENTRE_BACKS"
+        },
+        {
+          "t": 1929.2,
+          "action": "ATTACK_OPEN_CHANNEL"
+        },
+        {
+          "t": 1931,
+          "action": "PIN_CENTRE_BACKS"
+        },
+        {
+          "t": 1934.3,
+          "action": "PIN_AND_RUN"
+        },
+        {
+          "t": 1935.8,
+          "action": "ATTACK_NEAR_POST"
+        },
+        {
+          "t": 1938.6,
+          "action": "SHOT_LANE_COVER"
+        },
+        {
+          "t": 1941,
+          "action": "PRESS_CONTAIN"
+        },
+        {
+          "t": 1941.9,
+          "action": "ENGAGE"
+        },
+        {
+          "t": 1942.5,
+          "action": "PRESS_CONTAIN"
+        },
+        {
+          "t": 1943.4,
+          "action": "HOLD_BLOCK"
+        }
+      ]
+    },
+    "nearestOpponents": [
+      {
+        "id": "A-CM",
+        "d": 5.34,
+        "action": "PIVOT_SCREEN",
+        "markTargetId": null
+      },
+      {
+        "id": "A-RCB",
+        "d": 8.09,
+        "action": "REST_DEFENCE",
+        "markTargetId": null
+      },
+      {
+        "id": "A-LCB",
+        "d": 9.66,
+        "action": "REST_DEFENCE",
+        "markTargetId": "H-ST"
+      },
+      {
+        "id": "A-LB",
+        "d": 13.15,
+        "action": "INVERT_REST",
+        "markTargetId": "H-RW"
+      }
+    ],
+    "nearestMetrics": {
+      "A-CM": {
+        "samples": 351,
+        "t0": 1924.5999999999378,
+        "t1": 1959.599999999906,
+        "start": [
+          59.32,
+          32.25
+        ],
+        "end": [
+          50.17,
+          33.31
+        ],
+        "path": 95.3,
+        "net": 9.21,
+        "pathToNet": 10.35,
+        "xReversals": 8,
+        "yReversals": 2,
+        "actions": [
+          {
+            "t": 1924.6,
+            "action": "HOLD_LIVE"
+          },
+          {
+            "t": 1924.7,
+            "action": "PRESS_CONTAIN"
+          },
+          {
+            "t": 1925.9,
+            "action": "ENGAGE"
+          },
+          {
+            "t": 1926.5,
+            "action": "PRESS_CONTAIN"
+          },
+          {
+            "t": 1927.1,
+            "action": "MIDFIELD_BLOCK"
+          },
+          {
+            "t": 1928.9,
+            "action": "PIVOT_SCREEN_DEF"
+          },
+          {
+            "t": 1930.4,
+            "action": "MIDFIELD_BLOCK"
+          },
+          {
+            "t": 1934,
+            "action": "PIVOT_SCREEN_DEF"
+          },
+          {
+            "t": 1934.6,
+            "action": "SHOT_LANE_COVER"
+          },
+          {
+            "t": 1935.5,
+            "action": "PIVOT_SCREEN_DEF"
+          },
+          {
+            "t": 1937.3,
+            "action": "DEEP_SCREEN"
+          },
+          {
+            "t": 1937.9,
+            "action": "BOX_EDGE_SCREEN"
+          },
+          {
+            "t": 1938.6,
+            "action": "DROP_BETWEEN_LINES"
+          },
+          {
+            "t": 1938.9,
+            "action": "PIVOT_SCREEN"
+          },
+          {
+            "t": 1941,
+            "action": "DROP_TO_BUILD"
+          },
+          {
+            "t": 1943.4,
+            "action": "PIVOT_SCREEN"
+          },
+          {
+            "t": 1957.1,
+            "action": "COUNTER_GUARD"
+          },
+          {
+            "t": 1957.7,
+            "action": "PIVOT_SCREEN"
+          }
+        ]
+      },
+      "A-RCB": {
+        "samples": 351,
+        "t0": 1924.5999999999378,
+        "t1": 1959.599999999906,
+        "start": [
+          83.68,
+          27.07
+        ],
+        "end": [
+          58.3,
+          25.05
+        ],
+        "path": 76.66,
+        "net": 25.46,
+        "pathToNet": 3.01,
+        "xReversals": 7,
+        "yReversals": 4,
+        "actions": [
+          {
+            "t": 1924.6,
+            "action": "HOLD_LIVE"
+          },
+          {
+            "t": 1924.7,
+            "action": "HOLD_BLOCK"
+          },
+          {
+            "t": 1925.9,
+            "action": "MARK_LANE_SCREEN"
+          },
+          {
+            "t": 1930.4,
+            "action": "HOLD_BLOCK"
+          },
+          {
+            "t": 1935.8,
+            "action": "SHOT_LANE_COVER"
+          },
+          {
+            "t": 1938.6,
+            "action": "REST_DEFENCE"
+          },
+          {
+            "t": 1940.9,
+            "action": "FIRST_TOUCH_FLOW"
+          },
+          {
+            "t": 1941.6,
+            "action": "CARRY_FORWARD"
+          },
+          {
+            "t": 1943.4,
+            "action": "REST_DEFENCE"
+          }
+        ]
+      },
+      "A-LCB": {
+        "samples": 351,
+        "t0": 1924.5999999999378,
+        "t1": 1959.599999999906,
+        "start": [
+          84.85,
+          42.91
+        ],
+        "end": [
+          58.3,
+          41.85
+        ],
+        "path": 73.03,
+        "net": 26.57,
+        "pathToNet": 2.75,
+        "xReversals": 4,
+        "yReversals": 8,
+        "actions": [
+          {
+            "t": 1924.6,
+            "action": "HOLD_LIVE"
+          },
+          {
+            "t": 1924.7,
+            "action": "HOLD_BLOCK"
+          },
+          {
+            "t": 1933.7,
+            "action": "MARK_LANE_SCREEN"
+          },
+          {
+            "t": 1935.8,
+            "action": "MIDFIELD_LANE_SCREEN"
+          },
+          {
+            "t": 1938.6,
+            "action": "REST_DEFENCE"
+          },
+          {
+            "t": 1940.4,
+            "action": "MOVE_TO_RECEIVE"
+          },
+          {
+            "t": 1941,
+            "action": "BUILD_PLATFORM"
+          },
+          {
+            "t": 1943.4,
+            "action": "REST_DEFENCE"
+          }
+        ]
+      },
+      "A-LB": {
+        "samples": 351,
+        "t0": 1924.5999999999378,
+        "t1": 1959.599999999906,
+        "start": [
+          81.63,
+          58.19
+        ],
+        "end": [
+          45.5,
+          41.2
+        ],
+        "path": 84.73,
+        "net": 39.93,
+        "pathToNet": 2.12,
+        "xReversals": 5,
+        "yReversals": 2,
+        "actions": [
+          {
+            "t": 1924.6,
+            "action": "HOLD_LIVE"
+          },
+          {
+            "t": 1924.7,
+            "action": "HOLD_BLOCK"
+          },
+          {
+            "t": 1935.8,
+            "action": "MIDFIELD_LANE_SCREEN"
+          },
+          {
+            "t": 1938.6,
+            "action": "INVERT_REST"
+          },
+          {
+            "t": 1944.6,
+            "action": "INVERT_SUPPORT"
+          },
+          {
+            "t": 1949.7,
+            "action": "INVERT_REST"
+          },
+          {
+            "t": 1953.8,
+            "action": "INVERT_SUPPORT"
+          },
+          {
+            "t": 1956.5,
+            "action": "INVERT_REST"
+          }
+        ]
+      }
+    },
+    "futureOutcomePrecomputed": false
+  },
+  "newMissingChoicePassOptions": {
+    "time": 772.9,
+    "ownerId": "H-ST",
+    "passOptions": [
+      {
+        "targetId": "H-RCM",
+        "slot": "RCM",
+        "role": "CM",
+        "d": 18.08,
+        "forward": -13.28,
+        "open": 5.31,
+        "block": 0,
+        "score": -1.88,
+        "running": true,
+        "leadForward": 0.1,
+        "offsideRisk": false,
+        "task": "LATE_BOX_ARRIVAL",
+        "vx": 5.3,
+        "vy": 0.88
+      },
+      {
+        "targetId": "H-CM",
+        "slot": "CM",
+        "role": "CM",
+        "d": 13.1,
+        "forward": -11.78,
+        "open": 1.4,
+        "block": 0,
+        "score": -2.385,
+        "running": true,
+        "leadForward": -0.03,
+        "offsideRisk": false,
+        "task": "POST_PASS_CONTINUE_RUN",
+        "vx": 3.79,
+        "vy": 2.35
+      },
+      {
+        "targetId": "H-LCM",
+        "slot": "LCM",
+        "role": "CM",
+        "d": 16.24,
+        "forward": -14.59,
+        "open": 3.65,
+        "block": 0,
+        "score": -3.828,
+        "running": false,
+        "leadForward": -14.59,
+        "offsideRisk": false,
+        "task": "SECOND_LINE_SUPPORT",
+        "vx": 0.84,
+        "vy": 0
+      },
+      {
+        "targetId": "H-RCB",
+        "slot": "RCB",
+        "role": "CB",
+        "d": 31,
+        "forward": -28.74,
+        "open": 12.63,
+        "block": 0,
+        "score": -3.894,
+        "running": false,
+        "leadForward": -28.74,
+        "offsideRisk": false,
+        "task": "REST_DEFENCE",
+        "vx": 4.09,
+        "vy": -0.15
+      },
+      {
+        "targetId": "H-LCB",
+        "slot": "LCB",
+        "role": "CB",
+        "d": 29.21,
+        "forward": -28.74,
+        "open": 13.51,
+        "block": 1,
+        "score": -4.934,
+        "running": false,
+        "leadForward": -28.74,
+        "offsideRisk": false,
+        "task": "REST_DEFENCE",
+        "vx": 4.09,
+        "vy": -0.15
+      },
+      {
+        "targetId": "H-RB",
+        "slot": "RB",
+        "role": "FB",
+        "d": 41.42,
+        "forward": -28.15,
+        "open": 7.25,
+        "block": 0,
+        "score": -5.973,
+        "running": false,
+        "leadForward": -28.15,
+        "offsideRisk": false,
+        "task": "REST_BALANCE",
+        "vx": 4.35,
+        "vy": 0
+      },
+      {
+        "targetId": "H-LB",
+        "slot": "LB",
+        "role": "FB",
+        "d": 36.75,
+        "forward": -28.15,
+        "open": 6.02,
+        "block": 0,
+        "score": -6.181,
+        "running": false,
+        "leadForward": -28.15,
+        "offsideRisk": false,
+        "task": "REST_BALANCE",
+        "vx": 4.35,
+        "vy": 0
+      }
+    ],
+    "wingers": []
+  }
+}
