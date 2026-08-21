@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   snapshot:
@@ -22,6 +22,7 @@ jobs:
         run: |
           printf '{"schemaVersion":"FLR_LOCAL_DEV_SNAPSHOT_0.2","ref":"%s","sha":"%s","createdBy":"github-actions"}\n' "${GITHUB_REF_NAME}" "${GITHUB_SHA}" > FLR_LOCAL_DEV_SNAPSHOT.json
       - name: Upload complete repository snapshot
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: FLR_CURRENT_MAIN_SNAPSHOT
@@ -31,3 +32,19 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
+      - name: Record snapshot artifact id
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          mkdir -p .flr
+          STATUS=$(printf '{"schemaVersion":"FLR_LOCAL_DEV_SNAPSHOT_STATUS_0.2","sourceSha":"%s","runId":%s,"artifactId":%s,"artifactName":"FLR_CURRENT_MAIN_SNAPSHOT"}' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$ARTIFACT_ID")
+          CONTENT=$(printf '%s' "$STATUS" | base64 -w0)
+          PATH_NAME='.flr/local-snapshot-v2-status.json'
+          CURRENT_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/${PATH_NAME}?ref=${GITHUB_REF_NAME}" --jq '.sha' 2>/dev/null || true)
+          if [ -n "$CURRENT_SHA" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${PATH_NAME}" -f message='Record local snapshot v2 artifact' -f content="$CONTENT" -f sha="$CURRENT_SHA" -f branch="$GITHUB_REF_NAME" >/dev/null
+          else
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${PATH_NAME}" -f message='Record local snapshot v2 artifact' -f content="$CONTENT" -f branch="$GITHUB_REF_NAME" >/dev/null
+          fi
