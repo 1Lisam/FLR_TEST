@@ -1,11 +1,11 @@
 {
   "schemaVersion": "FLR_CLOUDFLARE_D1_DEPLOY_REQUEST_1.0",
-  "version": "TT-0.51-D1-LIVE-ENTRY",
+  "version": "TT-0.51-FEEDBACK-BATCH",
   "worker": "flr-bug-reporter",
   "storage": "D1",
   "database": "flr-bug-reports",
-  "purpose": "Anonymous tester bug intake with reportId metadata and chunked current+previous situation JSON, without R2",
-  "sourceCommit": "0128dff29ca0ad53f3026751cbd6e8332086bd66",
-  "requestedAt": "2026-08-21T11:10:00+09:00",
-  "attemptNonce": "tt051-d1-live-entry-20260821-readback-retry-mail-suppressed"
+  "purpose": "Deploy feedback-batch Worker with optional match JSON attachment and verify D1 round trip",
+  "sourceCommit": "0ea56fdc3aeb1610b8b0192b7fb14ddc0bd54ea2",
+  "requestedAt": "2026-08-21T12:04:00+09:00",
+  "attemptNonce": "tt051-feedback-batch-20260821-1204"
 }
