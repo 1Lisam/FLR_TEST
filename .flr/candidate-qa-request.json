@@ -4,9 +4,9 @@
   "candidateBranch": "tt051-player-risk-choice-candidate",
   "baselineRef": "main",
   "applyScripts": [
-    ".flr/tt051_player_risk_choice_apply_v2.py"
+    ".flr/tt051_player_risk_choice_apply_v3.py"
   ],
-  "validationScript": ".flr/tt051_player_risk_choice_validation.js",
+  "validationScript": ".flr/tt051_player_risk_choice_validation_v2.js",
   "changedFiles": [
     "runtime/continuous_match_core.js",
     "runtime/protagonist_match_controller.js",
@@ -18,5 +18,5 @@
     "runtime/tactical_movement.js"
   ],
   "resultDir": ".flr/qa-results/TT-0.51-player-risk-choice",
-  "runNonce": "2026-08-21T12:43+09:00-player-risk-v2"
+  "runNonce": "2026-08-21T12:48+09:00-player-risk-v3-raw-floor"
 }
