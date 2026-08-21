@@ -1,7 +1,7 @@
 {
   "schemaVersion":"FLR_FEEDBACK_DIAGNOSTICS_REQUEST_1.0",
-  "requestedAt":"2026-08-21T11:46:00+09:00",
+  "requestedAt":"2026-08-21T11:49:00+09:00",
   "oldJitterReport":"tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469",
   "newMissingChoiceReport":"tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb",
-  "runNonce":"feedback-diag-20260821-114600-corrected"
+  "runNonce":"feedback-diag-20260821-114900-compact"
 }
