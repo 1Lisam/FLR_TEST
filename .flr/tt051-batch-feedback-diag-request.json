@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "FLR_TT051_BATCH_FEEDBACK_DIAG_REQUEST_1.1",
-  "requestedAt": "2026-08-21T12:25:00+09:00",
+  "schemaVersion": "FLR_TT051_BATCH_FEEDBACK_DIAG_REQUEST_1.2",
+  "requestedAt": "2026-08-21T12:28:00+09:00",
   "reportCount": 7,
-  "purpose": "Re-run compact issue-focused diagnostics for all recovered TT-0.51 feedback",
-  "runNonce": "compact-20260821-1225"
+  "purpose": "Generate minimal issue facts for recovered TT-0.51 feedback",
+  "runNonce": "facts-20260821-1228"
 }
