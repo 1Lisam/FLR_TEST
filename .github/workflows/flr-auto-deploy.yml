@@ -100,7 +100,13 @@ jobs:
           PY
           while IFS= read -r f; do
             [ -z "$f" ] && continue
-            if [[ "$f" == *.js && -f "$f" ]]; then node --check "$f"; fi
+            if [[ "$f" == *.js && -f "$f" ]]; then
+              if [[ "$f" == bug-report-worker/* ]]; then
+                node --input-type=module --check < "$f"
+              else
+                node --check "$f"
+              fi
+            fi
           done < /tmp/flr_changed_files
 
       - name: Commit TT build to main
