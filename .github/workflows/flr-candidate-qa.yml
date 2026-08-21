@@ -114,3 +114,46 @@ jobs:
           else
             echo "Candidate QA passed."
           fi
+
+      - name: Promote passing candidate when explicitly requested
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,pathlib,shutil,subprocess
+          cfg=json.loads(pathlib.Path('control/.flr/candidate-qa-request.json').read_text(encoding='utf-8'))
+          if cfg.get('promoteValidated') is not True:
+              print('Promotion not requested.'); raise SystemExit(0)
+          result=json.loads(pathlib.Path('qa-out/CI_RESULT.json').read_text(encoding='utf-8'))
+          if result.get('workflowStatus')!='PASS' or result.get('validationExitCode')!=0:
+              raise SystemExit('PROMOTION_BLOCKED_QA_NOT_PASS')
+          expected=cfg.get('expectedPatchSha256')
+          if expected and result.get('patchSha256')!=expected:
+              raise SystemExit(f"PROMOTION_PATCH_SHA_MISMATCH expected={expected} actual={result.get('patchSha256')}")
+          subprocess.check_call(['git','-C','baseline','fetch','origin','main'])
+          head=subprocess.check_output(['git','-C','baseline','rev-parse','HEAD'],text=True).strip()
+          remote=subprocess.check_output(['git','-C','baseline','rev-parse','origin/main'],text=True).strip()
+          if head!=remote:
+              raise SystemExit(f'PROMOTION_MAIN_MOVED baseline={head} remote={remote}')
+          changed=result.get('changedFiles') or []
+          allowed=cfg.get('changedFiles') or []
+          if set(changed)!=set(allowed):
+              raise SystemExit('PROMOTION_CHANGED_FILES_MISMATCH')
+          for rel in changed:
+              src=pathlib.Path('qa-work')/rel; dst=pathlib.Path('baseline')/rel
+              if src.exists():
+                  dst.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(src,dst)
+              elif dst.exists():
+                  dst.unlink()
+          pathlib.Path('/tmp/flr_promote_files').write_text('\n'.join(changed)+'\n',encoding='utf-8')
+          PY
+          promote="$(python -c 'import json; print("true" if json.load(open("control/.flr/candidate-qa-request.json",encoding="utf-8")).get("promoteValidated") is True else "false")')"
+          [ "$promote" = true ] || exit 0
+          git -C baseline config user.name 'FLR Test Deploy Bot'
+          git -C baseline config user.email 'actions@users.noreply.github.com'
+          while IFS= read -r f; do [ -z "$f" ] || git -C baseline add -- "$f"; done < /tmp/flr_promote_files
+          git -C baseline diff --cached --quiet && { echo 'PROMOTION_NO_CHANGES'; exit 1; }
+          msg="$(python -c 'import json; print(json.load(open("control/.flr/candidate-qa-request.json",encoding="utf-8")).get("promotionCommitMessage") or "Promote validated FLR candidate")')"
+          git -C baseline commit -m "$msg"
+          git -C baseline push origin HEAD:main
