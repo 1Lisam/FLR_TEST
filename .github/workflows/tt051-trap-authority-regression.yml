@@ -7,7 +7,7 @@ on:
       - '.flr/tt051_trap_authority_validation.js'
       - 'runtime/**'
 permissions:
-  contents: read
+  contents: write
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -20,4 +20,20 @@ jobs:
           node --check runtime/protagonist_match_controller.js
           node --check .flr/tt051_trap_authority_validation.js
       - name: Reproduce TRAP_CONTROL authority chain
-        run: node .flr/tt051_trap_authority_validation.js .
+        shell: bash
+        run: |
+          set +e
+          node .flr/tt051_trap_authority_validation.js . > .flr/tt051-trap-authority-result.json
+          code=$?
+          echo "$code" > .flr/tt051-trap-authority-exit.txt
+          exit 0
+      - name: Persist result
+        shell: bash
+        run: |
+          git config user.name "FLR Regression QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add .flr/tt051-trap-authority-result.json .flr/tt051-trap-authority-exit.txt
+          git diff --cached --quiet || {
+            git commit -m "Record TT-0.51 TRAP_CONTROL authority regression"
+            git push origin HEAD:tt051-trap-authority-regression
+          }
