@@ -1,0 +1,406 @@
+{
+  "schemaVersion": "FLR_JSON_STORAGE_ANALYSIS_1.0",
+  "reports": [
+    {
+      "label": "old-ui",
+      "rawBytes": 1449885,
+      "gzipBytes": 149339,
+      "gzipRatio": 0.103,
+      "compactFramesBytes": 978982,
+      "compactFramesGzipBytes": 139163,
+      "dropEpisodeBytes": 445381,
+      "dropEpisodeGzipBytes": 47279,
+      "compactDropEpisodeBytes": 414980,
+      "compactDropEpisodeGzipBytes": 47142,
+      "frameArrays": [
+        {
+          "path": "root.currentSituation.highResolution.preActionFrames",
+          "count": 55,
+          "bytes": 372899
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames",
+          "count": 74,
+          "bytes": 1004584
+        }
+      ],
+      "largestDuplicateSubtrees": [
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[0].players",
+          "sameAs": "root.previousSituation.highResolution.entrySnapshot.players",
+          "bytes": 6388
+        },
+        {
+          "path": "root.currentSituation.hybridAfter.state.sceneCandidates[0]",
+          "sameAs": "root.currentSituation.hybridBefore.boundary",
+          "bytes": 6237
+        },
+        {
+          "path": "root.currentSituation.hybridBefore.preContext",
+          "sameAs": "root.currentSituation.hybridBefore.boundary.preContext",
+          "bytes": 5419
+        },
+        {
+          "path": "root.currentSituation.hybridAfter.state.sceneCandidates[0].preContext",
+          "sameAs": "root.currentSituation.hybridBefore.boundary.preContext",
+          "bytes": 5419
+        },
+        {
+          "path": "root.previousSituation.hybridBefore.preContext",
+          "sameAs": "root.previousSituation.hybridBefore.boundary.preContext",
+          "bytes": 5356
+        },
+        {
+          "path": "root.previousSituation.hybridAfter.state.resolvedEvents",
+          "sameAs": "root.previousSituation.hybridAfter.state.chain",
+          "bytes": 4282
+        }
+      ]
+    },
+    {
+      "label": "old-jitter",
+      "rawBytes": 2273345,
+      "gzipBytes": 209982,
+      "gzipRatio": 0.0924,
+      "compactFramesBytes": 1735609,
+      "compactFramesGzipBytes": 199277,
+      "dropEpisodeBytes": 672466,
+      "dropEpisodeGzipBytes": 60575,
+      "compactDropEpisodeBytes": 623849,
+      "compactDropEpisodeGzipBytes": 60404,
+      "frameArrays": [
+        {
+          "path": "root.currentSituation.highResolution.preActionFrames",
+          "count": 55,
+          "bytes": 372899
+        },
+        {
+          "path": "root.currentSituation.highResolution.postActionFrames",
+          "count": 33,
+          "bytes": 223479
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames",
+          "count": 88,
+          "bytes": 596377
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames",
+          "count": 74,
+          "bytes": 1004584
+        }
+      ],
+      "largestDuplicateSubtrees": [
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[51]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[51]",
+          "bytes": 6861
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[59]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[4]",
+          "bytes": 6859
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[58]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[3]",
+          "bytes": 6856
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[60]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[5]",
+          "bytes": 6855
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[57]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[2]",
+          "bytes": 6853
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[52]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[52]",
+          "bytes": 6852
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[49]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[49]",
+          "bytes": 6848
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[48]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[48]",
+          "bytes": 6841
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[53]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[53]",
+          "bytes": 6835
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[50]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[50]",
+          "bytes": 6834
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[47]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[47]",
+          "bytes": 6826
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[54]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[54]",
+          "bytes": 6824
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[61]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[6]",
+          "bytes": 6823
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[7]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[7]",
+          "bytes": 6821
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[45]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[45]",
+          "bytes": 6821
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[55]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[0]",
+          "bytes": 6820
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[46]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[46]",
+          "bytes": 6819
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[15]",
+          "sameAs": "root.currentSituation.highResolution.preActionFrames[15]",
+          "bytes": 6817
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[56]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[1]",
+          "bytes": 6816
+        },
+        {
+          "path": "root.currentSituation.highResolution.episodeFrames[62]",
+          "sameAs": "root.currentSituation.highResolution.postActionFrames[7]",
+          "bytes": 6816
+        }
+      ]
+    },
+    {
+      "label": "old-goal-label",
+      "rawBytes": 1449602,
+      "gzipBytes": 149102,
+      "gzipRatio": 0.1029,
+      "compactFramesBytes": 978699,
+      "compactFramesGzipBytes": 138935,
+      "dropEpisodeBytes": 445098,
+      "dropEpisodeGzipBytes": 47042,
+      "compactDropEpisodeBytes": 414697,
+      "compactDropEpisodeGzipBytes": 46909,
+      "frameArrays": [
+        {
+          "path": "root.currentSituation.highResolution.preActionFrames",
+          "count": 55,
+          "bytes": 372899
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames",
+          "count": 74,
+          "bytes": 1004584
+        }
+      ],
+      "largestDuplicateSubtrees": [
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[0].players",
+          "sameAs": "root.previousSituation.highResolution.entrySnapshot.players",
+          "bytes": 6388
+        },
+        {
+          "path": "root.currentSituation.hybridAfter.state.sceneCandidates[0]",
+          "sameAs": "root.currentSituation.hybridBefore.boundary",
+          "bytes": 6237
+        },
+        {
+          "path": "root.currentSituation.hybridBefore.preContext",
+          "sameAs": "root.currentSituation.hybridBefore.boundary.preContext",
+          "bytes": 5419
+        },
+        {
+          "path": "root.currentSituation.hybridAfter.state.sceneCandidates[0].preContext",
+          "sameAs": "root.currentSituation.hybridBefore.boundary.preContext",
+          "bytes": 5419
+        },
+        {
+          "path": "root.previousSituation.hybridBefore.preContext",
+          "sameAs": "root.previousSituation.hybridBefore.boundary.preContext",
+          "bytes": 5356
+        },
+        {
+          "path": "root.previousSituation.hybridAfter.state.resolvedEvents",
+          "sameAs": "root.previousSituation.hybridAfter.state.chain",
+          "bytes": 4282
+        }
+      ]
+    },
+    {
+      "label": "d1-missing-wing-choice",
+      "rawBytes": 3504780,
+      "gzipBytes": 303766,
+      "gzipRatio": 0.0867,
+      "compactFramesBytes": 3229462,
+      "compactFramesGzipBytes": 302293,
+      "dropEpisodeBytes": 2151897,
+      "dropEpisodeGzipBytes": 189719,
+      "compactDropEpisodeBytes": 1986413,
+      "compactDropEpisodeGzipBytes": 188814,
+      "frameArrays": [
+        {
+          "path": "root.currentSituation.highResolution.preActionFrames",
+          "count": 101,
+          "bytes": 682632
+        },
+        {
+          "path": "root.previousSituation.highResolution.preActionFrames",
+          "count": 101,
+          "bytes": 686240
+        },
+        {
+          "path": "root.previousSituation.highResolution.postActionFrames",
+          "count": 98,
+          "bytes": 666724
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames",
+          "count": 199,
+          "bytes": 1352963
+        }
+      ],
+      "largestDuplicateSubtrees": [
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[105]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[4]",
+          "bytes": 6892
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[28]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[28]",
+          "bytes": 6884
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[27]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[27]",
+          "bytes": 6881
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[102]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[1]",
+          "bytes": 6881
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[106]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[5]",
+          "bytes": 6881
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[107]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[6]",
+          "bytes": 6881
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[29]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[29]",
+          "bytes": 6876
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[112]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[11]",
+          "bytes": 6875
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[111]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[10]",
+          "bytes": 6874
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[26]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[26]",
+          "bytes": 6873
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[66]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[66]",
+          "bytes": 6870
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[103]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[2]",
+          "bytes": 6870
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[113]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[12]",
+          "bytes": 6866
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[114]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[13]",
+          "bytes": 6865
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[67]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[67]",
+          "bytes": 6864
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[24]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[24]",
+          "bytes": 6861
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[25]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[25]",
+          "bytes": 6860
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[159]",
+          "sameAs": "root.previousSituation.highResolution.postActionFrames[58]",
+          "bytes": 6856
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[15]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[15]",
+          "bytes": 6855
+        },
+        {
+          "path": "root.previousSituation.highResolution.episodeFrames[21]",
+          "sameAs": "root.previousSituation.highResolution.preActionFrames[21]",
+          "bytes": 6855
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "rawBytes": 8677612,
+    "gzipBytes": 812189,
+    "compactFramesBytes": 6922752,
+    "compactFramesGzipBytes": 779668,
+    "dropEpisodeBytes": 3714842,
+    "dropEpisodeGzipBytes": 344615,
+    "compactDropEpisodeBytes": 3439939,
+    "compactDropEpisodeGzipBytes": 343269,
+    "gzipBytesVsRaw": 0.0936,
+    "compactFramesBytesVsRaw": 0.7978,
+    "compactFramesGzipBytesVsRaw": 0.0898,
+    "dropEpisodeBytesVsRaw": 0.4281,
+    "dropEpisodeGzipBytesVsRaw": 0.0397,
+    "compactDropEpisodeBytesVsRaw": 0.3964,
+    "compactDropEpisodeGzipBytesVsRaw": 0.0396
+  }
+}
