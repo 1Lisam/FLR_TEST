@@ -41,7 +41,7 @@ jobs:
           curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H 'Content-Type: application/json' \
-            --data '{"sql":"SELECT report_id, build, created_at, category, priority, description, size_bytes, chunk_count FROM bug_reports ORDER BY created_at DESC LIMIT 10"}' \
+            --data '{"sql":"SELECT report_id, build, created_at, category, priority, description, size_bytes, chunk_count FROM bug_reports ORDER BY created_at DESC LIMIT 50"}' \
             > /tmp/flr_d1_query.json
           rid="$(python -c "import json; j=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); rows=((j.get('result') or [{}])[0].get('results') or []); print(rows[0]['report_id'] if rows else '')")"
           build="$(python -c "import json; j=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); rows=((j.get('result') or [{}])[0].get('results') or []); print(rows[0]['build'] if rows else '')")"
