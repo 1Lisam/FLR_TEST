@@ -1,0 +1,23 @@
+name: TT051 Trap Authority Regression
+on:
+  push:
+    branches: [tt051-trap-authority-regression]
+    paths:
+      - '.github/workflows/tt051-trap-authority-regression.yml'
+      - '.flr/tt051_trap_authority_validation.js'
+      - 'runtime/**'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        run: |
+          node --check runtime/continuous_match_core.js
+          node --check runtime/protagonist_match_controller.js
+          node --check .flr/tt051_trap_authority_validation.js
+      - name: Reproduce TRAP_CONTROL authority chain
+        run: node .flr/tt051_trap_authority_validation.js .
