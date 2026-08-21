@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "FLR_TT051_TRAP_AUTHORITY_DIAG_1.0",
-  "pass": false,
+  "schemaVersion": "FLR_TT051_TRAP_AUTHORITY_DIAG_1.1",
+  "pass": true,
   "checks": [
     {
       "name": "interactive-episode-trap-scenario-valid",
@@ -24,12 +24,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": false,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -44,13 +83,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -58,7 +90,7 @@
     },
     {
       "name": "interactive-episode-hero-actually-receives-after-trap",
-      "ok": false,
+      "ok": true,
       "detail": {
         "explicit": false,
         "valid": true,
@@ -78,12 +110,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": false,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -98,13 +169,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -112,7 +176,7 @@
     },
     {
       "name": "interactive-episode-no-unchosen-material-action",
-      "ok": false,
+      "ok": true,
       "detail": {
         "explicit": false,
         "valid": true,
@@ -132,12 +196,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": false,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -152,13 +255,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -166,7 +262,7 @@
     },
     {
       "name": "interactive-episode-next-choice-before-ai-action",
-      "ok": false,
+      "ok": true,
       "detail": {
         "explicit": false,
         "valid": true,
@@ -186,12 +282,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": false,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -206,13 +341,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -240,12 +368,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": false,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -260,13 +427,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -294,12 +454,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": true,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -314,13 +513,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -328,7 +520,7 @@
     },
     {
       "name": "explicit-hero-actually-receives-after-trap",
-      "ok": false,
+      "ok": true,
       "detail": {
         "explicit": true,
         "valid": true,
@@ -348,12 +540,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": true,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -368,13 +599,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -382,7 +606,7 @@
     },
     {
       "name": "explicit-no-unchosen-material-action",
-      "ok": false,
+      "ok": true,
       "detail": {
         "explicit": true,
         "valid": true,
@@ -402,12 +626,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": true,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -422,13 +685,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -436,7 +692,7 @@
     },
     {
       "name": "explicit-next-choice-before-ai-action",
-      "ok": false,
+      "ok": true,
       "detail": {
         "explicit": true,
         "valid": true,
@@ -456,12 +712,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": true,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -476,13 +771,6 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
@@ -510,12 +798,51 @@
           "futureOutcomePrecomputed": false
         },
         "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
+        "heroReceived": true,
+        "receiveAt": 5180.600000000002,
+        "nextPendingAt": 5185.200000000019,
         "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
+        "offside": false,
+        "lockAtReceive": {
+          "interactive": {
+            "active": true,
+            "playerId": "H-ST",
+            "episodeId": "STEP40-1",
+            "sceneId": "STEP40-1",
+            "armedAt": 5180
+          },
+          "explicit": true,
+          "deferred": null
+        },
+        "pending": {
+          "kind": "ON_BALL",
+          "options": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
         "events": [
           {
             "t": 5180,
@@ -530,345 +857,13 @@
             "actorId": null,
             "targetId": null,
             "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
           }
         ],
         "futureOutcomePrecomputed": false
       }
     }
   ],
-  "failures": [
-    {
-      "name": "interactive-episode-hero-actually-receives-after-trap",
-      "ok": false,
-      "detail": {
-        "explicit": false,
-        "valid": true,
-        "applied": {
-          "ok": true,
-          "kind": "INCOMING_BALL",
-          "choice": "TRAP_CONTROL",
-          "requestedTargetId": null,
-          "targetId": null,
-          "inputSource": "QA_TRAP_AUTHORITY",
-          "action": {
-            "type": "INCOMING_INTENT",
-            "kind": "TRAP_CONTROL"
-          },
-          "intentUntil": 5181.058999999999,
-          "intentProtected": true,
-          "futureOutcomePrecomputed": false
-        },
-        "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
-        "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
-        "events": [
-          {
-            "t": 5180,
-            "type": "PASS",
-            "actorId": "H-LCM",
-            "targetId": "H-ST",
-            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
-          },
-          {
-            "t": 5180,
-            "type": "USER_CHOICE",
-            "actorId": null,
-            "targetId": null,
-            "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
-          }
-        ],
-        "futureOutcomePrecomputed": false
-      }
-    },
-    {
-      "name": "interactive-episode-no-unchosen-material-action",
-      "ok": false,
-      "detail": {
-        "explicit": false,
-        "valid": true,
-        "applied": {
-          "ok": true,
-          "kind": "INCOMING_BALL",
-          "choice": "TRAP_CONTROL",
-          "requestedTargetId": null,
-          "targetId": null,
-          "inputSource": "QA_TRAP_AUTHORITY",
-          "action": {
-            "type": "INCOMING_INTENT",
-            "kind": "TRAP_CONTROL"
-          },
-          "intentUntil": 5181.058999999999,
-          "intentProtected": true,
-          "futureOutcomePrecomputed": false
-        },
-        "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
-        "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
-        "events": [
-          {
-            "t": 5180,
-            "type": "PASS",
-            "actorId": "H-LCM",
-            "targetId": "H-ST",
-            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
-          },
-          {
-            "t": 5180,
-            "type": "USER_CHOICE",
-            "actorId": null,
-            "targetId": null,
-            "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
-          }
-        ],
-        "futureOutcomePrecomputed": false
-      }
-    },
-    {
-      "name": "interactive-episode-next-choice-before-ai-action",
-      "ok": false,
-      "detail": {
-        "explicit": false,
-        "valid": true,
-        "applied": {
-          "ok": true,
-          "kind": "INCOMING_BALL",
-          "choice": "TRAP_CONTROL",
-          "requestedTargetId": null,
-          "targetId": null,
-          "inputSource": "QA_TRAP_AUTHORITY",
-          "action": {
-            "type": "INCOMING_INTENT",
-            "kind": "TRAP_CONTROL"
-          },
-          "intentUntil": 5181.058999999999,
-          "intentProtected": true,
-          "futureOutcomePrecomputed": false
-        },
-        "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
-        "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
-        "events": [
-          {
-            "t": 5180,
-            "type": "PASS",
-            "actorId": "H-LCM",
-            "targetId": "H-ST",
-            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
-          },
-          {
-            "t": 5180,
-            "type": "USER_CHOICE",
-            "actorId": null,
-            "targetId": null,
-            "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
-          }
-        ],
-        "futureOutcomePrecomputed": false
-      }
-    },
-    {
-      "name": "explicit-hero-actually-receives-after-trap",
-      "ok": false,
-      "detail": {
-        "explicit": true,
-        "valid": true,
-        "applied": {
-          "ok": true,
-          "kind": "INCOMING_BALL",
-          "choice": "TRAP_CONTROL",
-          "requestedTargetId": null,
-          "targetId": null,
-          "inputSource": "QA_TRAP_AUTHORITY",
-          "action": {
-            "type": "INCOMING_INTENT",
-            "kind": "TRAP_CONTROL"
-          },
-          "intentUntil": 5181.058999999999,
-          "intentProtected": true,
-          "futureOutcomePrecomputed": false
-        },
-        "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
-        "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
-        "events": [
-          {
-            "t": 5180,
-            "type": "PASS",
-            "actorId": "H-LCM",
-            "targetId": "H-ST",
-            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
-          },
-          {
-            "t": 5180,
-            "type": "USER_CHOICE",
-            "actorId": null,
-            "targetId": null,
-            "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
-          }
-        ],
-        "futureOutcomePrecomputed": false
-      }
-    },
-    {
-      "name": "explicit-no-unchosen-material-action",
-      "ok": false,
-      "detail": {
-        "explicit": true,
-        "valid": true,
-        "applied": {
-          "ok": true,
-          "kind": "INCOMING_BALL",
-          "choice": "TRAP_CONTROL",
-          "requestedTargetId": null,
-          "targetId": null,
-          "inputSource": "QA_TRAP_AUTHORITY",
-          "action": {
-            "type": "INCOMING_INTENT",
-            "kind": "TRAP_CONTROL"
-          },
-          "intentUntil": 5181.058999999999,
-          "intentProtected": true,
-          "futureOutcomePrecomputed": false
-        },
-        "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
-        "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
-        "events": [
-          {
-            "t": 5180,
-            "type": "PASS",
-            "actorId": "H-LCM",
-            "targetId": "H-ST",
-            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
-          },
-          {
-            "t": 5180,
-            "type": "USER_CHOICE",
-            "actorId": null,
-            "targetId": null,
-            "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
-          }
-        ],
-        "futureOutcomePrecomputed": false
-      }
-    },
-    {
-      "name": "explicit-next-choice-before-ai-action",
-      "ok": false,
-      "detail": {
-        "explicit": true,
-        "valid": true,
-        "applied": {
-          "ok": true,
-          "kind": "INCOMING_BALL",
-          "choice": "TRAP_CONTROL",
-          "requestedTargetId": null,
-          "targetId": null,
-          "inputSource": "QA_TRAP_AUTHORITY",
-          "action": {
-            "type": "INCOMING_INTENT",
-            "kind": "TRAP_CONTROL"
-          },
-          "intentUntil": 5181.058999999999,
-          "intentProtected": true,
-          "futureOutcomePrecomputed": false
-        },
-        "chosenAt": 5180,
-        "heroReceived": false,
-        "receiveAt": null,
-        "nextPendingAt": null,
-        "autoMaterial": null,
-        "lockAtReceive": null,
-        "pending": null,
-        "events": [
-          {
-            "t": 5180,
-            "type": "PASS",
-            "actorId": "H-LCM",
-            "targetId": "H-ST",
-            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
-          },
-          {
-            "t": 5180,
-            "type": "USER_CHOICE",
-            "actorId": null,
-            "targetId": null,
-            "text": "H-ST: TRAP_CONTROL"
-          },
-          {
-            "t": 5180.05,
-            "type": "OFFSIDE",
-            "actorId": null,
-            "targetId": null,
-            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
-          }
-        ],
-        "futureOutcomePrecomputed": false
-      }
-    }
-  ],
+  "failures": [],
   "cases": {
     "episode": {
       "explicit": false,
@@ -889,12 +884,51 @@
         "futureOutcomePrecomputed": false
       },
       "chosenAt": 5180,
-      "heroReceived": false,
-      "receiveAt": null,
-      "nextPendingAt": null,
+      "heroReceived": true,
+      "receiveAt": 5180.600000000002,
+      "nextPendingAt": 5185.200000000019,
       "autoMaterial": null,
-      "lockAtReceive": null,
-      "pending": null,
+      "offside": false,
+      "lockAtReceive": {
+        "interactive": {
+          "active": true,
+          "playerId": "H-ST",
+          "episodeId": "STEP40-1",
+          "sceneId": "STEP40-1",
+          "armedAt": 5180
+        },
+        "explicit": false,
+        "deferred": null
+      },
+      "pending": {
+        "kind": "ON_BALL",
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW"
+          ],
+          [
+            "SWITCH_PASS",
+            "H-LW"
+          ],
+          [
+            "SHOT",
+            null
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RW"
+          ],
+          [
+            "CARRY",
+            null
+          ]
+        ]
+      },
       "events": [
         {
           "t": 5180,
@@ -909,13 +943,6 @@
           "actorId": null,
           "targetId": null,
           "text": "H-ST: TRAP_CONTROL"
-        },
-        {
-          "t": 5180.05,
-          "type": "OFFSIDE",
-          "actorId": null,
-          "targetId": null,
-          "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
         }
       ],
       "futureOutcomePrecomputed": false
@@ -939,12 +966,51 @@
         "futureOutcomePrecomputed": false
       },
       "chosenAt": 5180,
-      "heroReceived": false,
-      "receiveAt": null,
-      "nextPendingAt": null,
+      "heroReceived": true,
+      "receiveAt": 5180.600000000002,
+      "nextPendingAt": 5185.200000000019,
       "autoMaterial": null,
-      "lockAtReceive": null,
-      "pending": null,
+      "offside": false,
+      "lockAtReceive": {
+        "interactive": {
+          "active": true,
+          "playerId": "H-ST",
+          "episodeId": "STEP40-1",
+          "sceneId": "STEP40-1",
+          "armedAt": 5180
+        },
+        "explicit": true,
+        "deferred": null
+      },
+      "pending": {
+        "kind": "ON_BALL",
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW"
+          ],
+          [
+            "SWITCH_PASS",
+            "H-LW"
+          ],
+          [
+            "SHOT",
+            null
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RW"
+          ],
+          [
+            "CARRY",
+            null
+          ]
+        ]
+      },
       "events": [
         {
           "t": 5180,
@@ -959,13 +1025,6 @@
           "actorId": null,
           "targetId": null,
           "text": "H-ST: TRAP_CONTROL"
-        },
-        {
-          "t": 5180.05,
-          "type": "OFFSIDE",
-          "actorId": null,
-          "targetId": null,
-          "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
         }
       ],
       "futureOutcomePrecomputed": false
