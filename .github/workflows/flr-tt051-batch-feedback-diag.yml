@@ -1,0 +1,62 @@
+name: FLR TT051 Batch Feedback Diagnostics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/tt051-batch-feedback-diag-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-tt051-batch-feedback-diag
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fetch 7 reports and extract focused diagnostics
+        id: diag
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/flr_batch
+          for rid in \
+            tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8 \
+            tt051-cc852f58-6718-4b71-9e39-bc67abd66574 \
+            tt051-53de8a05-f3f4-465c-9780-e51d381d66f8 \
+            tt051-ac85275c-b6a0-465c-851f-53296142d471 \
+            tt051-81ee7089-fc98-4f05-99d2-b7f1b1fa7a3e \
+            tt051-259e1218-0586-4693-af88-7adfb22b6fc3 \
+            tt051-e418816c-7d1e-434e-9c09-1c740879b08e; do
+            curl --max-time 30 -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/TT-0.51/${rid}.json" > "/tmp/flr_batch/${rid}.json"
+          done
+          python .flr/tt051_batch_feedback_diag.py /tmp/flr_batch/*.json > /tmp/flr_batch_feedback_diag.json
+      - name: Record result safely
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.diag.outcome }}
+        run: |
+          set +e
+          if [ "${OUTCOME}" != success ] || [ ! -s /tmp/flr_batch_feedback_diag.json ]; then
+            printf '{"schemaVersion":"FLR_TT051_BATCH_FEEDBACK_DIAG_1.0","status":"FAILED","reports":[]}\n' > /tmp/flr_batch_feedback_diag.json
+          fi
+          git config user.name 'FLR Batch Feedback Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/flr_batch_feedback_diag.json .flr/tt051-batch-feedback-diag.json
+          git add .flr/tt051-batch-feedback-diag.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record TT-0.51 batch feedback diagnostics' || exit 0
+          git push origin HEAD:main || exit 0
