@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: flr-d1-report-audit
+  cancel-in-progress: false
+
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -34,7 +38,6 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          mkdir -p .flr
           npx --yes wrangler@latest d1 list --json > /tmp/flr_d1_list.json
           dbid="$(python -c "import json; j=json.load(open('/tmp/flr_d1_list.json',encoding='utf-8')); print(next(((r.get('uuid') or r.get('id') or '') for r in j if r.get('name')=='flr-bug-reports'),''))")"
           test -n "$dbid"
@@ -50,23 +53,35 @@ jobs:
           else
             printf '{}\n' > /tmp/flr_latest_report.json
           fi
-          python -c "import json,pathlib; q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); assert q.get('success') is True; rows=((q.get('result') or [{}])[0].get('results') or []); d=json.load(open('/tmp/flr_latest_report.json',encoding='utf-8')); cur=d.get('currentSituation'); prev=d.get('previousSituation'); slim={'schemaVersion':'FLR_D1_REPORT_AUDIT_1.1','status':'PASS','count':len(rows),'reports':rows,'latestBundle':{'schemaVersion':d.get('schemaVersion'),'scope':d.get('scope'),'bugReportContext':d.get('bugReportContext'),'currentSituationPresent':cur is not None,'previousSituationPresent':prev is not None,'currentSituationKeys':list(cur.keys()) if isinstance(cur,dict) else [],'previousSituationKeys':list(prev.keys()) if isinstance(prev,dict) else [],'currentReportScope':cur.get('reportScope') if isinstance(cur,dict) else None,'previousReportScope':prev.get('reportScope') if isinstance(prev,dict) else None,'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0}}; pathlib.Path('.flr/d1-report-audit-status.json').write_text(json.dumps(slim,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')"
+          python -c "import json,pathlib; q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); assert q.get('success') is True; rows=((q.get('result') or [{}])[0].get('results') or []); d=json.load(open('/tmp/flr_latest_report.json',encoding='utf-8')); cur=d.get('currentSituation'); prev=d.get('previousSituation'); slim={'schemaVersion':'FLR_D1_REPORT_AUDIT_1.2','status':'PASS','count':len(rows),'reports':rows,'latestBundle':{'schemaVersion':d.get('schemaVersion'),'scope':d.get('scope'),'bugReportContext':d.get('bugReportContext'),'currentSituationPresent':cur is not None,'previousSituationPresent':prev is not None,'currentSituationKeys':list(cur.keys()) if isinstance(cur,dict) else [],'previousSituationKeys':list(prev.keys()) if isinstance(prev,dict) else [],'currentReportScope':cur.get('reportScope') if isinstance(cur,dict) else None,'previousReportScope':prev.get('reportScope') if isinstance(prev,dict) else None,'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0}}; pathlib.Path('/tmp/flr_d1_report_status.json').write_text(json.dumps(slim,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')"
 
-      - name: Record audit result
+      - name: Record audit result without failing notification
         if: always()
+        continue-on-error: true
         shell: bash
         env:
           OUTCOME: ${{ steps.audit.outcome }}
         run: |
-          set -euo pipefail
-          if [ "${OUTCOME}" != 'success' ]; then
-            printf '{"schemaVersion":"FLR_D1_REPORT_AUDIT_1.1","status":"FAILED","count":0,"reports":[]}\n' > .flr/d1-report-audit-status.json
+          set +e
+          if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_d1_report_status.json ]; then
+            printf '{"schemaVersion":"FLR_D1_REPORT_AUDIT_1.2","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_d1_report_status.json
           fi
           git config user.name 'FLR D1 Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git pull --rebase origin main
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          mkdir -p .flr
+          cp /tmp/flr_d1_report_status.json .flr/d1-report-audit-status.json
           git add .flr/d1-report-audit-status.json
-          git diff --cached --quiet || {
-            git commit -m 'Record latest FLR D1 bug reports'
-            git push origin HEAD:main
-          }
+          if git diff --cached --quiet; then
+            echo 'AUDIT_STATUS_UNCHANGED'
+            exit 0
+          fi
+          git commit -m 'Record latest FLR D1 bug reports' || exit 0
+          for attempt in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            sleep 2
+            git pull --rebase origin main || git rebase --abort || true
+          done
+          echo '::warning::D1 audit result could not be pushed; suppressing workflow failure email.'
+          exit 0
