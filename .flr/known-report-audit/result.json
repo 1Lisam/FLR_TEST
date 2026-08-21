@@ -1,0 +1,2987 @@
+{
+  "reports": [
+    {
+      "reportId": "tt051-cd014e0d-5a36-4adb-8133-77e1f536f0e1",
+      "fetchOk": true,
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "scope": {
+        "currentSituation": true,
+        "previousSituation": true,
+        "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
+        "olderSituationsIncluded": false
+      },
+      "bugReportContext": {
+        "reportId": "tt051-cd014e0d-5a36-4adb-8133-77e1f536f0e1",
+        "build": "TT-0.51",
+        "step": 78,
+        "description": "이 선택지 이전에서 \n\n30' · 선택 2회\n안전한 패스 → 같은 팀 RCM → 소유권 변화\n\n인데 골을 넣고 바뀐것이라 소유권 변화 라고 적기 보다는 득점 이라고 적는게 나을거 같아.",
+        "category": "패스/공격",
+        "priority": 3,
+        "reportedAt": "2026-08-21T00:36:26.083Z"
+      },
+      "currentSituation": {
+        "scope": {
+          "startSecond": 1924.5999999999378,
+          "endSecond": 1924.5999999999378,
+          "cumulativeMatchHistoryIncluded": false,
+          "keepsFullSituationFrames": true
+        },
+        "selectedChoice": null,
+        "choiceSteps": [],
+        "actualResult": null,
+        "actualResults": [],
+        "actualEventsCount": 2,
+        "actualEventsTail": [
+          {
+            "t": 1924.8999999999376,
+            "type": "PASS",
+            "text": "블루팀 CM이 블루팀 RCM 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-CM",
+            "team": "HOME",
+            "targetId": "H-RCM",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1928.1999999999346,
+            "type": "PASS",
+            "text": "블루팀 RCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-RCM",
+            "team": "HOME",
+            "targetId": "H-ST",
+            "passKind": "PASS"
+          }
+        ],
+        "episodeFrameCount": 0,
+        "firstFrameTime": null,
+        "lastFrameTime": null,
+        "boundary": {
+          "id": "HW0006",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "sceneId": "HW0006",
+          "atSecond": 1924.5999999999378,
+          "sourceEventId": "PROMOTE-E00365",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "heroPlayerId": "H-ST",
+          "heroRole": "ST",
+          "heroTeam": "HOME",
+          "stateSnapshot": {
+            "second": 1924.5999999999378,
+            "score": {
+              "HOME": 1,
+              "AWAY": 1
+            },
+            "possession": "HOME",
+            "zone": "MIDFIELD",
+            "phase": "PROGRESSION",
+            "danger": 0.14125444911243387,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.5368580445011611,
+              "ownerId": "H-CM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 54.696068357210606,
+                "lineHeight": 55,
+                "transitionDebt": 0.13616850431161662
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.99054063577205,
+                "lineHeight": 45,
+                "transitionDebt": 0.08399645695395375
+              }
+            }
+          },
+          "preContext": [
+            {
+              "id": "E00356",
+              "t": 1878.5999999999378,
+              "minute": 31.31,
+              "kind": "TURNOVER_DANGER",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "TRANSITION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "wonFrom": "AWAY",
+                "progress": 0.08,
+                "danger": 0.5768621102664621
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.577,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.08,
+                  "ownerId": "H-CM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.419823995791376,
+                    "lineHeight": 44.7607055939734,
+                    "transitionDebt": 0.300276
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.36468124180101,
+                    "lineHeight": 56.27779586240649,
+                    "transitionDebt": 0.3048624
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00357",
+              "t": 1880.5999999999378,
+              "minute": 31.34,
+              "kind": "PROGRESS",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": "H-RCM",
+                "targetRole": "CM",
+                "progress": 0.22724490448227153,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.22724490448227153,
+                  "ownerId": "H-RCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.960699311457574,
+                    "lineHeight": 55.75072930380702,
+                    "transitionDebt": 0.42139872
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.77702924818732,
+                    "lineHeight": 45.979984901845455,
+                    "transitionDebt": 0.40832092799999997
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00358",
+              "t": 1884.5999999999378,
+              "minute": 31.41,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-RB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.2583285529636778,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.2583285529636778,
+                  "ownerId": "H-RB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.258909843629226,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.3286070784
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.01378677994944,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.30281106816
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00359",
+              "t": 1889.5999999999378,
+              "minute": 31.49,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.2975781744625419,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.2975781744625419,
+                  "ownerId": "H-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.64955158275552,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.261797096448
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.83908528252505,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.22684396907519996
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00360",
+              "t": 1899.5999999999378,
+              "minute": 31.66,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.3318030662690289,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.3318030662690289,
+                  "ownerId": "H-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.23080086451955,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.21369390944255998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.22126326174475,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.17214765773414395
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00361",
+              "t": 1906.5999999999378,
+              "minute": 31.78,
+              "kind": "DANGEROUS_PASS",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "targetId": "H-RCM",
+                "targetRole": "CM",
+                "progress": 0.46859005992091257,
+                "lane": "CENTER",
+                "danger": 0.16281011225404213
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.163,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.46859005992091257,
+                  "ownerId": "H-RCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.86541333934292,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.17905961479864319
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.70154104544781,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.13276631356858365
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00362",
+              "t": 1918.5999999999378,
+              "minute": 31.98,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-RB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.4947513994607143,
+                "lane": "RIGHT",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "RIGHT",
+                  "progress": 0.4947513994607143,
+                  "ownerId": "H-RB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.384616383584216,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.1541229226550231
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.58689832664095,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.10441174576938021
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00363",
+              "t": 1924.5999999999378,
+              "minute": 32.08,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.5368580445011611,
+                "lane": "CENTER",
+                "danger": 0.14125444911243387
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.141,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.5368580445011611,
+                  "ownerId": "H-CM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.696068357210606,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.13616850431161662
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.99054063577205,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.08399645695395375
+                  }
+                }
+              }
+            }
+          ],
+          "futureOutcomePrecomputed": false,
+          "choicePrecomputed": false
+        }
+      },
+      "previousSituation": {
+        "scope": {
+          "startSecond": 1817.999999999953,
+          "endSecond": 1825.2999999999463,
+          "cumulativeMatchHistoryIncluded": false,
+          "keepsFullSituationFrames": true
+        },
+        "selectedChoice": null,
+        "choiceSteps": [],
+        "actualResult": null,
+        "actualResults": [],
+        "actualEventsCount": 5,
+        "actualEventsTail": [
+          {
+            "t": 1819.099999999952,
+            "type": "PASS",
+            "text": "레드팀 LW이 레드팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-LW",
+            "team": "AWAY",
+            "targetId": "A-ST",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1820.5999999999506,
+            "type": "PASS",
+            "text": "레드팀 ST이 레드팀 RCM 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-ST",
+            "team": "AWAY",
+            "targetId": "A-RCM",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1822.1999999999491,
+            "type": "PASS",
+            "text": "레드팀 RCM이 레드팀 RW 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-RCM",
+            "team": "AWAY",
+            "targetId": "A-RW",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1824.599999999947,
+            "type": "SHOT",
+            "text": "레드팀 RW이 감아차기을 시도합니다.",
+            "actorId": "A-RW",
+            "team": "AWAY",
+            "turningShot": false
+          },
+          {
+            "t": 1825.2999999999463,
+            "type": "GOAL",
+            "text": "레드팀 RW이 페널티지역 앞쪽에서 시도한 감아찬 슈팅이 골문 왼쪽 골망 안으로 들어갑니다. 1-1",
+            "actorId": "A-RW",
+            "team": "AWAY"
+          }
+        ],
+        "episodeFrameCount": 74,
+        "firstFrameTime": 1817.999999999953,
+        "lastFrameTime": 1825.2999999999463,
+        "boundary": {
+          "id": "NS0009",
+          "type": "NON_HERO_SHOT_2D_WINDOW",
+          "sceneId": "NS0009",
+          "atSecond": 1817.999999999953,
+          "sourceEventId": null,
+          "reason": "NON_HERO_SHOT",
+          "shot": {
+            "team": "AWAY",
+            "shooterId": "A-LW",
+            "quality": 0.6502482851768284,
+            "fromZone": "BOX"
+          },
+          "heroPlayerId": "H-ST",
+          "heroRole": "ST",
+          "heroTeam": "HOME",
+          "stateSnapshot": {
+            "second": 1817.999999999953,
+            "score": {
+              "HOME": 1,
+              "AWAY": 0
+            },
+            "possession": "AWAY",
+            "zone": "BOX",
+            "phase": "CHANCE",
+            "danger": 0.6502482851768284,
+            "ball": {
+              "team": "AWAY",
+              "lane": "LEFT",
+              "progress": 0.99,
+              "ownerId": "A-LW"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.441587242065,
+                "lineHeight": 45,
+                "transitionDebt": 0.08692732799999997
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.66527822823264,
+                "lineHeight": 55,
+                "transitionDebt": 0.12359231999999998
+              }
+            }
+          },
+          "preContext": [
+            {
+              "id": "E00328",
+              "t": 1799.8999999999548,
+              "minute": 30,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6174999927654862
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.617,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.58112384332344,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.06023352683519998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 57.25851634843275,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.10741425868799998
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00329",
+              "t": 1807.8999999999548,
+              "minute": 30.13,
+              "kind": "PROGRESS",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LCM",
+                "actorRole": "CM",
+                "targetId": "A-LB",
+                "targetRole": "FB",
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6762846175134182
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.676,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 48.00355337560177,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.05218813932134399
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 57.2464290370699,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.10253826625535999
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-1",
+              "t": 1809.4999999999534,
+              "minute": 30.16,
+              "kind": "HIGH_RES_LOOSE",
+              "team": null,
+              "zone": "FINAL_THIRD",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "블루팀 RCB과 레드팀 ST의 경합으로 공이 흘렀습니다.",
+                "sourceType": "LOOSE",
+                "actorId": null,
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4369909593695483,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.8799921385822159,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.209670129069245,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.65468887241035,
+                    "lineHeight": 39.49509381069964,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-2",
+              "t": 1809.899999999953,
+              "minute": 30.16,
+              "kind": "HIGH_RES_SHOT",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "레드팀 ST이 슈팅을 시도합니다.",
+                "sourceType": "SHOT",
+                "actorId": "A-ST",
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4380684769234855,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.8809291103682483,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.04908919330369,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 1,
+                    "backLineOccupancy": 4,
+                    "width": 56.00124182738688,
+                    "lineHeight": 41.62926051564387,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-3",
+              "t": 1809.999999999953,
+              "minute": 30.17,
+              "kind": "HIGH_RES_BLOCK",
+              "team": null,
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "블루팀 RCB이 슈팅 코스에 몸을 던져 막았습니다.",
+                "sourceType": "BLOCK",
+                "actorId": null,
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4669785894921778,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.9060683386888503,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.10808524462384,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 1,
+                    "backLineOccupancy": 4,
+                    "width": 55.81220215186497,
+                    "lineHeight": 42.188993353507676,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00333",
+              "t": 1811.999999999953,
+              "minute": 30.2,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LW",
+                "actorRole": "WF",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.94719961261788,
+                "lane": "LEFT",
+                "danger": 0.6011673113455056
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.601,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.94719961261788,
+                  "ownerId": "A-LW"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 48.30857421341352,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.13842
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.47966268612072,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.1548
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00334",
+              "t": 1813.999999999953,
+              "minute": 30.23,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6603276186361908
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.66,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.855601848103106,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.10848239999999998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.92606820492074,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.13665599999999997
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00335",
+              "t": 1817.999999999953,
+              "minute": 30.3,
+              "kind": "PROGRESS",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LB",
+                "actorRole": "FB",
+                "targetId": "A-LW",
+                "targetRole": "WF",
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6073961251154542
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.607,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LW"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.441587242065,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.08692732799999997
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.66527822823264,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.12359231999999998
+                  }
+                }
+              }
+            }
+          ],
+          "futureOutcomePrecomputed": false,
+          "choicePrecomputed": false
+        }
+      },
+      "topLevelKeys": [
+        "schemaVersion",
+        "scope",
+        "bugReportContext",
+        "currentSituation",
+        "previousSituation"
+      ]
+    },
+    {
+      "reportId": "tt051-16728bef-e746-46ca-ac22-316f269e59ed",
+      "fetchOk": true,
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "scope": {
+        "currentSituation": true,
+        "previousSituation": true,
+        "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
+        "olderSituationsIncluded": false
+      },
+      "bugReportContext": {
+        "reportId": "tt051-16728bef-e746-46ca-ac22-316f269e59ed",
+        "build": "TT-0.51",
+        "step": 78,
+        "description": "버그 리포트 창이 다른 곳을 터치하면 안꺼지게 해줘 이건 문서 작성인 부분이니 취소 버튼을 눌러야 꺼질 수 있게 해주고 지금 이런 버그리포트 처럼 굳이 JSON을 첨부 안해도 되는 상황이 있을 수 있으니 아래쪽에 JSON(경기상황) 첨부 체크 표시를 해줘 만약 굳이 이런 상황에서도 첨부를 해도 크게 무리가 없다는 판단이면 그대로 해도 되지만 같은 JSON이 여러개 등록 될 수 도 있을거 같네",
+        "category": "UI/다시보기",
+        "priority": 3,
+        "reportedAt": "2026-08-21T00:37:59.010Z"
+      },
+      "currentSituation": {
+        "scope": {
+          "startSecond": 1924.5999999999378,
+          "endSecond": 1924.5999999999378,
+          "cumulativeMatchHistoryIncluded": false,
+          "keepsFullSituationFrames": true
+        },
+        "selectedChoice": null,
+        "choiceSteps": [],
+        "actualResult": null,
+        "actualResults": [],
+        "actualEventsCount": 2,
+        "actualEventsTail": [
+          {
+            "t": 1924.8999999999376,
+            "type": "PASS",
+            "text": "블루팀 CM이 블루팀 RCM 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-CM",
+            "team": "HOME",
+            "targetId": "H-RCM",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1928.1999999999346,
+            "type": "PASS",
+            "text": "블루팀 RCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-RCM",
+            "team": "HOME",
+            "targetId": "H-ST",
+            "passKind": "PASS"
+          }
+        ],
+        "episodeFrameCount": 0,
+        "firstFrameTime": null,
+        "lastFrameTime": null,
+        "boundary": {
+          "id": "HW0006",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "sceneId": "HW0006",
+          "atSecond": 1924.5999999999378,
+          "sourceEventId": "PROMOTE-E00365",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "heroPlayerId": "H-ST",
+          "heroRole": "ST",
+          "heroTeam": "HOME",
+          "stateSnapshot": {
+            "second": 1924.5999999999378,
+            "score": {
+              "HOME": 1,
+              "AWAY": 1
+            },
+            "possession": "HOME",
+            "zone": "MIDFIELD",
+            "phase": "PROGRESSION",
+            "danger": 0.14125444911243387,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.5368580445011611,
+              "ownerId": "H-CM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 54.696068357210606,
+                "lineHeight": 55,
+                "transitionDebt": 0.13616850431161662
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.99054063577205,
+                "lineHeight": 45,
+                "transitionDebt": 0.08399645695395375
+              }
+            }
+          },
+          "preContext": [
+            {
+              "id": "E00356",
+              "t": 1878.5999999999378,
+              "minute": 31.31,
+              "kind": "TURNOVER_DANGER",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "TRANSITION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "wonFrom": "AWAY",
+                "progress": 0.08,
+                "danger": 0.5768621102664621
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.577,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.08,
+                  "ownerId": "H-CM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.419823995791376,
+                    "lineHeight": 44.7607055939734,
+                    "transitionDebt": 0.300276
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.36468124180101,
+                    "lineHeight": 56.27779586240649,
+                    "transitionDebt": 0.3048624
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00357",
+              "t": 1880.5999999999378,
+              "minute": 31.34,
+              "kind": "PROGRESS",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": "H-RCM",
+                "targetRole": "CM",
+                "progress": 0.22724490448227153,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.22724490448227153,
+                  "ownerId": "H-RCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.960699311457574,
+                    "lineHeight": 55.75072930380702,
+                    "transitionDebt": 0.42139872
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.77702924818732,
+                    "lineHeight": 45.979984901845455,
+                    "transitionDebt": 0.40832092799999997
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00358",
+              "t": 1884.5999999999378,
+              "minute": 31.41,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-RB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.2583285529636778,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.2583285529636778,
+                  "ownerId": "H-RB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.258909843629226,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.3286070784
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.01378677994944,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.30281106816
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00359",
+              "t": 1889.5999999999378,
+              "minute": 31.49,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.2975781744625419,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.2975781744625419,
+                  "ownerId": "H-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.64955158275552,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.261797096448
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.83908528252505,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.22684396907519996
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00360",
+              "t": 1899.5999999999378,
+              "minute": 31.66,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.3318030662690289,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.3318030662690289,
+                  "ownerId": "H-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.23080086451955,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.21369390944255998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.22126326174475,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.17214765773414395
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00361",
+              "t": 1906.5999999999378,
+              "minute": 31.78,
+              "kind": "DANGEROUS_PASS",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "targetId": "H-RCM",
+                "targetRole": "CM",
+                "progress": 0.46859005992091257,
+                "lane": "CENTER",
+                "danger": 0.16281011225404213
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.163,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.46859005992091257,
+                  "ownerId": "H-RCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.86541333934292,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.17905961479864319
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.70154104544781,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.13276631356858365
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00362",
+              "t": 1918.5999999999378,
+              "minute": 31.98,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-RB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.4947513994607143,
+                "lane": "RIGHT",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "RIGHT",
+                  "progress": 0.4947513994607143,
+                  "ownerId": "H-RB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.384616383584216,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.1541229226550231
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.58689832664095,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.10441174576938021
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00363",
+              "t": 1924.5999999999378,
+              "minute": 32.08,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.5368580445011611,
+                "lane": "CENTER",
+                "danger": 0.14125444911243387
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.141,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.5368580445011611,
+                  "ownerId": "H-CM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.696068357210606,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.13616850431161662
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.99054063577205,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.08399645695395375
+                  }
+                }
+              }
+            }
+          ],
+          "futureOutcomePrecomputed": false,
+          "choicePrecomputed": false
+        }
+      },
+      "previousSituation": {
+        "scope": {
+          "startSecond": 1817.999999999953,
+          "endSecond": 1825.2999999999463,
+          "cumulativeMatchHistoryIncluded": false,
+          "keepsFullSituationFrames": true
+        },
+        "selectedChoice": null,
+        "choiceSteps": [],
+        "actualResult": null,
+        "actualResults": [],
+        "actualEventsCount": 5,
+        "actualEventsTail": [
+          {
+            "t": 1819.099999999952,
+            "type": "PASS",
+            "text": "레드팀 LW이 레드팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-LW",
+            "team": "AWAY",
+            "targetId": "A-ST",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1820.5999999999506,
+            "type": "PASS",
+            "text": "레드팀 ST이 레드팀 RCM 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-ST",
+            "team": "AWAY",
+            "targetId": "A-RCM",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1822.1999999999491,
+            "type": "PASS",
+            "text": "레드팀 RCM이 레드팀 RW 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-RCM",
+            "team": "AWAY",
+            "targetId": "A-RW",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1824.599999999947,
+            "type": "SHOT",
+            "text": "레드팀 RW이 감아차기을 시도합니다.",
+            "actorId": "A-RW",
+            "team": "AWAY",
+            "turningShot": false
+          },
+          {
+            "t": 1825.2999999999463,
+            "type": "GOAL",
+            "text": "레드팀 RW이 페널티지역 앞쪽에서 시도한 감아찬 슈팅이 골문 왼쪽 골망 안으로 들어갑니다. 1-1",
+            "actorId": "A-RW",
+            "team": "AWAY"
+          }
+        ],
+        "episodeFrameCount": 74,
+        "firstFrameTime": 1817.999999999953,
+        "lastFrameTime": 1825.2999999999463,
+        "boundary": {
+          "id": "NS0009",
+          "type": "NON_HERO_SHOT_2D_WINDOW",
+          "sceneId": "NS0009",
+          "atSecond": 1817.999999999953,
+          "sourceEventId": null,
+          "reason": "NON_HERO_SHOT",
+          "shot": {
+            "team": "AWAY",
+            "shooterId": "A-LW",
+            "quality": 0.6502482851768284,
+            "fromZone": "BOX"
+          },
+          "heroPlayerId": "H-ST",
+          "heroRole": "ST",
+          "heroTeam": "HOME",
+          "stateSnapshot": {
+            "second": 1817.999999999953,
+            "score": {
+              "HOME": 1,
+              "AWAY": 0
+            },
+            "possession": "AWAY",
+            "zone": "BOX",
+            "phase": "CHANCE",
+            "danger": 0.6502482851768284,
+            "ball": {
+              "team": "AWAY",
+              "lane": "LEFT",
+              "progress": 0.99,
+              "ownerId": "A-LW"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.441587242065,
+                "lineHeight": 45,
+                "transitionDebt": 0.08692732799999997
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.66527822823264,
+                "lineHeight": 55,
+                "transitionDebt": 0.12359231999999998
+              }
+            }
+          },
+          "preContext": [
+            {
+              "id": "E00328",
+              "t": 1799.8999999999548,
+              "minute": 30,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6174999927654862
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.617,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.58112384332344,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.06023352683519998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 57.25851634843275,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.10741425868799998
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00329",
+              "t": 1807.8999999999548,
+              "minute": 30.13,
+              "kind": "PROGRESS",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LCM",
+                "actorRole": "CM",
+                "targetId": "A-LB",
+                "targetRole": "FB",
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6762846175134182
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.676,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 48.00355337560177,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.05218813932134399
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 57.2464290370699,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.10253826625535999
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-1",
+              "t": 1809.4999999999534,
+              "minute": 30.16,
+              "kind": "HIGH_RES_LOOSE",
+              "team": null,
+              "zone": "FINAL_THIRD",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "블루팀 RCB과 레드팀 ST의 경합으로 공이 흘렀습니다.",
+                "sourceType": "LOOSE",
+                "actorId": null,
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4369909593695483,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.8799921385822159,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.209670129069245,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.65468887241035,
+                    "lineHeight": 39.49509381069964,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-2",
+              "t": 1809.899999999953,
+              "minute": 30.16,
+              "kind": "HIGH_RES_SHOT",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "레드팀 ST이 슈팅을 시도합니다.",
+                "sourceType": "SHOT",
+                "actorId": "A-ST",
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4380684769234855,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.8809291103682483,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.04908919330369,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 1,
+                    "backLineOccupancy": 4,
+                    "width": 56.00124182738688,
+                    "lineHeight": 41.62926051564387,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-3",
+              "t": 1809.999999999953,
+              "minute": 30.17,
+              "kind": "HIGH_RES_BLOCK",
+              "team": null,
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "블루팀 RCB이 슈팅 코스에 몸을 던져 막았습니다.",
+                "sourceType": "BLOCK",
+                "actorId": null,
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4669785894921778,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.9060683386888503,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.10808524462384,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 1,
+                    "backLineOccupancy": 4,
+                    "width": 55.81220215186497,
+                    "lineHeight": 42.188993353507676,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00333",
+              "t": 1811.999999999953,
+              "minute": 30.2,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LW",
+                "actorRole": "WF",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.94719961261788,
+                "lane": "LEFT",
+                "danger": 0.6011673113455056
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.601,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.94719961261788,
+                  "ownerId": "A-LW"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 48.30857421341352,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.13842
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.47966268612072,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.1548
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00334",
+              "t": 1813.999999999953,
+              "minute": 30.23,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6603276186361908
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.66,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.855601848103106,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.10848239999999998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.92606820492074,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.13665599999999997
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00335",
+              "t": 1817.999999999953,
+              "minute": 30.3,
+              "kind": "PROGRESS",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LB",
+                "actorRole": "FB",
+                "targetId": "A-LW",
+                "targetRole": "WF",
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6073961251154542
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.607,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LW"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.441587242065,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.08692732799999997
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.66527822823264,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.12359231999999998
+                  }
+                }
+              }
+            }
+          ],
+          "futureOutcomePrecomputed": false,
+          "choicePrecomputed": false
+        }
+      },
+      "topLevelKeys": [
+        "schemaVersion",
+        "scope",
+        "bugReportContext",
+        "currentSituation",
+        "previousSituation"
+      ]
+    },
+    {
+      "reportId": "tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469",
+      "fetchOk": true,
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "scope": {
+        "currentSituation": true,
+        "previousSituation": true,
+        "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
+        "olderSituationsIncluded": false
+      },
+      "bugReportContext": {
+        "reportId": "tt051-6ca7c6f6-b9f6-4172-9946-9d7b75644469",
+        "build": "TT-0.51",
+        "step": 78,
+        "description": "현재 선택 전에 공격수는 안 움직이고 공격수하고 붙은 RCB는 발작이 난것만야 부들부들 떨어",
+        "category": "패스/공격",
+        "priority": 3,
+        "reportedAt": "2026-08-21T00:48:33.501Z"
+      },
+      "currentSituation": {
+        "scope": {
+          "startSecond": 1924.5999999999378,
+          "endSecond": 1933.4,
+          "cumulativeMatchHistoryIncluded": false,
+          "keepsFullSituationFrames": true
+        },
+        "selectedChoice": {
+          "id": "CARRY",
+          "targetId": null,
+          "targetName": null,
+          "family": "돌파",
+          "label": "공간 전진",
+          "meta": {
+            "space": 0.6799623584166028,
+            "pressure": 1.9932606641388166,
+            "clearRunway": false
+          },
+          "hint": "의도: 수비수에게 직접 1대1 승부를 걸기보다, 열려 있는 공간으로 공을 직접 운반합니다.\n관련 능력: 드리블, 볼 컨트롤, 가속\n위험: 보통\n성공하면: 빈 공간을 전진하며 다음 선택을 만들 수 있음\n실패하면: 공간이 닫히기 전에 판단하지 못하면 압박을 받을 수 있음",
+          "tooltip": "의도: 수비수에게 직접 1대1 승부를 걸기보다, 열려 있는 공간으로 공을 직접 운반합니다.\n관련 능력: 드리블, 볼 컨트롤, 가속\n위험: 보통\n성공하면: 빈 공간을 전진하며 다음 선택을 만들 수 있음\n실패하면: 공간이 닫히기 전에 판단하지 못하면 압박을 받을 수 있음"
+        },
+        "choiceSteps": [
+          {
+            "sceneId": "STEP40-1",
+            "selectedChoice": {
+              "at": 1930.1,
+              "id": "CARRY",
+              "label": "공간 전진",
+              "targetId": null,
+              "targetName": null,
+              "family": "돌파",
+              "applied": {
+                "ok": true,
+                "kind": "ON_BALL",
+                "choice": "CARRY",
+                "requestedTargetId": null,
+                "targetId": null,
+                "inputSource": "USER_UI_CLICK_IN_PITCH",
+                "action": {
+                  "type": "CARRY",
+                  "kind": null,
+                  "reason": "CANDIDATE_CARRY"
+                },
+                "intentUntil": 1933.2999999999329,
+                "intentProtected": true,
+                "futureOutcomePrecomputed": false
+              }
+            },
+            "result": {
+              "sceneId": "STEP40-1",
+              "at": 1933.4,
+              "choiceId": "CARRY",
+              "label": "공간 전진",
+              "targetId": null,
+              "targetName": null,
+              "family": "돌파",
+              "selectedChoice": {
+                "id": "CARRY",
+                "label": "공간 전진",
+                "targetId": null,
+                "targetName": null
+              },
+              "code": "POSSESSION_KEPT",
+              "headline": "전진 결과",
+              "detail": "공을 약 1.3m 운반했습니다. 공을 유지한 채 다음 판단 상태에 도달했습니다.",
+              "terminalEvent": null,
+              "events": [],
+              "score": {
+                "HOME": 1,
+                "AWAY": 1
+              },
+              "possession": "HOME",
+              "performanceImpact": {
+                "at": 1933.4,
+                "appearanceStatus": "STARTER",
+                "choiceId": "CARRY",
+                "resultCode": "POSSESSION_KEPT",
+                "reckless": false,
+                "saferOption": {
+                  "id": "SAFE_PASS",
+                  "targetId": "H-RCM",
+                  "targetName": "블루팀 RCM",
+                  "score": 1.411
+                },
+                "chosenScore": 1.351,
+                "ratingDelta": 0,
+                "rating": 6.5,
+                "substitutionPressureDelta": 0,
+                "substitutionPressure": 0,
+                "managerUsageTrustDelta": 0,
+                "managerUsageTrustTotal": 0,
+                "reason": "NO_PENALTY"
+              }
+            }
+          }
+        ],
+        "actualResult": {
+          "sceneId": "STEP40-1",
+          "at": 1933.4,
+          "choiceId": "CARRY",
+          "label": "공간 전진",
+          "targetId": null,
+          "targetName": null,
+          "family": "돌파",
+          "selectedChoice": {
+            "id": "CARRY",
+            "label": "공간 전진",
+            "targetId": null,
+            "targetName": null
+          },
+          "code": "POSSESSION_KEPT",
+          "headline": "전진 결과",
+          "detail": "공을 약 1.3m 운반했습니다. 공을 유지한 채 다음 판단 상태에 도달했습니다.",
+          "terminalEvent": null,
+          "events": [],
+          "score": {
+            "HOME": 1,
+            "AWAY": 1
+          },
+          "possession": "HOME",
+          "performanceImpact": {
+            "at": 1933.4,
+            "appearanceStatus": "STARTER",
+            "choiceId": "CARRY",
+            "resultCode": "POSSESSION_KEPT",
+            "reckless": false,
+            "saferOption": {
+              "id": "SAFE_PASS",
+              "targetId": "H-RCM",
+              "targetName": "블루팀 RCM",
+              "score": 1.411
+            },
+            "chosenScore": 1.351,
+            "ratingDelta": 0,
+            "rating": 6.5,
+            "substitutionPressureDelta": 0,
+            "substitutionPressure": 0,
+            "managerUsageTrustDelta": 0,
+            "managerUsageTrustTotal": 0,
+            "reason": "NO_PENALTY"
+          }
+        },
+        "actualResults": [
+          {
+            "sceneId": "STEP40-1",
+            "at": 1933.4,
+            "choiceId": "CARRY",
+            "label": "공간 전진",
+            "targetId": null,
+            "targetName": null,
+            "family": "돌파",
+            "selectedChoice": {
+              "id": "CARRY",
+              "label": "공간 전진",
+              "targetId": null,
+              "targetName": null
+            },
+            "code": "POSSESSION_KEPT",
+            "headline": "전진 결과",
+            "detail": "공을 약 1.3m 운반했습니다. 공을 유지한 채 다음 판단 상태에 도달했습니다.",
+            "terminalEvent": null,
+            "events": [],
+            "score": {
+              "HOME": 1,
+              "AWAY": 1
+            },
+            "possession": "HOME",
+            "performanceImpact": {
+              "at": 1933.4,
+              "appearanceStatus": "STARTER",
+              "choiceId": "CARRY",
+              "resultCode": "POSSESSION_KEPT",
+              "reckless": false,
+              "saferOption": {
+                "id": "SAFE_PASS",
+                "targetId": "H-RCM",
+                "targetName": "블루팀 RCM",
+                "score": 1.411
+              },
+              "chosenScore": 1.351,
+              "ratingDelta": 0,
+              "rating": 6.5,
+              "substitutionPressureDelta": 0,
+              "substitutionPressure": 0,
+              "managerUsageTrustDelta": 0,
+              "managerUsageTrustTotal": 0,
+              "reason": "NO_PENALTY"
+            }
+          }
+        ],
+        "actualEventsCount": 3,
+        "actualEventsTail": [
+          {
+            "t": 1924.8999999999376,
+            "type": "PASS",
+            "text": "블루팀 CM이 블루팀 RCM 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-CM",
+            "team": "HOME",
+            "targetId": "H-RCM",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1928.1999999999346,
+            "type": "PASS",
+            "text": "블루팀 RCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-RCM",
+            "team": "HOME",
+            "targetId": "H-ST",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1930.0999999999328,
+            "type": "USER_CHOICE",
+            "text": "H-ST: CARRY"
+          }
+        ],
+        "episodeFrameCount": 88,
+        "firstFrameTime": 1924.7,
+        "lastFrameTime": 1933.4,
+        "boundary": {
+          "id": "HW0006",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "sceneId": "HW0006",
+          "atSecond": 1924.5999999999378,
+          "sourceEventId": "PROMOTE-E00365",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "heroPlayerId": "H-ST",
+          "heroRole": "ST",
+          "heroTeam": "HOME",
+          "stateSnapshot": {
+            "second": 1924.5999999999378,
+            "score": {
+              "HOME": 1,
+              "AWAY": 1
+            },
+            "possession": "HOME",
+            "zone": "MIDFIELD",
+            "phase": "PROGRESSION",
+            "danger": 0.14125444911243387,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.5368580445011611,
+              "ownerId": "H-CM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 54.696068357210606,
+                "lineHeight": 55,
+                "transitionDebt": 0.13616850431161662
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.99054063577205,
+                "lineHeight": 45,
+                "transitionDebt": 0.08399645695395375
+              }
+            }
+          },
+          "preContext": [
+            {
+              "id": "E00356",
+              "t": 1878.5999999999378,
+              "minute": 31.31,
+              "kind": "TURNOVER_DANGER",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "TRANSITION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "wonFrom": "AWAY",
+                "progress": 0.08,
+                "danger": 0.5768621102664621
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.577,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.08,
+                  "ownerId": "H-CM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.419823995791376,
+                    "lineHeight": 44.7607055939734,
+                    "transitionDebt": 0.300276
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.36468124180101,
+                    "lineHeight": 56.27779586240649,
+                    "transitionDebt": 0.3048624
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00357",
+              "t": 1880.5999999999378,
+              "minute": 31.34,
+              "kind": "PROGRESS",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": "H-RCM",
+                "targetRole": "CM",
+                "progress": 0.22724490448227153,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.22724490448227153,
+                  "ownerId": "H-RCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.960699311457574,
+                    "lineHeight": 55.75072930380702,
+                    "transitionDebt": 0.42139872
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.77702924818732,
+                    "lineHeight": 45.979984901845455,
+                    "transitionDebt": 0.40832092799999997
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00358",
+              "t": 1884.5999999999378,
+              "minute": 31.41,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "OWN_THIRD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-RB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.2583285529636778,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.2583285529636778,
+                  "ownerId": "H-RB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.258909843629226,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.3286070784
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.01378677994944,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.30281106816
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00359",
+              "t": 1889.5999999999378,
+              "minute": 31.49,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "BUILD_UP",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.2975781744625419,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.2975781744625419,
+                  "ownerId": "H-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.64955158275552,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.261797096448
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.83908528252505,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.22684396907519996
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00360",
+              "t": 1899.5999999999378,
+              "minute": 31.66,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.3318030662690289,
+                "lane": "CENTER",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.3318030662690289,
+                  "ownerId": "H-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 55.23080086451955,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.21369390944255998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.22126326174475,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.17214765773414395
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00361",
+              "t": 1906.5999999999378,
+              "minute": 31.78,
+              "kind": "DANGEROUS_PASS",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "targetId": "H-RCM",
+                "targetRole": "CM",
+                "progress": 0.46859005992091257,
+                "lane": "CENTER",
+                "danger": 0.16281011225404213
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.163,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.46859005992091257,
+                  "ownerId": "H-RCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.86541333934292,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.17905961479864319
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 46.70154104544781,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.13276631356858365
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00362",
+              "t": 1918.5999999999378,
+              "minute": 31.98,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-RB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.4947513994607143,
+                "lane": "RIGHT",
+                "danger": 0.05
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.05,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "RIGHT",
+                  "progress": 0.4947513994607143,
+                  "ownerId": "H-RB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.384616383584216,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.1541229226550231
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.58689832664095,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.10441174576938021
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00363",
+              "t": 1924.5999999999378,
+              "minute": 32.08,
+              "kind": "RECYCLE",
+              "team": "HOME",
+              "zone": "MIDFIELD",
+              "phase": "PROGRESSION",
+              "detail": {
+                "actorId": "H-CM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.5368580445011611,
+                "lane": "CENTER",
+                "danger": 0.14125444911243387
+              },
+              "context": {
+                "possession": "HOME",
+                "danger": 0.141,
+                "ball": {
+                  "team": "HOME",
+                  "lane": "CENTER",
+                  "progress": 0.5368580445011611,
+                  "ownerId": "H-CM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.696068357210606,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.13616850431161662
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.99054063577205,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.08399645695395375
+                  }
+                }
+              }
+            }
+          ],
+          "futureOutcomePrecomputed": false,
+          "choicePrecomputed": false
+        }
+      },
+      "previousSituation": {
+        "scope": {
+          "startSecond": 1817.999999999953,
+          "endSecond": 1825.2999999999463,
+          "cumulativeMatchHistoryIncluded": false,
+          "keepsFullSituationFrames": true
+        },
+        "selectedChoice": null,
+        "choiceSteps": [],
+        "actualResult": null,
+        "actualResults": [],
+        "actualEventsCount": 5,
+        "actualEventsTail": [
+          {
+            "t": 1819.099999999952,
+            "type": "PASS",
+            "text": "레드팀 LW이 레드팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-LW",
+            "team": "AWAY",
+            "targetId": "A-ST",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1820.5999999999506,
+            "type": "PASS",
+            "text": "레드팀 ST이 레드팀 RCM 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-ST",
+            "team": "AWAY",
+            "targetId": "A-RCM",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1822.1999999999491,
+            "type": "PASS",
+            "text": "레드팀 RCM이 레드팀 RW 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "A-RCM",
+            "team": "AWAY",
+            "targetId": "A-RW",
+            "passKind": "PASS"
+          },
+          {
+            "t": 1824.599999999947,
+            "type": "SHOT",
+            "text": "레드팀 RW이 감아차기을 시도합니다.",
+            "actorId": "A-RW",
+            "team": "AWAY",
+            "turningShot": false
+          },
+          {
+            "t": 1825.2999999999463,
+            "type": "GOAL",
+            "text": "레드팀 RW이 페널티지역 앞쪽에서 시도한 감아찬 슈팅이 골문 왼쪽 골망 안으로 들어갑니다. 1-1",
+            "actorId": "A-RW",
+            "team": "AWAY"
+          }
+        ],
+        "episodeFrameCount": 74,
+        "firstFrameTime": 1817.999999999953,
+        "lastFrameTime": 1825.2999999999463,
+        "boundary": {
+          "id": "NS0009",
+          "type": "NON_HERO_SHOT_2D_WINDOW",
+          "sceneId": "NS0009",
+          "atSecond": 1817.999999999953,
+          "sourceEventId": null,
+          "reason": "NON_HERO_SHOT",
+          "shot": {
+            "team": "AWAY",
+            "shooterId": "A-LW",
+            "quality": 0.6502482851768284,
+            "fromZone": "BOX"
+          },
+          "heroPlayerId": "H-ST",
+          "heroRole": "ST",
+          "heroTeam": "HOME",
+          "stateSnapshot": {
+            "second": 1817.999999999953,
+            "score": {
+              "HOME": 1,
+              "AWAY": 0
+            },
+            "possession": "AWAY",
+            "zone": "BOX",
+            "phase": "CHANCE",
+            "danger": 0.6502482851768284,
+            "ball": {
+              "team": "AWAY",
+              "lane": "LEFT",
+              "progress": 0.99,
+              "ownerId": "A-LW"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.441587242065,
+                "lineHeight": 45,
+                "transitionDebt": 0.08692732799999997
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.66527822823264,
+                "lineHeight": 55,
+                "transitionDebt": 0.12359231999999998
+              }
+            }
+          },
+          "preContext": [
+            {
+              "id": "E00328",
+              "t": 1799.8999999999548,
+              "minute": 30,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LB",
+                "actorRole": "FB",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6174999927654862
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.617,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.58112384332344,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.06023352683519998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 57.25851634843275,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.10741425868799998
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00329",
+              "t": 1807.8999999999548,
+              "minute": 30.13,
+              "kind": "PROGRESS",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LCM",
+                "actorRole": "CM",
+                "targetId": "A-LB",
+                "targetRole": "FB",
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6762846175134182
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.676,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LB"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 48.00355337560177,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.05218813932134399
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 57.2464290370699,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.10253826625535999
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-1",
+              "t": 1809.4999999999534,
+              "minute": 30.16,
+              "kind": "HIGH_RES_LOOSE",
+              "team": null,
+              "zone": "FINAL_THIRD",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "블루팀 RCB과 레드팀 ST의 경합으로 공이 흘렀습니다.",
+                "sourceType": "LOOSE",
+                "actorId": null,
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4369909593695483,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.8799921385822159,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.209670129069245,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.65468887241035,
+                    "lineHeight": 39.49509381069964,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-2",
+              "t": 1809.899999999953,
+              "minute": 30.16,
+              "kind": "HIGH_RES_SHOT",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "레드팀 ST이 슈팅을 시도합니다.",
+                "sourceType": "SHOT",
+                "actorId": "A-ST",
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4380684769234855,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.8809291103682483,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.04908919330369,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 1,
+                    "backLineOccupancy": 4,
+                    "width": 56.00124182738688,
+                    "lineHeight": 41.62926051564387,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "HR-14-3",
+              "t": 1809.999999999953,
+              "minute": 30.17,
+              "kind": "HIGH_RES_BLOCK",
+              "team": null,
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "text": "블루팀 RCB이 슈팅 코스에 몸을 던져 막았습니다.",
+                "sourceType": "BLOCK",
+                "actorId": null,
+                "targetId": null,
+                "score": {
+                  "HOME": 1,
+                  "AWAY": 0
+                },
+                "causalFrame": true
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.4669785894921778,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.9060683386888503,
+                  "ownerId": null
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.10808524462384,
+                    "lineHeight": 22,
+                    "transitionDebt": 0.18
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 1,
+                    "backLineOccupancy": 4,
+                    "width": 55.81220215186497,
+                    "lineHeight": 42.188993353507676,
+                    "transitionDebt": 0.18
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00333",
+              "t": 1811.999999999953,
+              "minute": 30.2,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LW",
+                "actorRole": "WF",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.94719961261788,
+                "lane": "LEFT",
+                "danger": 0.6011673113455056
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.601,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.94719961261788,
+                  "ownerId": "A-LW"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 48.30857421341352,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.13842
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.47966268612072,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.1548
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00334",
+              "t": 1813.999999999953,
+              "minute": 30.23,
+              "kind": "RECYCLE",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LCM",
+                "actorRole": "CM",
+                "targetId": null,
+                "targetRole": null,
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6603276186361908
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.66,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LCM"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 45.855601848103106,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.10848239999999998
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 54.92606820492074,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.13665599999999997
+                  }
+                }
+              }
+            },
+            {
+              "id": "E00335",
+              "t": 1817.999999999953,
+              "minute": 30.3,
+              "kind": "PROGRESS",
+              "team": "AWAY",
+              "zone": "BOX",
+              "phase": "CHANCE",
+              "detail": {
+                "actorId": "A-LB",
+                "actorRole": "FB",
+                "targetId": "A-LW",
+                "targetRole": "WF",
+                "progress": 0.99,
+                "lane": "LEFT",
+                "danger": 0.6073961251154542
+              },
+              "context": {
+                "possession": "AWAY",
+                "danger": 0.607,
+                "ball": {
+                  "team": "AWAY",
+                  "lane": "LEFT",
+                  "progress": 0.99,
+                  "ownerId": "A-LW"
+                },
+                "structure": {
+                  "HOME": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 47.441587242065,
+                    "lineHeight": 45,
+                    "transitionDebt": 0.08692732799999997
+                  },
+                  "AWAY": {
+                    "midfieldOccupancy": 3,
+                    "backLineOccupancy": 4,
+                    "width": 56.66527822823264,
+                    "lineHeight": 55,
+                    "transitionDebt": 0.12359231999999998
+                  }
+                }
+              }
+            }
+          ],
+          "futureOutcomePrecomputed": false,
+          "choicePrecomputed": false
+        }
+      },
+      "topLevelKeys": [
+        "schemaVersion",
+        "scope",
+        "bugReportContext",
+        "currentSituation",
+        "previousSituation"
+      ]
+    }
+  ]
+}
