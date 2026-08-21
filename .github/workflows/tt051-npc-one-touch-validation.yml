@@ -1,0 +1,35 @@
+name: TT051 NPC One Touch Validation
+on:
+  push:
+    branches: [tt051-npc-one-touch-candidate]
+    paths:
+      - '.github/workflows/tt051-npc-one-touch-validation.yml'
+      - '.flr/tt051_npc_one_touch_apply.py'
+      - '.flr/tt051_npc_one_touch_validation.js'
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply candidate locally
+        run: |
+          mkdir -p /tmp/flr-npc-one-touch
+          cp -a . /tmp/flr-npc-one-touch/repo
+          python .flr/tt051_npc_one_touch_apply.py /tmp/flr-npc-one-touch/repo
+          node --check /tmp/flr-npc-one-touch/repo/runtime/continuous_match_core.js
+      - name: Validate
+        shell: bash
+        run: |
+          set +e
+          node .flr/tt051_npc_one_touch_validation.js /tmp/flr-npc-one-touch/repo > .flr/tt051-npc-one-touch-result.json
+          echo "$?" > .flr/tt051-npc-one-touch-exit.txt
+          exit 0
+      - name: Persist result
+        run: |
+          git config user.name "FLR NPC Touch QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add .flr/tt051-npc-one-touch-result.json .flr/tt051-npc-one-touch-exit.txt
+          git diff --cached --quiet || { git commit -m "Record TT-0.51 NPC one-touch validation"; git push origin HEAD:tt051-npc-one-touch-candidate; }
