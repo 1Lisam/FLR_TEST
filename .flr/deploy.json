@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "FLR_TT_VALIDATED_DEPLOY_1.0",
+  "fromBuild": "TT-0.51",
+  "toBuild": "TT-0.51-D1-LIVE-ENTRY",
+  "baseCommit": "626e9203191ffd353f7b99e0099d203b16877a6a",
+  "validationStatus": "PASS_FOR_USER_VISUAL_RETEST",
+  "step79Started": false,
+  "patchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
+  "changedFiles": [
+    ".github/workflows/flr-cloudflare-bug-reporter.yml",
+    "bug-report-worker/schema.sql",
+    "bug-report-worker/worker.js",
+    "bug-report-worker/wrangler.toml",
+    "live_v06_scene_authority_browser.js"
+  ],
+  "commitMessage": "Deploy TT-0.51 D1 reports and live entry context"
+}
