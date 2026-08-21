@@ -1,18 +1,16 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-NPC-ONE-TOUCH",
-  "candidateBranch": "tt051-npc-one-touch-candidate",
+  "version": "TT-0.51-SHOOT-AUDIT-V2",
+  "candidateBranch": "tt051-shoot-audit-v2",
   "baselineRef": "main",
-  "applyScripts": [
-    ".flr/tt051_npc_one_touch_apply.py"
-  ],
-  "validationScript": ".flr/tt051_npc_one_touch_validation.js",
+  "applyScripts": [],
+  "validationScript": ".flr/tt051_shoot_audit_v2.js",
   "changedFiles": [
     "runtime/continuous_match_core.js"
   ],
   "syntaxChecks": [
     "runtime/continuous_match_core.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-npc-one-touch",
-  "runNonce": "2026-08-21T13:56+09:00-npc-one-touch"
+  "resultDir": ".flr/qa-results/TT-0.51-shoot-audit-v2",
+  "runNonce": "2026-08-21T14:02+09:00-shoot-priority-100-corrected"
 }
