@@ -87,7 +87,7 @@ needle="""  // A real, unblocked pass option must not disappear merely because t
 insert="""  // PLAYER risk floor: preserve a marginal-offside / contested attacking pass when the
   // geometry is still executable. Do not display an offside badge or probability: the player
   // reads the line from the scene and the actual law is resolved at ball release.
-  const riskyPhysical=ranked.filter(c=>c.id==='AVAILABLE_PASS'&&(c.meta?.offsideRisk||c.meta?.laneBlockers>0||c.meta?.contested)&&Number(c.meta?.forward??-99)>0).sort((a,b)=>(Number(b.meta?.offsideRisk)-Number(a.meta?.offsideRisk))+(Number(b.meta?.forward||0)-Number(a.meta?.forward||0))*.03).slice(0,2);
+  const riskyPhysical=ranked.filter(c=>(c.id==='AVAILABLE_PASS'||(c.id==='THROUGH_PASS'&&c.meta?.offsideRisk))&&(c.meta?.offsideRisk||c.meta?.laneBlockers>0||c.meta?.contested)&&Number(c.meta?.forward??c.meta?.leadForward??-99)>0).sort((a,b)=>(Number(b.meta?.offsideRisk)-Number(a.meta?.offsideRisk))+(Number(b.meta?.forward??b.meta?.leadForward??0)-Number(a.meta?.forward??a.meta?.leadForward??0))*.03).slice(0,2);
   for(const risky of riskyPhysical){
     if(out.some(o=>o.family==='패스'&&o.targetId===risky.targetId))continue;
     if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||o.id==='CARRY');if(ix>=0)out.splice(ix,1);}
