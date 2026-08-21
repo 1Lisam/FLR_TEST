@@ -1,22 +1,18 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-PLAYER-RISK-CHOICE",
-  "candidateBranch": "tt051-player-risk-choice-candidate",
+  "version": "TT-0.51-TRAP-AUTHORITY-DIAG",
+  "candidateBranch": "tt051-trap-authority-candidate",
   "baselineRef": "main",
-  "applyScripts": [
-    ".flr/tt051_player_risk_choice_apply_v4.py"
-  ],
-  "validationScript": ".flr/tt051_player_risk_choice_validation_v2.js",
+  "applyScripts": [],
+  "validationScript": ".flr/tt051_trap_authority_diagnostic.js",
   "changedFiles": [
     "runtime/continuous_match_core.js",
-    "runtime/protagonist_match_controller.js",
-    "runtime/tactical_movement.js"
+    "runtime/protagonist_match_controller.js"
   ],
   "syntaxChecks": [
     "runtime/continuous_match_core.js",
-    "runtime/protagonist_match_controller.js",
-    "runtime/tactical_movement.js"
+    "runtime/protagonist_match_controller.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-player-risk-choice",
-  "runNonce": "2026-08-21T12:51+09:00-player-risk-v4-protect-risky-pass"
+  "resultDir": ".flr/qa-results/TT-0.51-trap-authority-diag",
+  "runNonce": "2026-08-21T13:04+09:00-trap-authority-reproduce"
 }
