@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "FLR_CURRENT_ENGINE_FEEDBACK_DIAG_1.0",
+  "schemaVersion": "FLR_CURRENT_ENGINE_FEEDBACK_DIAG_1.1",
   "oldJitterReplayOnCurrentEngine": {
     "hadChoice": false,
     "preSpan": 10,
@@ -357,6 +357,33 @@
   "newMissingChoicePassOptions": {
     "time": 772.9,
     "ownerId": "H-ST",
+    "ballX": 76.93,
+    "offsideLine": 77.93,
+    "eligibilityThreshold": 78.18,
+    "wingState": [
+      {
+        "id": "H-LW",
+        "x": 78.94,
+        "y": 18,
+        "vx": 0,
+        "vy": 0,
+        "task": "FAR_SIDE_HOLD",
+        "runUntil": 0,
+        "offsideMargin": 0.76,
+        "onside": false
+      },
+      {
+        "id": "H-RW",
+        "x": 78.91,
+        "y": 50,
+        "vx": 0,
+        "vy": 0,
+        "task": "FAR_SIDE_HOLD",
+        "runUntil": 0,
+        "offsideMargin": 0.73,
+        "onside": false
+      }
+    ],
     "passOptions": [
       {
         "targetId": "H-RCM",
