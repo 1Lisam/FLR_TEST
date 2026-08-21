@@ -14,5 +14,5 @@
     "runtime/protagonist_match_controller.js"
   ],
   "resultDir": ".flr/qa-results/TT-0.51-shoot-npc-touch-audit",
-  "runNonce": "2026-08-21T13:42+09:00-shoot-priority-100"
+  "runNonce": "2026-08-21T13:49+09:00-shoot-priority-100-lightweight"
 }
