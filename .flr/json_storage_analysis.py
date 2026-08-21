@@ -40,16 +40,22 @@ def compact_frames_copy(obj):
         elif isinstance(v,list):
             for x in v: rec(x)
     rec(o); return o
-def drop_episode_duplicates(obj):
-    o=copy.deepcopy(obj)
-    def rec(v):
+def safe_episode_dedup(obj):
+    o=copy.deepcopy(obj); removed=[]
+    def rec(v,path='root'):
         if isinstance(v,dict):
-            if isinstance(v.get('episodeFrames'),list) and (isinstance(v.get('preActionFrames'),list) or isinstance(v.get('postActionFrames'),list)):
-                v['episodeFramesRef']='PRE_PLUS_POST_OR_EPISODE_RECONSTRUCT'; v.pop('episodeFrames',None)
-            for x in v.values(): rec(x)
+            ep=v.get('episodeFrames'); pre=v.get('preActionFrames'); post=v.get('postActionFrames')
+            if isinstance(ep,list) and ep:
+                parts=[]
+                if isinstance(pre,list) and pre: parts.extend(pre)
+                if isinstance(post,list) and post: parts.extend(post)
+                if parts and ep==parts:
+                    removed.append({'path':path+'.episodeFrames','count':len(ep),'bytes':size(ep)})
+                    v['episodeFramesRef']='preActionFrames+postActionFrames'; v.pop('episodeFrames',None)
+            for k,x in list(v.items()): rec(x,f'{path}.{k}')
         elif isinstance(v,list):
-            for x in v: rec(x)
-    rec(o); return o
+            for i,x in enumerate(v): rec(x,f'{path}[{i}]')
+    rec(o); return o,removed
 def subtree_dups(obj):
     seen={}; dups=[]
     for p,v in walk(obj):
@@ -63,15 +69,15 @@ def subtree_dups(obj):
     return sorted(dups,key=lambda x:-x['bytes'])[:20]
 def analyze(path,label):
     obj=json.loads(Path(path).read_text(encoding='utf-8'))
-    compact=compact_frames_copy(obj); noep=drop_episode_duplicates(obj); combo=compact_frames_copy(noep)
+    compact=compact_frames_copy(obj); dedup,removed=safe_episode_dedup(obj); combo=compact_frames_copy(dedup)
     fas=frame_arrays(obj)
-    return {'label':label,'rawBytes':size(obj),'gzipBytes':gzsize(obj),'gzipRatio':round(gzsize(obj)/max(1,size(obj)),4),'compactFramesBytes':size(compact),'compactFramesGzipBytes':gzsize(compact),'dropEpisodeBytes':size(noep),'dropEpisodeGzipBytes':gzsize(noep),'compactDropEpisodeBytes':size(combo),'compactDropEpisodeGzipBytes':gzsize(combo),'frameArrays':[{'path':p,'count':len(v),'bytes':size(v)} for p,v in fas],'largestDuplicateSubtrees':subtree_dups(obj)}
+    return {'label':label,'rawBytes':size(obj),'gzipBytes':gzsize(obj),'gzipRatio':round(gzsize(obj)/max(1,size(obj)),4),'compactFramesBytes':size(compact),'compactFramesGzipBytes':gzsize(compact),'safeDedupBytes':size(dedup),'safeDedupGzipBytes':gzsize(dedup),'compactSafeDedupBytes':size(combo),'compactSafeDedupGzipBytes':gzsize(combo),'safeDedupRemoved':removed,'frameArrays':[{'path':p,'count':len(v),'bytes':size(v)} for p,v in fas],'largestDuplicateSubtrees':subtree_dups(obj)}
 def main():
-    args=sys.argv[1:]
-    out=[]
+    args=sys.argv[1:]; out=[]
     for i in range(0,len(args)-1,2): out.append(analyze(args[i],args[i+1]))
-    agg={k:sum(r[k] for r in out) for k in ('rawBytes','gzipBytes','compactFramesBytes','compactFramesGzipBytes','dropEpisodeBytes','dropEpisodeGzipBytes','compactDropEpisodeBytes','compactDropEpisodeGzipBytes')}
-    for k in list(agg):
+    keys=('rawBytes','gzipBytes','compactFramesBytes','compactFramesGzipBytes','safeDedupBytes','safeDedupGzipBytes','compactSafeDedupBytes','compactSafeDedupGzipBytes')
+    agg={k:sum(r[k] for r in out) for k in keys}
+    for k in keys:
         if k!='rawBytes': agg[k+'VsRaw']=round(agg[k]/max(1,agg['rawBytes']),4)
-    print(json.dumps({'schemaVersion':'FLR_JSON_STORAGE_ANALYSIS_1.0','reports':out,'aggregate':agg},ensure_ascii=False,indent=2))
+    print(json.dumps({'schemaVersion':'FLR_JSON_STORAGE_ANALYSIS_1.1','reports':out,'aggregate':agg},ensure_ascii=False,indent=2))
 if __name__=='__main__': main()
