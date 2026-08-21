@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "FLR_TT051_CARRY_STALL_VALIDATION_1.0",
+  "pass": true,
+  "checks": [
+    {
+      "name": "static-blocked-stall-threshold",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "static-stall-clears-carry-lock",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "blocked-carry-scenario-valid",
+      "ok": true,
+      "detail": {
+        "pick": {
+          "ok": true,
+          "receipt": {
+            "ok": true,
+            "kind": "ON_BALL",
+            "choice": "CARRY",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_CARRY_STALL",
+            "action": {
+              "type": "CARRY",
+              "kind": null,
+              "reason": "CANDIDATE_CARRY"
+            },
+            "intentUntil": 1203.2,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          }
+        },
+        "elapsed": 0.9999999999990905,
+        "next": 1200.999999999999,
+        "lost": null
+      }
+    },
+    {
+      "name": "blocked-carry-resolves-or-reopens-fast",
+      "ok": true,
+      "detail": {
+        "elapsed": 0.9999999999990905,
+        "next": 1200.999999999999,
+        "lost": null,
+        "stallReopens": 1,
+        "pending": [
+          "TAKE_ON",
+          "SAFE_PASS",
+          "SHOT",
+          "CARRY",
+          "HOLD"
+        ]
+      }
+    },
+    {
+      "name": "blocked-carry-no-unchosen-material-action",
+      "ok": true,
+      "detail": [
+        {
+          "t": 1200,
+          "type": "USER_CHOICE",
+          "text": "H-ST: CARRY"
+        }
+      ]
+    },
+    {
+      "name": "free-carry-scenario-valid",
+      "ok": true,
+      "detail": {
+        "pick": {
+          "ok": true,
+          "receipt": {
+            "ok": true,
+            "kind": "ON_BALL",
+            "choice": "CARRY",
+            "requestedTargetId": null,
+            "targetId": null,
+            "inputSource": "QA_CARRY_STALL",
+            "action": {
+              "type": "CARRY",
+              "kind": null,
+              "reason": "CANDIDATE_CARRY"
+            },
+            "intentUntil": 1203.2,
+            "intentProtected": true,
+            "futureOutcomePrecomputed": false
+          }
+        }
+      }
+    },
+    {
+      "name": "free-carry-not-falsely-stall-reopened",
+      "ok": true,
+      "detail": {
+        "elapsed": 1.0999999999989996,
+        "pending": false,
+        "stallReopens": 0,
+        "hero": [
+          63.494734603353486,
+          34.091065054274715
+        ]
+      }
+    },
+    {
+      "name": "future-not-precomputed",
+      "ok": true,
+      "detail": {}
+    }
+  ],
+  "failures": []
+}
