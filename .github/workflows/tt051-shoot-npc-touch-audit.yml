@@ -1,0 +1,30 @@
+name: TT051 Shoot and NPC Touch Audit
+on:
+  push:
+    branches: [tt051-shoot-npc-touch-audit]
+    paths:
+      - '.github/workflows/tt051-shoot-npc-touch-audit.yml'
+      - '.flr/tt051_shoot_npc_touch_audit.js'
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run 100-match audit
+        shell: bash
+        run: |
+          node --check .flr/tt051_shoot_npc_touch_audit.js
+          node .flr/tt051_shoot_npc_touch_audit.js . > .flr/tt051-shoot-npc-touch-audit.json
+      - name: Persist result
+        shell: bash
+        run: |
+          git config user.name "FLR Audit QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add .flr/tt051-shoot-npc-touch-audit.json
+          git diff --cached --quiet || {
+            git commit -m "Record TT-0.51 shoot and NPC touch audit"
+            git push origin HEAD:tt051-shoot-npc-touch-audit
+          }
