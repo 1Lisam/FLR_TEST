@@ -2,7 +2,7 @@
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.0",
   "build": "TT-0.51",
   "limit": 10,
-  "requestedAt": "2026-08-21T11:18:30+09:00",
-  "purpose": "Verify latest tester bug report stored in D1",
-  "runNonce": "verify-latest-20260821-111830"
+  "requestedAt": "2026-08-21T11:19:30+09:00",
+  "purpose": "Verify latest tester bug report stored in D1 and inspect bundle integrity",
+  "runNonce": "verify-latest-bundle-20260821-111930"
 }
