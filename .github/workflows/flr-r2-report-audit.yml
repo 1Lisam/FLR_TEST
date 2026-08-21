@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.flr/report-audit-request.json'
+      - '.github/workflows/flr-r2-report-audit.yml'
 
 permissions:
   contents: write
