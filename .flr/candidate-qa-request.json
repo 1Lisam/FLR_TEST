@@ -19,5 +19,8 @@
     "live_v06_scene_authority_browser.js"
   ],
   "resultDir": ".flr/qa-results/TT-0.51-d1-live-entry",
-  "runNonce": "2026-08-21T10:41+09:00-d1-live-entry-3case-choice-proof"
+  "promoteValidated": true,
+  "expectedPatchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
+  "promotionCommitMessage": "Deploy TT-0.51 D1 reports and live entry context",
+  "runNonce": "2026-08-21T11:06+09:00-qa-and-promote"
 }
