@@ -214,7 +214,7 @@ function onBallOptions(frame){
   // but must not erase it from a protagonist checkpoint while there is actual forward space.
   const physicalCarry=ranked.find(c=>c.id==='CARRY'&&Number(c.meta?.space??frame.space??0)>=0.75);
   if(physicalCarry&&!out.some(o=>o.id==='CARRY')){
-    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||o.id==='AVAILABLE_PASS');if(ix>=0)out.splice(ix,1);}
+    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||(o.id==='AVAILABLE_PASS'&&!o.meta?.offsideRisk&&!o.meta?.contested&&!(o.meta?.laneBlockers>0))||o.id==='SAFE_PASS');if(ix>=0)out.splice(ix,1);}
     const row={id:'CARRY',targetId:null,targetName:null,family:'돌파',label:labelFor(physicalCarry),meta:physicalCarry.meta?deep(physicalCarry.meta):null};row.hint=tooltipFor(physicalCarry,frame);row.tooltip=row.hint;out.push(row);
   }
   if(ranked.some(c=>c.id==='HOLD')&&!out.some(c=>c.id==='HOLD')&&out.length<6){const c=ranked.find(x=>x.id==='HOLD'),row={id:'HOLD',targetId:null,targetName:null,family:'볼 유지',label:'볼 지키기'};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}

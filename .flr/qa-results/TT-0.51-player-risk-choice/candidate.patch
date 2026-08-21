@@ -64,7 +64,7 @@ index 0f0435f..668fc9d 100644
      const existingSafeTargets=new Set(ranked.filter(c=>c.id==='SAFE_PASS'&&c.meta?.targetId).map(c=>c.meta.targetId));
      const directSafePasses=opts.filter(o=>!existingSafeTargets.has(o.p.id)&&o.block===0&&o.d<=30&&o.open>=2.35&&o.forward<=5.5&&o.forward>=-20&&['CM','FB','WF','ST'].includes(o.p.role)).sort((a,b)=>(b.open-a.open)||(a.d-b.d)).slice(0,2).map(o=>({id:'SAFE_PASS',score:Number((1.15+Math.min(5,o.open)*.18-o.d*.018).toFixed(3)),reason:'user_visible_safe_feet',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,directSafe:true}}));
 diff --git a/runtime/protagonist_match_controller.js b/runtime/protagonist_match_controller.js
-index bb2155f..44f1d26 100644
+index bb2155f..2ced014 100644
 --- a/runtime/protagonist_match_controller.js
 +++ b/runtime/protagonist_match_controller.js
 @@ -101,7 +101,7 @@ function defendingImportance(f){
@@ -101,6 +101,15 @@ index bb2155f..44f1d26 100644
    // A real, unblocked pass option must not disappear merely because the NPC score
    // strongly prefers shooting/carrying. Player choice availability != NPC preference.
    if(!out.some(o=>o.family==='패스')){
+@@ -205,7 +214,7 @@ function onBallOptions(frame){
+   // but must not erase it from a protagonist checkpoint while there is actual forward space.
+   const physicalCarry=ranked.find(c=>c.id==='CARRY'&&Number(c.meta?.space??frame.space??0)>=0.75);
+   if(physicalCarry&&!out.some(o=>o.id==='CARRY')){
+-    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||o.id==='AVAILABLE_PASS');if(ix>=0)out.splice(ix,1);}
++    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||(o.id==='AVAILABLE_PASS'&&!o.meta?.offsideRisk&&!o.meta?.contested&&!(o.meta?.laneBlockers>0))||o.id==='SAFE_PASS');if(ix>=0)out.splice(ix,1);}
+     const row={id:'CARRY',targetId:null,targetName:null,family:'돌파',label:labelFor(physicalCarry),meta:physicalCarry.meta?deep(physicalCarry.meta):null};row.hint=tooltipFor(physicalCarry,frame);row.tooltip=row.hint;out.push(row);
+   }
+   if(ranked.some(c=>c.id==='HOLD')&&!out.some(c=>c.id==='HOLD')&&out.length<6){const c=ranked.find(x=>x.id==='HOLD'),row={id:'HOLD',targetId:null,targetName:null,family:'볼 유지',label:'볼 지키기'};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
 diff --git a/runtime/tactical_movement.js b/runtime/tactical_movement.js
 index 2a80eab..0cd04f7 100644
 --- a/runtime/tactical_movement.js
