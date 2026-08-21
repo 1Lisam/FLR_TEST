@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "FLR_D1_REPORT_AUDIT_1.0",
+  "status": "PASS",
+  "count": 1,
+  "reports": [
+    {
+      "report_id": "tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb",
+      "build": "TT-0.51",
+      "created_at": "2026-08-21T02:16:47.146Z",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "이 상황에서 LW는 완전히 빈공간이고 RW도 공간침투가 가능한 상황인데 선택지 자체가 안뜨는 이유가 뭔지 모르겠어",
+      "size_bytes": 3504780,
+      "chunk_count": 3
+    }
+  ]
+}
