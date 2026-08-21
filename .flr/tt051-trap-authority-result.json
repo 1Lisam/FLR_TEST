@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "FLR_TT051_TRAP_AUTHORITY_VALIDATION_1.0",
+  "pass": false,
+  "checks": [
+    {
+      "name": "incoming-checkpoint-found",
+      "ok": false,
+      "detail": "null"
+    },
+    {
+      "name": "trap-option-present",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "name": "trap-choice-applied",
+      "ok": false,
+      "detail": "null"
+    },
+    {
+      "name": "hero-receives-after-trap",
+      "ok": false,
+      "detail": "{\"time\":1814.0499999999872,\"ball\":{\"mode\":\"FLIGHT\",\"ownerId\":null},\"resultTracker\":false,\"interactive\":null}"
+    },
+    {
+      "name": "no-unchosen-material-action-after-trap",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "next-user-choice-or-live-protection",
+      "ok": false,
+      "detail": "{\"nextPending\":false,\"interactive\":null,\"deferred\":null,\"resultTracker\":false}"
+    },
+    {
+      "name": "future-not-precomputed",
+      "ok": false,
+      "detail": ""
+    }
+  ],
+  "failures": [
+    {
+      "name": "incoming-checkpoint-found",
+      "ok": false,
+      "detail": "null"
+    },
+    {
+      "name": "trap-option-present",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "name": "trap-choice-applied",
+      "ok": false,
+      "detail": "null"
+    },
+    {
+      "name": "hero-receives-after-trap",
+      "ok": false,
+      "detail": "{\"time\":1814.0499999999872,\"ball\":{\"mode\":\"FLIGHT\",\"ownerId\":null},\"resultTracker\":false,\"interactive\":null}"
+    },
+    {
+      "name": "next-user-choice-or-live-protection",
+      "ok": false,
+      "detail": "{\"nextPending\":false,\"interactive\":null,\"deferred\":null,\"resultTracker\":false}"
+    },
+    {
+      "name": "future-not-precomputed",
+      "ok": false,
+      "detail": ""
+    }
+  ]
+}
