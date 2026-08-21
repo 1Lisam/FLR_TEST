@@ -1,18 +1,18 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-TRAP-AUTHORITY-DIAG",
-  "candidateBranch": "tt051-trap-authority-candidate",
+  "version": "TT-0.51-CARRY-STALL-REOPEN",
+  "candidateBranch": "tt051-carry-stall-candidate",
   "baselineRef": "main",
-  "applyScripts": [],
-  "validationScript": ".flr/tt051_trap_authority_diagnostic.js",
+  "applyScripts": [
+    ".flr/tt051_carry_stall_apply.py"
+  ],
+  "validationScript": ".flr/tt051_carry_stall_validation.js",
   "changedFiles": [
-    "runtime/continuous_match_core.js",
     "runtime/protagonist_match_controller.js"
   ],
   "syntaxChecks": [
-    "runtime/continuous_match_core.js",
     "runtime/protagonist_match_controller.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-trap-authority-diag",
-  "runNonce": "2026-08-21T13:08+09:00-trap-authority-onside-reproduce"
+  "resultDir": ".flr/qa-results/TT-0.51-carry-stall-reopen",
+  "runNonce": "2026-08-21T13:15+09:00-carry-blocked-fast-rechoice"
 }
