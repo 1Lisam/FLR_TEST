@@ -48,7 +48,7 @@ jobs:
               raise SystemExit('STEP79_MUST_REMAIN_FALSE')
           if not m.get('changedFiles'):
               raise SystemExit('CHANGED_FILES_EMPTY')
-          if not m.get('patchSha256') and not m.get('assembledFiles'):
+          if not m.get('patchSha256') and not m.get('assembledFiles') and not m.get('base64TarGz'):
               raise SystemExit('NO_DEPLOY_PAYLOAD')
           pathlib.Path('/tmp/flr_deploy.json').write_text(json.dumps(m), encoding='utf-8')
           print(f"Validated {m['fromBuild']} -> {m['toBuild']}")
@@ -59,7 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import hashlib, json, pathlib, subprocess
+          import base64, hashlib, io, json, pathlib, subprocess, tarfile
           m=json.load(open('/tmp/flr_deploy.json'))
           if m.get('patchSha256'):
               parts=sorted(pathlib.Path('_incoming/.flr').glob('incoming.patch.part*'))
@@ -86,6 +86,61 @@ jobs:
               dest.parent.mkdir(parents=True, exist_ok=True)
               dest.write_bytes(data)
               print(f"Assembled {dest} bytes={len(data)} sha256={actual}")
+          if m.get('base64TarGz'):
+              spec=m['base64TarGz']
+              root=pathlib.Path('_incoming')
+              def read_parts(names):
+                  paths=[root/x for x in names]
+                  absent=[str(p) for p in paths if not p.is_file()]
+                  if absent:
+                      raise SystemExit('ARCHIVE_PART_MISSING:'+','.join(absent))
+                  return b''.join(p.read_bytes() for p in paths)
+              head=read_parts(spec['headParts'])
+              bridge=read_parts(spec['bridgeParts'])
+              middle=read_parts(spec['middleParts'])
+              split=int(spec['bridgeSplit'])
+              if split < 0 or split > len(bridge):
+                  raise SystemExit('ARCHIVE_BRIDGE_SPLIT_INVALID')
+              encoded=head + bridge[:split] + middle + bridge[split:]
+              try:
+                  data=base64.b64decode(encoded, validate=True)
+              except Exception as exc:
+                  raise SystemExit(f'ARCHIVE_BASE64_INVALID:{exc}')
+              actual=hashlib.sha256(data).hexdigest()
+              if actual != spec['sha256']:
+                  raise SystemExit(f"ARCHIVE_SHA_MISMATCH expected={spec['sha256']} actual={actual}")
+              expected=set(m['changedFiles'])
+              with tarfile.open(fileobj=io.BytesIO(data), mode='r:gz') as tf:
+                  members=tf.getmembers()
+                  files=[]
+                  normalized={}
+                  for member in members:
+                      name=member.name
+                      while name.startswith('./'):
+                          name=name[2:]
+                      if not name:
+                          continue
+                      pp=pathlib.PurePosixPath(name)
+                      if pp.is_absolute() or '..' in pp.parts:
+                          raise SystemExit(f'ARCHIVE_UNSAFE_PATH:{name}')
+                      if member.isdir():
+                          continue
+                      if not member.isfile():
+                          raise SystemExit(f'ARCHIVE_NONREGULAR:{name}')
+                      files.append(name)
+                      normalized[member.name]=name
+                  if set(files) != expected or len(files) != len(expected):
+                      raise SystemExit(f'ARCHIVE_MEMBER_MISMATCH expected={sorted(expected)} actual={sorted(files)}')
+                  for member in members:
+                      if member.name not in normalized:
+                          continue
+                      source=tf.extractfile(member)
+                      if source is None:
+                          raise SystemExit(f'ARCHIVE_EXTRACT_FAILED:{member.name}')
+                      dest=pathlib.Path(normalized[member.name])
+                      dest.parent.mkdir(parents=True, exist_ok=True)
+                      dest.write_bytes(source.read())
+              print(f"Archive applied files={len(expected)} sha256={actual}")
           PY
           rm -rf _incoming
 
