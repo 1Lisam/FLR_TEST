@@ -1,7 +1,7 @@
 {
   "schemaVersion": "FLR_TT051_BATCH_FEEDBACK_DIAG_REQUEST_1.2",
-  "requestedAt": "2026-08-23T04:13:00+09:00",
-  "reportCount": 11,
-  "purpose": "Generate compact issue facts for the latest carry-stall and goal-celebration reports together with prior regressions",
-  "runNonce": "facts-user-test-v0-2-batch-20260823-0413"
+  "requestedAt": "2026-08-23T04:14:00+09:00",
+  "reportCount": 2,
+  "purpose": "Focused diagnostics for carry stall and missing goal celebration",
+  "runNonce": "facts-latest-two-20260823-0414"
 }
