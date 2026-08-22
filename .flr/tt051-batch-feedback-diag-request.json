@@ -1,7 +1,7 @@
 {
   "schemaVersion": "FLR_TT051_BATCH_FEEDBACK_DIAG_REQUEST_1.2",
-  "requestedAt": "2026-08-23T04:05:00+09:00",
-  "reportCount": 9,
-  "purpose": "Generate compact issue facts including the two latest Match Engine User Test V0.1 reports",
-  "runNonce": "facts-user-test-v0-1-20260823-0405"
+  "requestedAt": "2026-08-23T04:13:00+09:00",
+  "reportCount": 11,
+  "purpose": "Generate compact issue facts for the latest carry-stall and goal-celebration reports together with prior regressions",
+  "runNonce": "facts-user-test-v0-2-batch-20260823-0413"
 }
