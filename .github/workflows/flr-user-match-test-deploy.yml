@@ -1,4 +1,4 @@
-name: FLR User Match Test one-time deploy
+name: FLR User Match Test V0.2 patch deploy
 
 on:
   issues:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   deploy:
-    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.1'
+    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.2'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
@@ -18,97 +18,53 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Checkout staged test build
-        uses: actions/checkout@v4
-        with:
-          ref: automation/tt-deploy
-          path: _incoming
-          fetch-depth: 1
-
-      - name: Replace test files
+      - name: Apply narrow ST-entry fix and V0.2 labels
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import base64, hashlib, io, pathlib, tarfile
+          from pathlib import Path
 
-          root = pathlib.Path('_incoming/.flr/user_match_test_v0_1')
-          encoded = b''.join((root / f'b64.part{i:02d}').read_bytes() for i in range(10))
-          tail = (root / 'missing.part05').read_bytes()
-          encoded += tail[4000:] + b'WqX'
-          encoded += (root / 'missing.part06').read_bytes()
-          encoded += (root / 'missing.part07').read_bytes()
+          p=Path('live_hybrid_session_v02.js')
+          s=p.read_text(encoding='utf-8')
+          old_actor="function pickActor(session,team,state,kind){const p=team==='HOME'?'H':'A';if(kind==='SHOT'){const pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];return pick(session,pool);}return pick(session,lanePool(team,state.ball.lane,state.phase));}"
+          new_actor="function pickActor(session,team,state,kind){const p=team==='HOME'?'H':'A';if(kind==='SHOT'){const pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];return pick(session,pool);}const actor=pick(session,lanePool(team,state.ball.lane,state.phase));if(Number(state.ball.progress)<.28&&roleOf(actor)==='ST')return state.ball.lane==='LEFT'?`${p}-LCM`:state.ball.lane==='RIGHT'?`${p}-RCM`:`${p}-CM`;return actor;}"
+          old_target="function pickTarget(session,team,state,actor){const p=team==='HOME'?'H':'A';let pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`,`${p}-LB`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`,`${p}-RB`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];pool=pool.filter(x=>x!==actor);return pick(session,pool)||`${p}-ST`; }".replace('; }',';}')
+          new_target="function pickTarget(session,team,state,actor){const p=team==='HOME'?'H':'A';let pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`,`${p}-LB`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`,`${p}-RB`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];pool=pool.filter(x=>x!==actor);let target=pick(session,pool)||`${p}-ST`;if(Number(state.ball.progress)<.28&&roleOf(target)==='ST')target=state.ball.lane==='LEFT'?`${p}-LCM`:state.ball.lane==='RIGHT'?`${p}-RCM`:`${p}-CM`;if(target===actor)target=`${p}-CM`===actor?`${p}-LCM`:`${p}-CM`;return target;}"
+          if s.count(old_actor)!=1: raise SystemExit(f'pickActor match count={s.count(old_actor)}')
+          if s.count(old_target)!=1: raise SystemExit(f'pickTarget match count={s.count(old_target)}')
+          s=s.replace(old_actor,new_actor).replace(old_target,new_target)
+          p.write_text(s,encoding='utf-8')
 
-          archive = base64.b64decode(encoded, validate=True)
-          expected_sha = 'a7de123697cd6020868f46930df9d1094493117109ee0e11d5f6970014ebd611'
-          actual_sha = hashlib.sha256(archive).hexdigest()
-          if actual_sha != expected_sha:
-              raise SystemExit(f'ARCHIVE_SHA_MISMATCH expected={expected_sha} actual={actual_sha}')
+          p=Path('step71_hybrid_v06_ui.js')
+          s=p.read_text(encoding='utf-8')
+          if 'TT-0.51' not in s: raise SystemExit('TT-0.51 build tag not found')
+          s=s.replace('TT-0.51','USER-MATCH-TEST-V0.2').replace('tt051-','umt02-')
+          p.write_text(s,encoding='utf-8')
 
-          expected = [
-              'index.html',
-              'live_hybrid_session_v02.js',
-              'live_v06_scene_authority_browser.js',
-              'runtime/attribute_match_adapter.js',
-              'runtime/ball_strike_model.js',
-              'runtime/choice_action_resolver.js',
-              'runtime/continuous_match_core.js',
-              'runtime/manager_tendency_adapter.js',
-              'runtime/match_choice_telemetry.js',
-              'runtime/protagonist_match_controller.js',
-              'runtime/restart_movement.js',
-              'runtime/tactical_movement.js',
-          ]
-          expected_set = set(expected)
-
-          with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as tf:
-              files = []
-              for member in tf.getmembers():
-                  name = member.name
-                  while name.startswith('./'):
-                      name = name[2:]
-                  if not name or member.isdir():
-                      continue
-                  p = pathlib.PurePosixPath(name)
-                  if p.is_absolute() or '..' in p.parts or not member.isfile():
-                      raise SystemExit('UNSAFE_ARCHIVE_ENTRY:' + name)
-                  files.append((member, name))
-              names = [name for _, name in files]
-              if set(names) != expected_set or len(names) != len(expected):
-                  raise SystemExit(f'FILE_SET_MISMATCH actual={sorted(names)}')
-              for member, name in files:
-                  src = tf.extractfile(member)
-                  if src is None:
-                      raise SystemExit('EXTRACT_FAILED:' + name)
-                  dest = pathlib.Path(name)
-                  dest.parent.mkdir(parents=True, exist_ok=True)
-                  dest.write_bytes(src.read())
-                  print('replaced', name)
-
-          pathlib.Path('/tmp/flr_changed_files').write_text('\n'.join(expected) + '\n', encoding='utf-8')
-          print('archive sha256', actual_sha)
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'V0.1' not in s: raise SystemExit('V0.1 label not found')
+          p.write_text(s.replace('V0.1','V0.2'),encoding='utf-8')
           PY
-          rm -rf _incoming
 
-      - name: Check JavaScript
+      - name: JavaScript syntax check
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r f; do
-            [ -z "$f" ] && continue
-            if [[ "$f" == *.js ]]; then node --check "$f"; fi
-          done < /tmp/flr_changed_files
+          node --check live_hybrid_session_v02.js
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'Match Engine User Test V0.2' index.html
+          grep -q 'USER-MATCH-TEST-V0.2' step71_hybrid_v06_ui.js
+          ! grep -q 'TT-0.51' step71_hybrid_v06_ui.js
 
-      - name: Commit test build
+      - name: Commit V0.2
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "FLR Test Deploy Bot"
-          git config user.email "actions@users.noreply.github.com"
-          while IFS= read -r f; do
-            [ -z "$f" ] && continue
-            git add -- "$f"
-          done < /tmp/flr_changed_files
+          git config user.name 'FLR Test Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add live_hybrid_session_v02.js step71_hybrid_v06_ui.js index.html
           git diff --cached --quiet && { echo NO_CHANGES; exit 1; }
-          git commit -m "Deploy Match Engine User Test V0.1"
+          git commit -m 'Deploy Match Engine User Test V0.2'
           git push origin main
