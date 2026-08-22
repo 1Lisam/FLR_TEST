@@ -1726,6 +1726,332 @@
           ]
         ]
       }
+    },
+    {
+      "id": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
+      "description": "공간 전진을 했으나 공을 들고 가만히 있음",
+      "current": {
+        "selected": [
+          "CARRY",
+          null
+        ],
+        "options": [
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RW",
+            "안전한 패스 → 같은 팀 RW"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-LW",
+            "전진 패스 → 같은 팀 LW"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "POSSESSION_KEPT",
+          "전진 결과"
+        ],
+        "motion": {
+          "t0": 2603.0,
+          "t1": 2608.5,
+          "heroStart": [
+            69.22,
+            35.31
+          ],
+          "heroEnd": [
+            78.93,
+            33.63
+          ],
+          "heroXRange": [
+            69.22,
+            78.93
+          ],
+          "heroYRange": [
+            32.49,
+            35.31
+          ],
+          "heroMeanSpeed": 2.06,
+          "minOpponentDistance": 1.36,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 9,
+          "spanUnder1_6m": 0.8,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 1.37,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": [
+          [
+            2607.5,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: CARRY"
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          "SHOT",
+          null
+        ],
+        "options": [
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-LW",
+            "전진 패스 → 같은 팀 LW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RB",
+            "안전한 패스 → 같은 팀 RB"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RW",
+            "안전한 패스 → 같은 팀 RW"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          "GOAL",
+          "슈팅 → 득점"
+        ],
+        "motion": {
+          "t0": 2272.1,
+          "t1": 2300.1,
+          "heroStart": [
+            87.51,
+            37.37
+          ],
+          "heroEnd": [
+            92.49,
+            37.48
+          ],
+          "heroXRange": [
+            87.51,
+            92.49
+          ],
+          "heroYRange": [
+            37.37,
+            37.49
+          ],
+          "heroMeanSpeed": 1.8,
+          "minOpponentDistance": 1.44,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 4,
+          "spanUnder1_6m": 25.3,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 1.44,
+            "task": "RETURN_FOR_KICKOFF"
+          }
+        },
+        "heroSequence": [
+          [
+            2274.3,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            2274.3,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ],
+          [
+            2274.6,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            2274.6,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ],
+          [
+            2275.1,
+            "GOAL",
+            "H-ST",
+            null,
+            "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-1"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-f7f30898-f3b1-423c-a9e6-94d5c6972ab2",
+      "description": "득점을 하였으나 우리가 약속한 골세레머니가 나오지 않고 너무 빨리 장면이 끝남",
+      "current": {
+        "selected": [
+          "SHOT",
+          null
+        ],
+        "options": [
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-LW",
+            "전진 패스 → 같은 팀 LW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RB",
+            "안전한 패스 → 같은 팀 RB"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RW",
+            "안전한 패스 → 같은 팀 RW"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          "GOAL",
+          "슈팅 → 득점"
+        ],
+        "motion": {
+          "t0": 2272.1,
+          "t1": 2300.1,
+          "heroStart": [
+            87.51,
+            37.37
+          ],
+          "heroEnd": [
+            92.49,
+            37.48
+          ],
+          "heroXRange": [
+            87.51,
+            92.49
+          ],
+          "heroYRange": [
+            37.37,
+            37.49
+          ],
+          "heroMeanSpeed": 1.8,
+          "minOpponentDistance": 1.44,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 4,
+          "spanUnder1_6m": 25.3,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 1.44,
+            "task": "RETURN_FOR_KICKOFF"
+          }
+        },
+        "heroSequence": [
+          [
+            2274.3,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            2274.3,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ],
+          [
+            2274.6,
+            "SHOT",
+            "H-ST",
+            null,
+            "블루팀 ST이 슈팅을 시도합니다."
+          ],
+          [
+            2274.6,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SHOT"
+          ],
+          [
+            2275.1,
+            "GOAL",
+            "H-ST",
+            null,
+            "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-1"
+          ]
+        ]
+      },
+      "previous": {
+        "selected": [
+          null,
+          null
+        ],
+        "options": [],
+        "result": [
+          null,
+          null
+        ],
+        "motion": {},
+        "heroSequence": []
+      }
     }
   ]
 }
