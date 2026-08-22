@@ -1,8 +1,28 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 10,
+  "count": 12,
   "reports": [
+    {
+      "report_id": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
+      "build": "TT-0.51",
+      "created_at": "2026-08-22T19:19:56.670Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "공간 전진을 했으나 공을 들고 가만히 있음",
+      "size_bytes": 1288129,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "tt051-f7f30898-f3b1-423c-a9e6-94d5c6972ab2",
+      "build": "TT-0.51",
+      "created_at": "2026-08-22T19:19:33.013Z",
+      "category": "슈팅/GK",
+      "priority": 3,
+      "description": "득점을 하였으나 우리가 약속한 골세레머니가 나오지 않고 너무 빨리 장면이 끝남",
+      "size_bytes": 485993,
+      "chunk_count": 1
+    },
     {
       "report_id": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
       "build": "TT-0.51",
@@ -104,7 +124,7 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
+  "latestAttachedReportId": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -114,13 +134,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
+      "reportId": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
       "build": "TT-0.51",
       "step": 78,
-      "description": "역시 동일한 문제 ST 의 위치는 뒤에서 시작하고 상대 포지션은 다 정해진 상태",
-      "category": "수비/전술",
+      "description": "공간 전진을 했으나 공을 들고 가만히 있음",
+      "category": "패스/공격",
       "priority": 3,
-      "reportedAt": "2026-08-22T18:56:19.476Z"
+      "reportedAt": "2026-08-22T19:18:14.803Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -143,18 +163,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 4671.899999999922,
-      "endSecond": 4671.899999999922,
+      "startSecond": 2602.8999999998896,
+      "endSecond": 2608.5,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 3991.69999999982,
-      "endSecond": 3999.8,
+      "startSecond": 2271.9999999999027,
+      "endSecond": 2300.1,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 163604,
-    "previousSerializedBytes": 1299654
+    "currentSerializedBytes": 895625,
+    "previousSerializedBytes": 540408
   }
 }
