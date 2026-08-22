@@ -30,6 +30,8 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/flr_batch
           for rid in \
+            tt051-f42d0a99-3280-4119-9879-06117a3fca9c \
+            tt051-f7f30898-f3b1-423c-a9e6-94d5c6972ab2 \
             tt051-64c478ef-3c53-4345-b932-8c70adc7a4e1 \
             tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845 \
             tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8 \
