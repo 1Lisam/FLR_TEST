@@ -1,8 +1,28 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 8,
+  "count": 10,
   "reports": [
+    {
+      "report_id": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
+      "build": "TT-0.51",
+      "created_at": "2026-08-22T18:58:01.910Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "역시 동일한 문제 ST 의 위치는 뒤에서 시작하고 상대 포지션은 다 정해진 상태",
+      "size_bytes": 1312669,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "tt051-64c478ef-3c53-4345-b932-8c70adc7a4e1",
+      "build": "TT-0.51",
+      "created_at": "2026-08-22T18:50:40.237Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "스타트 상황 여전히 상대의 포메이션은 완성 되어 있고 ST는 우리 수비진 최 후방에서 출발함 3일전부터 언급했었던 문제임",
+      "size_bytes": 3508064,
+      "chunk_count": 1
+    },
     {
       "report_id": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
       "build": "TT-0.51",
@@ -84,7 +104,7 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
+  "latestAttachedReportId": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -94,13 +114,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
+      "reportId": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
       "build": "TT-0.51",
       "step": 78,
-      "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
-      "category": "슈팅/GK",
+      "description": "역시 동일한 문제 ST 의 위치는 뒤에서 시작하고 상대 포지션은 다 정해진 상태",
+      "category": "수비/전술",
       "priority": 3,
-      "reportedAt": "2026-08-21T02:35:07.726Z"
+      "reportedAt": "2026-08-22T18:56:19.476Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -123,18 +143,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 5267.100000000299,
-      "endSecond": 5277.600000000337,
+      "startSecond": 4671.899999999922,
+      "endSecond": 4671.899999999922,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 5163.3000000001575,
-      "endSecond": 5194.10000000027,
+      "startSecond": 3991.69999999982,
+      "endSecond": 3999.8,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 1659655,
-    "previousSerializedBytes": 4648921
+    "currentSerializedBytes": 163604,
+    "previousSerializedBytes": 1299654
   }
 }
