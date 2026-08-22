@@ -1290,11 +1290,11 @@ function updatePendingShots(m){
   }
 }
 
-function executeCarry(m,owner){
+function executeCarry(m,owner,opts={}){
   m.frontPassChain[owner.team]=0;
   if((m.attackRecycleUntil?.[owner.team]||0)>m.time){m.stats.recycleReattacks=(m.stats.recycleReattacks||0)+1;m.attackRecycleUntil[owner.team]=0;}
   const l=worldToLocal(owner.team,owner.x,owner.y),pressure=ballCarrierPressureDistance(m,owner),space=forwardSpace(m,owner,13),laneBias=(34-l.y)*0.055,inBox=inOppPenaltyArea(owner.team,owner.x,owner.y);
-  if(!inBox&&l.x>=70&&l.x<88&&['ST','WF','CM'].includes(owner.role)&&pressure<3.0){owner.action=owner.tacticalTask='SHIELD_SCAN';owner.sprint=false;owner.lockTargetUntil=0;owner.nextThink=m.time+0.68;owner.lastDecision='HOLD';return;}
+  if(!opts.userCommitted&&!inBox&&l.x>=70&&l.x<88&&['ST','WF','CM'].includes(owner.role)&&pressure<3.0){owner.action=owner.tacticalTask='SHIELD_SCAN';owner.sprint=false;owner.lockTargetUntil=0;owner.nextThink=m.time+0.68;owner.lastDecision='HOLD';return;}
   const base=owner.role==='WF'?4.8:owner.role==='ST'?4.3:owner.role==='CM'?3.8:owner.role==='FB'?3.5:2.8,stride=clamp(Math.min(base+space*0.19,space-0.45),1.2,7.2);
   let tx,ty;
   if(inBox){
@@ -2042,7 +2042,8 @@ function applyResolvedOwnerAction(m,owner,action){
   else if(action.type==='HOLD'){owner.action='SHIELD_SCAN';owner.tacticalTask='SHIELD_SCAN';owner.sprint=false;owner.nextThink=m.time+0.55;owner.lockTargetUntil=0;}
   else if(action.type==='TURN_BACK'){
     const l=worldToLocal(owner.team,owner.x,owner.y),w=localToWorld(owner.team,Math.max(76,l.x-8),clamp(lerp(l.y,34,0.22),4,64));owner.tx=w.x;owner.ty=w.y;owner.action='TURN_BACK';owner.sprint=false;owner.nextThink=m.time+0.95;owner.lockTargetUntil=owner.nextThink;
-  }else executeCarry(m,owner);
+  }else if(action.type==='CARRY')executeCarry(m,owner,{userCommitted:action.reason==='CANDIDATE_CARRY'||action.reason==='CLEAR_RUNWAY'});
+  else executeCarry(m,owner);
   return true;
 }
 function incomingBallChoiceState(m,owner){

@@ -431,7 +431,7 @@ function updateResultTracker(s){
   if(s.m.possession!==tr.startPossession&&tr.possessionChangedAt==null){tr.possessionChangedAt=s.m.time;if(s.m.userChoiceControl?.playerId===s.heroPlayerId&&s.m.userChoiceControl?.mode!=='POST_TACKLE_SETTLE')s.m.userChoiceControl=null;}
   const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
   let ready=false;
-  if(tt==='GOAL')ready=(s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))||age>=6.2;
+  if(tt==='GOAL'){const visibleGoalAge=s.m.goalCelebration?now-Number(s.m.goalCelebration.startedAt||now):null;ready=(s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))||(visibleGoalAge!=null&&visibleGoalAge>=4.8);}
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
     const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY';
     if(tt==='GOAL_KICK'||tt==='CORNER')ready=(now>=tr.minimumUntil)&&((ballReady&&ratio>=0.52)||!s.m.restart||age>=6.40);
@@ -463,7 +463,7 @@ function updateResultTracker(s){
         if(['CORNER','GOAL_KICK'].includes(shotOutcome.type)){
           const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY';
           ready=(ballReady&&ratio>=0.52)||!s.m.restart||sa>=6.4;
-        }else if(shotOutcome.type==='GOAL')ready=(s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))||sa>=6.2;
+        }else if(shotOutcome.type==='GOAL'){const visibleGoalAge=s.m.goalCelebration?now-Number(s.m.goalCelebration.startedAt||now):null;ready=(s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))||(visibleGoalAge!=null&&visibleGoalAge>=4.8);}
         else if(['SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK'].includes(shotOutcome.type)){
           const follow=tr.newEvents.find(e=>e.t>shotOutcome.t+.30&&['PASS','SHOT','TAKE_ON','CLEARANCE'].includes(e.type));
           ready=ballSettled&&((follow&&now-follow.t>=.20)||sa>=2.1);
@@ -474,7 +474,7 @@ function updateResultTracker(s){
       }else ready=now>=tr.startedAt+4.4&&ballSettled;
     }
   }else if(['DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(tr.choiceId))ready=now>=tr.startedAt+2.2||tr.possessionChangedAt!=null&&now-tr.possessionChangedAt>=1.1;
-  if(ready||now>=tr.deadline||s.m.completed)return finalizeResult(s,terminal);
+  const goalPresentationActive=tt==='GOAL'&&s.m.phase==='GOAL_CELEBRATION'&&!!s.m.goalCelebration;if(ready||(!goalPresentationActive&&now>=tr.deadline)||s.m.completed)return finalizeResult(s,terminal);
   return null;
 }
 function applyChoice(s,choiceId,targetId=null,inputMeta={}){
