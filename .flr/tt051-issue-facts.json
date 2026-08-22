@@ -213,6 +213,170 @@
       }
     },
     {
+      "id": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
+      "description": "역시 동일한 문제 ST 의 위치는 뒤에서 시작하고 상대 포지션은 다 정해진 상태",
+      "current": {
+        "selected": [
+          null,
+          null
+        ],
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-RW",
+            "공간 침투 패스 → 같은 팀 RW"
+          ],
+          [
+            "THROUGH_PASS",
+            "H-LW",
+            "공간 침투 패스 → 같은 팀 LW"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-CM",
+            "안전한 패스 → 같은 팀 CM"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          null,
+          null
+        ],
+        "motion": {
+          "t0": 4672.0,
+          "t1": 4673.5,
+          "heroStart": [
+            50.39,
+            34.02
+          ],
+          "heroEnd": [
+            56.3,
+            34.04
+          ],
+          "heroXRange": [
+            50.39,
+            56.3
+          ],
+          "heroYRange": [
+            34.02,
+            34.04
+          ],
+          "heroMeanSpeed": 3.83,
+          "minOpponentDistance": 8.37,
+          "minOpponentId": "A-CM",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 0,
+          "spanUnder1_6m": 0,
+          "lastNearest": {
+            "id": "A-CM",
+            "d": 8.37,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": []
+      },
+      "previous": {
+        "selected": [
+          "SAFE_PASS",
+          "H-RCM"
+        ],
+        "options": [
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RCM",
+            "안전한 패스 → 같은 팀 RCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LW",
+            "안전한 패스 → 같은 팀 LW"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "INTERCEPT",
+          "안전한 패스 → 같은 팀 RCM 결과"
+        ],
+        "motion": {
+          "t0": 3991.8,
+          "t1": 3999.8,
+          "heroStart": [
+            89.77,
+            18.0
+          ],
+          "heroEnd": [
+            80.36,
+            31.88
+          ],
+          "heroXRange": [
+            80.36,
+            94.32
+          ],
+          "heroYRange": [
+            13.51,
+            32.18
+          ],
+          "heroMeanSpeed": 4.23,
+          "minOpponentDistance": 1.25,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 7,
+          "spanUnder1_6m": 1.4,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 5.41,
+            "task": "REST_DEFENCE"
+          }
+        },
+        "heroSequence": [
+          [
+            3993.3,
+            "PASS",
+            "H-ST",
+            "H-RCM",
+            "블루팀 ST이 블루팀 RCM 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            3993.3,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SAFE_PASS -> H-RCM"
+          ]
+        ]
+      }
+    },
+    {
       "id": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
       "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
       "current": {
@@ -596,6 +760,198 @@
             "H-ST",
             "H-LW",
             "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tt051-64c478ef-3c53-4345-b932-8c70adc7a4e1",
+      "description": "스타트 상황 여전히 상대의 포메이션은 완성 되어 있고 ST는 우리 수비진 최 후방에서 출발함 3일전부터 언급했었던 문제임",
+      "current": {
+        "selected": [
+          null,
+          null
+        ],
+        "options": [
+          [
+            "THROUGH_PASS",
+            "H-LW",
+            "공간 침투 패스 → 같은 팀 LW"
+          ],
+          [
+            "SWITCH_PASS",
+            "H-LW",
+            "전환 패스 → 같은 팀 LW"
+          ],
+          [
+            "THROUGH_PASS",
+            "H-CM",
+            "공간 침투 패스 → 같은 팀 CM"
+          ],
+          [
+            "THROUGH_PASS",
+            "H-LCM",
+            "공간 침투 패스 → 같은 팀 LCM"
+          ],
+          [
+            "SAFE_PASS",
+            "H-RB",
+            "안전한 패스 → 같은 팀 RB"
+          ],
+          [
+            "CARRY",
+            null,
+            "공간 전진"
+          ]
+        ],
+        "result": [
+          null,
+          null
+        ],
+        "motion": {
+          "t0": 2348.6,
+          "t1": 2350.1,
+          "heroStart": [
+            17.69,
+            33.96
+          ],
+          "heroEnd": [
+            23.58,
+            33.91
+          ],
+          "heroXRange": [
+            17.69,
+            23.58
+          ],
+          "heroYRange": [
+            33.91,
+            33.96
+          ],
+          "heroMeanSpeed": 3.83,
+          "minOpponentDistance": 5.23,
+          "minOpponentId": "A-ST",
+          "samplesUnder1_2m": 0,
+          "spanUnder1_2m": 0,
+          "samplesUnder1_6m": 0,
+          "spanUnder1_6m": 0,
+          "lastNearest": {
+            "id": "A-ST",
+            "d": 5.23,
+            "task": "PRESS_CONTAIN"
+          }
+        },
+        "heroSequence": []
+      },
+      "previous": {
+        "selected": [
+          "DELAY",
+          null
+        ],
+        "options": [
+          [
+            "SAFE_PASS",
+            "H-LW",
+            "안전한 패스 → 같은 팀 LW"
+          ],
+          [
+            "SHOT",
+            null,
+            "슈팅"
+          ],
+          [
+            "SAFE_PASS",
+            "H-LCM",
+            "안전한 패스 → 같은 팀 LCM"
+          ],
+          [
+            "AVAILABLE_PASS",
+            "H-RW",
+            "전진 패스 → 같은 팀 RW"
+          ],
+          [
+            "HOLD",
+            null,
+            "볼 지키기"
+          ]
+        ],
+        "result": [
+          "POSSESSION_LOST",
+          "지연 수비 결과"
+        ],
+        "motion": {
+          "t0": 1917.5,
+          "t1": 1941.5,
+          "heroStart": [
+            74.87,
+            31.97
+          ],
+          "heroEnd": [
+            70.01,
+            31.8
+          ],
+          "heroXRange": [
+            70.01,
+            86.85
+          ],
+          "heroYRange": [
+            29.6,
+            42.4
+          ],
+          "heroMeanSpeed": 2.77,
+          "minOpponentDistance": 1.05,
+          "minOpponentId": "A-RCB",
+          "samplesUnder1_2m": 19,
+          "spanUnder1_2m": 15.2,
+          "samplesUnder1_6m": 85,
+          "spanUnder1_6m": 18.5,
+          "lastNearest": {
+            "id": "A-RCB",
+            "d": 6.44,
+            "task": "REST_DEFENCE"
+          }
+        },
+        "heroSequence": [
+          [
+            1927.5,
+            "PASS",
+            "H-ST",
+            "H-LW",
+            "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            1927.5,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SAFE_PASS -> H-LW"
+          ],
+          [
+            1930.4,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: CARRY"
+          ],
+          [
+            1931.4,
+            "PASS",
+            "H-ST",
+            "H-LCM",
+            "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          ],
+          [
+            1931.4,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: SAFE_PASS -> H-LCM"
+          ],
+          [
+            1939.2,
+            "USER_CHOICE",
+            null,
+            null,
+            "H-ST: DELAY"
           ]
         ]
       }
