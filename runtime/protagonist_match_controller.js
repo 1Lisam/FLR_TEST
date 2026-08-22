@@ -99,7 +99,7 @@ function defendingImportance(f){
   if(attackX>=86)v+=.07;if((f.role==='CB'||f.role==='FB')&&attackX>=78)v+=.025;
   return clamp(v,0,1);
 }
-function isShotChoice(id){return['SHOT','DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(id);}function isPassChoice(id){return['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','ONE_TOUCH_PASS','HEADER_PASS'].includes(id);}function family(id){if(isShotChoice(id))return'슈팅';if(['CARRY','TAKE_ON'].includes(id))return'돌파';if(['EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(id))return'크로스';if(isPassChoice(id))return'패스';if(['TACKLE','DELAY','BLOCK_LANE'].includes(id))return'수비';return'볼 유지';}
+function isShotChoice(id){return['SHOT','DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(id);}function isPassChoice(id){return['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','ONE_TOUCH_PASS','HEADER_PASS'].includes(id);}function family(id){if(isShotChoice(id))return'슈팅';if(['CARRY','TAKE_ON'].includes(id))return'돌파';if(['EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(id))return'크로스';if(isPassChoice(id))return'패스';if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(id))return'수비';return'볼 유지';}
 function targetDisplay(c){return c?.meta?.targetSlot?`같은 팀 ${c.meta.targetSlot}`:(c.targetName||null)}function labelFor(c){const target=targetDisplay(c),t=target?` → ${target}`:'';const shotLabel=c.id==='SHOT'?(c.meta?.turningRequired?'터닝 슛':c.meta?.longRange?'중거리 슛':'슈팅'):'슈팅';return({SHOT:shotLabel,DIRECT_SHOT:'논스톱 슈팅',VOLLEY_SHOT:'발리 슈팅',HEADER_SHOT:'헤더 슈팅',ONE_TOUCH_PASS:'원터치 패스',HEADER_PASS:'헤더 패스',TRAP_CONTROL:'트래핑 후 컨트롤',CARRY:'공간 전진',TAKE_ON:'1대1 돌파',THROUGH_PASS:'공간 침투 패스',PROGRESSIVE_PASS:'발밑 전진 패스',AVAILABLE_PASS:'전진 패스',EARLY_CROSS:'얼리 크로스',DEEP_CROSS:'크로스',CUTBACK:'컷백',SWITCH_PASS:'전환 패스',SAFE_PASS:'안전한 패스',RECYCLE:'재순환',SHORT_DISTRIBUTION:'짧은 빌드업',LONG_DISTRIBUTION:'전방 롱 배급',HOLD:'볼 지키기',TURN_BACK:'방향 전환'}[c.id]||c.id)+t;}
 function riskFor(c,f){if(c.id==='TAKE_ON')return f.pressure<1.8?'높음':'보통';if(['DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(c.id))return'높음';if(['ONE_TOUCH_PASS','HEADER_PASS'].includes(c.id))return'보통';if(c.id==='TRAP_CONTROL')return f.pressure<1.5?'높음':'낮음';if(c.id==='SHOT')return c.meta?.turningRequired?'높음':c.meta?.longRange?'높음':(f.shot?.blockers??0)>=1?'높음':f.shot?.openWindow?'보통':(f.shot?.dGoal??99)>15?'높음':'보통';if(c.id==='THROUGH_PASS')return'보통';if(c.id==='AVAILABLE_PASS')return c.meta?.contested?'높음':'보통';if(c.id==='CUTBACK'||c.id==='DEEP_CROSS')return'보통';if(c.id==='SAFE_PASS'||c.id==='RECYCLE')return'낮음';if(c.id==='HOLD')return f.pressure<1.5?'높음':'낮음';return'보통';}
 function tooltipFor(c,f){
@@ -221,12 +221,12 @@ function onBallOptions(frame){
   return out;
 }
 function defensiveOptions(frame){
-  const mk=(id,label,targetId=null,targetName=null)=>{let intent='',related='',gain='',loss='',risk='보통';if(id==='TACKLE'){intent='즉시 발을 넣어 공을 빼앗습니다.';related='태클, 반응';gain='바로 소유권을 가져올 수 있음';loss='실패하면 돌파 또는 파울 위험';risk='높음';}else if(id==='DELAY'){intent='볼 소유자와 골문 사이를 지키며 진로를 늦춰 동료 복귀 시간을 법니다.';related='수비 위치선정, 반응';gain='상대 공격 속도를 늦출 수 있음';loss='간격을 잘못 잡으면 패스나 돌파 시간을 줄 수 있음';risk='보통';}else{intent=`볼 소유자보다 골문 쪽 위치에서 위협적인 패스 대상${targetName?` (${targetName})`:''}으로 향하는 길을 막습니다.`;related='예측, 수비 위치선정';gain='전진 패스를 차단할 수 있음';loss='볼 소유자에게 직접 압박을 덜 줄 수 있음';risk='보통';}const tip=`의도: ${intent}\n관련 능력: ${related}\n위험: ${risk}\n성공하면: ${gain}\n실패하면: ${loss}`;return{id,family:'수비',label,targetId,targetName,hint:tip,tooltip:tip};};
+  const mk=(id,label,targetId=null,targetName=null)=>{let intent='',related='',gain='',loss='',risk='보통';if(id==='TACKLE'){intent='즉시 발을 넣어 공을 빼앗습니다.';related='태클, 반응';gain='바로 소유권을 가져올 수 있음';loss='실패하면 돌파 또는 파울 위험';risk='높음';}else if(id==='DELAY'){intent='볼 소유자와 골문 사이를 지키며 진로를 늦춰 동료 복귀 시간을 법니다.';related='수비 위치선정, 반응';gain='상대 공격 속도를 늦출 수 있음';loss='간격을 잘못 잡으면 패스나 돌파 시간을 줄 수 있음';risk='보통';}else if(id==='GK_HOLD_POSITION'){intent='현재 골문 깊이를 크게 버리지 않고 슈터의 다음 동작을 보며 반응 준비를 합니다.';related='GK 위치선정, 반응, 예측';gain='칩이나 추가 패스에 쉽게 노출되지 않으면서 슈팅에 반응할 수 있음';loss='슈터에게 보이는 골문 각도를 더 많이 남길 수 있음';risk='보통';}else if(id==='GK_STEP_OUT'){intent='골문을 버리고 달려드는 것이 아니라 한두 걸음만 전진해 슈팅 각도를 줄입니다.';related='GK 위치선정, 반응, 가속';gain='슈터에게 보이는 골문 면적을 줄일 수 있음';loss='칩이나 옆 패스가 나오면 복귀 여유가 줄어들 수 있음';risk='보통';}else{intent=`볼 소유자보다 골문 쪽 위치에서 위협적인 패스 대상${targetName?` (${targetName})`:''}으로 향하는 길을 막습니다.`;related='예측, 수비 위치선정';gain='전진 패스를 차단할 수 있음';loss='볼 소유자에게 직접 압박을 덜 줄 수 있음';risk='보통';}const tip=`의도: ${intent}\n관련 능력: ${related}\n위험: ${risk}\n성공하면: ${gain}\n실패하면: ${loss}`;return{id,family:'수비',label,targetId,targetName,hint:tip,tooltip:tip};};
   const out=[],goalSide=Number(frame.goalSideMargin??0),behind=goalSide<-.55;
   if(frame.role==='GK'){
     if(frame.distance<=1.75)out.push(mk('TACKLE','몸을 던져 먼저 건드리기'));
-    if(frame.distance<=11.5)out.push(mk('DELAY','각도 좁히며 버티기'));
-    if(frame.threatTarget&&frame.distance<=10.5)out.push(mk('BLOCK_LANE',`컷백/패스 대비 → ${frame.threatTarget.name}`,frame.threatTarget.id,frame.threatTarget.name));
+    const shot=frame.threatShot||{},urgent=!!shot.oneVOne||(!!shot.openWindow&&Number(shot.dGoal??99)<=18.0);
+    if(urgent){out.push(mk('GK_HOLD_POSITION','현재 깊이 유지하며 반응 준비'));out.push(mk('GK_STEP_OUT','한두 걸음 전진해 각도 좁히기'));}
     return out;
   }
   // An attacker who has already been bypassed should not receive centre-back style
@@ -293,7 +293,7 @@ function readyForOnBallPause(s,f,importance){
   if(!newControl&&!gapReady(s,importance))return false;if(newControl&&s.m.time-s.lastPauseAt<.55)return false;if(!newControl&&s.m.time-s.lastPauseAt<1.75)return false;return true;
 }
 function readyForIncomingPause(s,f,importance){if(f.kind!=='INCOMING_BALL')return false;const eta=Number(f.eta);if(!Number.isFinite(eta)||eta<.07||eta>.82)return false;const mode=normalizeMode(s.mode),age=s.m.time-s.lastPauseAt,chain=episodeContinuation(s,f);if(chain)return age>=.08;if(mode==='IMPORTANT'&&importance<MODES.IMPORTANT.threshold)return false;if(mode==='DECISIVE_ONLY'&&importance<MODES.DECISIVE_ONLY.threshold)return false;if(['FULL_MATCH','PLAYER_ALL','PLAYER_FOCUS'].includes(mode))return age>=.22;if(mode==='IMPORTANT')return age>=18;if(mode==='DECISIVE_ONLY')return age>=24;return false;}
-function readyForDefPause(s,f,importance){if(f.kind!=='DEFENDING'||f.distance>5.6)return false;const mode=normalizeMode(s.mode),age=s.m.time-s.lastPauseAt;if(mode==='IMPORTANT'&&age<150)return false;if(mode==='DECISIVE_ONLY'&&age<210)return false;if(!gapReady(s,importance))return false;const h=hero(s);if(!h||h.nextChallengeAt>s.m.time+.25)return false;return true;}
+function readyForDefPause(s,f,importance){if(f.kind!=='DEFENDING')return false;const gkThreat=f.role==='GK';if(!gkThreat&&f.distance>5.6)return false;if(gkThreat){const sh=f.threatShot||{},urgent=!!sh.oneVOne||(!!sh.openWindow&&Number(sh.dGoal??99)<=18.0);if(!urgent)return false;}const mode=normalizeMode(s.mode),age=s.m.time-s.lastPauseAt;if(mode==='IMPORTANT'&&age<150)return false;if(mode==='DECISIVE_ONLY'&&age<210)return false;if(!gapReady(s,importance))return false;const h=hero(s);if(!h||h.nextChallengeAt>s.m.time+.25)return false;return true;}
 function sanitizeFrameForScene(q){if(!q)return null;const f=q.frame||{};return{kind:f.kind,playerId:f.playerId,team:f.team,role:f.role,slot:f.slot,time:Number((f.time||0).toFixed(3)),localX:Number.isFinite(f.localX)?Number(f.localX.toFixed(3)):null,localY:Number.isFinite(f.localY)?Number(f.localY.toFixed(3)):null,pressure:Number.isFinite(f.pressure)?Number(f.pressure.toFixed(3)):null,space:Number.isFinite(f.space)?Number(f.space.toFixed(3)):null,held:Number.isFinite(f.held)?Number(f.held.toFixed(3)):null,shot:f.shot?deep(f.shot):null,distance:Number.isFinite(f.distance)?Number(f.distance.toFixed(3)):null,opponentId:f.opponentId||null,opponentName:f.opponentName||null,opponentAttackX:Number.isFinite(f.opponentAttackX)?Number(f.opponentAttackX.toFixed(3)):null,goalSideMargin:Number.isFinite(f.goalSideMargin)?Number(f.goalSideMargin.toFixed(3)):null,threatTarget:f.threatTarget?deep(f.threatTarget):null,threatShot:f.threatShot?deep(f.threatShot):null,eta:Number.isFinite(f.eta)?Number(f.eta.toFixed(3)):null,contactX:Number.isFinite(f.contactX)?Number(f.contactX.toFixed(3)):null,contactY:Number.isFinite(f.contactY)?Number(f.contactY.toFixed(3)):null,contactZ:Number.isFinite(f.contactZ)?Number(f.contactZ.toFixed(3)):null,incomingSpeed:Number.isFinite(f.incomingSpeed)?Number(f.incomingSpeed.toFixed(3)):null,flightKind:f.flightKind||null,sourceId:f.sourceId||null,candidates:(f.candidates||[]).map(c=>({id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,score:c.score,meta:c.meta?deep(c.meta):null}))};}
 function maybeCheckpoint(s){
   updateEpisodeState(s);const def=modeDef(s);if(s.pending||s.resultTracker||def.presentation==='SKIP'||s.m.completed||s.m.restart)return null;const q=inspect(s);
@@ -317,7 +317,7 @@ function beginResultTracker(s,opt,res,beforeKeys){
   if(['CARRY','HOLD'].includes(opt.id)){minimumUntil=intentUntil||now+1.0;deadline=minimumUntil+0.45;}
   else if(opt.id==='TAKE_ON'){minimumUntil=intentUntil||now+1.05;deadline=now+3.8;}
   else if(isShotChoice(opt.id)){minimumUntil=now+0.8;deadline=now+10.0;}
-  else if(['TACKLE','DELAY','BLOCK_LANE'].includes(opt.id)){minimumUntil=now+0.8;deadline=now+4.5;}
+  else if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(opt.id)){minimumUntil=now+0.8;deadline=now+4.5;}
   else if(familyName==='패스'||familyName==='크로스'){minimumUntil=now+0.9;deadline=now+8.0;}
   s.resultTracker={sceneId:s.currentScene?.sceneId||null,startedAt:Number(now.toFixed(3)),minimumUntil,deadline,choiceId:opt.id,targetId:opt.targetId||null,targetName:opt.targetName||null,label:opt.label,family:familyName,action:res.action?deep(res.action):null,intentUntil,seen:new Set(beforeKeys||[]),newEvents:[],startScore:{...s.m.score},startPossession:s.m.possession,startOwnerId:s.m.ball.ownerId||null,terminalEvent:null,terminalAt:null,possessionChangedAt:null,done:false};
   if(s.currentScene){s.currentScene.choice={at:Number(now.toFixed(3)),id:opt.id,label:opt.label,targetId:opt.targetId||null,targetName:opt.targetName||null,family:familyName,applied:deep(res)};s.currentScene.postFrames=[];}
@@ -351,7 +351,7 @@ function resultNarrative(s,tr,terminal=null){
     if(x?.type==='TAKE_ON_TACKLED')return{code:'TACKLED',headline:'1대1 돌파 실패',detail:flow||`${x.text} 이후 상대의 다음 플레이까지 이어졌습니다.`,terminalEvent:deep(x)};
     if(x?.type==='TAKE_ON_LOOSE')return{code:'LOOSE',headline:'1대1 돌파 후 루즈볼',detail:flow||`${x.text} 이후 루즈볼 경합까지 이어졌습니다.`,terminalEvent:deep(x)};
   }
-  if(['TACKLE','DELAY','BLOCK_LANE'].includes(choice)){
+  if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){
     const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));
     if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};
   }
@@ -473,7 +473,7 @@ function updateResultTracker(s){
         ready=ballSettled&&((oppFollow&&now-oppFollow.t>=.20)||now-tr.possessionChangedAt>=1.25);
       }else ready=now>=tr.startedAt+4.4&&ballSettled;
     }
-  }else if(['DELAY','BLOCK_LANE'].includes(tr.choiceId))ready=now>=tr.startedAt+2.2||tr.possessionChangedAt!=null&&now-tr.possessionChangedAt>=1.1;
+  }else if(['DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(tr.choiceId))ready=now>=tr.startedAt+2.2||tr.possessionChangedAt!=null&&now-tr.possessionChangedAt>=1.1;
   if(ready||now>=tr.deadline||s.m.completed)return finalizeResult(s,terminal);
   return null;
 }

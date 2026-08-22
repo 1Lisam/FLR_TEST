@@ -21,7 +21,11 @@ function passPlan(ctx={}){
   if(kind==='CUTBACK'){
     style='CUTBACK';arrival=clamp(0.54+d/58,0.60,0.92);speed=clamp(d/arrival+quality*0.8,14.2,20.5);loft=0.08;
   }else if(kind==='CROSS'){
-    style=ctx.sourceX>=94?'BYLINE_CROSS':'CROSS';arrival=clamp(0.82+d/48,0.95,1.45);speed=clamp(d/arrival+3.6+quality*1.1,18.2,25.2);loft=ctx.sourceX>=94?2.65:3.05;
+    if(ctx.crossVariant==='DRIVEN_LOW'){
+      style='DRIVEN_LOW_CROSS';arrival=clamp(0.48+d/58,0.64,1.02);speed=clamp(d/arrival+2.0+quality*0.9,18.0,25.8);loft=0.08;
+    }else{
+      style=ctx.sourceX>=94?'BYLINE_HIGH_CROSS':'HIGH_CROSS';arrival=clamp(0.82+d/48,0.95,1.45);speed=clamp(d/arrival+3.6+quality*1.1,18.2,25.2);loft=ctx.sourceX>=94?2.65:3.05;
+    }
   }else if(kind==='THROUGH'){
     if(mode==='AERIAL'){
       style='LOFTED_THROUGH';arrival=clamp(0.95+d/41,1.12,1.72);speed=clamp(d/arrival+3.0+quality,16.0,23.8);loft=1.55;
@@ -36,13 +40,13 @@ function passPlan(ctx={}){
     }
   }else{
     if(d<=9.5&&forward<8){
-      style='SHORT_GROUND';arrival=clamp(0.48+d/34,0.55,0.78);speed=clamp(d/arrival+quality*0.7,9.5,15.5);loft=0.06;
+      style='SHORT_GROUND';arrival=clamp(0.48+d/34,0.55,0.78);speed=clamp(d/arrival+quality*0.7,8.5,13.8);loft=0.06;
     }else{
-      style='FIRM_GROUND';arrival=clamp(0.56+d/43-(pressure<1.55?0.06:0),0.68,1.12);speed=clamp(d/arrival+quality*0.9,13.8,21.8);loft=0.07;
+      style='FIRM_GROUND';arrival=clamp(0.72+d/34-(pressure<1.55?0.04:0),0.86,1.48);speed=clamp(d/arrival+quality*0.9,10.5,16.8);loft=0.07;
     }
   }
   // A pressured ball-carrier tends to punch a ground pass more firmly; aerial balls are not sped up artificially.
-  if(mode==='GROUND'&&pressure<1.55&&kind!=='CUTBACK')speed=clamp(speed+0.8,9.5,26.0);
+  if(mode==='GROUND'&&pressure<1.55&&kind!=='CUTBACK')speed=clamp(speed+0.6,8.5,22.0);
   const groundDragK=mode==='GROUND'&&kind==='THROUGH'?groundDragFor(d,arrival,speed):null;
   return{style,speed:Number(speed.toFixed(3)),loft:Number(loft.toFixed(3)),arrival:Number(arrival.toFixed(3)),groundDragK};
 }

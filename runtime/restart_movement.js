@@ -106,6 +106,33 @@ function buildCorner(m,setup){
   for(const p of def){const q=defendSlots[p.slot]||[94,34];target(setup,p.id,opponentSlotTarget(team,p,q[0],q[1]),'CORNER_DEFENCE_SETUP',['GK','CB','FB','CM'].includes(p.role),true);}
   return setup;
 }
+function secondLastDefenderLocalX(m,setup,restartTeam,defenders){
+  const xs=[];
+  for(const p of defenders){
+    const t=setup?.targets?.[p.id];
+    const q=t?worldToLocal(restartTeam,t.x,t.y):worldToLocal(restartTeam,p.x,p.y);
+    if(Number.isFinite(q.x))xs.push(q.x);
+  }
+  xs.sort((a,b)=>b-a);
+  return xs.length>=2?xs[1]:(xs[0]??0);
+}
+function keepFreeKickAttackersOnside(m,setup,restartTeam,defenders,ballLocalX){
+  const secondLastX=secondLastDefenderLocalX(m,setup,restartTeam,defenders);
+  // Law 11: a player is not beyond the offside line while level with/behind either
+  // the ball or the second-last opponent.  Keep setup players a small distance behind
+  // that line; their later live run remains governed by the normal offside system.
+  const offsideLineX=Math.max(ballLocalX,secondLastX);
+  const safeX=clamp(offsideLineX-0.80,1,103.2);
+  for(const p of teamPlayers(m,restartTeam)){
+    if(p.id===setup.kickerId||!['ST','WF'].includes(p.role))continue;
+    const t=setup.targets[p.id];if(!t||t.task!=='FREE_KICK_ATTACK_SETUP')continue;
+    const l=worldToLocal(restartTeam,t.x,t.y);
+    if(l.x<=safeX)continue;
+    const w=localToWorld(restartTeam,safeX,l.y);
+    t.x=w.x;t.y=w.y;
+  }
+  setup.freeKickOffsideLine={secondLastX,ballLocalX,offsideLineX,safeX};
+}
 function buildFreeKick(m,setup){
   const r=m.restart,team=r.team,opp=other(team),point={x:r.x,y:r.y},attackers=teamPlayers(m,team),defenders=teamPlayers(m,opp),used=new Set();
   const kicker=nearestForTarget(outfield(m,team),point,'SET_PIECE',used);if(!kicker)return null;used.add(kicker.id);setup.kickerId=kicker.id;const lp0=worldToLocal(team,r.x,r.y),approach=localToWorld(team,Math.max(1,lp0.x-1.45),lp0.y);target(setup,kicker.id,approach,r.kind==='OFFSIDE'?'OFFSIDE_KICKER_READY':'FREE_KICK_KICKER_READY',true,true);setup.restartApproach={start:approach,ball:{x:r.x,y:r.y}};
@@ -132,6 +159,7 @@ function buildFreeKick(m,setup){
       else q=[59,p.slot==='LW'?14:p.slot==='RW'?54:34];
       target(setup,p.id,opponentSlotTarget(team,p,q[0],q[1]),'FREE_KICK_DEFENCE_SETUP',['GK','CB','FB','CM'].includes(p.role),true);
     }
+    keepFreeKickAttackersOnside(m,setup,team,defenders,lp.x);
   }else{
     for(const p of defenders){const dl=worldToLocal(team,p.x,p.y);let holdX=clamp(Math.max(lp.x+10,dl.x),35,82),holdY=p.slot==='LB'?10:p.slot==='RB'?58:p.slot==='LCB'?27:p.slot==='RCB'?41:p.slot==='LCM'?22:p.slot==='RCM'?46:34;
       if(p.role==='ST'){holdX=Math.min(holdX,54);holdY=34;}

@@ -31,6 +31,8 @@ function relevant(action){switch(String(action||'').toUpperCase()){
   case'CARRY':case'DRIBBLE':return['dribbling','ball_control','agility','acceleration','balance'];
   case'TACKLE':return['tackling','anticipation','defensive_positioning','reaction','agility'];
   case'DELAY':case'BLOCK_LANE':return['defensive_positioning','anticipation','reaction','one_v_one_marking'];
+  case'GK_HOLD_POSITION':return['gk_positioning','reaction','anticipation','agility'];
+  case'GK_STEP_OUT':return['gk_positioning','reaction','acceleration','anticipation','agility'];
   default:return[];
 }}
 function composite(m,playerId,action){switch(String(action||'').toUpperCase()){
@@ -43,6 +45,8 @@ function composite(m,playerId,action){switch(String(action||'').toUpperCase()){
   case'CARRY':case'DRIBBLE':return weighted(m,playerId,{dribbling:.34,ball_control:.25,agility:.17,acceleration:.12,balance:.12});
   case'TACKLE':return weighted(m,playerId,{tackling:.42,anticipation:.22,defensive_positioning:.18,reaction:.10,agility:.08});
   case'DELAY':case'BLOCK_LANE':return weighted(m,playerId,{defensive_positioning:.36,anticipation:.30,reaction:.16,one_v_one_marking:.12,agility:.06});
+  case'GK_HOLD_POSITION':return weighted(m,playerId,{gk_positioning:.46,reaction:.26,anticipation:.18,agility:.10});
+  case'GK_STEP_OUT':return weighted(m,playerId,{gk_positioning:.36,reaction:.25,acceleration:.16,anticipation:.14,agility:.09});
   default:return DEFAULT;
 }}
 function testProfiles(role){

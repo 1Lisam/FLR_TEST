@@ -51,6 +51,10 @@ function apply(m,spec={}){
       if(roll<chance){B.setControlled(m,player,false);m.stats.turnovers++;m.stats.tacklesWon++;m.transitionUntil=m.time+2.2;player.nextThink=m.time+0.45;B.event(m,'TACKLE',`${player.name}이 사용자 선택 태클로 공을 빼앗았습니다.`);log.result='TACKLE_WON';}
       else if(roll<chance+0.10&&m.time-m.lastFoulAt>8){m.lastFoulAt=m.time;m.stats.fouls++;m.stats.freeKicks++;B.event(m,'FOUL',`${player.name}의 사용자 선택 태클이 파울이 됐습니다.`);B.startDeadRestart(m,'FREE_KICK',owner.team,owner.x,owner.y);log.result='FOUL';}
       else{const n=B.norm(player.x-owner.x,player.y-owner.y);B.setLoose(m,m.ball.x,m.ball.y,-n.x*(2.5+m.r()*2.5),-n.y*(2.5+m.r()*2.5),owner.team,owner.id);m.stats.looseBalls++;B.event(m,'LOOSE',`${player.name}의 태클 경합으로 공이 흘렀습니다.`);log.result='TACKLE_LOOSE';}
+    }else if(choice==='GK_HOLD_POSITION'||choice==='GK_STEP_OUT'){
+      if(player.role!=='GK')return finish(m,log,false,'GK_CHOICE_REQUIRES_GK');
+      m.userGoalkeeperPositionIntent={playerId:player.id,team:player.team,mode:choice==='GK_STEP_OUT'?'STEP_OUT':'HOLD_DEPTH',setAt:m.time,until:m.time+3.20,futureOutcomePrecomputed:false};
+      player.action=choice==='GK_STEP_OUT'?'USER_GK_STEP_OUT_INTENT':'USER_GK_HOLD_INTENT';player.tacticalTask=choice==='GK_STEP_OUT'?'GK_NARROW_ANGLE_INTENT':'GK_HOLD_DEPTH_INTENT';player.sprint=false;player.lockTargetUntil=0;player.nextChallengeAt=m.time+.55;player.pressCommitUntil=0;log.result=choice==='GK_STEP_OUT'?'GK_STEP_OUT_INTENT_ARMED':'GK_HOLD_INTENT_ARMED';
     }else if(choice==='DELAY'){
       const n=B.norm(goal.x-owner.x,goal.y-owner.y),hold=1.65;player.tx=B.clamp(owner.x+n.x*hold,1,104);player.ty=B.clamp(owner.y+n.y*hold,1,67);player.action='USER_DELAY';player.tacticalTask='CONTAIN';player.sprint=false;player.lockTargetUntil=m.time+1.45;player.nextChallengeAt=m.time+1.55;player.duelContainUntil=Math.max(player.duelContainUntil||0,m.time+1.55);player.pressCommitUntil=0;log.result='DELAY_SET';
       // The user's intent is 'delay', not 'delay for 0.7 s and then auto-engage'.

@@ -33,6 +33,10 @@ function phaseLocal(m,team){return local(team,m.ball.x,m.ball.y).x;}
 function maybeDecisionBias(m,team){
   const pr=m.managerProfiles?.[team];if(!pr||m.ball.mode!=='CONTROLLED')return;
   const owner=B.playerById(m,m.ball.ownerId);if(!owner||owner.team!==team||owner.role==='GK')return;
+  // The manager may influence an NPC's decision, but once the hybrid/live authority
+  // layer has explicitly reserved the protagonist's next material action for the user,
+  // this adapter must not bypass that reservation by calling executePass directly.
+  if(m.protagonistExplicitActionRequired===true&&owner.id===m.protagonistControllerId)return;
   // Manager preference may bias WHICH pass is chosen, but it must not bypass the
   // player's first-touch / scan readiness. Quick combinations still happen naturally
   // when the core gives a short nextThink in transitions or under pressure.
