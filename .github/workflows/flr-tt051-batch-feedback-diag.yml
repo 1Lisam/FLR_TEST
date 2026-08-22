@@ -22,7 +22,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Fetch reports and extract compact issue facts
+      - name: Fetch latest two reports and extract compact issue facts
         id: diag
         continue-on-error: true
         shell: bash
@@ -31,16 +31,7 @@ jobs:
           mkdir -p /tmp/flr_batch
           for rid in \
             tt051-f42d0a99-3280-4119-9879-06117a3fca9c \
-            tt051-f7f30898-f3b1-423c-a9e6-94d5c6972ab2 \
-            tt051-64c478ef-3c53-4345-b932-8c70adc7a4e1 \
-            tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845 \
-            tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8 \
-            tt051-cc852f58-6718-4b71-9e39-bc67abd66574 \
-            tt051-53de8a05-f3f4-465c-9780-e51d381d66f8 \
-            tt051-ac85275c-b6a0-465c-851f-53296142d471 \
-            tt051-81ee7089-fc98-4f05-99d2-b7f1b1fa7a3e \
-            tt051-259e1218-0586-4693-af88-7adfb22b6fc3 \
-            tt051-e418816c-7d1e-434e-9c09-1c740879b08e; do
+            tt051-f7f30898-f3b1-423c-a9e6-94d5c6972ab2; do
             curl --max-time 30 -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/TT-0.51/${rid}.json" > "/tmp/flr_batch/${rid}.json"
           done
           python .flr/tt051_issue_facts.py /tmp/flr_batch/*.json > /tmp/flr_issue_facts.json
@@ -62,5 +53,5 @@ jobs:
           cp /tmp/flr_issue_facts.json .flr/tt051-issue-facts.json
           git add .flr/tt051-issue-facts.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Record TT-0.51 issue facts' || exit 0
+          git commit -m 'Record latest two FLR issue facts' || exit 0
           git push origin HEAD:main || exit 0
