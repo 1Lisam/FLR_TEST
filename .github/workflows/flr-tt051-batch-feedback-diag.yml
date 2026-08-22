@@ -22,7 +22,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Fetch 7 reports and extract compact issue facts
+      - name: Fetch reports and extract compact issue facts
         id: diag
         continue-on-error: true
         shell: bash
@@ -30,6 +30,8 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/flr_batch
           for rid in \
+            tt051-64c478ef-3c53-4345-b932-8c70adc7a4e1 \
+            tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845 \
             tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8 \
             tt051-cc852f58-6718-4b71-9e39-bc67abd66574 \
             tt051-53de8a05-f3f4-465c-9780-e51d381d66f8 \
