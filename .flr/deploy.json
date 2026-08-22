@@ -1,19 +1,50 @@
 {
-  "schemaVersion": "FLR_TT_VALIDATED_DEPLOY_1.0",
+  "schemaVersion": "FLR_TT_VALIDATED_DEPLOY_1.1",
   "fromBuild": "TT-0.51",
-  "toBuild": "TT-0.51-D1-LIVE-ENTRY",
-  "baseCommit": "8dfdfda456d1e8130af168450b8eff2f3a9aa6d7",
-  "validatedBaselineCommit": "626e9203191ffd353f7b99e0099d203b16877a6a",
+  "toBuild": "USER-MATCH-TEST-V0.1",
+  "baseCommit": "35968ed8dda2cb71c18a03d8a7844b62d2167fe1",
+  "validatedBaselineCommit": "35968ed8dda2cb71c18a03d8a7844b62d2167fe1",
   "validationStatus": "PASS_FOR_USER_VISUAL_RETEST",
   "step79Started": false,
-  "patchSha256": "c9997639fdbc4e1dd820a3ddcb8c82bb5de285ab53b24810e8bc04b311e36c65",
   "changedFiles": [
-    ".github/workflows/flr-cloudflare-bug-reporter.yml",
-    "bug-report-worker/schema.sql",
-    "bug-report-worker/worker.js",
-    "bug-report-worker/wrangler.toml",
-    "live_v06_scene_authority_browser.js"
+    "index.html",
+    "live_hybrid_session_v02.js",
+    "live_v06_scene_authority_browser.js",
+    "runtime/attribute_match_adapter.js",
+    "runtime/ball_strike_model.js",
+    "runtime/choice_action_resolver.js",
+    "runtime/continuous_match_core.js",
+    "runtime/manager_tendency_adapter.js",
+    "runtime/match_choice_telemetry.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/restart_movement.js",
+    "runtime/tactical_movement.js"
   ],
-  "commitMessage": "Deploy TT-0.51 D1 reports and live entry context",
-  "requestNonce": "2026-08-21T10:52+09:00-esm-checker-fixed"
+  "base64TarGz": {
+    "headParts": [
+      ".flr/user_match_test_v0_1/b64.part00",
+      ".flr/user_match_test_v0_1/b64.part01",
+      ".flr/user_match_test_v0_1/b64.part02"
+    ],
+    "bridgeParts": [
+      ".flr/user_match_test_v0_1/missing.part00",
+      ".flr/user_match_test_v0_1/missing.part01",
+      ".flr/user_match_test_v0_1/missing.part02",
+      ".flr/user_match_test_v0_1/missing.part03",
+      ".flr/user_match_test_v0_1/missing.part04",
+      ".flr/user_match_test_v0_1/missing.part05",
+      ".flr/user_match_test_v0_1/missing.part06",
+      ".flr/user_match_test_v0_1/missing.part07"
+    ],
+    "middleParts": [
+      ".flr/user_match_test_v0_1/b64.part04",
+      ".flr/user_match_test_v0_1/b64.part05",
+      ".flr/user_match_test_v0_1/b64.part06",
+      ".flr/user_match_test_v0_1/b64.part07"
+    ],
+    "bridgeSplit": 18000,
+    "sha256": "a7de123697cd6020868f46930df9d1094493117109ee0e11d5f6970014ebd611"
+  },
+  "commitMessage": "Deploy Match Engine User Test V0.1",
+  "requestNonce": "2026-08-23T02:47+09:00-user-match-test-v0.1"
 }
