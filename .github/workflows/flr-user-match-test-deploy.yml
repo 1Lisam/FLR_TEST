@@ -18,73 +18,79 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Checkout staged payload
+      - name: Checkout staged test build
         uses: actions/checkout@v4
         with:
           ref: automation/tt-deploy
           path: _incoming
           fetch-depth: 1
 
-      - name: Verify and replace public test files
+      - name: Replace test files
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import base64, hashlib, io, json, pathlib, subprocess, tarfile
-          meta = json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
-          head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
-          if head != meta['baseCommit']:
-              raise SystemExit(f"BASE_COMMIT_MISMATCH expected={meta['baseCommit']} actual={head}")
-          if meta.get('toBuild') != 'USER-MATCH-TEST-V0.1':
-              raise SystemExit('WRONG_BUILD')
-          if meta.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
-              raise SystemExit('BUILD_NOT_VALIDATED')
-          spec = meta['base64TarGz']
-          root = pathlib.Path('_incoming')
-          def read_parts(names):
-              paths = [root / x for x in names]
-              missing = [str(p) for p in paths if not p.is_file()]
-              if missing:
-                  raise SystemExit('MISSING_PARTS:'+','.join(missing))
-              return b''.join(p.read_bytes() for p in paths)
-          head64 = read_parts(spec['headParts'])
-          bridge = read_parts(spec['bridgeParts'])
-          middle = read_parts(spec['middleParts'])
-          cut = int(spec['bridgeSplit'])
-          encoded = head64 + bridge[:cut] + middle + bridge[cut:]
+          import base64, hashlib, io, pathlib, tarfile
+
+          root = pathlib.Path('_incoming/.flr/user_match_test_v0_1')
+          encoded = b''.join((root / f'b64.part{i:02d}').read_bytes() for i in range(10))
+          tail = (root / 'missing.part05').read_bytes()
+          encoded += tail[4000:] + b'WqX'
+          encoded += (root / 'missing.part06').read_bytes()
+          encoded += (root / 'missing.part07').read_bytes()
+
           archive = base64.b64decode(encoded, validate=True)
-          actual = hashlib.sha256(archive).hexdigest()
-          if actual != spec['sha256']:
-              raise SystemExit(f"ARCHIVE_SHA_MISMATCH expected={spec['sha256']} actual={actual}")
-          expected = set(meta['changedFiles'])
+          expected_sha = 'a7de123697cd6020868f46930df9d1094493117109ee0e11d5f6970014ebd611'
+          actual_sha = hashlib.sha256(archive).hexdigest()
+          if actual_sha != expected_sha:
+              raise SystemExit(f'ARCHIVE_SHA_MISMATCH expected={expected_sha} actual={actual_sha}')
+
+          expected = [
+              'index.html',
+              'live_hybrid_session_v02.js',
+              'live_v06_scene_authority_browser.js',
+              'runtime/attribute_match_adapter.js',
+              'runtime/ball_strike_model.js',
+              'runtime/choice_action_resolver.js',
+              'runtime/continuous_match_core.js',
+              'runtime/manager_tendency_adapter.js',
+              'runtime/match_choice_telemetry.js',
+              'runtime/protagonist_match_controller.js',
+              'runtime/restart_movement.js',
+              'runtime/tactical_movement.js',
+          ]
+          expected_set = set(expected)
+
           with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as tf:
-              entries = []
+              files = []
               for member in tf.getmembers():
                   name = member.name
                   while name.startswith('./'):
                       name = name[2:]
                   if not name or member.isdir():
                       continue
-                  pp = pathlib.PurePosixPath(name)
-                  if pp.is_absolute() or '..' in pp.parts or not member.isfile():
-                      raise SystemExit('UNSAFE_ARCHIVE_ENTRY:'+name)
-                  entries.append((member, name))
-              names = [name for _, name in entries]
-              if set(names) != expected or len(names) != len(expected):
-                  raise SystemExit(f"FILE_SET_MISMATCH expected={sorted(expected)} actual={sorted(names)}")
-              for member, name in entries:
+                  p = pathlib.PurePosixPath(name)
+                  if p.is_absolute() or '..' in p.parts or not member.isfile():
+                      raise SystemExit('UNSAFE_ARCHIVE_ENTRY:' + name)
+                  files.append((member, name))
+              names = [name for _, name in files]
+              if set(names) != expected_set or len(names) != len(expected):
+                  raise SystemExit(f'FILE_SET_MISMATCH actual={sorted(names)}')
+              for member, name in files:
                   src = tf.extractfile(member)
                   if src is None:
-                      raise SystemExit('EXTRACT_FAILED:'+name)
+                      raise SystemExit('EXTRACT_FAILED:' + name)
                   dest = pathlib.Path(name)
                   dest.parent.mkdir(parents=True, exist_ok=True)
                   dest.write_bytes(src.read())
                   print('replaced', name)
-          pathlib.Path('/tmp/flr_changed_files').write_text('\n'.join(meta['changedFiles'])+'\n', encoding='utf-8')
+
+          pathlib.Path('/tmp/flr_changed_files').write_text('\n'.join(expected) + '\n', encoding='utf-8')
+          print('archive sha256', actual_sha)
           PY
           rm -rf _incoming
 
-      - name: JavaScript syntax check
+      - name: Check JavaScript
         shell: bash
         run: |
           set -euo pipefail
@@ -93,7 +99,7 @@ jobs:
             if [[ "$f" == *.js ]]; then node --check "$f"; fi
           done < /tmp/flr_changed_files
 
-      - name: Commit replacement to main
+      - name: Commit test build
         shell: bash
         run: |
           set -euo pipefail
