@@ -1,8 +1,8 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
-  "build": "USER-MATCH-TEST-V0.1",
+  "build": "USER-MATCH-TEST-V0.2",
   "limit": 50,
-  "requestedAt": "2026-08-23T04:05:00+09:00",
-  "purpose": "Inspect latest user-submitted Match Engine User Test V0.1 bug reports after deployment",
-  "runNonce": "user-match-test-v0-1-audit-20260823-0405"
+  "requestedAt": "2026-08-23T04:12:00+09:00",
+  "purpose": "Inspect all newly submitted Match Engine User Test reports and group them for the V0.2 fix batch",
+  "runNonce": "user-match-test-v0-2-audit-20260823-0412"
 }
