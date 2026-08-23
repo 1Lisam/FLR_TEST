@@ -26,7 +26,7 @@ function tuneShot(m,p,choice){
 }
 function tunePass(m,p,choice){
   if(m.ball.mode!=='FLIGHT'||m.ball.kind==='SHOT')return;
-  const skill=A.composite(m,p.id,choice),pressure=B.nearestOppDistance(m,p),long=['THROUGH','LONG_DISTRIBUTION'].includes(choice)||Math.hypot((m.ball.targetX||m.ball.x)-m.ball.originX,(m.ball.targetY||m.ball.y)-m.ball.originY)>28;
+  const skill=A.composite(m,p.id,choice),pressure=B.nearestOppDistance(m,p),long=['THROUGH','LONG_DISTRIBUTION','LOFTED_DISTRIBUTION'].includes(choice)||Math.hypot((m.ball.targetX||m.ball.x)-m.ball.originX,(m.ball.targetY||m.ball.y)-m.ball.originY)>28;
   let errP=(long?0.135:0.085)-(skill-50)*0.00215+(pressure<2?0.045:pressure<3?0.018:0);errP=clamp(errP,0.008,long?0.22:0.16);
   const roll=m.r(),miscontrol=roll<errP;m.ball.passMiscontrol=miscontrol;
   const errScale=(100-skill)/100*(long?3.4:1.7);if(errScale>0.05&&m.ball.targetX!=null){const tx=clamp(m.ball.targetX+(m.r()-0.5)*errScale,0,105),ty=clamp(m.ball.targetY+(m.r()-0.5)*errScale*1.6,0,68);retargetFlight(m,tx,ty);}
@@ -53,7 +53,7 @@ function apply(m,spec={}){
   if(choice==='TACKLE'&&owner&&owner.team!==p.team&&m.ball.mode==='CONTROLLED')return abilityTackle(m,spec,p,owner);
   const res=BASE.apply(m,spec);if(!res.ok)return res;
   if(['SHOT','LONG_SHOT'].includes(choice))tuneShot(m,p,choice);
-  else if(['PASS','THROUGH','SHORT_DISTRIBUTION','LONG_DISTRIBUTION'].includes(choice))tunePass(m,p,choice);
+  else if(['PASS','THROUGH','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','LOFTED_DISTRIBUTION'].includes(choice))tunePass(m,p,choice);
   else if(['CARRY','DRIBBLE'].includes(choice))tuneCarry(m,p,choice);
   else if(['DELAY','BLOCK_LANE'].includes(choice)){const skill=A.composite(m,p.id,choice),n=clamp((skill-40)/50,0,1);p.tx=p.x+(p.tx-p.x)*(0.72+n*0.28);p.ty=p.y+(p.ty-p.y)*(0.72+n*0.28);record(m,{at:m.time,playerId:p.id,action:choice,skill:Number(skill.toFixed(2)),test:'DEFENSIVE_POSITIONING'});}
   return{...res,abilityComposite:Number(A.composite(m,p.id,choice).toFixed(2)),relatedAttributes:A.relevant(choice),futureOutcomePrecomputed:false};

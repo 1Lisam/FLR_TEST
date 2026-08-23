@@ -1,3 +1,14 @@
+# USER-MATCH-TEST V0.5.2 — 2026-08-24 — Intent V2 Integrated User Test
+
+- Promotes the frozen V0.5.2 correction plus Intent V2 spatial movement into the user-test candidate.
+- Preserves continuous Hybrid → V0.6 scene state without formation respawn at choice entry.
+- Adds bounded marking handoff for central winger runs and re-handoff when a winger exits wide.
+- Prevents long defender follow-the-man excursions while preserving off-ball attackers winning some exchanges.
+- Separates `공간으로 전진` from `1대1 돌파` in both choice semantics and execution.
+- Keeps explicit ground passes on the ground; adds long-range `로빙 패스`, preserves `로빙 침투패스`, and separates GK low-long vs lofted distribution.
+- Promotion gate: four-risk user gate PASS_FOR_PROMOTION_REVIEW, marking/lob/carry integration PASS, short/long multi-cycle PASS, 4×90-minute ST/CM/CB/GK integrated bench PASS.
+- This entry records the local integrated candidate; deployment commit is filled in only after GitHub test deployment succeeds.
+
 # TT-0.51 — Meaningful Choice / One-touch / Live Movement
 
 - Meaningless single-option protagonist checkpoints no longer stop play or auto-execute a material protagonist action.

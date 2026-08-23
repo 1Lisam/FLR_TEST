@@ -36,9 +36,9 @@ function apply(m,spec={}){
     }else if(choice==='SHORT_DISTRIBUTION'){
       const op=byId(spec.targetId)||opts.find(o=>['CB','FB','CM'].includes(o.p.role)&&o.block===0&&o.d<32)||opts[0];if(!op)return finish(m,log,false,'NO_SHORT_TARGET');
       player.lastActionAt=m.time;player.lastDecision=choice;B.executePass(m,player,op.p,op.d>30?'LONG_PASS':'PASS',op);log.targetId=op.p.id;
-    }else if(choice==='LONG_DISTRIBUTION'){
+    }else if(choice==='LONG_DISTRIBUTION'||choice==='LOFTED_DISTRIBUTION'){
       const target=B.playerById(m,spec.targetId)||B.teamPlayers(m,player.team).find(p=>p.role==='ST')||B.teamPlayers(m,player.team).find(p=>p.role==='WF');if(!target)return finish(m,log,false,'NO_LONG_TARGET');
-      const op=byId(target.id)||{p:target,d:B.dist(player,target),block:B.laneBlockers(m,player,target,B.other(player.team)).length,open:B.nearestOppDistance(m,target),forward:B.dir(player.team)*(target.x-player.x),running:false,lead:false,leadForward:0};player.lastActionAt=m.time;player.lastDecision=choice;B.executePass(m,player,target,'LONG_PASS',op);log.targetId=target.id;
+      const op0=byId(target.id)||{p:target,d:B.dist(player,target),block:B.laneBlockers(m,player,target,B.other(player.team)).length,open:B.nearestOppDistance(m,target),forward:B.dir(player.team)*(target.x-player.x),running:false,lead:false,leadForward:0},op=choice==='LOFTED_DISTRIBUTION'?{...op0,forceAerial:true}:choice==='LONG_DISTRIBUTION'?{...op0,forceGround:true}:op0;player.lastActionAt=m.time;player.lastDecision=choice;B.executePass(m,player,target,'LONG_PASS',op);log.targetId=target.id;
     }else return finish(m,log,false,'UNSUPPORTED_ON_BALL_CHOICE');
     if(choice!=='CARRY'&&choice!=='DRIBBLE')m.userChoiceControl=null;
     return finish(m,log,true,'APPLIED','ON_BALL');

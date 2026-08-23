@@ -713,11 +713,11 @@ function shotAssessment(m,owner){
   // A trailing defender does not cancel a visual breakaway, but a defender still occupying the broad
   // goal-side protection cone does. Keep this strict so ordinary box possession is not mislabeled 1v1.
   const oneVOne=inBox&&dGoal<=12.8&&Math.abs(owner.y-34)<=9.8&&blockers.length===0&&goalSideDefenders.length===0&&pressure>0.72;
-  const openWindow=inBox&&dGoal<=20.5&&blockers.length===0&&pressure>1.05;
+  const openWindow=inBox&&dGoal<=20.5&&blockers.length===0&&pressure>1.65&&goalSideDefenders.filter(p=>dist(owner,p)<10.5).length===0;
   // A visually clear keeper-facing chance is broader than the strict engine 1v1 label.
   // It still requires an open shooting lane and no outfield defender sitting goal-side in the
   // immediate finishing corridor, but includes the 14-18m breakaway finishes users read as 1v1.
-  const clearKeeperChance=inBox&&dGoal<=18.5&&Math.abs(owner.y-34)<=11.5&&blockers.length===0&&keeperLaneDefenders.length===0&&pressure>0.95;
+  const clearKeeperChance=inBox&&dGoal<=18.5&&Math.abs(owner.y-34)<=11.5&&blockers.length===0&&keeperLaneDefenders.length===0&&pressure>1.45;
   const cleanOneVOne=clearKeeperChance&&Math.abs(owner.y-34)<=10.5&&pressure>1.45;
   let score=(inBox?4.4:0)+(dGoal<12?5:dGoal<18?3.5:dGoal<24?1.8:0)+(central?1.4:0)-blockers.length*1.2-(pressure<1.2?1.4:pressure<2.2?0.55:0);
   if(owner.role==='ST')score+=1.6;if(owner.role==='WF')score+=0.8;if(owner.role==='CM'&&inBox)score+=0.45;if(oneVOne)score+=2.2;if(openWindow)score+=1.15;
@@ -823,8 +823,9 @@ function candidateToAction(m,owner,c,frame){
   if((c.id==='DEEP_CROSS'||c.id==='CUTBACK')&&frame.deep){if((c.id==='CUTBACK')===(frame.deep.kind==='CUTBACK'))return{...frame.deep,reason:c.id};}
   if(c.id==='THROUGH_PASS'){const o=optionById(opts,c.meta?.targetId),committed=o&&(['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p.tacticalTask)||o.running);if(o&&(c.meta?.runLead||c.meta?.syntheticLead)){const lead={x:Number(c.meta.leadX),y:Number(c.meta.leadY)},forward=dir(owner.team)*(lead.x-owner.x),blocks=laneBlockers(m,owner,lead,other(owner.team)).length;if(Number.isFinite(lead.x)&&Number.isFinite(lead.y)&&forward>2.5&&blocks<=1)return{type:'PASS',target:o.p,kind:'THROUGH',option:{...o,running:true,lead,leadForward:forward},reason:'USER_OPEN_SPACE_THROUGH'};}if(o&&committed&&o.block===0&&o.leadForward>2.5)return{type:'PASS',target:o.p,kind:'THROUGH',option:o,reason:'CANDIDATE_THROUGH'};}
   if(c.id==='LOFTED_THROUGH_PASS'){const o=optionById(opts,c.meta?.targetId),committed=o&&(['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p.tacticalTask)||o.running||c.meta?.physicalCommittedRun);if(o&&(c.meta?.runLead||c.meta?.syntheticLead)&&Number.isFinite(Number(c.meta?.leadX))&&Number.isFinite(Number(c.meta?.leadY))){const lead={x:Number(c.meta.leadX),y:Number(c.meta.leadY)},forward=dir(owner.team)*(lead.x-owner.x);if(forward>2.5)return{type:'PASS',target:o.p,kind:'THROUGH',option:{...o,running:true,lead,leadForward:forward,forceAerial:true},reason:'USER_LOFTED_THROUGH'};}if(o&&committed&&o.leadForward>2.5)return{type:'PASS',target:o.p,kind:'THROUGH',option:{...o,forceAerial:true},reason:'USER_LOFTED_THROUGH'};}
+  if(c.id==='LOFTED_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.d>=24&&o.d<=50)return{type:'PASS',target:o.p,kind:'LONG_PASS',option:{...o,forceAerial:true},reason:'USER_LOFTED_PASS'};}
   if(c.id==='PROGRESSIVE_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block===0)return{type:'PASS',target:o.p,kind:o.d>31?'LONG_PASS':'PASS',option:o,reason:'CANDIDATE_PROGRESSIVE'};}
-  if(c.id==='SWITCH_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block===0){o.longDiagonal=o.d>31;return{type:'PASS',target:o.p,kind:o.d>31?'LONG_PASS':'PASS',option:o,reason:'CANDIDATE_SWITCH'};}}
+  if(c.id==='SWITCH_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block===0){o.longDiagonal=o.d>31;o.switchPlay=true;return{type:'PASS',target:o.p,kind:o.d>31?'LONG_PASS':'PASS',option:o,reason:'CANDIDATE_SWITCH'};}}
   if(c.id==='SAFE_PASS'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block===0)return{type:'PASS',target:o.p,kind:o.d>31?'LONG_PASS':'PASS',option:o,reason:'CANDIDATE_SAFE'};}
   if(c.id==='RECYCLE'){const o=optionById(opts,c.meta?.targetId);if(o&&o.block===0)return{type:'PASS',target:o.p,kind:'PASS',option:o,reason:'CANDIDATE_RECYCLE',recycle:true};}
   if(c.id==='HOLD')return{type:'HOLD',reason:'CANDIDATE_HOLD'};
@@ -1059,7 +1060,7 @@ function chooseOwnerAction(m,owner){
   // TT-0.48 decisive-receive finishing: NPC attackers should sometimes finish the chance
   // created by a teammate instead of automatically recycling until the ball returns to the
   // protagonist. This is still live/stochastic and uses the actual lane, pressure and body state.
-  const receiveAge=m.time-(owner.lastReceivedAt||-99),throughReceiveFinalThird=owner.lastReceivedFlightKind==='THROUGH'&&receiveAge<=1.35&&local.x>=82&&shot.dGoal<=23.5&&shot.blockers.length<=1,decisiveReceive=receiveAge>=.22&&receiveAge<=1.35&&(shot.inBox||throughReceiveFinalThird)&&shot.dGoal<=23.5&&shot.blockers.length<=1&&shot.facingAlignment>=.55&&['ST','WF','CM'].includes(owner.role);
+  const receiveAge=m.time-(owner.lastReceivedAt||-99),throughReceiveFinalThird=owner.lastReceivedFlightKind==='THROUGH'&&receiveAge<=1.35&&local.x>=82&&shot.dGoal<=23.5&&shot.blockers.length===0,decisiveReceive=receiveAge>=.22&&receiveAge<=1.35&&(shot.inBox||throughReceiveFinalThird)&&shot.dGoal<=23.5&&(shot.oneVOne||shot.openWindow||(shot.blockers.length===0&&shot.dGoal<=15.8&&pressure>1.75))&&shot.facingAlignment>=.62&&['ST','WF','CM'].includes(owner.role);
   if(decisiveReceive){const open=shot.blockers.length===0,baseP=shot.oneVOne?.62:open?(shot.inBox?.32:.24):.16,roleP=owner.role==='ST'?0.06:owner.role==='WF'?0.02:-0.02,pressureP=pressure>=3.2?.08:pressure>=2.0?.03:pressure<1.2?-.10:0,p=clamp(baseP+roleP+pressureP,shot.inBox?.28:.22,.96),roll=(hash32(`${m.seed}|DECISIVE_RECEIVE_SHOT|${Math.floor((owner.controlledSince||m.time)*10)}|${owner.id}`)%10000)/10000;if(roll<p){m.stats.decisiveReceiveShots=(m.stats.decisiveReceiveShots||0)+1;return{type:'SHOT',reason:'DECISIVE_RECEIVE_FINISH'};}}
   const rhythmAction=rhythmBuildUpAction(m,owner,pre);if(rhythmAction)return rhythmAction;
   // Keep restart-sensitive goalkeeper and kick-off behaviour on the proven path. Candidate ownership begins once normal attacking play is established.
@@ -1141,6 +1142,8 @@ function chooseCrossVariant(m,owner,target,option,pd,pressureDist){
   return roll<lowP?'DRIVEN_LOW':'HIGH';
 }
 function choosePassDelivery(m,owner,target,kind,option,pd){
+  if(option?.forceGround&&['PASS','LONG_PASS','THROUGH'].includes(kind))return'GROUND';
+  if(option?.forceAerial&&['PASS','LONG_PASS','THROUGH'].includes(kind))return'AERIAL';
   if(kind==='CUTBACK')return'GROUND';
   if(kind==='CROSS')return option?.crossVariant==='DRIVEN_LOW'?'GROUND':'AERIAL';
   if(kind==='PASS')return'GROUND';
@@ -1154,7 +1157,7 @@ function choosePassDelivery(m,owner,target,kind,option,pd){
     // Distance describes the pass family; trajectory is independent. A clean 30-35m lane can be
     // drilled along the floor, while switches, blocked lanes and GK clearances are more often lofted.
     const lateral=Math.abs(target.y-owner.y),block=option?.block??0,switchPlay=!!option?.switchPlay;
-    let aerialP=0.16+(pd>36?0.20:0)+(pd>43?0.16:0)+(lateral>20?0.16:0)+(block>0?0.18:0)+(switchPlay?0.14:0)+(owner.role==='GK'?0.48:0);
+    let aerialP=0.26+(pd>35?0.17:0)+(pd>42?0.15:0)+(lateral>20?0.18:0)+(block>0?0.16:0)+(switchPlay?0.16:0)+(owner.role==='GK'?0.42:0);
     aerialP=clamp(aerialP,0.10,0.94);return m.r()<aerialP?'AERIAL':'GROUND';
   }
   return'GROUND';
@@ -2153,6 +2156,11 @@ function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='
   else{if(same.length>1&&same.some(x=>(x.targetId||x.meta?.targetId)!=null))return{ok:false,reason:'AMBIGUOUS_CHOICE_TARGET'};c=same[0]||null;}
   if(!c)return{ok:false,reason:'CANDIDATE_NOT_AVAILABLE'};
   const action=candidateToAction(m,owner,c,frame._frame);if(!action)return{ok:false,reason:'CANDIDATE_NOT_EXECUTABLE'};
+  // Player-facing trajectory semantics: when both a ground pass and an explicit lofted variant
+  // exist, the labels must describe visibly different actions. Keep NPC long-pass variation
+  // untouched; only an explicit protagonist ground-pass choice forces a ground trajectory.
+  const explicitGroundPassChoices=new Set(['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE']);
+  if(action.type==='PASS'&&explicitGroundPassChoices.has(c.id))action.option={...(action.option||{}),forceGround:true};
   // STEP75 hard ownership guard: a non-shot user choice invalidates any automatic shot
   // preparation that may have been queued before the checkpoint. User input is the current
   // state input; an older pendingShot can never fire through HOLD/PASS/CARRY.
@@ -2171,7 +2179,7 @@ function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='
   }else if(c.id==='SHOT'&&owner.pendingShot){intentUntil=owner.pendingShot.releaseAt;m.userChoiceControl={playerId:owner.id,choice:c.id,mode:'SHOT_PREP',startedAt:m.time,until:intentUntil,controllerOwned:true,futureOutcomePrecomputed:false};}
   else m.userChoiceControl=null;
   const resolvedTargetId=c.meta?.targetId||c.targetId||null;
-  const directedPassChoices=new Set(['THROUGH_PASS','LOFTED_THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','EARLY_CROSS','DEEP_CROSS','CUTBACK']);
+  const directedPassChoices=new Set(['THROUGH_PASS','LOFTED_THROUGH_PASS','LOFTED_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','EARLY_CROSS','DEEP_CROSS','CUTBACK']);
   if(directedPassChoices.has(c.id)&&resolvedTargetId){m.lastUserDirectedPassTrace={at:Number(m.time.toFixed(3)),sourceId:owner.id,choiceId:c.id,requestedTargetId:targetId||resolvedTargetId,resolvedTargetId,intendedReceiverId:m.ball.intendedReceiverId||null,firstControllerId:null,outcome:'IN_FLIGHT'};}
   m.userChoiceLog=m.userChoiceLog||[];m.userChoiceLog.push({at:Number(m.time.toFixed(3)),playerId:owner.id,team:owner.team,role:owner.role,choice:c.id,requestedTargetId:targetId||null,targetId:resolvedTargetId,inputSource,result:'APPLIED_CURRENT_STATE',futureOutcomePrecomputed:false});event(m,'USER_CHOICE',`${owner.id}: ${c.id}${resolvedTargetId?` -> ${resolvedTargetId}`:''}`);
   return{ok:true,kind:'ON_BALL',choice:c.id,requestedTargetId:targetId||null,targetId:resolvedTargetId,inputSource,action:{type:action.type,kind:action.kind||null,reason:action.reason||null},intentUntil,intentProtected:!!intentUntil,futureOutcomePrecomputed:false};
