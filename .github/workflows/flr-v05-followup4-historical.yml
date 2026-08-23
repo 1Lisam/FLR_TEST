@@ -1,0 +1,70 @@
+name: FLR V0.5 Four Report Historical QA
+
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v05-followup4-historical-request.json']
+
+permissions: {contents: write}
+
+jobs:
+  presentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v05-followup4-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v05_followup_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_presentation_discontinuity_v04.js
+  farside:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v05-followup4-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v05_followup_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_far_side_committed_v04.js
+  open_gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v05-followup4-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v05_followup_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_open_gates_v04.js
+  record:
+    if: always()
+    needs: [presentation, farside, open_gates]
+    runs-on: ubuntu-latest
+    env:
+      P: ${{ needs.presentation.result }}
+      F: ${{ needs.farside.result }}
+      O: ${{ needs.open_gates.result }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - run: |
+          python - <<'PY'
+          import json,os,pathlib
+          rows={'presentation':os.environ['P'],'farside':os.environ['F'],'openGates':os.environ['O']}
+          status='PASS' if all(v=='success' for v in rows.values()) else 'FAIL'
+          pathlib.Path('.flr/v05-followup4-historical-status.json').write_text(json.dumps({'schemaVersion':'FLR_V05_FOLLOWUP4_HISTORICAL_1.0','status':status,'jobs':rows},indent=2)+'\n')
+          PY
+          git config user.name 'FLR V0.5 Historical QA'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          git add .flr/v05-followup4-historical-status.json
+          git commit -m 'Record V0.5 four-report historical QA' || true
+          git push origin HEAD:main
