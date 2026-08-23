@@ -1,0 +1,42 @@
+name: FLR V0.5.1 Residual Gate Diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v051-residual-diagnostic-request.json']
+permissions: {contents: write}
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Diagnose exact residual cases
+        shell: bash
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node <<'NODE' > /tmp/diag.json
+          const E=require('./runtime/continuous_match_core.js'),P=require('./runtime/protagonist_match_controller.js'),C=E.choiceStateBridge();
+          const local=(team,x)=>team==='HOME'?x:105-x, lp=(team,p)=>({x:local(team,p.x),y:team==='HOME'?p.y:68-p.y});
+          function ownerOf(m){return m.ball.mode==='CONTROLLED'?m.players.find(p=>p.id===m.ball.ownerId):null}
+          function inspectStrong(m,o){const f=C.inspect(m,o.id),shot=f?.shot||{},pos=lp(o.team,o),opts=f?._frame?.opts||[];const committed=opts.filter(x=>x.p?.role==='ST'&&!x.offsideRisk&&x.block===0&&x.open>=1.2&&x.forward>=2.5&&(x.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(x.p?.tacticalTask))&&x.leadForward>=2.5).sort((a,b)=>b.leadForward-a.leadForward)[0]||null;const blockers=Array.isArray(shot.blockers)?shot.blockers.length:Number(shot.blockers??99);return{strong:!!shot.inBox&&!!shot.openWindow&&blockers===0&&(shot.dGoal??99)<=18.5&&Math.abs(pos.y-34)<=12.5&&['ST','WF','CM'].includes(o.role),shot,pos,committed,frame:f}}
+          function npc(seed){const m=E.createMatch(seed),hits=[];let cur=0,g=0;while(!m.completed&&g++<140000){const o=ownerOf(m),pre=o?inspectStrong(m,o):null,before=o?{t:m.time,id:o.id,team:o.team,role:o.role,x:o.x,y:o.y,action:o.action,tacticalTask:o.tacticalTask,lastDecision:o.lastDecision,lastReceivedFlightKind:o.lastReceivedFlightKind,lastReceivedAt:o.lastReceivedAt,nextThink:o.nextThink,controlledSince:o.controlledSince,pre}:null;E.step(m,.1);const ev=m.events.slice(cur);cur=m.events.length;if(before&&before.pre?.strong){for(const e of ev){if(e.actorId!==before.id||e.type!=='PASS'||!e.targetId)continue;const t=m.players.find(p=>p.id===e.targetId),tx=t?local(before.team,t.x):null,fx=local(before.team,before.x);if(tx!=null&&tx<fx-4)hits.push({before,event:e,targetNow:t&&{id:t.id,x:t.x,y:t.y,action:t.action,tacticalTask:t.tacticalTask},stats:{strongAttackBackpassGuards:m.stats.strongAttackBackpassGuards||0,npcOneTouchPasses:m.stats.npcOneTouchPasses||0}})}}}return{seed,hits}}
+          function carry(){const s=P.create('HIST-V04-OPEN-CARRY-1',{heroPlayerId:'H-ST',mode:'PLAYER_ALL',replaySeconds:10}),hits=[];let watch=null,g=0;while(!s.m.completed&&s.m.time<2700&&g++<350000){if(s.pending){const p=s.m.players.find(x=>x.id==='H-ST');if(watch&&s.m.ball.ownerId==='H-ST'){const delay=s.m.time-watch.t,disp=Math.hypot(p.x-watch.x,p.y-watch.y);if(delay<2.2&&disp<3){const q=P.inspect(s);hits.push({t:s.m.time,delay,disp,guard:s.carryContinuationGuard||null,pending:{kind:s.pending.kind,importance:s.pending.importance,options:s.pending.options.map(x=>x.id)},inspect:q&&{importance:q.importance,shot:q.frame?.shot,pressure:q.frame?.pressure,space:q.frame?.space},hero:{action:p.action,tacticalTask:p.tacticalTask,nextThink:p.nextThink,lockTargetUntil:p.lockTargetUntil,controlledSince:p.controlledSince},result:s.lastResult&&{code:s.lastResult.code,choiceId:s.lastResult.choiceId}})}}watch=null;const pick=s.pending.options.find(x=>x.id==='CARRY')||P.autoPick(s)||s.pending.options[0];if(!pick){s.pending=null;continue}const p0=s.m.players.find(x=>x.id==='H-ST'),r=P.applyChoice(s,pick.id,pick.targetId||null,{source:'V051_RESIDUAL_DIAG'});if(r.ok&&pick.id==='CARRY')watch={t:s.m.time,x:p0.x,y:p0.y};continue}P.step(s,.1);if(watch&&s.m.ball.ownerId!=='H-ST')watch=null}return{seed:'HIST-V04-OPEN-CARRY-1',hits}}
+          console.log(JSON.stringify({npc:[npc('HIST-V04-OPEN-NPC-5'),npc('HIST-V04-OPEN-NPC-10'),npc('HIST-V04-OPEN-NPC-18')],carry:carry()},null,2));
+          NODE
+          cat /tmp/diag.json
+      - name: Record compact diagnostic
+        shell: bash
+        run: |
+          git reset --hard HEAD
+          git fetch origin main
+          git checkout -B record origin/main
+          cp /tmp/diag.json .flr/v051-residual-diagnostic.json
+          git config user.name 'FLR V0.5.1 Diagnostic'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/v051-residual-diagnostic.json
+          git commit -m 'Record V0.5.1 residual gate diagnostic' || true
+          git push origin HEAD:main
