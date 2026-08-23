@@ -1,0 +1,38 @@
+name: FLR V0.5 Fourth Report Keyfacts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v05-fourth-keyfacts-request.json'
+permissions:
+  contents: write
+jobs:
+  keyfacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Extract previous episode key facts
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          d=json.load(open('.flr/v05-fourth-report-compact.json',encoding='utf-8'))
+          p=d.get('previous') or {}
+          def sm(x):
+              if not isinstance(x,dict):return None
+              h=x.get('hero') or {};b=x.get('ball') or {}
+              return {'t':x.get('t'),'phase':x.get('phase'),'heroSpeed':x.get('heroSpeed'),'hero':{k:h.get(k) for k in ('x','y','vx','vy','action','tacticalTask')},'ball':{k:b.get(k) for k in ('mode','x','y','vx','vy','ownerId','intendedReceiverId','kind','lastTouchPlayer')},'heroBallDistance':x.get('heroBallDistance')}
+          fs={}
+          for k,v in (p.get('frames') or {}).items():fs[k]={'count':v.get('count'),'start':v.get('start'),'end':v.get('end'),'samples':[sm(x) for x in (v.get('samples') or [])]}
+          dec=p.get('decision') or {};res=p.get('actualResult') or {}
+          out={'reportId':d.get('reportId'),'previousBoundary':p.get('boundary'),'decision':{'at':dec.get('at'),'kind':dec.get('kind'),'selected':dec.get('selected'),'options':[{k:o.get(k) for k in ('id','targetId','label')} for o in (dec.get('options') or [])]},'result':{k:res.get(k) for k in ('at','choiceId','targetId','code','headline','detail')},'events':p.get('events'),'frames':fs}
+          pathlib.Path('/tmp/out.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          git config user.name 'FLR V0.5 Report Inspector'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/out.json .flr/v05-fourth-keyfacts.json
+          git add .flr/v05-fourth-keyfacts.json
+          git commit -m 'Record fourth V0.5 report key facts'
+          git push origin HEAD:main
