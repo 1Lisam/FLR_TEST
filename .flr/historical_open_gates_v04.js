@@ -13,39 +13,34 @@ function inspectAttack(m,owner){
   const blockers=Array.isArray(shot.blockers)?shot.blockers.length:Number(shot.blockers??99);
   const cleanShot=!!shot.inBox&&!!shot.openWindow&&blockers===0&&(shot.dGoal??99)<=18.5&&Math.abs(pos.y-34)<=12.5&&['ST','WF','CM'].includes(owner.role);
   const runnerLane=pos.x>=80&&!!committed;
-  return{strong:cleanShot||runnerLane,cleanShot,runnerLane,committed};
+  return{strong:cleanShot||runnerLane,cleanShot,runnerLane,committed,pos};
 }
 function runNpc(seed){
-  const m=E.createMatch(seed),out={seed,strongWindows:0,strongActions:0,harmfulBackpasses:0,deadAttackStalls:0,npcOneTouchPasses:0,examples:[]};
+  const m=E.createMatch(seed),out={seed,strongWindows:0,strongActionFrames:0,harmfulBackpasses:0,deadAttackStalls:0,npcOneTouchPasses:0,examples:[]};
   let eventCursor=0,watch=null,guard=0;
   while(!m.completed&&guard++<140000){
-    const owner=ownerOf(m);
-    if(owner&&owner.role!=='GK'){
-      const a=inspectAttack(m,owner);
-      if(a.strong&&(!watch||watch.ownerId!==owner.id||watch.controlledSince!==owner.controlledSince)){
-        out.strongWindows++;
-        watch={ownerId:owner.id,team:owner.team,controlledSince:owner.controlledSince,startT:m.time,startX:owner.x,startY:owner.y,lastDecision:owner.lastDecision,cleanShot:a.cleanShot,runnerLane:a.runnerLane,runnerId:a.committed?.p?.id||null,runnerLead:a.committed?.leadForward??null};
-      }else if(watch&&owner.id===watch.ownerId&&owner.controlledSince===watch.controlledSince&&a.strong){
-        watch.cleanShot=watch.cleanShot||a.cleanShot;watch.runnerLane=watch.runnerLane||a.runnerLane;if(!watch.runnerId&&a.committed){watch.runnerId=a.committed.p.id;watch.runnerLead=a.committed.leadForward;}
-      }
+    const owner=ownerOf(m),frameAttack=owner&&owner.role!=='GK'?inspectAttack(m,owner):null;
+    if(owner&&frameAttack?.strong){
+      if(!watch||watch.ownerId!==owner.id||watch.controlledSince!==owner.controlledSince){out.strongWindows++;watch={ownerId:owner.id,team:owner.team,controlledSince:owner.controlledSince,startT:m.time,startX:owner.x,startY:owner.y,lastDecision:owner.lastDecision,cleanShot:frameAttack.cleanShot,runnerLane:frameAttack.runnerLane};}
+      else{watch.cleanShot=watch.cleanShot||frameAttack.cleanShot;watch.runnerLane=watch.runnerLane||frameAttack.runnerLane;}
     }
+    const frame={ownerId:owner?.id||null,team:owner?.team||null,x:owner?.x??null,controlledSince:owner?.controlledSince??null,attack:frameAttack};
     E.step(m,.1);
     const newEvents=m.events.slice(eventCursor);eventCursor=m.events.length;
-    if(!watch)continue;
-    const material=newEvents.find(e=>e.actorId===watch.ownerId&&['PASS','SHOT','TAKE_ON'].includes(e.type));
-    if(material){
-      out.strongActions++;
+    const material=frame.ownerId?newEvents.find(e=>e.actorId===frame.ownerId&&['PASS','SHOT','TAKE_ON'].includes(e.type)):null;
+    if(material&&frame.attack?.strong){
+      out.strongActionFrames++;
       if(material.type==='PASS'&&['PASS','LONG_PASS'].includes(material.passKind||'PASS')&&material.targetId){
-        const target=m.players.find(p=>p.id===material.targetId),tx=target?local(watch.team,target.x):null,fromX=local(watch.team,watch.startX);
-        if(tx!=null&&tx<fromX-4){out.harmfulBackpasses++;if(out.examples.length<12)out.examples.push({kind:'HARMFUL_BACKPASS',t:+(material.t??m.time).toFixed(2),owner:watch.ownerId,fromX:+fromX.toFixed(2),target:material.targetId,targetX:+tx.toFixed(2),cleanShot:watch.cleanShot,runnerLane:watch.runnerLane,runnerId:watch.runnerId,runnerLead:watch.runnerLead==null?null:+watch.runnerLead.toFixed(2)});}
+        const target=m.players.find(p=>p.id===material.targetId),tx=target?local(frame.team,target.x):null,fromX=local(frame.team,frame.x);
+        if(tx!=null&&tx<fromX-4){out.harmfulBackpasses++;if(out.examples.length<12)out.examples.push({kind:'HARMFUL_BACKPASS_AT_LIVE_STRONG_FRAME',t:+(material.t??m.time).toFixed(2),owner:frame.ownerId,fromX:+fromX.toFixed(2),target:material.targetId,targetX:+tx.toFixed(2),cleanShot:frame.attack.cleanShot,runnerLane:frame.attack.runnerLane,runnerId:frame.attack.committed?.p?.id||null,runnerLead:frame.attack.committed?.leadForward==null?null:+frame.attack.committed.leadForward.toFixed(2)});}
       }
-      watch=null;continue;
     }
+    if(!watch)continue;
     const now=ownerOf(m);
     if(!now||now.id!==watch.ownerId||now.controlledSince!==watch.controlledSince){watch=null;continue;}
     const age=m.time-watch.startT,move=Math.hypot(now.x-watch.startX,now.y-watch.startY),speed=Math.hypot(now.vx||0,now.vy||0),decisionChanged=now.lastDecision!==watch.lastDecision;
     if(age>=2.2&&move<0.85&&speed<0.75&&!decisionChanged){out.deadAttackStalls++;if(out.examples.length<12)out.examples.push({kind:'DEAD_ATTACK_STALL',t:+m.time.toFixed(2),owner:watch.ownerId,age:+age.toFixed(2),move:+move.toFixed(2),cleanShot:watch.cleanShot,runnerLane:watch.runnerLane,action:now.action,lastDecision:now.lastDecision,nextThink:+(now.nextThink||0).toFixed(2)});watch=null;}
-    else if(age>4.0)watch=null;
+    else if(age>4.0||material)watch=null;
   }
   out.npcOneTouchPasses=m.stats.npcOneTouchPasses||0;return out;
 }
@@ -63,7 +58,7 @@ function runCarry(seed){
 }
 const npc=[];for(let i=1;i<=24;i++)npc.push(runNpc(`HIST-V04-OPEN-NPC-${i}`));
 const carry=[];for(let i=1;i<=8;i++)carry.push(runCarry(`HIST-V04-OPEN-CARRY-${i}`));
-const summary={matches:npc.length,strongWindows:npc.reduce((n,x)=>n+x.strongWindows,0),strongActions:npc.reduce((n,x)=>n+x.strongActions,0),harmfulBackpasses:npc.reduce((n,x)=>n+x.harmfulBackpasses,0),deadAttackStalls:npc.reduce((n,x)=>n+x.deadAttackStalls,0),npcOneTouchPasses:npc.reduce((n,x)=>n+x.npcOneTouchPasses,0),carryChoices:carry.reduce((n,x)=>n+x.carries,0),carryFollowups:carry.reduce((n,x)=>n+x.followups,0),badRapidCarryReprompts:carry.reduce((n,x)=>n+x.badRapidCarryReprompts,0),minCarryFollowupDelay:Math.min(...carry.map(x=>x.minDelay??999))};if(summary.minCarryFollowupDelay===999)summary.minCarryFollowupDelay=null;
+const summary={matches:npc.length,strongWindows:npc.reduce((n,x)=>n+x.strongWindows,0),strongActionFrames:npc.reduce((n,x)=>n+x.strongActionFrames,0),harmfulBackpasses:npc.reduce((n,x)=>n+x.harmfulBackpasses,0),deadAttackStalls:npc.reduce((n,x)=>n+x.deadAttackStalls,0),npcOneTouchPasses:npc.reduce((n,x)=>n+x.npcOneTouchPasses,0),carryChoices:carry.reduce((n,x)=>n+x.carries,0),carryFollowups:carry.reduce((n,x)=>n+x.followups,0),badRapidCarryReprompts:carry.reduce((n,x)=>n+x.badRapidCarryReprompts,0),minCarryFollowupDelay:Math.min(...carry.map(x=>x.minDelay??999))};if(summary.minCarryFollowupDelay===999)summary.minCarryFollowupDelay=null;
 const gates={npcOneTouch:summary.npcOneTouchPasses>0,npcGoodAttackNoDeadStall:summary.deadAttackStalls===0,strongAttackNoHarmfulBackpass:summary.harmfulBackpasses===0,carryCadence:summary.badRapidCarryReprompts===0};
-const result={schemaVersion:'FLR_HISTORICAL_OPEN_GATES_V04_1.0',engineRoot:ROOT,summary,gates,status:Object.values(gates).every(Boolean)?'PASS':'FAIL',npc,carry};
+const result={schemaVersion:'FLR_HISTORICAL_OPEN_GATES_V04_1.1_ACTION_FRAME',engineRoot:ROOT,summary,gates,status:Object.values(gates).every(Boolean)?'PASS':'FAIL',npc,carry};
 console.log(JSON.stringify(result));process.exit(result.status==='PASS'?0:1);
