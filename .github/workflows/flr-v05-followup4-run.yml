@@ -1,0 +1,78 @@
+name: FLR V0.5 Four Report Candidate
+
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v05-followup4-run-request.json']
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: candidate/v05-followup4-20260823
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Apply four-report patch
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v05_followup_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node --check step71_hybrid_v06_ui.js
+          node --check runtime/protagonist_match_controller.js
+          node --check live_hybrid_session_v02.js
+          node --check runtime/continuous_match_core.js
+      - name: Direct four-report regression
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),assert=require('assert');
+          const E=require('./runtime/continuous_match_core.js'),P=require('./runtime/protagonist_match_controller.js'),H=require('./live_hybrid_session_v02.js');
+          const checks=[];
+          const ui=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          assert(ui.includes('function showPendingCausally()'));
+          assert(ui.includes("p.kind==='INCOMING_BALL'&&p.chained"));
+          assert(!ui.includes('if(session.pending?.chained){showPending();return}'));
+          assert(ui.includes("startReplay(clip,'CHOICE','다가오는 공 → 선택 직전 실제 경기')"));
+          checks.push('CHAINED_INCOMING_REPLAY');
+
+          const sess=P.create('V05-F4-LW',{heroPlayerId:'H-ST',mode:'PLAYER_ALL'}),old=E.choiceStateBridge;
+          const fake={kind:'ON_BALL',playerId:'H-ST',team:'HOME',role:'ST',slot:'ST',time:66.55,localX:78.78,localY:35.06,pressure:2.384,space:.9,shot:{dGoal:26.24,inBox:false,oneVOne:false,openWindow:false,longRange:false,turningRequired:false,backToGoal:false,bodyAngleDiff:.2,blockers:1},candidates:[{id:'TAKE_ON',score:2.3,meta:{}},{id:'CARRY',score:2.1,meta:{}},{id:'HOLD',score:2,meta:{}},{id:'SAFE_PASS',targetId:'H-RCM',score:1.9,meta:{targetSlot:'RCM'}},{id:'SHOT',score:1.8,meta:{}},{id:'SAFE_PASS',targetId:'H-CM',score:1.7,meta:{targetSlot:'CM'}}],_frame:{opts:[{p:{id:'H-LW',role:'WF',slot:'LW',vx:.693,vy:2.524},block:1,d:16.23,open:6.06,forward:-1.19,running:true,offsideRisk:false}]}};
+          E.choiceStateBridge=()=>({inspect:()=>fake});const x=P.inspect(sess);E.choiceStateBridge=old;
+          const lw=x.options.find(o=>o.targetId==='H-LW');assert(lw);assert.strictEqual(lw.meta.targetId,'H-LW');assert.strictEqual(!!sess.futureOutcomePrecomputed,false);checks.push('OPEN_WIDE_LW_OPTION');
+
+          const hs=fs.readFileSync('live_hybrid_session_v02.js','utf8');
+          assert(hs.includes("fromExact=sp.source==='V06_HANDOFF_EXACT'"));assert(hs.includes("fromExact?24:18"));assert(hs.includes("HYBRID_CONTINUOUS_FROM_V06"));assert(hs.includes("nearSide=(nearLeft&&['LB','LCM','LW'].includes(slot))"));
+          const hy=H.createSession({seed:'V05-F4-SPATIAL',heroTeam:'HOME',heroRole:'ST',heroPlayerId:'H-ST'});assert(hy.state.spatial.players['H-LCM']);checks.push('HYBRID_ASYMMETRY_RETENTION');
+
+          const m=E.createMatch('V05-F4-RECEIVE',{});m.restart=null;m.phase='OPEN_PLAY';m.time=100;m.nextShape=100;m.protagonistControllerId='H-LW';m.protagonistExplicitActionRequired=true;
+          const B=E.choiceActionBridge(),r=B.playerById(m,'H-LW');r.x=76;r.y=18;r.vx=5;r.vy=.15;r.tx=82;r.ty=18.3;r.sprint=true;m.ball.x=75.55;m.ball.y=18;m.ball.z=0;m.ball.mode='LOOSE';m.ball.ownerId=null;m.possession='HOME';
+          B.setControlled(m,r,true,{flow:true,flightKind:'THROUGH',deliveryMode:'GROUND',sourceId:'H-ST',incomingVx:15,incomingVy:.3});
+          const d=Math.hypot(r.tx-r.x,r.ty-r.y),x0=r.x;assert.strictEqual(r.tacticalTask,'FIRST_TOUCH_FLOW');assert.strictEqual(r.sprint,true);assert(r.receiveRunContinuationUntil>=100.99);assert(d>=4);
+          E.step(m,.1);E.step(m,.1);E.step(m,.1);assert(r.x>x0+.08);assert(r.receiveRunContinuationUntil>m.time);
+          assert(fs.readFileSync('runtime/continuous_match_core.js','utf8').includes('owner.receiveRunContinuationUntil=0;'));checks.push('THROUGH_RECEIVE_CONTINUITY');
+          console.log(JSON.stringify({status:'PASS',checks,futureOutcomePrecomputed:false},null,2));
+          NODE
+      - name: Historical regression shards
+        run: |
+          set -euo pipefail
+          node .flr/historical_presentation_discontinuity_v04.js
+          node .flr/historical_far_side_committed_v04.js
+          node .flr/historical_open_gates_v04.js
+      - name: Commit validated candidate
+        run: |
+          set -euo pipefail
+          mkdir -p .flr/qa-results
+          cat > .flr/qa-results/V05_FOLLOWUP_4_REPORTS.json <<'JSON'
+          {"schemaVersion":"FLR_V05_FOLLOWUP_4_REPORTS_1.0","status":"PASS","reports":["umt05-94f72953-e6dd-4a49-82d9-2639d15870a6","umt05-bca7cf28-9efa-407c-9692-10e3c63e3610","umt05-95769221-3144-4b0b-b702-e06fa6e7dd80","umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0"],"futureOutcomePrecomputed":false,"historicalRegressionShards":"PASS"}
+          JSON
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add step71_hybrid_v06_ui.js runtime/protagonist_match_controller.js live_hybrid_session_v02.js runtime/continuous_match_core.js .flr/qa-results/V05_FOLLOWUP_4_REPORTS.json
+          git commit -m 'Fix four V0.5 user retest reports'
+          git push origin HEAD:candidate/v05-followup4-20260823
