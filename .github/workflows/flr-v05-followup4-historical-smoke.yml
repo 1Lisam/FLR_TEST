@@ -1,0 +1,49 @@
+name: FLR V0.5 Four Report Historical Smoke
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v05-followup4-historical-smoke-request.json']
+permissions: {contents: write}
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v05-followup4-20260823, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Run patched reduced historical gates
+        id: qa
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v05_followup_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          cp .flr/historical_open_gates_v04.js /tmp/smoke.js
+          python - <<'PY'
+          p='/tmp/smoke.js'
+          s=open(p).read().replace("const ROOT=path.resolve(process.argv[2]||path.join(__dirname,'..'));","const ROOT=path.resolve(process.argv[2]||process.cwd());")
+          s=s.replace('for(let i=1;i<=24;i++)npc.push','for(let i=1;i<=3;i++)npc.push').replace('for(let i=1;i<=8;i++)carry.push','for(let i=1;i<=2;i++)carry.push')
+          open(p,'w').write(s)
+          PY
+          node /tmp/smoke.js "$PWD" > /tmp/result.json
+          cat /tmp/result.json
+      - name: Persist smoke status
+        if: always()
+        env: {OUTCOME: "${{ steps.qa.outcome }}"}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset --hard HEAD
+          git fetch origin main
+          git checkout -B record origin/main
+          mkdir -p .flr
+          if [ "$OUTCOME" = success ]; then cp /tmp/result.json .flr/v05-followup4-historical-smoke-status.json; else printf '{"status":"FAIL"}\n' > .flr/v05-followup4-historical-smoke-status.json; fi
+          git config user.name 'FLR V0.5 Historical Smoke'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/v05-followup4-historical-smoke-status.json
+          git commit -m 'Record V0.5 four-report historical smoke' || true
+          git push origin HEAD:main
+          [ "$OUTCOME" = success ]
