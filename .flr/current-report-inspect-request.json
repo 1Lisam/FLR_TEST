@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "FLR_CURRENT_REPORT_INSPECT_REQUEST_1.0",
+  "build": "USER-MATCH-TEST-V0.5.2",
+  "limit": 10,
+  "requestedAt": "2026-08-24T08:22:00+09:00",
+  "purpose": "Inspect latest V0.5.2 user-submitted reports and attached situation bundles"
+}
