@@ -1,0 +1,102 @@
+name: FLR Historical V0.4 Final Regression
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  final-regression:
+    if: github.event.pull_request.title == '[FLR_AUDIT] HISTORICAL V0.4 REFINED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout audit control
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+      - name: Checkout V0.4 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: historical-closure-v04-candidate
+          path: engine
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify candidate and production change scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "CANDIDATE_SHA=$(git -C engine rev-parse HEAD)"
+          git -C engine diff --name-only 53c9a69bdc6a99608c167b5523b2f83dfb0fb25a..HEAD > /tmp/all-changes.txt
+          grep -Ev '^(\.flr/|\.github/)' /tmp/all-changes.txt | sort > /tmp/production-changes.txt || true
+          cat /tmp/production-changes.txt
+          cat > /tmp/expected-production.txt <<'EOF'
+          full_time_presentation.js
+          runtime/protagonist_match_controller.js
+          step71_hybrid_v06_ui.js
+          EOF
+          diff -u /tmp/expected-production.txt /tmp/production-changes.txt
+      - name: Run final historical regression bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in historical_open_gates_v04.js historical_carry_cadence_v04.js historical_far_side_committed_v04.js; do
+            node --check "control/.flr/$f"
+          done
+          node --check engine/.flr/historical_closure_audit.js
+
+          set +e
+          node control/.flr/historical_open_gates_v04.js engine > /tmp/open.json
+          open_rc=$?
+          node control/.flr/historical_carry_cadence_v04.js engine > /tmp/carry.json
+          carry_rc=$?
+          node control/.flr/historical_far_side_committed_v04.js engine > /tmp/farside.json
+          farside_rc=$?
+          node engine/.flr/historical_closure_audit.js /tmp/legacy.json > /tmp/legacy.log 2>&1
+          legacy_rc=$?
+          set -e
+
+          echo '--- OPEN GATES ---'; cat /tmp/open.json
+          echo '--- CARRY ---'; cat /tmp/carry.json
+          echo '--- FAR SIDE ---'; cat /tmp/farside.json
+          echo '--- LEGACY SUMMARY ---'; tail -c 16000 /tmp/legacy.log || true
+
+          OPEN_RC="$open_rc" CARRY_RC="$carry_rc" FARSIDE_RC="$farside_rc" LEGACY_RC="$legacy_rc" python - <<'PY'
+          import json, os, pathlib, sys
+          def load(path):
+              p=pathlib.Path(path)
+              try: return json.loads(p.read_text(encoding='utf-8'))
+              except Exception as e:
+                  print(f'QA_INFRA_FAILURE: {path}: {e}', file=sys.stderr); sys.exit(2)
+          op=load('/tmp/open.json'); ca=load('/tmp/carry.json'); fa=load('/tmp/farside.json'); le=load('/tmp/legacy.json')
+          checks={
+            'npcOneTouch': bool(op.get('gates',{}).get('npcOneTouch')),
+            'npcGoodAttackNoDeadStall': bool(op.get('gates',{}).get('npcGoodAttackNoDeadStall')),
+            'strongAttackNoHarmfulBackpass': bool(op.get('gates',{}).get('strongAttackNoHarmfulBackpass')),
+            'carryCadence': ca.get('status')=='PASS',
+            'farSideCommittedRunner': fa.get('status')=='PASS',
+          }
+          lg=le.get('gates',{})
+          for k in ['protagonistAuthority','duelStall','rcmStOverlap','carrySemantics','nonRestartSpeedContinuity','throughLead']:
+              checks[k]=bool(lg.get(k))
+          result={
+            'schemaVersion':'FLR_HISTORICAL_V04_FINAL_REGRESSION_1.0',
+            'candidateSha':os.popen('git -C engine rev-parse HEAD').read().strip(),
+            'checks':checks,
+            'openSummary':op.get('summary',{}),
+            'carrySummary':ca.get('summary',{}),
+            'farSideSummary':fa.get('summary',{}),
+            'legacySummary':le.get('summary',{}),
+            'status':'PASS' if all(checks.values()) else 'FAIL'
+          }
+          pathlib.Path('/tmp/final-regression.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          # Valid gate FAIL is a development result and intentionally does not fail Actions.
+          # Missing/invalid outputs above are infrastructure failures and still fail the workflow.
+          PY
