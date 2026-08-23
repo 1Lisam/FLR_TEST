@@ -1,4 +1,5 @@
 name: FLR local snapshot v2
+# V0.5.1 local bootstrap snapshot trigger — temporary branch only
 
 on:
   push:
