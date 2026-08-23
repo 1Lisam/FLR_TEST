@@ -1,6 +1,10 @@
 name: FLR Historical Closure Audit
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/historical-closure-request.json'
   issues:
     types: [opened]
 
@@ -13,7 +17,7 @@ concurrency:
 
 jobs:
   audit:
-    if: github.event.issue.title == '[FLR_AUDIT] HISTORICAL CLOSURE V0.3'
+    if: github.event_name == 'push' || github.event.issue.title == '[FLR_AUDIT] HISTORICAL CLOSURE V0.3'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
