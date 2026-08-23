@@ -1,0 +1,192 @@
+--- 214 ---
+212: function kickoff(m,team){placeKickoff(m,team);m.restart={kind:'KICKOFF',team,until:m.time+0.9};event(m,'KICKOFF',`${subjectName(teamDisplayName(team))} 경기를 시작합니다.`);}
+213: function createMatch(seed='step34',opts={}){
+214:   const m={seed:String(seed),r:rng(seed),dt:Number(opts.dt)||DEFAULT_DT,time:0,playerAbilityProfiles:{...(opts.playerAbilityProfiles||{})},managerProfiles:{...(opts.managerProfiles||{})},players:createPlayers(),playersById:{},ball:{mode:'DEAD',x:52.5,y:34,z:0,vx:0,vy:0,vz:0,ownerId:null},ballOwner:null,possession:HOME,lastTouchTeam:HOME,lastTouchPlayer:null,score:{HOME:0,AWAY:0},phase:'KICKOFF',restart:null,nextShape:0,transitionUntil:0,events:[],completed:false,lastChallengeAt:-99,lastFoulAt:-99,lastRecycleAt:{HOME:-99,AWAY:-99},frontPassChain:{HOME:0,AWAY:0},nextRunPlan:{HOME:0,AWAY:0},lastPassAt:{HOME:-99,AWAY:-99},lastShotAt:{HOME:-99,AWAY:-99},kickoffBuildUntil:0,tactical:null,activeDuel:null,attackRecycleUntil:{HOME:0,AWAY:0},attackRecycleFloor:{HOME:0,AWAY:0},attackRhythm:{HOME:{possessionStartedAt:0,regainX:52.5,settleUntil:0,counterUntil:0},AWAY:{possessionStartedAt:0,regainX:52.5,settleUntil:0,counterUntil:0}},stats:{passes:0,completedPasses:0,progressivePasses:0,throughPasses:0,backwardThroughPasses:0,wideThroughPasses:0,passesOnMove:0,longGroundPasses:0,longAerialPasses:0,aerialPasses:0,aerialDuels:0,aerialDuelsWonByAttack:0,aerialDuelsWonByDefence:0,goalKickAerialContests:0,flowReceives:0,flowGroundReceives:0,flowAerialReceives:0,maxFlowReceiveDelay:0,switchesOfPlay:0,crosses:0,earlyCrosses:0,deepWideCrosses:0,bylineCrosses:0,highCrosses:0,drivenLowCrosses:0,crossExecutionErrors:0,crossHeaderAttempts:0,crossHeaderShotsOnTarget:0,crossesCompleted:0,crossesDefended:0,cutbacks:0,recycles:0,recycleReattacks:0,midfieldShots:0,midfieldBoxShots:0,midfieldLongShots:0,midfieldLongShotCandidates:0,midfieldFinalReceipts:0,passDeflections:0,passLooseBalls:0,fouls:0,freeKicks:0,carries:0,carryDistance:0,takeOnAttempts:0,takeOnWins:0,takeOnTackled:0,takeOnLoose:0,takeOnDistance:0,takeOnBreakawayShots:0,boxCommittedCarries:0,boxCarryExtensions:0,boxCarryPressureReleases:0,clearRunwayCarries:0,runsStarted:0,maxFrontPassChain:0,shots:0,boxShots:0,boxFinalActions:0,boxBackPasses:0,boxEntriesST:0,boxEntriesWF:0,boxEntriesCM:0,boxSlotConflicts:0,duelDisengages:0,duelContactResolves:0,duelEpisodes:0,duelForcedResolves:0,maxDuelDuration:0,maxStationaryDuel:0,maxPairedDuel:0,maxBoxPairedDuel:0,goals:0,turnovers:0,interceptions:0,challenges:0,tacklesWon:0,offsides:0,throwIns:0,corners:0,goalKicks:0,saves:0,gkCatches:0,gkParries:0,blocks:0,shotBlocks:0,clearances:0,looseBalls:0,maxCrowd:0,minSpacing:99,possessionSeconds:{HOME:0,AWAY:0},firstHalfPossession:{HOME:0,AWAY:0},secondHalfPossession:{HOME:0,AWAY:0},longestPossession:{HOME:0,AWAY:0},shotReasons:{},currentPossessionTeam:null,currentPossessionStartedAt:0,shotsByTeam:{HOME:0,AWAY:0},crossesByTeam:{HOME:0,AWAY:0},crossesBySourceSlot:{LW:0,RW:0,LB:0,RB:0,OTHER:0},crossesToST:0,wfCrossesToST:0,bylineCrossesByTeam:{HOME:0,AWAY:0},headerShotsByTeam:{HOME:0,AWAY:0},takeOnAttemptsByRole:{WF:0,ST:0,CM:0,FB:0},passStyles:{},shotStyles:{},fullbackSurges:0}};
+215:   if(TELEMETRY&&typeof TELEMETRY.createState==='function')m.telemetry=TELEMETRY.createState(opts.telemetry||{});
+216:   rebuildMap(m);kickoff(m,m.r()<.5?HOME:AWAY);return m;
+--- 390 ---
+388:   const owner=playerById(m,m.ball.ownerId);
+389:   const ownerLocal=owner?worldToLocal(owner.team,owner.x,owner.y):null;
+390:   const ownerCarrying=!!owner&&m.ball.mode==='CONTROLLED'&&['CARRY_FORWARD','CARRY_SCAN','DRIBBLE_EVADE','COMMITTED_BOX_CARRY','TAKE_ON'].includes(owner.action);
+391:   const finalThirdPaceMode=!!ownerCarrying&&!!ownerLocal&&ownerLocal.x>=78;
+392:   for(const p of m.players){
+--- 432 ---
+430:     const dvx=tvx-p.vx,dvy=tvy-p.vy,dv=Math.hypot(dvx,dvy),maxDv=a*dt*(0.58+0.42*turnMoveScale),sc=dv>maxDv?maxDv/(dv||1):1;p.vx+=dvx*sc;p.vy+=dvy*sc;
+431:     const mx=p.vx*dt,my=p.vy*dt,travel=Math.hypot(mx,my);if(travel>=d){p.x=p.tx;p.y=p.ty;p.vx=p.vy=0;}else{const restartThrower=!!(m.restart&&m.restart.kind==='THROW_IN'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&p.tacticalTask==='THROW_IN_THROWER');p.x=clamp(p.x+mx,0.8,104.2);p.y=clamp(p.y+my,restartThrower?-1.2:0.8,restartThrower?69.2:67.2);}
+432:     if(p.hasBall&&['CARRY_FORWARD','DRIBBLE_EVADE','COMMITTED_BOX_CARRY','TAKE_ON'].includes(p.action)){m.stats.carryDistance=(m.stats.carryDistance||0)+travel;if(p.action==='TAKE_ON')m.stats.takeOnDistance=(m.stats.takeOnDistance||0)+travel;}
+433:   }
+434:   resolveSpacing(m);
+--- 809 ---
+807:   const meta=o=>o?{targetId:o.p.id,targetSlot:o.p.slot,score:o.score,leadForward:o.leadForward,forward:o.forward,d:o.d,receiverPressure:o.open,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0),task:o.p.tacticalTask||null,running:!!o.running,leadX:o.lead&&Number.isFinite(o.lead.x)?Number(o.lead.x.toFixed(3)):null,leadY:o.lead&&Number.isFinite(o.lead.y)?Number(o.lead.y.toFixed(3)):null}:null;
+808:   const attackingThroughReceive=owner.lastReceivedFlightKind==='THROUGH'&&m.time-(owner.lastReceivedPassAt||-99)<1.65&&l.x>=76&&['WF','ST','CM'].includes(owner.role);
+809:   return{role:owner.role,localX:l.x,localY:l.y,wide:l.y<19||l.y>49,pressure,space,held,recentTakeOn:m.time-(owner.lastTakeOnAt||-99)<3.2,recentTakeOnWin,takeOn:takeOn||null,frontPassChain:m.frontPassChain[owner.team]||0,recycleActive:(m.attackRecycleUntil?.[owner.team]||0)>m.time,clearRunway:runway.clear,counterActive,boxApproach,deepEntryRestricted,attackingThroughReceive,recentTeamShot:m.time-(m.lastShotAt?.[owner.team]??-99)<2.4,boxCarryChain:(m.time-(owner.lastBoxCarryAt||-99)<3.0)?(owner.boxCarryChain||0):0,recentBoxCarry:m.time-(owner.lastBoxCarryAt||-99)<2.2,shot:{score:shot.score,dGoal:shot.dGoal,inBox:shot.inBox,oneVOne:shot.oneVOne,openWindow:shot.openWindow,blockers:shot.blockers.length,centrality:Math.abs(l.y-34),bodyAngleDiff:shot.bodyAngleDiff,facingAlignment:shot.facingAlignment,turningRequired:shot.turningRequired,backToGoal:shot.backToGoal},pass:{runner:meta(runner),progressive:meta(progressive),switch:meta(switchOpt),safe:meta(safe),recycle:meta(recycle)},earlyCross:early?early.candidateMeta:null,deepDelivery:deepDelivery?{kind:deepDelivery.kind,targetId:deepDelivery.target?.id,targetOpen:deepDelivery.option?.open||0,sourceX:l.x,sourceTouchline:Math.min(l.y,68-l.y)<=16.0,targetLocalX:deepDelivery.option?.q?.x??null,deliveryIntent:deepDelivery.deliveryIntent||null}:null};
+810: }
+811: function candidateRank(m,owner,ctx){
+--- 856 ---
+854:   if(delivery&&['WF','FB'].includes(owner.role)&&(centrality>11.5||local.x>90.0)&&m.r()<0.72)return{...delivery,reason:'BOX_DELIVERY'};
+855:   // If the lane is blocked, carry to change the angle before recycling.
+856:   if((owner.boxCarryChain||0)<2&&space>2.0&&local.x<94.0&&(shot.blockers.length>=1||pressure<2.0)&&m.r()<0.64)return{type:'CARRY',reason:'CREATE_ANGLE'};
+857:   if((owner.boxCarryChain||0)<2&&space>3.0&&local.x<93.0&&m.r()<0.40)return{type:'CARRY',reason:'BOX_CARRY'};
+858:   // If the finish is not on, keep the attack alive around the box instead of habitually recycling to the defensive line.
+--- 857 ---
+855:   // If the lane is blocked, carry to change the angle before recycling.
+856:   if((owner.boxCarryChain||0)<2&&space>2.0&&local.x<94.0&&(shot.blockers.length>=1||pressure<2.0)&&m.r()<0.64)return{type:'CARRY',reason:'CREATE_ANGLE'};
+857:   if((owner.boxCarryChain||0)<2&&space>3.0&&local.x<93.0&&m.r()<0.40)return{type:'CARRY',reason:'BOX_CARRY'};
+858:   // If the finish is not on, keep the attack alive around the box instead of habitually recycling to the defensive line.
+859:   const layoff=opts.find(o=>o.block===0&&o.open>1.3&&o.forward>-3&&worldToLocal(owner.team,o.p.x,o.p.y).x>76);
+--- 861 ---
+859:   const layoff=opts.find(o=>o.block===0&&o.open>1.3&&o.forward>-3&&worldToLocal(owner.team,o.p.x,o.p.y).x>76);
+860:   if(layoff&&m.r()<0.68)return{type:'PASS',target:layoff.p,kind:'PASS',option:layoff,reason:'BOX_LAYOFF'};
+861:   if((owner.boxCarryChain||0)<2&&space>1.2&&local.x<94.5)return{type:'CARRY',reason:'PROTECT_BOX_POSSESSION'};
+862:   return{type:'HOLD',reason:'BOX_SHIELD'};
+863: }
+--- 1082 ---
+1080:   }else{owner.openFinishingWindowSince=null;owner.openFinishingControlSince=null;}
+1081:   const finishAge=finishOpen&&Number.isFinite(owner.openFinishingWindowSince)?m.time-owner.openFinishingWindowSince:0;
+1082:   const recentAngleCarry=(owner.boxCarryChain||0)>=1&&m.time-(owner.lastBoxCarryAt||-99)<1.5;
+1083:   const finishDeadline=recentAngleCarry?(owner.role==='ST'?0.40:(owner.role==='WF'?0.48:0.58)):(owner.role==='ST'?0.90:(owner.role==='WF'?0.88:1.00));
+1084:   const finishForceDistance=owner.role==='ST'?18.0:(owner.role==='WF'?16.8:16.0);
+--- 1161 ---
+1159:   return'GROUND';
+1160: }
+1161: function executePass(m,owner,target,kind,option=null,actionReason=null){
+1162:   if(!target)return;const frontRoles=new Set(['ST','WF']),frontCombo=(kind==='PASS'||kind==='THROUGH')&&frontRoles.has(owner.role)&&frontRoles.has(target.role);if(frontCombo)m.frontPassChain[owner.team]=(m.frontPassChain[owner.team]||0)+1;else m.frontPassChain[owner.team]=0;m.stats.maxFrontPassChain=Math.max(m.stats.maxFrontPassChain,m.frontPassChain[owner.team]||0);
+1163:   const d=dist(owner,target),running=option?.running||(target.runUntil||0)>m.time,feetIntent=actionReason==='CANDIDATE_SAFE'||actionReason==='CANDIDATE_RECYCLE';let tp;
+--- 1312 ---
+1310:     // for the commitment window and use a target far enough away that normal braking
+1311:     // does not bring the carrier to a full stop before the next meaningful decision.
+1312:     const previousCommit=(owner.boxCarryCommittedUntil||0)>m.time&&owner.boxCarrySide;
+1313:     let side=previousCommit?owner.boxCarrySide:Math.sign((owner.vy||0)*(owner.team===HOME?1:-1));
+1314:     if(!side)side=Math.sign(34-l.y);if(!side)side=(m.r()<0.5?-1:1);
+--- 1313 ---
+1311:     // does not bring the carrier to a full stop before the next meaningful decision.
+1312:     const previousCommit=(owner.boxCarryCommittedUntil||0)>m.time&&owner.boxCarrySide;
+1313:     let side=previousCommit?owner.boxCarrySide:Math.sign((owner.vy||0)*(owner.team===HOME?1:-1));
+1314:     if(!side)side=Math.sign(34-l.y);if(!side)side=(m.r()<0.5?-1:1);
+1315:     owner.boxCarrySide=side;
+--- 1315 ---
+1313:     let side=previousCommit?owner.boxCarrySide:Math.sign((owner.vy||0)*(owner.team===HOME?1:-1));
+1314:     if(!side)side=Math.sign(34-l.y);if(!side)side=(m.r()<0.5?-1:1);
+1315:     owner.boxCarrySide=side;
+1316:     const central=(34-l.y),centralPull=clamp(central*0.10,-0.70,0.70);
+1317:     // Keep V0.4's forward ambition.  The fix is continuity, not a stronger dribble.
+--- 1336 ---
+1334:   }
+1335:   const w=localToWorld(owner.team,tx,ty);
+1336:   owner.tx=w.x;owner.ty=w.y;owner.action=inBox?'COMMITTED_BOX_CARRY':(pressure<2.4?'DRIBBLE_EVADE':'CARRY_FORWARD');owner.tacticalTask=owner.action;owner.sprint=!inBox&&space>7&&l.x<82;const pressured=pressure<1.45;
+1337:   if(inBox){
+1338:     const prevBoxCarry=owner.lastBoxCarryAt||-99;owner.boxCarryChain=m.time-prevBoxCarry<3.0?Math.min(4,(owner.boxCarryChain||0)+1):1;owner.lastBoxCarryAt=m.time;m.stats.maxBoxCarryChain=Math.max(m.stats.maxBoxCarryChain||0,owner.boxCarryChain);
+--- 1338 ---
+1336:   owner.tx=w.x;owner.ty=w.y;owner.action=inBox?'COMMITTED_BOX_CARRY':(pressure<2.4?'DRIBBLE_EVADE':'CARRY_FORWARD');owner.tacticalTask=owner.action;owner.sprint=!inBox&&space>7&&l.x<82;const pressured=pressure<1.45;
+1337:   if(inBox){
+1338:     const prevBoxCarry=owner.lastBoxCarryAt||-99;owner.boxCarryChain=m.time-prevBoxCarry<3.0?Math.min(4,(owner.boxCarryChain||0)+1):1;owner.lastBoxCarryAt=m.time;m.stats.maxBoxCarryChain=Math.max(m.stats.maxBoxCarryChain||0,owner.boxCarryChain);
+1339:     const duration=pressured?0.68:0.98;owner.boxCarryStartedAt=m.time;owner.boxCarryCommittedUntil=m.time+duration;owner.lockTargetUntil=owner.boxCarryCommittedUntil;owner.nextThink=owner.lockTargetUntil;m.stats.boxCommittedCarries=(m.stats.boxCommittedCarries||0)+1;
+1340:   }else{if(m.time-(owner.lastBoxCarryAt||-99)>=3.0)owner.boxCarryChain=0;
+--- 1339 ---
+1337:   if(inBox){
+1338:     const prevBoxCarry=owner.lastBoxCarryAt||-99;owner.boxCarryChain=m.time-prevBoxCarry<3.0?Math.min(4,(owner.boxCarryChain||0)+1):1;owner.lastBoxCarryAt=m.time;m.stats.maxBoxCarryChain=Math.max(m.stats.maxBoxCarryChain||0,owner.boxCarryChain);
+1339:     const duration=pressured?0.68:0.98;owner.boxCarryStartedAt=m.time;owner.boxCarryCommittedUntil=m.time+duration;owner.lockTargetUntil=owner.boxCarryCommittedUntil;owner.nextThink=owner.lockTargetUntil;m.stats.boxCommittedCarries=(m.stats.boxCommittedCarries||0)+1;
+1340:   }else{if(m.time-(owner.lastBoxCarryAt||-99)>=3.0)owner.boxCarryChain=0;
+1341:     owner.lockTargetUntil=m.time+(pressured?0.62:1.32)+(owner.sprint?0.42:0.20);owner.nextThink=Math.max(owner.lockTargetUntil,m.time+0.72+m.r()*0.18);
+--- 1340 ---
+1338:     const prevBoxCarry=owner.lastBoxCarryAt||-99;owner.boxCarryChain=m.time-prevBoxCarry<3.0?Math.min(4,(owner.boxCarryChain||0)+1):1;owner.lastBoxCarryAt=m.time;m.stats.maxBoxCarryChain=Math.max(m.stats.maxBoxCarryChain||0,owner.boxCarryChain);
+1339:     const duration=pressured?0.68:0.98;owner.boxCarryStartedAt=m.time;owner.boxCarryCommittedUntil=m.time+duration;owner.lockTargetUntil=owner.boxCarryCommittedUntil;owner.nextThink=owner.lockTargetUntil;m.stats.boxCommittedCarries=(m.stats.boxCommittedCarries||0)+1;
+1340:   }else{if(m.time-(owner.lastBoxCarryAt||-99)>=3.0)owner.boxCarryChain=0;
+1341:     owner.lockTargetUntil=m.time+(pressured?0.62:1.32)+(owner.sprint?0.42:0.20);owner.nextThink=Math.max(owner.lockTargetUntil,m.time+0.72+m.r()*0.18);
+1342:   }
+--- 1346 ---
+1344: }
+1345: function extendCommittedBoxCarry(m,owner){
+1346:   if(owner.action!=='COMMITTED_BOX_CARRY'||(owner.boxCarryCommittedUntil||0)<=m.time)return false;
+1347:   const remain=dist(owner,{x:owner.tx,y:owner.ty});if(remain>0.56||owner.boxCarryCommittedUntil-m.time<0.18)return false;
+1348:   const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),side=owner.boxCarrySide||1;
+--- 1347 ---
+1345: function extendCommittedBoxCarry(m,owner){
+1346:   if(owner.action!=='COMMITTED_BOX_CARRY'||(owner.boxCarryCommittedUntil||0)<=m.time)return false;
+1347:   const remain=dist(owner,{x:owner.tx,y:owner.ty});if(remain>0.56||owner.boxCarryCommittedUntil-m.time<0.18)return false;
+1348:   const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),side=owner.boxCarrySide||1;
+1349:   let dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy);if(n<0.12){dx=1.0;dy=side*0.42;n=Math.hypot(dx,dy);}
+--- 1348 ---
+1346:   if(owner.action!=='COMMITTED_BOX_CARRY'||(owner.boxCarryCommittedUntil||0)<=m.time)return false;
+1347:   const remain=dist(owner,{x:owner.tx,y:owner.ty});if(remain>0.56||owner.boxCarryCommittedUntil-m.time<0.18)return false;
+1348:   const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),side=owner.boxCarrySide||1;
+1349:   let dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy);if(n<0.12){dx=1.0;dy=side*0.42;n=Math.hypot(dx,dy);}
+1350:   const ext=Math.min(0.90,Math.max(0.48,(owner.boxCarryCommittedUntil-m.time)*1.45));
+--- 1350 ---
+1348:   const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),side=owner.boxCarrySide||1;
+1349:   let dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy);if(n<0.12){dx=1.0;dy=side*0.42;n=Math.hypot(dx,dy);}
+1350:   const ext=Math.min(0.90,Math.max(0.48,(owner.boxCarryCommittedUntil-m.time)*1.45));
+1351:   const nx=clamp(l.x+dx/n*ext,87.5,94.2),ny=clamp(l.y+dy/n*ext,15,53),w=localToWorld(owner.team,nx,ny);
+1352:   owner.tx=w.x;owner.ty=w.y;m.stats.boxCarryExtensions=(m.stats.boxCarryExtensions||0)+1;return true;
+--- 1352 ---
+1350:   const ext=Math.min(0.90,Math.max(0.48,(owner.boxCarryCommittedUntil-m.time)*1.45));
+1351:   const nx=clamp(l.x+dx/n*ext,87.5,94.2),ny=clamp(l.y+dy/n*ext,15,53),w=localToWorld(owner.team,nx,ny);
+1352:   owner.tx=w.x;owner.ty=w.y;m.stats.boxCarryExtensions=(m.stats.boxCarryExtensions||0)+1;return true;
+1353: }
+1354: function executeTakeOn(m,owner,opp){
+--- 1379 ---
+1377:   const targets=teamPlayers(m,owner.team).filter(p=>p.role!=='GK').sort((a,b)=>dir(owner.team)*(b.x-a.x)-dir(owner.team)*(a.x-b.x));
+1378:   const target=targets.find(p=>p.role==='ST')||targets[0];if(!target)return;
+1379:   executePass(m,owner,target,'LONG_PASS',null);owner.lastDecision='GK_CLEAR';
+1380: }
+1381: function ownerThink(m,owner){
+--- 1407 ---
+1405:       if(userControl.mode==='CARRY'&&m.time<Number(userControl.until||0)-0.05&&m.ball.mode==='CONTROLLED'&&m.ball.ownerId===owner.id){
+1406:         const remain=dist(owner,{x:owner.tx,y:owner.ty});
+1407:         if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?dx/n:1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,clamp(l.x+ux*step,4,96.2),clamp(l.y+uy*step,4,64));owner.tx=w.x;owner.ty=w.y;owner.action=inOppPenaltyArea(owner.team,owner.x,owner.y)?'COMMITTED_BOX_CARRY':'CARRY_FORWARD';owner.tacticalTask=owner.action;owner.sprint=!inOppPenaltyArea(owner.team,owner.x,owner.y)&&step>2.4;m.stats.userCarryIntentExtensions=(m.stats.userCarryIntentExtensions||0)+1;}
+1408:       }
+1409:       return;
+--- 1416 ---
+1414:   // A committed carry/evasion/turn has a short execution window. Pressure may accelerate the NEXT decision,
+1415:   // but must not redraw the movement target every simulation tick while the action is still being executed.
+1416:   if((owner.lockTargetUntil||0)>m.time&&['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY','TAKE_ON','TURN_BACK','DUEL_ESCAPE','FIRST_TOUCH_FLOW','TURNING_SHOT_PREP'].includes(owner.action)){
+1417:     if(['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY','TAKE_ON','FIRST_TOUCH_FLOW'].includes(owner.action)&&m.time-(owner.lastCarryInterruptCheck||-99)>=(owner.action==='TAKE_ON'?0.14:0.22)){
+1418:       owner.lastCarryInterruptCheck=m.time;
+--- 1417 ---
+1415:   // but must not redraw the movement target every simulation tick while the action is still being executed.
+1416:   if((owner.lockTargetUntil||0)>m.time&&['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY','TAKE_ON','TURN_BACK','DUEL_ESCAPE','FIRST_TOUCH_FLOW','TURNING_SHOT_PREP'].includes(owner.action)){
+1417:     if(['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY','TAKE_ON','FIRST_TOUCH_FLOW'].includes(owner.action)&&m.time-(owner.lastCarryInterruptCheck||-99)>=(owner.action==='TAKE_ON'?0.14:0.22)){
+1418:       owner.lastCarryInterruptCheck=m.time;
+1419:       // Do not shoot *during* an unresolved take-on duel. Once the defender has actually been
+--- 1433 ---
+1431:         // state. Reopen the decision before the animation/target lock can drag the attacker
+1432:         // through several seconds of an already-finished chance. Unresolved TAKE_ON remains protected.
+1433:         if(carryCriticalOpen&&openCarryAge>=reopenDeadline&&owner.action!=='TAKE_ON'){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;owner.nextThink=m.time;m.stats.openFinishDecisionReopens=(m.stats.openFinishDecisionReopens||0)+1;}
+1434:         const takeOnFinish=takeOnBreak&&si.inBox&&si.blockers.length===0&&si.dGoal<=15.5&&(si.oneVOne||si.openWindow||Math.abs(slOpen.y-34)<=10.5),firstTouchFlow=owner.action==='FIRST_TOUCH_FLOW';
+1435:         const instantOpenFinish=!firstTouchFlow&&si.openWindow&&si.dGoal<=13.2&&si.blockers.length===0&&m.r()<(takeOnBreak?0.72:0.28);
+--- 1436 ---
+1434:         const takeOnFinish=takeOnBreak&&si.inBox&&si.blockers.length===0&&si.dGoal<=15.5&&(si.oneVOne||si.openWindow||Math.abs(slOpen.y-34)<=10.5),firstTouchFlow=owner.action==='FIRST_TOUCH_FLOW';
+1435:         const instantOpenFinish=!firstTouchFlow&&si.openWindow&&si.dGoal<=13.2&&si.blockers.length===0&&m.r()<(takeOnBreak?0.72:0.28);
+1436:         if(si.inBox&&((si.oneVOne)||(takeOnFinish&&m.r()<(si.dGoal<=11.5?0.98:0.82))||(si.dGoal<=9.5&&si.blockers.length===0)||instantOpenFinish)){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;if(takeOnBreak)m.stats.takeOnBreakawayShots=(m.stats.takeOnBreakawayShots||0)+1;applyResolvedOwnerAction(m,owner,{type:'SHOT',reason:takeOnBreak?(si.oneVOne?'TAKE_ON_ONE_V_ONE':'TAKE_ON_SHOT_WINDOW'):(si.oneVOne?'ONE_V_ONE':'CARRY_SHOT_WINDOW')});return;}
+1437:       }
+1438:       if(owner.action==='COMMITTED_BOX_CARRY'){
+--- 1438 ---
+1436:         if(si.inBox&&((si.oneVOne)||(takeOnFinish&&m.r()<(si.dGoal<=11.5?0.98:0.82))||(si.dGoal<=9.5&&si.blockers.length===0)||instantOpenFinish)){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;if(takeOnBreak)m.stats.takeOnBreakawayShots=(m.stats.takeOnBreakawayShots||0)+1;applyResolvedOwnerAction(m,owner,{type:'SHOT',reason:takeOnBreak?(si.oneVOne?'TAKE_ON_ONE_V_ONE':'TAKE_ON_SHOT_WINDOW'):(si.oneVOne?'ONE_V_ONE':'CARRY_SHOT_WINDOW')});return;}
+1437:       }
+1438:       if(owner.action==='COMMITTED_BOX_CARRY'){
+1439:         const age=m.time-(owner.boxCarryStartedAt||m.time),pressure=ballCarrierPressureDistance(m,owner),sl=worldToLocal(owner.team,owner.x,owner.y),carryShot=shotAssessment(m,owner);
+1440:         const carryFinishOpen=carryShot.inBox&&carryShot.openWindow&&carryShot.blockers.length===0&&carryShot.dGoal<=18.5&&Math.abs(sl.y-34)<=11.5&&['ST','WF','CM'].includes(owner.role);
+--- 1439 ---
+1437:       }
+1438:       if(owner.action==='COMMITTED_BOX_CARRY'){
+1439:         const age=m.time-(owner.boxCarryStartedAt||m.time),pressure=ballCarrierPressureDistance(m,owner),sl=worldToLocal(owner.team,owner.x,owner.y),carryShot=shotAssessment(m,owner);
+1440:         const carryFinishOpen=carryShot.inBox&&carryShot.openWindow&&carryShot.blockers.length===0&&carryShot.dGoal<=18.5&&Math.abs(sl.y-34)<=11.5&&['ST','WF','CM'].includes(owner.role);
+1441:         if(carryFinishOpen){
+--- 1448 ---
+1446:         // A genuinely new pressure state OR a sustained newly-open finishing lane ends the
+1447:         // committed carry early. The persistent timer survives subsequent carry choices.
+1448:         if(shotReady||persistentOpenAge>=0.58||age>=0.48&&pressure<1.18){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;owner.nextThink=m.time;if(pressure<1.18)m.stats.boxCarryPressureReleases=(m.stats.boxCarryPressureReleases||0)+1;if(persistentOpenAge>=0.58)m.stats.openFinishCarryReleases=(m.stats.openFinishCarryReleases||0)+1;}
+1449:         else extendCommittedBoxCarry(m,owner);
+1450:       }
+--- 1517 ---
+1515:   const outlet=opts.find(o=>o.block===0&&o.open>1.35&&(o.forward>-5||worldToLocal(owner.team,o.p.x,o.p.y).x>74));
+1516:   if(outlet){
+1517:     executePass(m,owner,outlet.p,outlet.running&&outlet.leadForward>8?'THROUGH':(outlet.d>31?'LONG_PASS':'PASS'),outlet);
+1518:     m.stats.duelForcedResolves++;
+1519:     return;
+--- 2046 ---
+2044:   if(action.type==='SHOT')executeShot(m,owner,action.reason||'GENERAL');
+2045:   else if(action.type==='DRAW_FOUL')executeDrawFoul(m,owner);
+2046:   else if(action.type==='PASS')executePass(m,owner,action.target,action.kind,action.option||null,action.reason||null);
+2047:   else if(action.type==='GK_CLEAR')executeGKClear(m,owner);
+2048:   else if(action.type==='TAKE_ON')executeTakeOn(m,owner,action.takeOn);
