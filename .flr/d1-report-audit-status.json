@@ -1,8 +1,38 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 21,
+  "count": 24,
   "reports": [
+    {
+      "report_id": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
+      "build": "USER-MATCH-TEST-V0.5",
+      "created_at": "2026-08-23T09:05:22.822Z",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "이 부분에 대해서는 분명히 공이 날아오는것 을 보여주고 선택지가 나오기로 했는데 출발도 전에 선택지가 나오는 현상 유지중임",
+      "size_bytes": 3668949,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
+      "build": "USER-MATCH-TEST-V0.5",
+      "created_at": "2026-08-23T09:00:17.222Z",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "LW 가 무방비 임에도 패스 옵션이 활성화가 안됨",
+      "size_bytes": 1670275,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
+      "build": "USER-MATCH-TEST-V0.5",
+      "created_at": "2026-08-23T08:58:33.791Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "여전히 우리 팀의 포메이션에서 ST만 특출나고 \n나머지 우리팀과 상대팀의 포메이션은 너무 정갈함",
+      "size_bytes": 518364,
+      "chunk_count": 1
+    },
     {
       "report_id": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
       "build": "USER-MATCH-TEST-V0.4",
@@ -214,26 +244,26 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
+  "latestAttachedReportId": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
       "currentSituation": true,
-      "previousSituation": false,
+      "previousSituation": true,
       "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
-      "build": "USER-MATCH-TEST-V0.4",
+      "reportId": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
+      "build": "USER-MATCH-TEST-V0.5",
       "step": 78,
-      "description": "선택지에서는 공중패스도 있어야 할 것 같다.\n쓰루패스가 매번 땅으로만 가니 수비를 넘겨서 패스한다는 선택지가 성립이 안되네",
+      "description": "이 부분에 대해서는 분명히 공이 날아오는것 을 보여주고 선택지가 나오기로 했는데 출발도 전에 선택지가 나오는 현상 유지중임",
       "category": "패스/공격",
       "priority": 4,
-      "reportedAt": "2026-08-23T05:41:50.143Z"
+      "reportedAt": "2026-08-23T09:03:40.817Z"
     },
     "currentSituationPresent": true,
-    "previousSituationPresent": false,
+    "previousSituationPresent": true,
     "currentSituationKeys": [
       "schemaVersion",
       "canonicalContract",
@@ -243,15 +273,28 @@
       "futureOutcomePrecomputed",
       "reportScope"
     ],
-    "previousSituationKeys": [],
+    "previousSituationKeys": [
+      "schemaVersion",
+      "canonicalContract",
+      "hybridBefore",
+      "highResolution",
+      "hybridAfter",
+      "futureOutcomePrecomputed",
+      "reportScope"
+    ],
     "currentReportScope": {
-      "startSecond": 3613.499999999811,
-      "endSecond": 3617.8,
+      "startSecond": 3975.0999999997853,
+      "endSecond": 4002.7,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "previousReportScope": null,
-    "currentSerializedBytes": 707052,
-    "previousSerializedBytes": 0
+    "previousReportScope": {
+      "startSecond": 3752.7999999997924,
+      "endSecond": 3759.1,
+      "cumulativeMatchHistoryIncluded": false,
+      "keepsFullSituationFrames": true
+    },
+    "currentSerializedBytes": 3058624,
+    "previousSerializedBytes": 1037646
   }
 }
