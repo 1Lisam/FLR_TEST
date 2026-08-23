@@ -1,8 +1,8 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
-  "build": "USER-MATCH-TEST-V0.4",
+  "build": "USER-MATCH-TEST-V0.5",
   "limit": 50,
-  "requestedAt": "2026-08-23T14:43:00+09:00",
-  "purpose": "Inspect all newly submitted Match Engine User Test V0.4 reports, compare against unresolved TT-0.48/TT-0.49 history, and group regressions versus new issues before the next fix batch",
-  "runNonce": "user-match-test-v0-4-feedback-audit-20260823-1443"
+  "requestedAt": "2026-08-23T18:29:00+09:00",
+  "purpose": "Inspect newly submitted Match Engine User Test V0.5 reports after the correction retest deployment, identify resolved V0.4 items, persistent regressions, and genuinely new issues before any further engine changes",
+  "runNonce": "user-match-test-v0-5-feedback-audit-20260823-1829"
 }
