@@ -1,8 +1,68 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 25,
+  "count": 31,
   "reports": [
+    {
+      "report_id": "umt051-7af55f13-b377-4c5c-9242-a6c86d45c0df",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:11:52.654Z",
+      "category": "기타",
+      "priority": 3,
+      "description": "1. 이것도 다른 건의 사항인데 공격수들의 쇄도가 꽤나 적은것 같아. 그들이 돌파 하는 것도 좀 보고 싶은데 공을 잡고 있더라도 모두 오프사이드 라인 이상은 넘어가지 않으려는 것 같음\n\n2.",
+      "size_bytes": 0,
+      "chunk_count": 0
+    },
+    {
+      "report_id": "umt051-666fc044-4d36-4d2d-9e16-1ea98d776f14",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:10:37.795Z",
+      "category": "기타",
+      "priority": 3,
+      "description": "이건 JSON이 없이 다른 이야기 인데\n1. 패스 중 꽤나 긴 패스라고 판단 되면 공중 패스로 판단 하는 경우도 필요 할 것 같음.\n2. 그리고 선택지 캐릭터 오른쪽 위에 O 표시가 있는것의 의미를 모르겠음\n3. 2. 의 항목 때문에 공이 햇갈림, 공의 표현을 바꿔줘야 할  것같음 축구공 모양 스프라이트를 쓰던지 아니면 공임을 알 수 있는 다른 문양을 쓰던지",
+      "size_bytes": 0,
+      "chunk_count": 0
+    },
+    {
+      "report_id": "umt051-8e44fd09-7ae9-4587-8fc1-ef3c856c0e8a",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:08:52.915Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "아까부터 선택 직전에 장면이 한번 되돌아갔다가 돌아오는 버퍼링 같은 현상이 발생 중임",
+      "size_bytes": 5437298,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt051-4666b14a-cb73-44db-a2a6-1b62961f8d9c",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:06:52.061Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "여전히 현재 화면에서 포메이션이 너무 반듯하게 배치 되어 있으며 다른 21명의 선수 중 내 ST (조작캐릭터)만 포메이션과 전혀 다른 위치에 배치 되어 있음.\n\n다만 이건 ST가 배치 되어 있으면 거기에 마크하는 수비수가 있어야 하거나 \n혹은 ST가 여기 위치에 있는데 다른 선수들은 정 위치에 있는것들이 매우 어색함\n이부분도 몇번이나 언급되었던 이슈인데 고쳐지지 않는 중",
+      "size_bytes": 1613687,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt051-aa3cf94e-e023-4f23-a446-88038e5babfb",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:05:11.442Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "해당 상황에서 LW가 비어 있는 상태임에도 패스가 불가능. 분명히 선택지로 존재 해도 될 법한 상황인데 존재하지 않음",
+      "size_bytes": 1697781,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt051-c61b317e-68bb-485c-b15d-8c51592bdab5",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:03:41.841Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "최종적으로 우리팀 RW가 공격을 성공 시켰으나 '골세레머니' 나오지 않음, 또한 표현도 '득점'이 아닌 '공격지속' 이 되어 밋밋하게 끝나버림 이 부분은 몇번이나 언급했듯 수정이 필요함",
+      "size_bytes": 2066896,
+      "chunk_count": 1
+    },
     {
       "report_id": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
       "build": "USER-MATCH-TEST-V0.5",
@@ -254,7 +314,7 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
+  "latestAttachedReportId": "umt051-8e44fd09-7ae9-4587-8fc1-ef3c856c0e8a",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -264,13 +324,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
-      "build": "USER-MATCH-TEST-V0.5",
+      "reportId": "umt051-8e44fd09-7ae9-4587-8fc1-ef3c856c0e8a",
+      "build": "USER-MATCH-TEST-V0.5.1",
       "step": 78,
-      "description": "공간 침투패스를 받은 후 그대로 달려나가는것이 정상이지만 공간 침투 패스를 달려가서 잡은 후 멈춰버림",
-      "category": "패스/공격",
+      "description": "아까부터 선택 직전에 장면이 한번 되돌아갔다가 돌아오는 버퍼링 같은 현상이 발생 중임",
+      "category": "2D 움직임",
       "priority": 3,
-      "reportedAt": "2026-08-23T10:02:33.756Z"
+      "reportedAt": "2026-08-23T12:07:11.702Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -293,18 +353,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 3115.399999999885,
-      "endSecond": 3130.1,
+      "startSecond": 2792.1999999998966,
+      "endSecond": 2830.4,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 2972.3999999999114,
-      "endSecond": 3001.4,
+      "startSecond": 2247.7999999999297,
+      "endSecond": 2309.2,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 2303232,
-    "previousSerializedBytes": 4506580
+    "currentSerializedBytes": 3549231,
+    "previousSerializedBytes": 2514324
   }
 }
