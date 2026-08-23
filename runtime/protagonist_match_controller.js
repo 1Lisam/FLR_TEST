@@ -8,7 +8,7 @@
   if(typeof module==='object'&&module.exports)module.exports=api;else root.FLRPG_PROTAGONIST_MATCH_CONTROLLER=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(E,R38,M,A){
 'use strict';
-const VERSION='TT051-PROTAGONIST-MATCH-CONTROLLER-1.6-MEANINGFUL-CHOICE-FLOORS';
+const VERSION='TT051-PROTAGONIST-MATCH-CONTROLLER-1.8-HISTORICAL-CLOSURE';
 const MODES={
   FULL_MATCH:{id:'FULL_MATCH',label:'전체 경기',presentation:'LIVE',threshold:0,minGap:0.8,description:'경기 전체를 보면서 모든 유효한 주인공 판단을 표시'},
   PLAYER_ALL:{id:'PLAYER_ALL',label:'내 플레이 보기',presentation:'HIGHLIGHT',threshold:0,minGap:0.8,description:'경기는 고속 계산하고 주인공 판단 장면은 모두 직전 10초부터 재생'},
@@ -194,6 +194,15 @@ function onBallOptions(frame){
     if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='CARRY');if(ix>=0)out.splice(ix,1);}
     if(out.length<6){const row={id:release.id,targetId:release.targetId||null,targetName:release.targetName||null,family:'패스',label:labelFor(release),meta:release.meta?deep(release.meta):null};row.hint=tooltipFor(release,frame);row.tooltip=row.hint;out.push(row);}
   }
+  // V0.4 historical far-side committed-run floor: Candidate ranking and physical pass
+  // availability are separate contracts. If a winger is currently making a real, unblocked
+  // lead run, the six-option display cap must not erase that live passing lane merely because
+  // another candidate family ranked higher. Execution still re-checks the current pass geometry.
+  const committedWide=(frame?._frame?.opts||[]).filter(o=>o?.p&&o.p.role==='WF'&&o.block===0&&o.open>=.45&&o.forward>1.5&&o.running===true&&Math.hypot(o.p.vx||0,o.p.vy||0)>=1.1&&Number(o.leadForward||0)>=2.5).sort((a,b)=>Number(b.leadForward||0)-Number(a.leadForward||0))[0]||null;
+  if(committedWide&&!out.some(o=>o.family==='패스'&&o.targetId===committedWide.p.id)){
+    if(out.length>=6){const ix=out.findIndex(o=>['HOLD','RECYCLE','CARRY','SAFE_PASS'].includes(o.id));if(ix>=0)out.splice(ix,1);}
+    if(out.length<6){const c={id:'THROUGH_PASS',targetId:committedWide.p.id,targetName:`같은 팀 ${committedWide.p.slot}`,meta:{targetId:committedWide.p.id,targetSlot:committedWide.p.slot,runnerTask:committedWide.p.tacticalTask||null,leadForward:Number(committedWide.leadForward||0),physicalCommittedRun:true}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
+  }
   // PLAYER risk floor: the raw live pass geometry, not NPC ranking, decides whether a risky
   // pass can be shown. One blocker / tight pressure / a marginal offside shoulder remains a
   // player choice; the live engine still decides interception or OFFSIDE after execution.
@@ -297,6 +306,11 @@ function readyForDefPause(s,f,importance){if(f.kind!=='DEFENDING')return false;c
 function sanitizeFrameForScene(q){if(!q)return null;const f=q.frame||{};return{kind:f.kind,playerId:f.playerId,team:f.team,role:f.role,slot:f.slot,time:Number((f.time||0).toFixed(3)),localX:Number.isFinite(f.localX)?Number(f.localX.toFixed(3)):null,localY:Number.isFinite(f.localY)?Number(f.localY.toFixed(3)):null,pressure:Number.isFinite(f.pressure)?Number(f.pressure.toFixed(3)):null,space:Number.isFinite(f.space)?Number(f.space.toFixed(3)):null,held:Number.isFinite(f.held)?Number(f.held.toFixed(3)):null,shot:f.shot?deep(f.shot):null,distance:Number.isFinite(f.distance)?Number(f.distance.toFixed(3)):null,opponentId:f.opponentId||null,opponentName:f.opponentName||null,opponentAttackX:Number.isFinite(f.opponentAttackX)?Number(f.opponentAttackX.toFixed(3)):null,goalSideMargin:Number.isFinite(f.goalSideMargin)?Number(f.goalSideMargin.toFixed(3)):null,threatTarget:f.threatTarget?deep(f.threatTarget):null,threatShot:f.threatShot?deep(f.threatShot):null,eta:Number.isFinite(f.eta)?Number(f.eta.toFixed(3)):null,contactX:Number.isFinite(f.contactX)?Number(f.contactX.toFixed(3)):null,contactY:Number.isFinite(f.contactY)?Number(f.contactY.toFixed(3)):null,contactZ:Number.isFinite(f.contactZ)?Number(f.contactZ.toFixed(3)):null,incomingSpeed:Number.isFinite(f.incomingSpeed)?Number(f.incomingSpeed.toFixed(3)):null,flightKind:f.flightKind||null,sourceId:f.sourceId||null,candidates:(f.candidates||[]).map(c=>({id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,score:c.score,meta:c.meta?deep(c.meta):null}))};}
 function maybeCheckpoint(s){
   updateEpisodeState(s);const def=modeDef(s);if(s.pending||s.resultTracker||def.presentation==='SKIP'||s.m.completed||s.m.restart)return null;const q=inspect(s);
+  // V0.4 historical #5: if a chosen CARRY was physically stopped almost immediately by tight
+  // pressure, the very next checkpoint must not offer the identical generic CARRY again.
+  // This is a one-checkpoint semantic guard, not a time quota: passes/take-on/shot remain live,
+  // and a genuinely critical new shooting state keeps the full current-state option set.
+  if(q&&s.suppressCarryNextCheckpoint){if(q.frame?.kind==='ON_BALL'){const blockers=Array.isArray(q.frame?.shot?.blockers)?q.frame.shot.blockers.length:Number(q.frame?.shot?.blockers??99),critical=!!(q.frame?.shot?.oneVOne||(q.frame?.shot?.inBox&&q.frame?.shot?.openWindow&&blockers<=1));if(!critical){const before=q.options.length;q.options=q.options.filter(o=>o.id!=='CARRY');if(q.options.length<before)s.m.stats.userCarryRepeatSuppressions=(s.m.stats.userCarryRepeatSuppressions||0)+1;}s.suppressCarryNextCheckpoint=false;}else s.suppressCarryNextCheckpoint=false;}
   // TT-0.51 1_1/1_6: a one-button checkpoint is not a meaningful decision. Do not auto-apply
   // that sole material action. Keep live pressure/movement running while temporarily reserving
   // protagonist owner authority; reopen only when >=2 real options exist or possession ends.
@@ -448,7 +462,7 @@ function updateResultTracker(s){
   else if(tr.choiceId==='TAKE_ON'&&tt==='DRIBBLE_BEAT'){const settledHero=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;ready=settledHero&&now>=Math.max(tr.minimumUntil,(tr.terminalAt||now)+0.88);if(!settledHero&&now>=(tr.terminalAt||now)+2.10&&ballSettled)ready=true;}
   else if(['CARRY','HOLD'].includes(tr.choiceId)){
     if(tr.possessionChangedAt!=null)ready=now-tr.possessionChangedAt>=1.20&&ballSettled;
-    else if(tr.choiceId==='CARRY'&&heroOwnNow){const q=inspect(s),f=q?.frame||{},moved=protagonistMovement(s.currentScene)||0,critical=!!(f.shot?.oneVOne||(f.shot?.inBox&&f.shot?.openWindow&&(f.shot?.blockers??9)<=1)),carryAge=now-tr.startedAt,blockedStall=carryAge>=.95&&moved<.75&&Number(f.pressure??99)<=1.55;if(blockedStall){const h=hero(s);if(h){h.lockTargetUntil=0;h.nextThink=now;h.tx=h.x;h.ty=h.y;h.vx=0;h.vy=0;h.sprint=false;if(['CARRY_FORWARD','COMMITTED_BOX_CARRY','CARRY_SCAN','PROBE_WITH_BALL'].includes(h.action)){h.action='HOLD_BALL';h.tacticalTask='HOLD_BALL';}}if(s.m.userChoiceControl?.playerId===s.heroPlayerId)s.m.userChoiceControl=null;s.m.stats.userCarryStallReopens=(s.m.stats.userCarryStallReopens||0)+1;}ready=blockedStall||(critical&&now>=tr.startedAt+1.35)||(moved>=7.5&&now>=tr.startedAt+2.90)||now>=tr.minimumUntil;}
+    else if(tr.choiceId==='CARRY'&&heroOwnNow){const q=inspect(s),f=q?.frame||{},moved=protagonistMovement(s.currentScene)||0,critical=!!(f.shot?.oneVOne||(f.shot?.inBox&&f.shot?.openWindow&&(f.shot?.blockers??9)<=1)),carryAge=now-tr.startedAt,blockedStall=carryAge>=.95&&moved<.75&&Number(f.pressure??99)<=1.55;if(blockedStall){s.suppressCarryNextCheckpoint=true;const h=hero(s);if(h){h.lockTargetUntil=0;h.nextThink=now;h.tx=h.x;h.ty=h.y;h.vx=0;h.vy=0;h.sprint=false;if(['CARRY_FORWARD','COMMITTED_BOX_CARRY','CARRY_SCAN','PROBE_WITH_BALL'].includes(h.action)){h.action='HOLD_BALL';h.tacticalTask='HOLD_BALL';}}if(s.m.userChoiceControl?.playerId===s.heroPlayerId)s.m.userChoiceControl=null;s.m.stats.userCarryStallReopens=(s.m.stats.userCarryStallReopens||0)+1;}ready=blockedStall||(critical&&now>=tr.startedAt+1.35)||(moved>=7.5&&now>=tr.startedAt+2.90)||now>=tr.minimumUntil;}
     else ready=now>=tr.minimumUntil;
   }else if(tr.family==='패스'||tr.family==='크로스'){
     const heroOwn=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
