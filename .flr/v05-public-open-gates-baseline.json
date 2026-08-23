@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "FLR_V05_PUBLIC_OPEN_GATES_BASELINE_1.0",
+  "status": "FAIL",
+  "summary": {
+    "matches": 24,
+    "strongWindows": 810,
+    "strongActionFrames": 36,
+    "harmfulBackpasses": 2,
+    "deadAttackStalls": 0,
+    "npcOneTouchPasses": 1463,
+    "carryChoices": 199,
+    "carryFollowups": 88,
+    "badRapidCarryReprompts": 9,
+    "minCarryFollowupDelay": 1
+  },
+  "gates": {
+    "npcOneTouch": true,
+    "npcGoodAttackNoDeadStall": true,
+    "strongAttackNoHarmfulBackpass": false,
+    "carryCadence": false
+  }
+}
