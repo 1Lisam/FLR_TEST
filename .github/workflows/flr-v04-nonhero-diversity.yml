@@ -1,0 +1,47 @@
+name: FLR V0.4 Non-Hero Shot Diversity Audit
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.event.pull_request.title == '[FLR_AUDIT] V0.4 FEEDBACK BATCH'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Run diversity audit
+        id: audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .flr/v04_nonhero_shot_diversity_audit.js . 100 > /tmp/flr_v04_nonhero_diversity.json
+      - name: Record result quietly
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.audit.outcome }}
+        run: |
+          set +e
+          if [ "$OUTCOME" != success ] || [ ! -s /tmp/flr_v04_nonhero_diversity.json ]; then
+            printf '{"schemaVersion":"FLR_V04_NONHERO_SHOT_DIVERSITY_1.1","status":"FAILED","matches":0,"windows":0}\n' > /tmp/flr_v04_nonhero_diversity.json
+          fi
+          git config user.name 'FLR V0.4 Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/flr_v04_nonhero_diversity.json .flr/v04-nonhero-shot-diversity-status.json
+          git add .flr/v04-nonhero-shot-diversity-status.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record V0.4 non-hero shot diversity audit' || exit 0
+          git push origin HEAD:main || true
+          exit 0
