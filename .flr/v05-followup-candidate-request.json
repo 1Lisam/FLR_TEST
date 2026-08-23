@@ -1,0 +1,11 @@
+{
+  "base": "b3302e755e0e502dc7963f98c7e402977016581b",
+  "candidateBranch": "candidate/v05-followup-20260823",
+  "reports": [
+    "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
+    "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
+    "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80"
+  ],
+  "requestedAt": "2026-08-23T18:50:00+09:00",
+  "purpose": "Build and test isolated corrections for the three submitted V0.5 user retest reports"
+}
