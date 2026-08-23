@@ -1,8 +1,18 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 31,
+  "count": 32,
   "reports": [
+    {
+      "report_id": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T12:23:17.275Z",
+      "category": "기타",
+      "priority": 3,
+      "description": "7:0 이라는 수치가 나온것과 우리팀 득점 장면은 대부분 뜬금없이 포메이션이 다 구성된 곳에서 득점자 하나만 돌출 되어 ST와 함께 패널티 라인 안에 들어와 있고 수비수들은 모두 자기 포메이션을 유지 중인 상황인데 이게 맞나?\n\n이러면 '득점자만 앞에두고 나머지는 그냥 던져놓자' 라고 해서 갑자기 득점자만 툭 튀어나온 느낌이라 우리가 지향하는 '뒤에서 시뮬레이션 계산을 하던 포메이션을 그대로 드러나자'가 절대 아닌게 드러나는데?",
+      "size_bytes": 4046581,
+      "chunk_count": 1
+    },
     {
       "report_id": "umt051-7af55f13-b377-4c5c-9242-a6c86d45c0df",
       "build": "USER-MATCH-TEST-V0.5.1",
@@ -314,7 +324,7 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt051-8e44fd09-7ae9-4587-8fc1-ef3c856c0e8a",
+  "latestAttachedReportId": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -324,13 +334,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt051-8e44fd09-7ae9-4587-8fc1-ef3c856c0e8a",
+      "reportId": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
       "build": "USER-MATCH-TEST-V0.5.1",
       "step": 78,
-      "description": "아까부터 선택 직전에 장면이 한번 되돌아갔다가 돌아오는 버퍼링 같은 현상이 발생 중임",
-      "category": "2D 움직임",
+      "description": "7:0 이라는 수치가 나온것과 우리팀 득점 장면은 대부분 뜬금없이 포메이션이 다 구성된 곳에서 득점자 하나만 돌출 되어 ST와 함께 패널티 라인 안에 들어와 있고 수비수들은 모두 자기 포메이션을 유지 중인 상황인데 이게 맞나?\n\n이러면 '득점자만 앞에두고 나머지는 그냥 던져놓자' 라고 해서 갑자기 득점자만 툭 튀어나온 느낌이라 우리가 지향하는 '뒤에서 시뮬레이션 계산을 하던 포메이션을 그대로 드러나자'가 절대 아닌게 드러나는데?",
+      "category": "기타",
       "priority": 3,
-      "reportedAt": "2026-08-23T12:07:11.702Z"
+      "reportedAt": "2026-08-23T12:21:36.187Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -353,18 +363,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 2792.1999999998966,
-      "endSecond": 2830.4,
+      "startSecond": 5349.6000000001095,
+      "endSecond": 5371.200000000188,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 2247.7999999999297,
-      "endSecond": 2309.2,
+      "startSecond": 4831.69999999995,
+      "endSecond": 4863.6,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 3549231,
-    "previousSerializedBytes": 2514324
+    "currentSerializedBytes": 3382851,
+    "previousSerializedBytes": 1132052
   }
 }
