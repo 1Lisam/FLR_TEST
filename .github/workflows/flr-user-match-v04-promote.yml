@@ -1,0 +1,88 @@
+name: FLR User Match Test V0.4 Promote
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-user-match-v04-promote
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.4 HISTORICAL CLOSURE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: prod
+          fetch-depth: 0
+      - name: Checkout exact validated V0.4 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: 1e112838840805cae39a771688b0eb72c3d72f76
+          path: cand
+          fetch-depth: 1
+      - name: Verify validated candidate and production scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C cand rev-parse HEAD)" = "1e112838840805cae39a771688b0eb72c3d72f76"
+          git -C cand diff --name-only 53c9a69bdc6a99608c167b5523b2f83dfb0fb25a..HEAD | grep -Ev '^(\.flr/|\.github/)' | sort > /tmp/candidate-production.txt
+          cat > /tmp/expected.txt <<'EOF'
+          full_time_presentation.js
+          runtime/protagonist_match_controller.js
+          step71_hybrid_v06_ui.js
+          EOF
+          diff -u /tmp/expected.txt /tmp/candidate-production.txt
+      - name: Promote exact candidate files and V0.4 labels
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp cand/full_time_presentation.js prod/full_time_presentation.js
+          cp cand/runtime/protagonist_match_controller.js prod/runtime/protagonist_match_controller.js
+          cp cand/step71_hybrid_v06_ui.js prod/step71_hybrid_v06_ui.js
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('prod/step71_hybrid_v06_ui.js')
+          s=p.read_text(encoding='utf-8')
+          if 'USER-MATCH-TEST-V0.3' not in s:
+              raise SystemExit('V0.3 build label missing before V0.4 promotion')
+          s=s.replace('USER-MATCH-TEST-V0.3','USER-MATCH-TEST-V0.4').replace('umt03-','umt04-')
+          p.write_text(s,encoding='utf-8')
+          p=Path('prod/index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'V0.3' not in s:
+              raise SystemExit('V0.3 page label missing before V0.4 promotion')
+          p.write_text(s.replace('V0.3','V0.4'),encoding='utf-8')
+          PY
+      - name: Validate promoted test build
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check prod/runtime/protagonist_match_controller.js
+          node --check prod/step71_hybrid_v06_ui.js
+          node --check prod/full_time_presentation.js
+          grep -q 'TT051-PROTAGONIST-MATCH-CONTROLLER-1.8-HISTORICAL-CLOSURE' prod/runtime/protagonist_match_controller.js
+          grep -q 'FLR_DISCONTINUITY_SNAP_V1' prod/step71_hybrid_v06_ui.js
+          grep -q 'USER-MATCH-TEST-V0.4' prod/step71_hybrid_v06_ui.js
+          grep -q 'umt04-' prod/step71_hybrid_v06_ui.js
+          grep -q 'Match Engine User Test V0.4' prod/index.html
+          ! grep -q 'USER-MATCH-TEST-V0.3' prod/step71_hybrid_v06_ui.js
+      - name: Commit V0.4 to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd prod
+          git config user.name 'FLR Test Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add full_time_presentation.js runtime/protagonist_match_controller.js step71_hybrid_v06_ui.js index.html
+          git diff --cached --quiet && { echo 'NO_STAGED_CHANGES'; exit 1; }
+          git commit -m 'Deploy Match Engine User Test V0.4 historical closure'
+          git push origin HEAD:main
