@@ -1,6 +1,6 @@
 {
   "build": "USER-MATCH-TEST-V0.5",
-  "requestedAt": "2026-08-23T18:38:00+09:00",
-  "purpose": "Inspect all V0.5 user report full frames and decision state after query fix",
-  "nonce": "v05-full-frame-inspect-20260823-1838"
+  "requestedAt": "2026-08-23T18:42:00+09:00",
+  "purpose": "Inspect the three known V0.5 user report full frames directly",
+  "nonce": "v05-direct-frame-inspect-20260823-1842"
 }
