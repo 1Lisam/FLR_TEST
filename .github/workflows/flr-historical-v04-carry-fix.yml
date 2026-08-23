@@ -1,0 +1,47 @@
+name: FLR Historical V0.4 Carry Cadence Fix
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    if: github.event.pull_request.title == '[FLR_AUDIT] HISTORICAL V0.4 REFINED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout patch control
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+      - name: Checkout V0.4 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: historical-closure-v04-candidate
+          path: engine
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Apply causal #5 fix
+        shell: bash
+        run: |
+          python control/.flr/apply_historical_carry_cadence_fix.py engine/runtime/protagonist_match_controller.js
+          node --check engine/runtime/protagonist_match_controller.js
+      - name: Commit candidate fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd engine
+          git config user.name 'FLR Historical Fix Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add runtime/protagonist_match_controller.js
+          if git diff --cached --quiet; then
+            echo 'No candidate change required.'
+            exit 0
+          fi
+          git commit -m 'Fix repeated CARRY follow-up cadence'
+          git push origin HEAD:historical-closure-v04-candidate
