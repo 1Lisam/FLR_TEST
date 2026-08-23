@@ -1,0 +1,60 @@
+name: FLR Historical V0.4 Refined Audit
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-historical-v04-refined
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    if: github.event.issue.title == '[FLR_AUDIT] HISTORICAL V0.4 REFINED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run refined historical closure audit
+        shell: bash
+        run: |
+          set +e
+          node --check .flr/historical_closure_v04_validation.js > /tmp/flr-v04-check.log 2>&1
+          rc=$?
+          if [ "$rc" -eq 0 ]; then
+            node .flr/historical_closure_v04_validation.js > /tmp/flr-v04-result.json 2> /tmp/flr-v04-error.log
+            rc=$?
+          fi
+          if [ ! -s /tmp/flr-v04-result.json ]; then
+            python - <<'PY'
+          import json,pathlib
+          err=''
+          for p in ['/tmp/flr-v04-check.log','/tmp/flr-v04-error.log']:
+              q=pathlib.Path(p)
+              if q.exists(): err+=q.read_text(encoding='utf-8',errors='replace')[-8000:]
+          pathlib.Path('/tmp/flr-v04-result.json').write_text(json.dumps({'schemaVersion':'FLR_HISTORICAL_CLOSURE_V04_VALIDATION_1.0','status':'FAILED_TO_RUN','errorTail':err},ensure_ascii=False)+'\n',encoding='utf-8')
+          PY
+          fi
+          exit 0
+      - name: Record refined audit result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR Historical V04 Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/flr-v04-result.json .flr/historical-v04-refined-status.json
+          git add .flr/historical-v04-refined-status.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record refined V0.4 historical closure audit'
+          git push origin HEAD:main
