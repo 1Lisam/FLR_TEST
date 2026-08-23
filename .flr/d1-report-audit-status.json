@@ -1,8 +1,98 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 12,
+  "count": 21,
   "reports": [
+    {
+      "report_id": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:43:29.428Z",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "선택지에서는 공중패스도 있어야 할 것 같다.\n쓰루패스가 매번 땅으로만 가니 수비를 넘겨서 패스한다는 선택지가 성립이 안되네",
+      "size_bytes": 634387,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-e4ab4e9d-34a5-4925-a0f7-555412e311b4",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:42:51.019Z",
+      "category": "2D 움직임",
+      "priority": 4,
+      "description": "이 장면에서는 선택 직후에 플레이가 끊기는데 플레이가 종료 되기 전 몇초 정도는 더 재생하고 왜 끊기는지 이유를 명확하게 적어줬으면 함.\n예를 들어 공을 뺐겼으면 '상대 RCB에게 공을 탈취 당한 후 공격권 종료' 그리고 바로 끊지 말고 살짝 재생 시켜주고 끝내줘 선택이 끝나자 마자 바로 다음 장면 공을 뺏긴 이후 상황이 바로 종료되어 버려서 무슨 상황인지 인지가 안됨",
+      "size_bytes": 288274,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-9d22011c-b234-45f0-b9e7-7e9d46990757",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:41:28.104Z",
+      "category": "2D 움직임",
+      "priority": 4,
+      "description": "2D 상 플레이어에게 닿지도 않았는데 슈팅이 나감",
+      "size_bytes": 1736371,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-fa3386a4-d200-408c-818c-a44b8078688a",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:40:59.588Z",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "공간침투 패스 선택 후 ST가 매우 빠르게 달려나가는데 이거 정상적인 속도인지?",
+      "size_bytes": 1098707,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-c4f44ee9-67f2-4814-a0a8-c125e278bf70",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:40:26.005Z",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "이 이전 상대방의 골 장면은 항상 동일한거 같음.\n어떤 테스트를 몇 번 하던 상대방 슈팅은 항상 저 위치에 저 포지션에 위치한 상태로 골이 들어갔다고 판단하는거 같은데 확인바람",
+      "size_bytes": 539444,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-17cf3c19-791c-412b-b5b5-824f70601e2d",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:39:35.818Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "내 선택 결과\n안전한 패스 → 같은 팀 RCM → 안전한 패스 → 같은 팀 RCM → 소유권 변화\n내 선택\n안전한 패스 → 같은 팀 RCM → 안전한 패스 → 같은 팀 RCM → 소유권 변화\n\nRCM에게 줘서 어시스트가 들어왔고 득점이 되었는데 단순히 소유권 변화라고 표시되는건 상당히 밋밋함. 또한 골이 들어갔으면 골 세레머니 장면까지는 나오게 해달라고 했는데도 구현이 안됨",
+      "size_bytes": 962734,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-e0e67a53-024a-4085-ab49-5f3007f82db4",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:38:41.972Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "이 선택지 이전 선택지의 끝나는  상황에서는 코너킥이 되었는데 이건 기회가 아니라고 계싼 되어서 넘어간건지 궁금함",
+      "size_bytes": 3118196,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-4c414a83-b4eb-42a6-b3dd-2d8de7b294ff",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:38:01.674Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "여전히 선택 바로 직전에 공을 잡고 ST가 부들부들 어디로 시선을 옮기는지 모를 정도로 떨다가 선택지가 나옴. \n이건 1주일째 해결 안되는 문제",
+      "size_bytes": 2754381,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt04-ed9f5fbe-1573-48dc-a663-9a51c79d3644",
+      "build": "USER-MATCH-TEST-V0.4",
+      "created_at": "2026-08-23T05:37:15.970Z",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "1. 이부분 플레이 시작되자 마자 여전히 ST의 위치가 정확하지 않음\n2. 또한 플레이 시작 되었는데 모든 포메이션이 정상 위치라는게 사실 '선택을 위해 포메이션을 뿌려줬다' 라고 밖에는 안느껴짐",
+      "size_bytes": 4306145,
+      "chunk_count": 1
+    },
     {
       "report_id": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
       "build": "TT-0.51",
@@ -124,26 +214,26 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
+  "latestAttachedReportId": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
       "currentSituation": true,
-      "previousSituation": true,
+      "previousSituation": false,
       "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
-      "build": "TT-0.51",
+      "reportId": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
+      "build": "USER-MATCH-TEST-V0.4",
       "step": 78,
-      "description": "공간 전진을 했으나 공을 들고 가만히 있음",
+      "description": "선택지에서는 공중패스도 있어야 할 것 같다.\n쓰루패스가 매번 땅으로만 가니 수비를 넘겨서 패스한다는 선택지가 성립이 안되네",
       "category": "패스/공격",
-      "priority": 3,
-      "reportedAt": "2026-08-22T19:18:14.803Z"
+      "priority": 4,
+      "reportedAt": "2026-08-23T05:41:50.143Z"
     },
     "currentSituationPresent": true,
-    "previousSituationPresent": true,
+    "previousSituationPresent": false,
     "currentSituationKeys": [
       "schemaVersion",
       "canonicalContract",
@@ -153,28 +243,15 @@
       "futureOutcomePrecomputed",
       "reportScope"
     ],
-    "previousSituationKeys": [
-      "schemaVersion",
-      "canonicalContract",
-      "hybridBefore",
-      "highResolution",
-      "hybridAfter",
-      "futureOutcomePrecomputed",
-      "reportScope"
-    ],
+    "previousSituationKeys": [],
     "currentReportScope": {
-      "startSecond": 2602.8999999998896,
-      "endSecond": 2608.5,
+      "startSecond": 3613.499999999811,
+      "endSecond": 3617.8,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "previousReportScope": {
-      "startSecond": 2271.9999999999027,
-      "endSecond": 2300.1,
-      "cumulativeMatchHistoryIncluded": false,
-      "keepsFullSituationFrames": true
-    },
-    "currentSerializedBytes": 895625,
-    "previousSerializedBytes": 540408
+    "previousReportScope": null,
+    "currentSerializedBytes": 707052,
+    "previousSerializedBytes": 0
   }
 }
