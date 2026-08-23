@@ -4,9 +4,15 @@ import runpy
 # Apply the four current V0.5 user-report corrections first.
 runpy.run_path('.flr/v05_followup_apply.py', run_name='__main__')
 
+# Keep new retest bug reports distinguishable from the public V0.5 batch.
+p=Path('step71_hybrid_v06_ui.js')
+s=p.read_text(encoding='utf-8')
+s=s.replace('USER-MATCH-TEST-V0.5','USER-MATCH-TEST-V0.5.1').replace('umt05-','umt051-')
+p.write_text(s,encoding='utf-8')
+
 # 5) CARRY cadence: after a user-committed carry, do not reopen another checkpoint
-# before either meaningful physical progress (>=3m), 2.2 visible/live seconds, possession
-# change, or a genuinely new critical shot state. This is causal state continuity, not a quota.
+# before either meaningful physical progress (>=3m), 2.2 live seconds, possession
+# change, or a genuinely new critical shot state. This is causal continuity, not a quota.
 p=Path('runtime/protagonist_match_controller.js')
 s=p.read_text(encoding='utf-8')
 if 'carryContinuationGuard' not in s:
@@ -25,10 +31,10 @@ if 'carryContinuationGuard' not in s:
     s=s.replace(old,new,1)
     p.write_text(s,encoding='utf-8')
 
-# 6) Strong-attack no-harmful-backpass guard for NPC decisions.
-# If a generic backward PASS/LONG_PASS is about to erase a real open finishing window,
-# take the causal finish. If a committed ST run is live, prefer that actual runner.
-# This changes action selection only; shot/pass outcomes remain live physics.
+# 6) NPC strong-attack backpass guard.
+# A backwards pass is overridden only when a finish is not merely geometrically open but
+# physically executable from the current body orientation, or when a genuine committed ST
+# runner exists. A back-to-goal player is NOT forced to shoot just to satisfy a statistic.
 p=Path('runtime/continuous_match_core.js')
 s=p.read_text(encoding='utf-8')
 if 'STRONG_ATTACK_NO_HARMFUL_BACKPASS' not in s:
@@ -39,7 +45,7 @@ if 'STRONG_ATTACK_NO_HARMFUL_BACKPASS' not in s:
   if(action.type==='PASS'&&action.target){
     const ol=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,action.target.x,action.target.y),backward=tl.x<ol.x-4.0;
     if(backward){
-      const sa=shotAssessment(m,owner),blockers=Array.isArray(sa.blockers)?sa.blockers.length:Number(sa.blockers||0),central=Math.abs(ol.y-34),strongFinish=!!sa.inBox&&!!sa.openWindow&&blockers===0&&sa.dGoal<=18.5&&central<=12.5&&['ST','WF','CM'].includes(owner.role);
+      const sa=shotAssessment(m,owner),blockers=Array.isArray(sa.blockers)?sa.blockers.length:Number(sa.blockers||0),central=Math.abs(ol.y-34),bodyReady=!!sa.oneVOne||(!sa.turningRequired&&Number(sa.facingAlignment??1)>=.38),strongFinish=!!sa.inBox&&!!sa.openWindow&&blockers===0&&sa.dGoal<=18.5&&central<=12.5&&bodyReady&&['ST','WF','CM'].includes(owner.role);
       if(strongFinish){action={type:'SHOT',reason:'STRONG_ATTACK_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}
       else{
         const opts=passOptions(m,owner,true),runner=opts.filter(o=>o?.p?.role==='ST'&&!o.offsideRisk&&o.block===0&&o.open>=1.2&&o.forward>=2.5&&(o.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p?.tacticalTask))&&o.leadForward>=2.5).sort((a,b)=>b.leadForward-a.leadForward)[0]||null;
