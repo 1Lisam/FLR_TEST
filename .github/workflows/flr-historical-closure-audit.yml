@@ -21,14 +21,12 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
       - name: Run historical closure audit with captured diagnostics
         shell: bash
         run: |
           set +e
           : > /tmp/historical-audit.log
+          node -v >> /tmp/historical-audit.log 2>&1
           node --check .flr/historical_closure_audit.js >> /tmp/historical-audit.log 2>&1
           rc=$?
           if [ "$rc" -eq 0 ]; then
@@ -36,13 +34,8 @@ jobs:
             rc=$?
           fi
           if [ "$rc" -ne 0 ] || [ ! -s /tmp/historical-closure-status.json ]; then
-            python - <<'PY'
-          import json, pathlib
-          p=pathlib.Path('/tmp/historical-audit.log')
-          text=p.read_text(encoding='utf-8',errors='replace') if p.exists() else ''
-          out={'schemaVersion':'FLR_HISTORICAL_CLOSURE_AUDIT_1.1','status':'FAILED_TO_RUN','errorTail':text[-12000:]}
-          pathlib.Path('/tmp/historical-closure-status.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          PY
+            LOG="$(tail -c 12000 /tmp/historical-audit.log 2>/dev/null | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')"
+            printf '{"schemaVersion":"FLR_HISTORICAL_CLOSURE_AUDIT_1.1","status":"FAILED_TO_RUN","errorTail":%s}\n' "$LOG" > /tmp/historical-closure-status.json
           fi
           exit 0
       - name: Record audit result
