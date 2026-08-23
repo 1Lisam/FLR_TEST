@@ -1,18 +1,10 @@
 {
-  "schemaVersion": "FLR_V05_REPORT_INSPECT_1.1",
+  "schemaVersion": "FLR_V05_REPORT_INSPECT_1.2",
   "count": 3,
   "reports": [
     {
-      "meta": {
-        "report_id": "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
-        "build": "USER-MATCH-TEST-V0.5",
-        "created_at": "2026-08-23T08:58:33.791Z",
-        "category": "수비/전술",
-        "priority": 3,
-        "description": "여전히 우리 팀의 포메이션에서 ST만 특출나고 \n나머지 우리팀과 상대팀의 포메이션은 너무 정갈함",
-        "size_bytes": 518364,
-        "chunk_count": 1
-      },
+      "reportId": "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
+      "description": "여전히 우리 팀의 포메이션에서 ST만 특출나고 나머지 우리팀과 상대팀의 포메이션은 너무 정갈함",
       "context": {
         "reportId": "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
         "build": "USER-MATCH-TEST-V0.5",
@@ -2856,16 +2848,8 @@
       }
     },
     {
-      "meta": {
-        "report_id": "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
-        "build": "USER-MATCH-TEST-V0.5",
-        "created_at": "2026-08-23T09:00:17.222Z",
-        "category": "패스/공격",
-        "priority": 4,
-        "description": "LW 가 무방비 임에도 패스 옵션이 활성화가 안됨",
-        "size_bytes": 1670275,
-        "chunk_count": 1
-      },
+      "reportId": "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
+      "description": "LW 가 무방비 임에도 패스 옵션이 활성화가 안됨",
       "context": {
         "reportId": "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
         "build": "USER-MATCH-TEST-V0.5",
@@ -6049,16 +6033,8 @@
       }
     },
     {
-      "meta": {
-        "report_id": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
-        "build": "USER-MATCH-TEST-V0.5",
-        "created_at": "2026-08-23T09:05:22.822Z",
-        "category": "패스/공격",
-        "priority": 4,
-        "description": "이 부분에 대해서는 분명히 공이 날아오는것 을 보여주고 선택지가 나오기로 했는데 출발도 전에 선택지가 나오는 현상 유지중임",
-        "size_bytes": 3668949,
-        "chunk_count": 1
-      },
+      "reportId": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
+      "description": "공이 날아오는 것을 보여주기 전에 선택지가 나오는 현상 유지",
       "context": {
         "reportId": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
         "build": "USER-MATCH-TEST-V0.5",
