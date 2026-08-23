@@ -1,0 +1,52 @@
+name: FLR Historical V0.4 Candidate Patch
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.issue.title == '[FLR_FIX] HISTORICAL CANDIDATE V0.4'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: historical-closure-v04-candidate
+          fetch-depth: 0
+      - name: Apply confirmed presentation closures
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('step71_hybrid_v06_ui.js')
+          s=p.read_text(encoding='utf-8')
+          old="function angleLerp(a,b,t){if(!Number.isFinite(a))return b;if(!Number.isFinite(b))return a;let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return a+d*t;}function interp(a,b,t){if(!a)return b;const pm=Object.fromEntries((a.players||[]).map(p=>[p.id,p]));return{...b,ball:{...b.ball,x:lerp(a.ball.x,b.ball.x,t),y:lerp(a.ball.y,b.ball.y,t),z:lerp(a.ball.z||0,b.ball.z||0,t)},players:(b.players||[]).map(p=>{const q=pm[p.id]||p;return{...p,x:lerp(q.x,p.x,t),y:lerp(q.y,p.y,t),bodyAngle:angleLerp(q.bodyAngle,p.bodyAngle,t),faceTargetAngle:angleLerp(q.faceTargetAngle,p.faceTargetAngle,t)}})}}"
+          new="function angleLerp(a,b,t){if(!Number.isFinite(a))return b;if(!Number.isFinite(b))return a;let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return a+d*t;}/* FLR_DISCONTINUITY_SNAP_V1: compressed restart/setup relocation is a scene cut, never a 600m/s sprint. */function interp(a,b,t){if(!a)return b;const pm=Object.fromEntries((a.players||[]).map(p=>[p.id,p])),jump=(q,p)=>Math.hypot((p.x||0)-(q.x||0),(p.y||0)-(q.y||0))>3.2,ballJump=Math.hypot((b.ball?.x||0)-(a.ball?.x||0),(b.ball?.y||0)-(a.ball?.y||0))>4.0;return{...b,ball:ballJump?{...b.ball}:{...b.ball,x:lerp(a.ball.x,b.ball.x,t),y:lerp(a.ball.y,b.ball.y,t),z:lerp(a.ball.z||0,b.ball.z||0,t)},players:(b.players||[]).map(p=>{const q=pm[p.id]||p;if(jump(q,p))return{...p};return{...p,x:lerp(q.x,p.x,t),y:lerp(q.y,p.y,t),bodyAngle:angleLerp(q.bodyAngle,p.bodyAngle,t),faceTargetAngle:angleLerp(q.faceTargetAngle,p.faceTargetAngle,t)}})}}"
+          if s.count(old)!=1: raise SystemExit(f'interp match count={s.count(old)}')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+
+          p=Path('full_time_presentation.js')
+          s=p.read_text(encoding='utf-8')
+          old="pace=1.15+((hash(p.id+'pace')%35)/100)"
+          new="pace=(1.15+((hash(p.id+'pace')%35)/100))*1.20"
+          if s.count(old)!=1: raise SystemExit(f'walkoff pace match count={s.count(old)}')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
+          node --check step71_hybrid_v06_ui.js
+          node --check full_time_presentation.js
+          grep -q 'FLR_DISCONTINUITY_SNAP_V1' step71_hybrid_v06_ui.js
+          grep -q '1.20' full_time_presentation.js
+      - name: Commit candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR Historical Fix Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add step71_hybrid_v06_ui.js full_time_presentation.js
+          git diff --cached --quiet && exit 0
+          git commit -m 'Candidate: close restart speed jump and walkoff pace reports'
+          git push origin HEAD:historical-closure-v04-candidate
