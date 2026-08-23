@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "FLR_HISTORICAL_CLOSURE_REQUEST_1.0",
-  "requestedAt": "2026-08-23T11:35:00+09:00",
+  "schemaVersion": "FLR_HISTORICAL_CLOSURE_REQUEST_1.1",
+  "requestedAt": "2026-08-23T11:50:00+09:00",
   "scope": "TT-0.48 through USER MATCH TEST V0.3 historical user-reported match-engine regressions",
-  "purpose": "Block new development until prior reports are actually closed on current code",
-  "runNonce": "historical-closure-20260823-rerun-1"
+  "purpose": "Refined current-code audit before any V0.4 promotion",
+  "runNonce": "historical-closure-refined-push-20260823-1150"
 }
