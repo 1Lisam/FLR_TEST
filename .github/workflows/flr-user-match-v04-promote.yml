@@ -56,15 +56,21 @@ jobs:
           from pathlib import Path
           p=Path('prod/step71_hybrid_v06_ui.js')
           s=p.read_text(encoding='utf-8')
-          if 'USER-MATCH-TEST-V0.3' not in s:
-              raise SystemExit('V0.3 build label missing before V0.4 promotion')
-          s=s.replace('USER-MATCH-TEST-V0.3','USER-MATCH-TEST-V0.4').replace('umt03-','umt04-')
-          p.write_text(s,encoding='utf-8')
+          if 'USER-MATCH-TEST-V0.4' in s:
+              print('STEP71_ALREADY_V04')
+          else:
+              if 'USER-MATCH-TEST-V0.3' not in s:
+                  raise SystemExit('EXPECTED_V0.3_OR_V0.4_BUILD_LABEL_MISSING')
+              s=s.replace('USER-MATCH-TEST-V0.3','USER-MATCH-TEST-V0.4').replace('umt03-','umt04-')
+              p.write_text(s,encoding='utf-8')
           p=Path('prod/index.html')
           s=p.read_text(encoding='utf-8')
-          if 'V0.3' not in s:
-              raise SystemExit('V0.3 page label missing before V0.4 promotion')
-          p.write_text(s.replace('V0.3','V0.4'),encoding='utf-8')
+          if 'V0.4' in s:
+              print('INDEX_ALREADY_V04')
+          else:
+              if 'V0.3' not in s:
+                  raise SystemExit('EXPECTED_V0.3_OR_V0.4_PAGE_LABEL_MISSING')
+              p.write_text(s.replace('V0.3','V0.4'),encoding='utf-8')
           PY
       - name: Validate promoted test build
         shell: bash
@@ -87,6 +93,6 @@ jobs:
           git config user.name 'FLR Test Deploy Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add full_time_presentation.js runtime/protagonist_match_controller.js step71_hybrid_v06_ui.js index.html
-          git diff --cached --quiet && { echo 'NO_STAGED_CHANGES'; exit 1; }
+          git diff --cached --quiet && { echo 'ALREADY_DEPLOYED'; exit 0; }
           git commit -m 'Deploy Match Engine User Test V0.4 historical closure'
           git push origin HEAD:main
