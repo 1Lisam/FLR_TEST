@@ -1,0 +1,38 @@
+name: FLR Historical V0.4 Carry Cadence Audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  carry-audit:
+    if: github.event.pull_request.title == '[FLR_AUDIT] HISTORICAL V0.4 REFINED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout audit control
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: audit
+          fetch-depth: 1
+      - name: Checkout V0.4 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: historical-closure-v04-candidate
+          path: engine
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Show candidate authority
+        shell: bash
+        run: echo "CANDIDATE_SHA=$(git -C engine rev-parse HEAD)"
+      - name: Run repeated-CARRY cadence audit
+        shell: bash
+        run: |
+          node --check audit/.flr/historical_carry_cadence_v04.js
+          node audit/.flr/historical_carry_cadence_v04.js engine | tee /tmp/historical-v04-carry.json
