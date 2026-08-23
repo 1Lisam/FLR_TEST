@@ -1,0 +1,71 @@
+name: FLR V0.5 Fourth Report Inspect
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v05-fourth-report-inspect-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Download report and inspect through-pass reception continuity
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid='umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0'
+          curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5/${rid}.json" -o /tmp/report.json
+          python - <<'PY'
+          import json, math, pathlib
+          d=json.load(open('/tmp/report.json',encoding='utf-8'))
+          def n(v,d=0):
+              try:return float(v)
+              except:return d
+          def pmap(f):return {p.get('id'):p for p in ((f or {}).get('players') or [])}
+          def snap(f,hid):
+              if not isinstance(f,dict):return None
+              p=pmap(f).get(hid) or {};b=f.get('ball') or {}
+              return {'t':f.get('time'),'phase':f.get('phase'),'possession':f.get('possession'),
+                'hero':{k:p.get(k) for k in ('id','x','y','vx','vy','action','tacticalTask','bodyAngle')},
+                'heroSpeed':round(math.hypot(n(p.get('vx')),n(p.get('vy'))),3),
+                'ball':{k:b.get(k) for k in ('mode','x','y','z','vx','vy','ownerId','intendedReceiverId','kind','lastTouchPlayer')},
+                'heroBallDistance':round(math.hypot(n(p.get('x'))-n(b.get('x')),n(p.get('y'))-n(b.get('y'))),3) if p else None}
+          def situation(s):
+              if not isinstance(s,dict):return None
+              hb=s.get('hybridBefore') or {};hr=s.get('highResolution') or {};bd=hb.get('boundary') or {};hid=bd.get('heroPlayerId') or 'H-ST'
+              arrays={k:v for k,v in hr.items() if isinstance(v,list) and ('frame' in k.lower() or 'history' in k.lower())}
+              frame_summaries={}
+              for k,arr in arrays.items():
+                  if not arr:continue
+                  idx=sorted(set([0,max(0,len(arr)//4),max(0,len(arr)//2),max(0,3*len(arr)//4),len(arr)-1]))
+                  frame_summaries[k]={'count':len(arr),'start':arr[0].get('time') if isinstance(arr[0],dict) else None,'end':arr[-1].get('time') if isinstance(arr[-1],dict) else None,'samples':[snap(arr[i],hid) for i in idx if isinstance(arr[i],dict)]}
+              events=[]
+              for key in ('actualEvents','events'):
+                  for e in (hr.get(key) or []):
+                      if isinstance(e,dict) and e.get('type') in ('PASS','USER_CHOICE','CONTROL','TRAP','AERIAL_LONG_CONTROL','SHOT','INTERCEPT','OFFSIDE'):
+                          events.append({k:e.get(k) for k in ('t','type','actorId','targetId','team','text','kind','intendedReceiverId')})
+              dec=hr.get('decision') or {}
+              return {'boundary':bd,'highResolutionKeys':list(hr.keys()),'decision':{'at':dec.get('at'),'kind':dec.get('kind'),'selected':dec.get('selected'),'options':[{k:o.get(k) for k in ('id','targetId','label','meta')} for o in (dec.get('options') or [])]},'actualResult':hr.get('actualResult'),'events':events[-30:],'frames':frame_summaries}
+          out={'schemaVersion':'FLR_V05_FOURTH_REPORT_INSPECT_1.0','reportId':'umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0','description':d.get('bugReportContext',{}).get('description'),'bugReportContext':d.get('bugReportContext'),'current':situation(d.get('currentSituation')),'previous':situation(d.get('previousSituation'))}
+          pathlib.Path('/tmp/out.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Persist diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR V0.5 Report Inspector'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/out.json .flr/v05-fourth-report-inspect-status.json
+          git add .flr/v05-fourth-report-inspect-status.json
+          git commit -m 'Record fourth V0.5 user report inspection'
+          git push origin HEAD:main
