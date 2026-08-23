@@ -1,0 +1,40 @@
+name: FLR Historical V0.4 PR Audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.event.pull_request.title == '[FLR_AUDIT] HISTORICAL V0.4 REFINED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout audit control
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: audit
+          fetch-depth: 1
+      - name: Checkout exact public V0.3 authority
+        uses: actions/checkout@v4
+        with:
+          ref: 53c9a69bdc6a99608c167b5523b2f83dfb0fb25a
+          path: engine
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify exact authority
+        shell: bash
+        run: |
+          test "$(git -C engine rev-parse HEAD)" = "53c9a69bdc6a99608c167b5523b2f83dfb0fb25a"
+          echo "ENGINE_SHA=$(git -C engine rev-parse HEAD)"
+      - name: Run historical open gates
+        shell: bash
+        run: |
+          node --check audit/.flr/historical_open_gates_v04.js
+          node audit/.flr/historical_open_gates_v04.js engine | tee /tmp/historical-v04-open-gates.json
