@@ -1,8 +1,8 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
-  "build": "USER-MATCH-TEST-V0.5.1",
+  "build": "USER-MATCH-TEST-V0.5.2",
   "limit": 50,
-  "requestedAt": "2026-08-23T21:23:00+09:00",
-  "purpose": "Refresh V0.5.1 report audit to include the one newly submitted user report; classification only, no engine development",
-  "runNonce": "user-match-test-v0-5-1-feedback-audit-20260823-2123"
+  "requestedAt": "2026-08-24T08:19:00+09:00",
+  "purpose": "Refresh V0.5.2 report audit after user submitted several test reports; classification and diagnosis only, no engine development",
+  "runNonce": "user-match-test-v0-5-2-feedback-audit-20260824-0819"
 }
