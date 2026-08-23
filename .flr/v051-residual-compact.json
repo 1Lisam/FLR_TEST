@@ -1,0 +1,285 @@
+{
+  "npc": [
+    {
+      "seed": "HIST-V04-OPEN-NPC-5",
+      "hits": [
+        {
+          "t": 310.99999999999966,
+          "owner": "H-ST",
+          "role": "ST",
+          "action": "CARRY_SCAN",
+          "lastDecision": "PASS",
+          "lastReceivedFlightKind": null,
+          "lastReceivedAt": 310.09999999999945,
+          "controlledSince": 310.09999999999945,
+          "shot": {
+            "dGoal": 7.803499927587995,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": true,
+            "blockers": 0,
+            "bodyAngleDiff": 3.1258645059052483,
+            "facingAlignment": 6.18423825279324e-05,
+            "turningRequired": true,
+            "backToGoal": true
+          },
+          "event": {
+            "t": 311.0999999999997,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-RCM",
+            "passKind": "PASS",
+            "reason": null,
+            "text": "\ube14\ub8e8\ud300 ST\uc774 \ube14\ub8e8\ud300 RCM \ucabd\uc73c\ub85c \uac15\ud55c \uc9c0\uc0c1 \ud328\uc2a4\ud588\uc2b5\ub2c8\ub2e4."
+          },
+          "targetNow": {
+            "id": "H-RCM",
+            "x": 86.20569548781083,
+            "y": 41.16619616304734,
+            "action": "MOVE_TO_RECEIVE",
+            "tacticalTask": "ST_WALL_SUPPORT"
+          },
+          "stats": {
+            "strongAttackBackpassGuards": 0,
+            "npcOneTouchPasses": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-OPEN-NPC-10",
+      "hits": [
+        {
+          "t": 388.1000000000133,
+          "owner": "A-ST",
+          "role": "ST",
+          "action": "CARRY_SCAN",
+          "lastDecision": "PASS",
+          "lastReceivedFlightKind": null,
+          "lastReceivedAt": 387.2000000000131,
+          "controlledSince": 387.2000000000131,
+          "shot": {
+            "dGoal": 7.843332250952413,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": true,
+            "blockers": 0,
+            "bodyAngleDiff": 3.131214418333263,
+            "facingAlignment": 2.692670007409248e-05,
+            "turningRequired": true,
+            "backToGoal": true
+          },
+          "event": {
+            "t": 388.20000000001335,
+            "type": "PASS",
+            "actorId": "A-ST",
+            "targetId": "A-LCM",
+            "passKind": "PASS",
+            "reason": null,
+            "text": "\ub808\ub4dc\ud300 ST\uc774 \ub808\ub4dc\ud300 LCM \ucabd\uc73c\ub85c \uac15\ud55c \uc9c0\uc0c1 \ud328\uc2a4\ud588\uc2b5\ub2c8\ub2e4."
+          },
+          "targetNow": {
+            "id": "A-LCM",
+            "x": 18.779717894701488,
+            "y": 41.45136960621108,
+            "action": "MOVE_TO_RECEIVE",
+            "tacticalTask": "ST_WALL_SUPPORT"
+          },
+          "stats": {
+            "strongAttackBackpassGuards": 0,
+            "npcOneTouchPasses": 2
+          }
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-OPEN-NPC-18",
+      "hits": [
+        {
+          "t": 120.99999999999721,
+          "owner": "H-LW",
+          "role": "WF",
+          "action": "COMMITTED_BOX_CARRY",
+          "lastDecision": "CARRY",
+          "lastReceivedFlightKind": "THROUGH",
+          "lastReceivedAt": 117.19999999999743,
+          "controlledSince": 117.19999999999743,
+          "shot": {
+            "dGoal": 17.504959315013895,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": true,
+            "blockers": 0,
+            "bodyAngleDiff": 1.1213534444658135,
+            "facingAlignment": 0.7172319058212066,
+            "turningRequired": false,
+            "backToGoal": false
+          },
+          "event": {
+            "t": 121.09999999999721,
+            "type": "PASS",
+            "actorId": "H-LW",
+            "targetId": "H-LCM",
+            "passKind": "PASS",
+            "reason": null,
+            "text": "\ube14\ub8e8\ud300 LW\uc774 \ube14\ub8e8\ud300 LCM \ucabd\uc73c\ub85c \uac15\ud55c \uc9c0\uc0c1 \ud328\uc2a4\ud588\uc2b5\ub2c8\ub2e4."
+          },
+          "targetNow": {
+            "id": "H-LCM",
+            "x": 74,
+            "y": 24.647859967902846,
+            "action": "MOVE_TO_RECEIVE",
+            "tacticalTask": "CUTBACK_EDGE"
+          },
+          "stats": {
+            "strongAttackBackpassGuards": 0,
+            "npcOneTouchPasses": 1
+          }
+        }
+      ]
+    }
+  ],
+  "carry": {
+    "seed": "HIST-V04-OPEN-CARRY-1",
+    "hits": [
+      {
+        "t": 731.8000000000656,
+        "delay": 1.4000000000003183,
+        "disp": 1.5355638732365358,
+        "guard": null,
+        "pending": {
+          "kind": "ON_BALL",
+          "importance": 0.916,
+          "options": [
+            "SHOT",
+            "AVAILABLE_PASS",
+            "AVAILABLE_PASS",
+            "SAFE_PASS",
+            "SAFE_PASS",
+            "CARRY"
+          ]
+        },
+        "inspect": {
+          "importance": 0.916,
+          "shot": {
+            "score": 11.5,
+            "dGoal": 13.271709575626579,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": true,
+            "blockers": 0,
+            "bodyAngleDiff": 0.521925219821159,
+            "facingAlignment": 0.9334304842527497,
+            "turningRequired": false,
+            "backToGoal": false
+          },
+          "pressure": 1.5886049445061359,
+          "space": 0.954018473077241
+        },
+        "hero": {
+          "action": "PROTECT_SCAN",
+          "tacticalTask": "PROTECT_SCAN",
+          "nextThink": 733.6000000000653,
+          "lockTargetUntil": 731.3800000000653,
+          "controlledSince": 730.4000000000652
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "choiceId": "CARRY"
+        }
+      },
+      {
+        "t": 805.8000000000768,
+        "delay": 1.4000000000003183,
+        "disp": 1.1424993686711125,
+        "guard": null,
+        "pending": {
+          "kind": "ON_BALL",
+          "importance": 0.915,
+          "options": [
+            "SHOT",
+            "AVAILABLE_PASS",
+            "SAFE_PASS",
+            "SAFE_PASS",
+            "SAFE_PASS",
+            "CARRY"
+          ]
+        },
+        "inspect": {
+          "importance": 0.915,
+          "shot": {
+            "score": 10.35,
+            "dGoal": 13.698356907759408,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": true,
+            "blockers": 0,
+            "bodyAngleDiff": 2.000554584299845,
+            "facingAlignment": 0.29167447269886926,
+            "turningRequired": true,
+            "backToGoal": false
+          },
+          "pressure": 1.8155548449499483,
+          "space": 1.6845157867208087
+        },
+        "hero": {
+          "action": "PROTECT_SCAN",
+          "tacticalTask": "PROTECT_SCAN",
+          "nextThink": 807.6000000000765,
+          "lockTargetUntil": 805.3800000000765,
+          "controlledSince": 802.9000000000761
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "choiceId": "CARRY"
+        }
+      },
+      {
+        "t": 2001.499999999522,
+        "delay": 1.3999999999987267,
+        "disp": 1.2223146087040226,
+        "guard": null,
+        "pending": {
+          "kind": "ON_BALL",
+          "importance": 0.922,
+          "options": [
+            "SHOT",
+            "AVAILABLE_PASS",
+            "SAFE_PASS",
+            "SAFE_PASS",
+            "SAFE_PASS",
+            "CARRY"
+          ]
+        },
+        "inspect": {
+          "importance": 0.922,
+          "shot": {
+            "score": 10.25,
+            "dGoal": 12.05383323238646,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": true,
+            "blockers": 0,
+            "bodyAngleDiff": 2.2848478945701913,
+            "facingAlignment": 0.17254951641489535,
+            "turningRequired": true,
+            "backToGoal": true
+          },
+          "pressure": 2.292461510517434,
+          "space": 2.0018031552355495
+        },
+        "hero": {
+          "action": "CARRY_SCAN",
+          "tacticalTask": "CARRY_SCAN",
+          "nextThink": 2003.2999999995234,
+          "lockTargetUntil": 2001.0799999995234,
+          "controlledSince": 2000.0999999995233
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "choiceId": "CARRY"
+        }
+      }
+    ]
+  }
+}
