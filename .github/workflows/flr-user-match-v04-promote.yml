@@ -7,6 +7,8 @@ on:
     branches: [main]
     paths:
       - '.flr/v04-promote-trigger.json'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -17,7 +19,7 @@ concurrency:
 
 jobs:
   promote:
-    if: github.event_name == 'push' || github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.4 HISTORICAL CLOSURE'
+    if: github.event_name == 'push' || github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.4 HISTORICAL CLOSURE' || github.event.pull_request.title == '[FLR_DEPLOY_TRIGGER] USER MATCH TEST V0.4'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
