@@ -1,0 +1,35 @@
+name: FLR V0.5.1 Residual Compact
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v051-residual-compact-request.json']
+permissions: {contents: write}
+jobs:
+  compact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Compact diagnostic
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          d=json.load(open('.flr/v051-residual-diagnostic.json'))
+          npc=[]
+          for row in d.get('npc',[]):
+            hits=[]
+            for h in row.get('hits',[]):
+              b=h.get('before',{}); pre=b.get('pre',{}); sh=pre.get('shot',{}); ev=h.get('event',{})
+              hits.append({'t':b.get('t'),'owner':b.get('id'),'role':b.get('role'),'action':b.get('action'),'lastDecision':b.get('lastDecision'),'lastReceivedFlightKind':b.get('lastReceivedFlightKind'),'lastReceivedAt':b.get('lastReceivedAt'),'controlledSince':b.get('controlledSince'),'shot':{k:sh.get(k) for k in ['dGoal','inBox','oneVOne','openWindow','blockers','bodyAngleDiff','facingAlignment','turningRequired','backToGoal']},'event':{k:ev.get(k) for k in ['t','type','actorId','targetId','passKind','reason','text']},'targetNow':h.get('targetNow'),'stats':h.get('stats')})
+            npc.append({'seed':row.get('seed'),'hits':hits})
+          carry=[]
+          for h in d.get('carry',{}).get('hits',[]):
+            carry.append({'t':h.get('t'),'delay':h.get('delay'),'disp':h.get('disp'),'guard':h.get('guard'),'pending':h.get('pending'),'inspect':h.get('inspect'),'hero':h.get('hero'),'result':h.get('result')})
+          out={'npc':npc,'carry':{'seed':d.get('carry',{}).get('seed'),'hits':carry}}
+          pathlib.Path('.flr/v051-residual-compact.json').write_text(json.dumps(out,indent=2)+'\n')
+          PY
+          git config user.name 'FLR V0.5.1 Diagnostic'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/v051-residual-compact.json
+          git commit -m 'Compact V0.5.1 residual diagnostics'
+          git push origin HEAD:main
