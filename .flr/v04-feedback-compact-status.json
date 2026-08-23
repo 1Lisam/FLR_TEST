@@ -1,0 +1,2076 @@
+{
+  "schemaVersion": "FLR_V04_FEEDBACK_COMPACT_SUMMARY_1.0",
+  "count": 9,
+  "reports": [
+    {
+      "reportId": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "선택지에서는 공중패스도 있어야 할 것 같다.\n쓰루패스가 매번 땅으로만 가니 수비를 넘겨서 패스한다는 선택지가 성립이 안되네",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0014",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 3613.499999999811,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "THROUGH_PASS",
+          "targetId": "H-LW",
+          "label": "공간 침투 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "targetSlot": "LW",
+            "runLead": true,
+            "leadX": 87.567,
+            "leadY": 14.914,
+            "leadForward": 31.176,
+            "receiverTravel": 9.813,
+            "receiverPressure": 3.852,
+            "leadOpen": 9.3,
+            "leadBlockers": 0,
+            "runnerTask": "FAR_SIDE_RUN"
+          }
+        },
+        "result": {
+          "code": "INTERCEPT",
+          "headline": "공간 침투 패스 → 같은 팀 LW 결과",
+          "detail": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다. → 레드팀 RCB이 패스 길을 읽고 가로챘습니다."
+        },
+        "entry": {
+          "time": 3613.499999999811,
+          "phase": "TRANSITION",
+          "possession": "HOME",
+          "score": {
+            "HOME": 1,
+            "AWAY": 1
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 50.58,
+            "y": 50.026
+          },
+          "homeXRange": [
+            5.807,
+            68.768
+          ],
+          "stDeepFlag": true
+        },
+        "motion": {
+          "heroMaxVelocity": 7.672,
+          "heroMaxPositionSpeed": 7.671,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 1,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "A-LW",
+              7.8
+            ],
+            [
+              "H-ST",
+              7.672
+            ],
+            [
+              "H-RB",
+              7.4
+            ],
+            [
+              "H-RW",
+              7.373
+            ]
+          ],
+          "duration": 4.2
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": 1.3,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SWITCH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 3615.0999999998094,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 3615.0999999998094,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 3616.499999999808,
+            "type": "INTERCEPT",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 RCB이 패스 길을 읽고 가로챘습니다."
+          }
+        ]
+      },
+      "previous": null,
+      "error": null
+    },
+    {
+      "reportId": "umt04-e4ab4e9d-34a5-4925-a0f7-555412e311b4",
+      "category": "2D 움직임",
+      "priority": 4,
+      "description": "이 장면에서는 선택 직후에 플레이가 끊기는데 플레이가 종료 되기 전 몇초 정도는 더 재생하고 왜 끊기는지 이유를 명확하게 적어줬으면 함.\n예를 들어 공을 뺐겼으면 '상대 RCB에게 공을 탈취 당한 후 공격권 종료' 그리고 바로 끊지 말고 살짝 재생 시켜주고 끝내줘 선택이 끝나자 마자 바로 다음 장면 공을 뺏긴 이후 상황이 바로 종료되어 버려서 무슨 상황인지 인지가 안됨",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0011",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 3179.2999999998947,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "THROUGH_PASS",
+          "targetId": "H-LW",
+          "label": "공간 침투 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "leadForward": 13.280562418349675,
+            "offsideRisk": true,
+            "offsideMargin": 0.6265688411528174,
+            "runnerTask": "FAR_SIDE_SHOULDER",
+            "running": true,
+            "leadX": 83.4,
+            "leadY": 21.529,
+            "targetSlot": "LW"
+          }
+        },
+        "result": {
+          "code": "OFFSIDE",
+          "headline": "공간 침투 패스 → 같은 팀 LW 결과",
+          "detail": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다. → 블루팀 LW이 오프사이드 위치에 있었습니다."
+        },
+        "entry": {
+          "time": 3179.2999999998947,
+          "phase": "FINAL_THIRD",
+          "possession": "HOME",
+          "score": {
+            "HOME": 1,
+            "AWAY": 1
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 64.222,
+            "y": 49.951
+          },
+          "homeXRange": [
+            11.802,
+            75.392
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 4.304,
+          "heroMaxPositionSpeed": 4.304,
+          "heroMaxTurnRate": 0.404,
+          "heroTurnReversals": 1,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "H-RB",
+              7.4
+            ],
+            [
+              "A-CM",
+              7.192
+            ],
+            [
+              "H-LCM",
+              6.139
+            ],
+            [
+              "A-ST",
+              5.852
+            ]
+          ],
+          "duration": 18.5
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "CARRY",
+            "targetId": null
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "SWITCH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "SHOT",
+            "targetId": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM"
+          }
+        ],
+        "events": [
+          {
+            "t": 3180.899999999893,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 3180.899999999893,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 3180.999999999893,
+            "type": "OFFSIDE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "블루팀 LW이 오프사이드 위치에 있었습니다."
+          }
+        ]
+      },
+      "previous": null,
+      "error": null
+    },
+    {
+      "reportId": "umt04-9d22011c-b234-45f0-b9e7-7e9d46990757",
+      "category": "2D 움직임",
+      "priority": 4,
+      "description": "2D 상 플레이어에게 닿지도 않았는데 슈팅이 나감",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0010",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 2906.8999999999055,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "SHOT",
+          "targetId": null,
+          "label": "슈팅",
+          "meta": {
+            "dGoal": 17.678282624528627,
+            "inBox": false,
+            "oneVOne": false,
+            "openWindow": false,
+            "longRange": false,
+            "turningRequired": false,
+            "backToGoal": false,
+            "facingAlignment": 0.6640713341383179
+          }
+        },
+        "result": {
+          "code": "MISS",
+          "headline": "슈팅 → 빗나감",
+          "detail": "슈팅이 골문 왼쪽 바깥으로 벗어났고 골킥 준비 장면까지 이어졌습니다."
+        },
+        "entry": {
+          "time": 2906.8999999999055,
+          "phase": "FINAL_THIRD",
+          "possession": "HOME",
+          "score": {
+            "HOME": 1,
+            "AWAY": 1
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 78.933,
+            "y": 35.905
+          },
+          "homeXRange": [
+            14.473,
+            78.933
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 6.649,
+          "heroMaxPositionSpeed": 6.647,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 7,
+          "topPlayerSpeeds": [
+            [
+              "H-RW",
+              7.8
+            ],
+            [
+              "H-LW",
+              7.797
+            ],
+            [
+              "H-LB",
+              7.4
+            ],
+            [
+              "H-RB",
+              7.4
+            ],
+            [
+              "H-LCM",
+              7.2
+            ]
+          ],
+          "duration": 36.3
+        },
+        "shots": [
+          {
+            "t": 2918.199999999895,
+            "type": "SHOT",
+            "actorId": "H-ST",
+            "ballOwnerId": "H-ST",
+            "actorBallDistance": 4.789,
+            "actorPos": [
+              87.808,
+              29.883
+            ],
+            "ballPos": [
+              88.155,
+              34.659
+            ]
+          }
+        ],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "TAKE_ON",
+            "targetId": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LW"
+          }
+        ],
+        "events": [
+          {
+            "t": 2907.1999999999052,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 ST 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 2908.499999999904,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 RW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 2908.499999999904,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-RW"
+          },
+          {
+            "t": 2910.599999999902,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 LW 쪽으로 긴 땅볼패스했습니다."
+          },
+          {
+            "t": 2912.8999999999,
+            "type": "PASS",
+            "actorId": "H-LW",
+            "targetId": "H-LCM",
+            "team": "HOME",
+            "text": "블루팀 LW이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 2914.999999999898,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 RW 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 2917.499999999896,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 LW 쪽으로 공중 롱패스했습니다."
+          },
+          {
+            "t": 2918.199999999895,
+            "type": "AERIAL_LONG_CONTROL",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "블루팀 ST이 공중 롱패스 첫 공을 이겨내고 받아냈습니다."
+          },
+          {
+            "t": 2918.199999999895,
+            "type": "SHOT",
+            "actorId": "H-ST",
+            "targetId": null,
+            "team": "HOME",
+            "text": "블루팀 ST이 슈팅을 시도합니다."
+          },
+          {
+            "t": 2918.199999999895,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: SHOT"
+          },
+          {
+            "t": 2918.9999999998945,
+            "type": "GOAL_KICK",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀의 골킥입니다."
+          }
+        ]
+      },
+      "previous": null,
+      "error": null
+    },
+    {
+      "reportId": "umt04-fa3386a4-d200-408c-818c-a44b8078688a",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "공간침투 패스 선택 후 ST가 매우 빠르게 달려나가는데 이거 정상적인 속도인지?",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0009",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 2696.19999999992,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "THROUGH_PASS",
+          "targetId": "H-RW",
+          "label": "공간 침투 패스 → 같은 팀 RW",
+          "meta": {
+            "targetId": "H-RW",
+            "leadForward": 9.987655543585895,
+            "offsideRisk": false,
+            "offsideMargin": 0,
+            "runnerTask": "WIDE_COMBINE",
+            "running": true,
+            "leadX": 66,
+            "leadY": 57,
+            "targetSlot": "RW"
+          }
+        },
+        "result": {
+          "code": "INTERCEPT",
+          "headline": "공간 침투 패스 → 같은 팀 RW 결과",
+          "detail": "블루팀 ST이 블루팀 RW 쪽으로 공간 패스했습니다. → 블루팀 RW이 블루팀 RB 쪽으로 짧은 패스했습니다. → 레드팀 LW이 패스에 발을 대 공이 루즈볼이 됐습니다. → 레드팀 LW이 공을 가로챘습니다."
+        },
+        "entry": {
+          "time": 2696.19999999992,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "score": {
+            "HOME": 1,
+            "AWAY": 1
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 51.646,
+            "y": 49.99
+          },
+          "homeXRange": [
+            11.354,
+            66.761
+          ],
+          "stDeepFlag": true
+        },
+        "motion": {
+          "heroMaxVelocity": 7.7,
+          "heroMaxPositionSpeed": 7.702,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 2,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "A-LW",
+              7.8
+            ],
+            [
+              "H-RW",
+              7.76
+            ],
+            [
+              "H-ST",
+              7.7
+            ],
+            [
+              "H-RB",
+              7.401
+            ]
+          ],
+          "duration": 7.6
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": 1.3,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RCM"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-CM"
+          }
+        ],
+        "events": [
+          {
+            "t": 2697.7999999999183,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 RW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 2697.7999999999183,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-RW"
+          },
+          {
+            "t": 2702.2999999999142,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-RB",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 RB 쪽으로 짧은 패스했습니다."
+          },
+          {
+            "t": 2702.499999999914,
+            "type": "PASS_DEFLECT",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 LW이 패스에 발을 대 공이 루즈볼이 됐습니다."
+          },
+          {
+            "t": 2702.599999999914,
+            "type": "INTERCEPT",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 LW이 공을 가로챘습니다."
+          }
+        ]
+      },
+      "previous": null,
+      "error": null
+    },
+    {
+      "reportId": "umt04-c4f44ee9-67f2-4814-a0a8-c125e278bf70",
+      "category": "패스/공격",
+      "priority": 4,
+      "description": "이 이전 상대방의 골 장면은 항상 동일한거 같음.\n어떤 테스트를 몇 번 하던 상대방 슈팅은 항상 저 위치에 저 포지션에 위치한 상태로 골이 들어갔다고 판단하는거 같은데 확인바람",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0007",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 2508.499999999955,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": null,
+          "targetId": null,
+          "label": null,
+          "meta": null
+        },
+        "result": {
+          "code": null,
+          "headline": null,
+          "detail": null
+        },
+        "entry": {
+          "time": 2508.499999999955,
+          "phase": "FINAL_THIRD",
+          "possession": "HOME",
+          "score": {
+            "HOME": 1,
+            "AWAY": 1
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 85.513,
+            "y": 33.104
+          },
+          "homeXRange": [
+            12.815,
+            85.513
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 3.142,
+          "heroMaxPositionSpeed": 2.955,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 3,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.798
+            ],
+            [
+              "A-CM",
+              7.199
+            ],
+            [
+              "A-LCM",
+              7.015
+            ],
+            [
+              "A-RB",
+              6.219
+            ],
+            [
+              "H-RW",
+              6.018
+            ]
+          ],
+          "duration": 2.3
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "TAKE_ON",
+            "targetId": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 2508.8999999999546,
+            "type": "PASS",
+            "actorId": "H-RB",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 RB이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+          }
+        ]
+      },
+      "previous": {
+        "boundary": {
+          "sceneId": "NS0008",
+          "type": "NON_HERO_SHOT_2D_WINDOW",
+          "reason": "NON_HERO_SHOT",
+          "atSecond": 1984.199999999977,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": null,
+          "targetId": null,
+          "label": null,
+          "meta": null
+        },
+        "result": {
+          "code": null,
+          "headline": null,
+          "detail": null
+        },
+        "entry": {
+          "time": 1984.199999999977,
+          "phase": "CHANCE",
+          "possession": "AWAY",
+          "score": {
+            "HOME": 1,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 55.713535938104805,
+            "y": 35.290573792968644
+          },
+          "homeXRange": [
+            4.577852038965747,
+            55.713535938104805
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 4.208,
+          "heroMaxPositionSpeed": 4.208,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 1,
+          "topPlayerSpeeds": [
+            [
+              "H-LCM",
+              7.2
+            ],
+            [
+              "H-CM",
+              7.2
+            ],
+            [
+              "H-RCM",
+              7.2
+            ],
+            [
+              "A-RW",
+              5.945
+            ],
+            [
+              "H-LB",
+              5.756
+            ]
+          ],
+          "duration": 27.3
+        },
+        "shots": [
+          {
+            "t": 1985.8999999999755,
+            "type": "SHOT",
+            "actorId": "A-RCM",
+            "ballOwnerId": null,
+            "actorBallDistance": 0.42,
+            "actorPos": [
+              13.5,
+              33.833293856842666
+            ],
+            "ballPos": [
+              13.08,
+              33.833293856842666
+            ]
+          }
+        ],
+        "goals": 1,
+        "goalToEpisodeEndSeconds": 25.0,
+        "celebrationFrames": 1,
+        "goalResultMismatch": true,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [],
+        "events": [
+          {
+            "t": 1985.8999999999755,
+            "type": "SHOT",
+            "actorId": "A-RCM",
+            "targetId": null,
+            "team": "AWAY",
+            "text": "레드팀 RCM이 슈팅을 시도합니다."
+          },
+          {
+            "t": 1986.499999999975,
+            "type": "GOAL",
+            "actorId": "A-RCM",
+            "targetId": null,
+            "team": "AWAY",
+            "text": "레드팀 RCM이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 왼쪽 골망 안으로 들어갑니다. 1-1"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "reportId": "umt04-17cf3c19-791c-412b-b5b5-824f70601e2d",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "내 선택 결과\n안전한 패스 → 같은 팀 RCM → 안전한 패스 → 같은 팀 RCM → 소유권 변화\n내 선택\n안전한 패스 → 같은 팀 RCM → 안전한 패스 → 같은 팀 RCM → 소유권 변화\n\nRCM에게 줘서 어시스트가 들어왔고 득점이 되었는데 단순히 소유권 변화라고 표시되는건 상당히 밋밋함. 또한 골이 들어갔으면 골 세레머니 장면까지는 나오게 해달라고 했는데도 구현이 안됨",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0004",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 1677.699999999991,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "SAFE_PASS",
+          "targetId": "H-RCM",
+          "label": "안전한 패스 → 같은 팀 RCM",
+          "meta": {
+            "targetId": "H-RCM",
+            "targetSlot": "RCM",
+            "forward": -3.3575379459912824,
+            "d": 7.170306895594622,
+            "receiverPressure": 6.445063330475974,
+            "directSafe": true
+          }
+        },
+        "result": {
+          "code": "POSSESSION_LOST",
+          "headline": "안전한 패스 → 같은 팀 RCM → 소유권 변화",
+          "detail": "블루팀 ST이 블루팀 RCM 쪽으로 짧은 패스했습니다. → 블루팀 RCM이 정교한 슈팅을 시도합니다. → 블루팀 RCM이 페널티지역 앞쪽에서 시도한 정교하게 깔아 찬 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0"
+        },
+        "entry": {
+          "time": 1677.699999999991,
+          "phase": "CHANCE",
+          "possession": "HOME",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 90.235,
+            "y": 30.537
+          },
+          "homeXRange": [
+            16.381,
+            90.235
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 5.595,
+          "heroMaxPositionSpeed": 5.592,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 4,
+          "topPlayerSpeeds": [
+            [
+              "H-LCM",
+              7.2
+            ],
+            [
+              "H-CM",
+              7.2
+            ],
+            [
+              "A-CM",
+              7.2
+            ],
+            [
+              "A-RCM",
+              7.2
+            ],
+            [
+              "A-LCM",
+              7.199
+            ]
+          ],
+          "duration": 31.5
+        },
+        "shots": [
+          {
+            "t": 1683.5999999999856,
+            "type": "SHOT",
+            "actorId": "H-RCM",
+            "ballOwnerId": null,
+            "actorBallDistance": 0.42,
+            "actorPos": [
+              89.392,
+              35.864
+            ],
+            "ballPos": [
+              89.812,
+              35.864
+            ]
+          }
+        ],
+        "goals": 1,
+        "goalToEpisodeEndSeconds": 25.0,
+        "celebrationFrames": 1,
+        "goalResultMismatch": true,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "SHOT",
+            "targetId": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 1679.0999999999897,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1679.9999999999889,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: HOLD"
+          },
+          {
+            "t": 1682.3999999999867,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-RCM",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 RCM 쪽으로 짧은 패스했습니다."
+          },
+          {
+            "t": 1682.3999999999867,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: SAFE_PASS -> H-RCM"
+          },
+          {
+            "t": 1683.5999999999856,
+            "type": "SHOT",
+            "actorId": "H-RCM",
+            "targetId": null,
+            "team": "HOME",
+            "text": "블루팀 RCM이 정교한 슈팅을 시도합니다."
+          },
+          {
+            "t": 1684.299999999985,
+            "type": "GOAL",
+            "actorId": "H-RCM",
+            "targetId": null,
+            "team": "HOME",
+            "text": "블루팀 RCM이 페널티지역 앞쪽에서 시도한 정교하게 깔아 찬 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0"
+          }
+        ]
+      },
+      "previous": null,
+      "error": null
+    },
+    {
+      "reportId": "umt04-e0e67a53-024a-4085-ab49-5f3007f82db4",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "이 선택지 이전 선택지의 끝나는  상황에서는 코너킥이 되었는데 이건 기회가 아니라고 계싼 되어서 넘어간건지 궁금함",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0004",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 1677.699999999991,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": null,
+          "targetId": null,
+          "label": null,
+          "meta": null
+        },
+        "result": {
+          "code": null,
+          "headline": null,
+          "detail": null
+        },
+        "entry": {
+          "time": 1677.699999999991,
+          "phase": "CHANCE",
+          "possession": "HOME",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 90.235,
+            "y": 30.537
+          },
+          "homeXRange": [
+            16.381,
+            90.235
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 4.173,
+          "heroMaxPositionSpeed": 4.113,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 1,
+          "topPlayerSpeeds": [
+            [
+              "A-CM",
+              7.2
+            ],
+            [
+              "A-RCM",
+              7.2
+            ],
+            [
+              "A-LCM",
+              7.199
+            ],
+            [
+              "H-LB",
+              6.93
+            ],
+            [
+              "A-LCB",
+              6.362
+            ]
+          ],
+          "duration": 2.2
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "SHOT",
+            "targetId": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 1679.0999999999897,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다."
+          }
+        ]
+      },
+      "previous": {
+        "boundary": {
+          "sceneId": "SP0001",
+          "type": "SET_PIECE_2D_WINDOW",
+          "reason": "SET_PIECE_FREE_KICK",
+          "atSecond": 1601.3000000000088,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "SAFE_PASS",
+          "targetId": "H-LCM",
+          "label": "안전한 패스 → 같은 팀 LCM",
+          "meta": {
+            "targetId": "H-LCM",
+            "targetSlot": "LCM",
+            "forward": -14.350005624850269,
+            "d": 15.074855040719207,
+            "receiverPressure": 16.127059514093208,
+            "directSafe": true
+          }
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "안전한 패스 → 같은 팀 LCM → 공격 지속",
+          "detail": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다. → 블루팀 LCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+        },
+        "entry": {
+          "time": 1627.0000000000089,
+          "phase": "FREE_KICK",
+          "possession": "AWAY",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 70.95,
+            "y": 32.61
+          },
+          "homeXRange": [
+            12.959,
+            70.95
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 7.7,
+          "heroMaxPositionSpeed": 7.709,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 20,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "H-RW",
+              7.8
+            ],
+            [
+              "A-RW",
+              7.8
+            ],
+            [
+              "H-ST",
+              7.7
+            ],
+            [
+              "A-LCM",
+              7.452
+            ]
+          ],
+          "duration": 47.6
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": 44.6,
+        "corners": 1,
+        "optionIds": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 1629.6000000000065,
+            "type": "FREE_KICK_TAKEN",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 RCB이 정지된 공 앞에서 준비한 뒤 경기를 재개합니다."
+          },
+          {
+            "t": 1630.100000000006,
+            "type": "INTERCEPT",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "블루팀 ST이 패스 길을 읽고 가로챘습니다."
+          },
+          {
+            "t": 1630.8000000000054,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 1630.8000000000054,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 1637.899999999999,
+            "type": "PASS",
+            "actorId": "H-LW",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 LW이 블루팀 ST 쪽으로 크로스했습니다."
+          },
+          {
+            "t": 1638.3999999999985,
+            "type": "AERIAL_DUEL",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "크로스 경합 뒤 공이 세컨드 볼로 흘렀습니다."
+          },
+          {
+            "t": 1639.999999999997,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1639.999999999997,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: SAFE_PASS -> H-LCM"
+          },
+          {
+            "t": 1641.7999999999954,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1645.499999999992,
+            "type": "PASS",
+            "actorId": "H-LW",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 LW이 블루팀 ST 쪽으로 크로스했습니다."
+          },
+          {
+            "t": 1645.599999999992,
+            "type": "CROSS_BLOCK",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 RB이 크로스가 올라오자 몸을 던져 바로 막아냈습니다."
+          },
+          {
+            "t": 1646.7999999999909,
+            "type": "CORNER",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "블루팀의 코너킥입니다."
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "reportId": "umt04-4c414a83-b4eb-42a6-b3dd-2d8de7b294ff",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "여전히 선택 바로 직전에 공을 잡고 ST가 부들부들 어디로 시선을 옮기는지 모를 정도로 떨다가 선택지가 나옴. \n이건 1주일째 해결 안되는 문제",
+      "current": {
+        "boundary": {
+          "sceneId": "SP0001",
+          "type": "SET_PIECE_2D_WINDOW",
+          "reason": "SET_PIECE_FREE_KICK",
+          "atSecond": 1601.3000000000088,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "THROUGH_PASS",
+          "targetId": "H-LW",
+          "label": "공간 침투 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "leadForward": 18.340365852785872,
+            "offsideRisk": false,
+            "offsideMargin": 0,
+            "runnerTask": "FAR_SIDE_RUN",
+            "running": true,
+            "leadX": 76.298,
+            "leadY": 15.5,
+            "targetSlot": "LW"
+          }
+        },
+        "result": {
+          "code": "CONNECTED",
+          "headline": "공간 침투 패스 → 같은 팀 LW → 연결",
+          "detail": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+        },
+        "entry": {
+          "time": 1627.0000000000089,
+          "phase": "FREE_KICK",
+          "possession": "AWAY",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 70.95,
+            "y": 32.61
+          },
+          "homeXRange": [
+            12.959,
+            70.95
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 7.7,
+          "heroMaxPositionSpeed": 7.709,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 17,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "H-RW",
+              7.8
+            ],
+            [
+              "A-RW",
+              7.8
+            ],
+            [
+              "H-ST",
+              7.7
+            ],
+            [
+              "H-LB",
+              7.4
+            ]
+          ],
+          "duration": 12.9
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": 9.9,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 1629.6000000000065,
+            "type": "FREE_KICK_TAKEN",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 RCB이 정지된 공 앞에서 준비한 뒤 경기를 재개합니다."
+          },
+          {
+            "t": 1630.100000000006,
+            "type": "INTERCEPT",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "블루팀 ST이 패스 길을 읽고 가로챘습니다."
+          },
+          {
+            "t": 1630.8000000000054,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 1630.8000000000054,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 1637.899999999999,
+            "type": "PASS",
+            "actorId": "H-LW",
+            "targetId": "H-ST",
+            "team": "HOME",
+            "text": "블루팀 LW이 블루팀 ST 쪽으로 크로스했습니다."
+          },
+          {
+            "t": 1638.3999999999985,
+            "type": "AERIAL_DUEL",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "크로스 경합 뒤 공이 세컨드 볼로 흘렀습니다."
+          }
+        ]
+      },
+      "previous": {
+        "boundary": {
+          "sceneId": "HW0003",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 724.7000000000066,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "THROUGH_PASS",
+          "targetId": "H-RW",
+          "label": "공간 침투 패스 → 같은 팀 RW",
+          "meta": {
+            "targetId": "H-RW",
+            "targetSlot": "RW",
+            "runLead": true,
+            "leadX": 66,
+            "leadY": 57,
+            "leadForward": 15.993,
+            "receiverTravel": 6.665,
+            "receiverPressure": 9.044,
+            "leadOpen": 8.853,
+            "leadBlockers": 0,
+            "runnerTask": "WIDE_COMBINE"
+          }
+        },
+        "result": {
+          "code": "INTERCEPT",
+          "headline": "공간 침투 패스 → 같은 팀 RW 결과",
+          "detail": "블루팀 ST이 블루팀 RW 쪽으로 공간 패스했습니다. → 레드팀 LB이 공을 가로챘습니다."
+        },
+        "entry": {
+          "time": 724.7000000000066,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 44.528,
+            "y": 50.029
+          },
+          "homeXRange": [
+            5.588,
+            60.344
+          ],
+          "stDeepFlag": true
+        },
+        "motion": {
+          "heroMaxVelocity": 7.699,
+          "heroMaxPositionSpeed": 7.708,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 3,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "A-LW",
+              7.8
+            ],
+            [
+              "H-ST",
+              7.699
+            ],
+            [
+              "H-RB",
+              7.4
+            ],
+            [
+              "H-LCM",
+              7.2
+            ]
+          ],
+          "duration": 5.4
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": 1.3,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "SWITCH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RB"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 726.300000000007,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 RW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 726.300000000007,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: THROUGH_PASS -> H-RW"
+          },
+          {
+            "t": 728.9000000000076,
+            "type": "INTERCEPT",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "레드팀 LB이 공을 가로챘습니다."
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "reportId": "umt04-ed9f5fbe-1573-48dc-a663-9a51c79d3644",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "1. 이부분 플레이 시작되자 마자 여전히 ST의 위치가 정확하지 않음\n2. 또한 플레이 시작 되었는데 모든 포메이션이 정상 위치라는게 사실 '선택을 위해 포메이션을 뿌려줬다' 라고 밖에는 안느껴짐",
+      "current": {
+        "boundary": {
+          "sceneId": "HW0003",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 724.7000000000066,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": null,
+          "targetId": null,
+          "label": null,
+          "meta": null
+        },
+        "result": {
+          "code": null,
+          "headline": null,
+          "detail": null
+        },
+        "entry": {
+          "time": 724.7000000000066,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 44.528,
+            "y": 50.029
+          },
+          "homeXRange": [
+            5.588,
+            60.344
+          ],
+          "stDeepFlag": true
+        },
+        "motion": {
+          "heroMaxVelocity": 4.31,
+          "heroMaxPositionSpeed": 4.295,
+          "heroMaxTurnRate": 0.401,
+          "heroTurnReversals": 2,
+          "topPlayerSpeeds": [
+            [
+              "A-LW",
+              7.724
+            ],
+            [
+              "H-RB",
+              7.4
+            ],
+            [
+              "H-RCM",
+              6.658
+            ],
+            [
+              "A-LCM",
+              6.224
+            ],
+            [
+              "H-RW",
+              5.928
+            ]
+          ],
+          "duration": 1.5
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": null,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "SWITCH_PASS",
+            "targetId": "H-LW"
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RB"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": []
+      },
+      "previous": {
+        "boundary": {
+          "sceneId": "HW0002",
+          "type": "PROTAGONIST_2D_WINDOW",
+          "reason": "ATTACKING_INVOLVEMENT",
+          "atSecond": 380.89999999999753,
+          "heroPlayerId": "H-ST"
+        },
+        "choice": {
+          "id": "AVAILABLE_PASS",
+          "targetId": "H-RW",
+          "label": "전진 패스 → 같은 팀 RW",
+          "meta": {
+            "targetId": "H-RW",
+            "targetSlot": "RW",
+            "forward": -0.17151418574091792,
+            "d": 28.887558265375592,
+            "receiverPressure": 1.0500000000000058,
+            "contested": true,
+            "laneBlockers": 1,
+            "offsideRisk": false,
+            "offsideMargin": 0
+          }
+        },
+        "result": {
+          "code": "PASS_MISCONTROL",
+          "headline": "전진 패스 → 같은 팀 RW 결과",
+          "detail": "블루팀 ST이 블루팀 RW 쪽으로 강한 지상 패스했습니다. → 블루팀 RW이 블루팀 RCM 쪽으로 강한 지상 패스했습니다. → 블루팀 RCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다. → 블루팀 LW이 패스를 완전히 잡지 못해 공이 흘렀습니다."
+        },
+        "entry": {
+          "time": 380.89999999999753,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "hero": {
+            "id": "H-ST",
+            "role": "ST",
+            "slot": "ST",
+            "x": 76.45,
+            "y": 33.007
+          },
+          "homeXRange": [
+            7.649,
+            76.45
+          ],
+          "stDeepFlag": false
+        },
+        "motion": {
+          "heroMaxVelocity": 6.257,
+          "heroMaxPositionSpeed": 6.251,
+          "heroMaxTurnRate": 3.98,
+          "heroTurnReversals": 30,
+          "topPlayerSpeeds": [
+            [
+              "H-LW",
+              7.8
+            ],
+            [
+              "H-RW",
+              7.8
+            ],
+            [
+              "A-LW",
+              7.8
+            ],
+            [
+              "H-LB",
+              7.4
+            ],
+            [
+              "H-RB",
+              7.4
+            ]
+          ],
+          "duration": 30.0
+        },
+        "shots": [],
+        "goals": 0,
+        "goalToEpisodeEndSeconds": null,
+        "celebrationFrames": 0,
+        "goalResultMismatch": false,
+        "lossToEpisodeEndSeconds": 14.9,
+        "corners": 0,
+        "optionIds": [
+          {
+            "id": "TAKE_ON",
+            "targetId": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-CM"
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM"
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW"
+          },
+          {
+            "id": "CARRY",
+            "targetId": null
+          }
+        ],
+        "events": [
+          {
+            "t": 381.1999999999976,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 RW 쪽으로 긴 땅볼패스했습니다."
+          },
+          {
+            "t": 385.29999999999853,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-RCM",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 RCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 388.89999999999935,
+            "type": "PASS",
+            "actorId": "H-RCM",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 RCM이 블루팀 RW 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 390.69999999999976,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 LW 쪽으로 긴 땅볼패스했습니다."
+          },
+          {
+            "t": 391.8,
+            "type": "PASS_BOBBLE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "패스 경합에서 공이 완전히 소유되지 않고 흘렀습니다."
+          },
+          {
+            "t": 392.7000000000002,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 ST이 블루팀 RW 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 392.7000000000002,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "H-ST: AVAILABLE_PASS -> H-RW"
+          },
+          {
+            "t": 395.10000000000076,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-RCM",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 RCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 396.30000000000103,
+            "type": "PASS",
+            "actorId": "H-RCM",
+            "targetId": "H-LW",
+            "team": "HOME",
+            "text": "블루팀 RCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 397.8000000000014,
+            "type": "PASS_MISCONTROL",
+            "actorId": null,
+            "targetId": null,
+            "team": null,
+            "text": "블루팀 LW이 패스를 완전히 잡지 못해 공이 흘렀습니다."
+          },
+          {
+            "t": 399.90000000000185,
+            "type": "PASS",
+            "actorId": "H-LW",
+            "targetId": "H-LCM",
+            "team": "HOME",
+            "text": "블루팀 LW이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          },
+          {
+            "t": 403.1000000000026,
+            "type": "PASS",
+            "actorId": "H-LCM",
+            "targetId": "H-RCM",
+            "team": "HOME",
+            "text": "블루팀 LCM이 블루팀 RCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 406.6000000000034,
+            "type": "PASS",
+            "actorId": "H-RCM",
+            "targetId": "H-RW",
+            "team": "HOME",
+            "text": "블루팀 RCM이 블루팀 RW 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 410.00000000000415,
+            "type": "PASS",
+            "actorId": "H-RW",
+            "targetId": "H-RB",
+            "team": "HOME",
+            "text": "블루팀 RW이 블루팀 RB 쪽으로 강한 지상 패스했습니다."
+          }
+        ]
+      },
+      "error": null
+    }
+  ]
+}
