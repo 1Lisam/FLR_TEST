@@ -1,0 +1,52 @@
+name: FLR V0.5 Through Reception Diagnostic
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v05-through-reception-request.json'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Inspect LW reception after user through pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS 'https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5/umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0.json' -o /tmp/r.json
+          python - <<'PY'
+          import json,math,pathlib
+          d=json.load(open('/tmp/r.json',encoding='utf-8'));hr=((d.get('currentSituation') or {}).get('highResolution') or {})
+          arrays={k:v for k,v in hr.items() if isinstance(v,list) and v and isinstance(v[0],dict) and 'players' in v[0]}
+          rows=[]
+          for k,arr in arrays.items():
+              for f in arr:
+                  t=float(f.get('time') or 0)
+                  if 3116.5<=t<=3120.2:
+                      ps={p.get('id'):p for p in (f.get('players') or [])};p=ps.get('H-LW');b=f.get('ball') or {}
+                      if p:
+                          rows.append({'src':k,'t':round(t,2),'x':round(float(p.get('x') or 0),3),'y':round(float(p.get('y') or 0),3),'vx':round(float(p.get('vx') or 0),3),'vy':round(float(p.get('vy') or 0),3),'speed':round(math.hypot(float(p.get('vx') or 0),float(p.get('vy') or 0)),3),'action':p.get('action'),'task':p.get('tacticalTask'),'ballMode':b.get('mode'),'ballOwner':b.get('ownerId'),'intended':b.get('intendedReceiverId'),'ballX':round(float(b.get('x') or 0),3),'ballY':round(float(b.get('y') or 0),3),'ballDist':round(math.hypot(float(p.get('x') or 0)-float(b.get('x') or 0),float(p.get('y') or 0)-float(b.get('y') or 0)),3)})
+          # dedupe by time preferring latest array occurrence
+          by={r['t']:r for r in rows};times=sorted(by);sample=[]
+          last=-999
+          for t in times:
+              if t-last>=.19 or t in (times[0],times[-1]): sample.append(by[t]);last=t
+          ev=[]
+          for e in (hr.get('actualEvents') or []):
+              if 3116.5<=float(e.get('t') or 0)<=3120.2:ev.append({k:e.get(k) for k in ('t','type','actorId','targetId','text','passKind')})
+          speeds=[r['speed'] for r in rows]
+          out={'reportId':'umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0','frameArrays':list(arrays),'rowCount':len(rows),'minSpeed':min(speeds) if speeds else None,'maxSpeed':max(speeds) if speeds else None,'events':ev,'timeline':sample}
+          pathlib.Path('/tmp/out.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          git config user.name 'FLR V0.5 Reception Diagnostic'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/out.json .flr/v05-through-reception-diag.json
+          git add .flr/v05-through-reception-diag.json
+          git commit -m 'Diagnose V0.5 through-pass reception continuity'
+          git push origin HEAD:main
