@@ -99,9 +99,9 @@ function defendingImportance(f){
   if(attackX>=86)v+=.07;if((f.role==='CB'||f.role==='FB')&&attackX>=78)v+=.025;
   return clamp(v,0,1);
 }
-function isShotChoice(id){return['SHOT','DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(id);}function isPassChoice(id){return['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','ONE_TOUCH_PASS','HEADER_PASS'].includes(id);}function family(id){if(isShotChoice(id))return'슈팅';if(['CARRY','TAKE_ON'].includes(id))return'돌파';if(['EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(id))return'크로스';if(isPassChoice(id))return'패스';if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(id))return'수비';return'볼 유지';}
-function targetDisplay(c){return c?.meta?.targetSlot?`같은 팀 ${c.meta.targetSlot}`:(c.targetName||null)}function labelFor(c){const target=targetDisplay(c),t=target?` → ${target}`:'';const shotLabel=c.id==='SHOT'?(c.meta?.turningRequired?'터닝 슛':c.meta?.longRange?'중거리 슛':'슈팅'):'슈팅';return({SHOT:shotLabel,DIRECT_SHOT:'논스톱 슈팅',VOLLEY_SHOT:'발리 슈팅',HEADER_SHOT:'헤더 슈팅',ONE_TOUCH_PASS:'원터치 패스',HEADER_PASS:'헤더 패스',TRAP_CONTROL:'트래핑 후 컨트롤',CARRY:'공간 전진',TAKE_ON:'1대1 돌파',THROUGH_PASS:'공간 침투 패스',PROGRESSIVE_PASS:'발밑 전진 패스',AVAILABLE_PASS:'전진 패스',EARLY_CROSS:'얼리 크로스',DEEP_CROSS:'크로스',CUTBACK:'컷백',SWITCH_PASS:'전환 패스',SAFE_PASS:'안전한 패스',RECYCLE:'재순환',SHORT_DISTRIBUTION:'짧은 빌드업',LONG_DISTRIBUTION:'전방 롱 배급',HOLD:'볼 지키기',TURN_BACK:'방향 전환'}[c.id]||c.id)+t;}
-function riskFor(c,f){if(c.id==='TAKE_ON')return f.pressure<1.8?'높음':'보통';if(['DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(c.id))return'높음';if(['ONE_TOUCH_PASS','HEADER_PASS'].includes(c.id))return'보통';if(c.id==='TRAP_CONTROL')return f.pressure<1.5?'높음':'낮음';if(c.id==='SHOT')return c.meta?.turningRequired?'높음':c.meta?.longRange?'높음':(f.shot?.blockers??0)>=1?'높음':f.shot?.openWindow?'보통':(f.shot?.dGoal??99)>15?'높음':'보통';if(c.id==='THROUGH_PASS')return'보통';if(c.id==='AVAILABLE_PASS')return c.meta?.contested?'높음':'보통';if(c.id==='CUTBACK'||c.id==='DEEP_CROSS')return'보통';if(c.id==='SAFE_PASS'||c.id==='RECYCLE')return'낮음';if(c.id==='HOLD')return f.pressure<1.5?'높음':'낮음';return'보통';}
+function isShotChoice(id){return['SHOT','DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(id);}function isPassChoice(id){return['THROUGH_PASS','LOFTED_THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','ONE_TOUCH_PASS','HEADER_PASS'].includes(id);}function family(id){if(isShotChoice(id))return'슈팅';if(['CARRY','TAKE_ON'].includes(id))return'돌파';if(['EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(id))return'크로스';if(isPassChoice(id))return'패스';if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(id))return'수비';return'볼 유지';}
+function targetDisplay(c){return c?.meta?.targetSlot?`같은 팀 ${c.meta.targetSlot}`:(c.targetName||null)}function labelFor(c){const target=targetDisplay(c),t=target?` → ${target}`:'';const shotLabel=c.id==='SHOT'?(c.meta?.turningRequired?'터닝 슛':c.meta?.longRange?'중거리 슛':'슈팅'):'슈팅';return({SHOT:shotLabel,DIRECT_SHOT:'논스톱 슈팅',VOLLEY_SHOT:'발리 슈팅',HEADER_SHOT:'헤더 슈팅',ONE_TOUCH_PASS:'원터치 패스',HEADER_PASS:'헤더 패스',TRAP_CONTROL:'트래핑 후 컨트롤',CARRY:'공간 전진',TAKE_ON:'1대1 돌파',THROUGH_PASS:'공간 침투 패스',LOFTED_THROUGH_PASS:'로빙 침투 패스',PROGRESSIVE_PASS:'발밑 전진 패스',AVAILABLE_PASS:'전진 패스',EARLY_CROSS:'얼리 크로스',DEEP_CROSS:'크로스',CUTBACK:'컷백',SWITCH_PASS:'전환 패스',SAFE_PASS:'안전한 패스',RECYCLE:'재순환',SHORT_DISTRIBUTION:'짧은 빌드업',LONG_DISTRIBUTION:'전방 롱 배급',HOLD:'볼 지키기',TURN_BACK:'방향 전환'}[c.id]||c.id)+t;}
+function riskFor(c,f){if(c.id==='TAKE_ON')return f.pressure<1.8?'높음':'보통';if(['DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(c.id))return'높음';if(['ONE_TOUCH_PASS','HEADER_PASS'].includes(c.id))return'보통';if(c.id==='TRAP_CONTROL')return f.pressure<1.5?'높음':'낮음';if(c.id==='SHOT')return c.meta?.turningRequired?'높음':c.meta?.longRange?'높음':(f.shot?.blockers??0)>=1?'높음':f.shot?.openWindow?'보통':(f.shot?.dGoal??99)>15?'높음':'보통';if(c.id==='THROUGH_PASS')return'보통';if(c.id==='LOFTED_THROUGH_PASS')return'높음';if(c.id==='AVAILABLE_PASS')return c.meta?.contested?'높음':'보통';if(c.id==='CUTBACK'||c.id==='DEEP_CROSS')return'보통';if(c.id==='SAFE_PASS'||c.id==='RECYCLE')return'낮음';if(c.id==='HOLD')return f.pressure<1.5?'높음':'낮음';return'보통';}
 function tooltipFor(c,f){
   const shownTarget=targetDisplay(c),target=shownTarget?` (${shownTarget})`:'';let intent='현재 공간을 이용해 공격을 이어갑니다.',related='볼 컨트롤, 판단',gain='공격을 이어갈 수 있음',loss='공 소유를 잃거나 공격 속도가 끊길 수 있음';
   if(c.id==='DIRECT_SHOT'){intent='다가오는 공을 멈추지 않고 현재 접촉 타이밍에서 바로 슈팅합니다.';related='골 결정력, 볼 컨트롤, 반응';gain='수비가 정비되기 전에 바로 마무리할 수 있음';loss='접촉이 어려우면 정확도가 떨어지거나 막힐 수 있음';}
@@ -114,6 +114,7 @@ function tooltipFor(c,f){
   else if(c.id==='TAKE_ON'){intent='앞의 수비수를 직접 제치고 다음 공간으로 진입합니다.';related='드리블, 민첩성, 가속';gain='수비 라인을 깨고 더 좋은 찬스를 만들 수 있음';loss='태클에 막히거나 공이 길어질 수 있음';}
   else if(c.id==='CARRY'){intent='수비수에게 직접 1대1 승부를 걸기보다, 열려 있는 공간으로 공을 직접 운반합니다.';related='드리블, 볼 컨트롤, 가속';gain='빈 공간을 전진하며 다음 선택을 만들 수 있음';loss='공간이 닫히기 전에 판단하지 못하면 압박을 받을 수 있음';}
   else if(c.id==='THROUGH_PASS'){intent=`전방 동료${target}의 발이 아니라, 달려갈 앞 공간으로 공을 먼저 보냅니다.`;related='시야, 패스, 타이밍';gain='수비 라인 뒤 공간에서 달리며 바로 다음 플레이를 만들 수 있음';loss='패스가 너무 길거나 타이밍이 어긋나면 차단되거나 오프사이드가 선언될 수 있음';}
+  else if(c.id==='LOFTED_THROUGH_PASS'){intent=`전방 동료${target}가 달려갈 공간으로 공을 띄워 수비 라인 위를 넘깁니다.`;related='시야, 롱패스, 타이밍';gain='지상 패스 길의 수비를 넘겨 침투 공간에 떨어뜨릴 수 있음';loss='체공 시간이 있어 골키퍼·수비가 먼저 대응하거나 오프사이드가 될 수 있음';}
   else if(c.id==='PROGRESSIVE_PASS'){intent=`전방 동료${target}의 현재 발밑/받기 쉬운 지점에 직접 연결해 공격 위치를 앞으로 옮깁니다.`;related='시야, 패스';gain='소유를 유지하면서 전진한 위치에서 다음 플레이를 만들 수 있음';loss='받는 선수가 바로 압박받으면 전진 효과가 줄어들 수 있음';}
   else if(c.id==='AVAILABLE_PASS'){intent=`패스 길 자체는 열려 있는 동료${target}에게 연결합니다.`;related='패스, 시야, 판단';gain='압박받는 동료라도 현재 존재하는 패스 선택을 사용할 수 있음';loss=c.meta?.contested?'받는 순간 수비 압박/경합으로 공을 잃을 위험이 큼':'연결 후 바로 압박을 받을 수 있음';}
   else if(['DEEP_CROSS','EARLY_CROSS','CUTBACK'].includes(c.id)){intent=`박스 안/뒤 공간의 동료${target}에게 전달을 노립니다.`;related='크로스, 시야, 패스';gain='즉시 슈팅 가능한 상황을 만들 수 있음';loss='수비에게 걷히거나 역습 출발점이 될 수 있음';}
@@ -186,6 +187,15 @@ function onBallOptions(frame){
     if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||o.id==='CARRY');if(ix>=0)out.splice(ix,1);}
     if(out.length<6){const row={id:lead.id,targetId:lead.targetId||null,targetName:lead.targetName||null,family:'패스',label:labelFor(lead),meta:lead.meta?deep(lead.meta):null};row.hint=tooltipFor(lead,frame);row.tooltip=row.hint;out.push(row);}
   }
+  // V0.5: expose one explicit lofted/chipped through-ball when a real ground through lane
+  // already exists.  This is a trajectory choice for the same live runner, not a synthetic
+  // receiver or a precomputed success branch.  Keep it selective so ordinary checkpoints do
+  // not become duplicated ground/air menus for every short pass.
+  const shownGroundThrough=out.filter(o=>o.id==='THROUGH_PASS'&&o.targetId&&(o.meta?.runLead||o.meta?.syntheticLead||o.meta?.physicalCommittedRun||o.meta?.running)&&(o.meta?.leadForward??0)>=7.0).sort((a,b)=>(b.meta?.leadForward??0)-(a.meta?.leadForward??0))[0]||null;
+  if(shownGroundThrough&&!out.some(o=>o.id==='LOFTED_THROUGH_PASS'&&o.targetId===shownGroundThrough.targetId)){
+    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||o.id==='CARRY'||(o.id==='SAFE_PASS'&&o.targetId!==shownGroundThrough.targetId));if(ix>=0)out.splice(ix,1);}
+    if(out.length<6){const c={id:'LOFTED_THROUGH_PASS',targetId:shownGroundThrough.targetId,targetName:shownGroundThrough.targetName,meta:{...(shownGroundThrough.meta||{}),deliveryMode:'AERIAL',trajectory:'LOFTED_THROUGH'}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
+  }
   // If the striker has drawn defenders and a winger is making a real release run,
   // keep the through-pass visible even when a dribble/shot scores higher. This is a
   // physical option created by team movement, not an artificial choice quota.
@@ -216,7 +226,7 @@ function onBallOptions(frame){
   // strongly prefers shooting/carrying. Player choice availability != NPC preference.
   if(!out.some(o=>o.family==='패스')){
     const c=ranked.find(x=>['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE'].includes(x.id)&&duplicateAllowed(x)&&x.score>=-0.75);
-    if(c&&out.length<6){const row={id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,family:'패스',label:labelFor(c)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
+    if(c&&out.length<6){const row={id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,family:'패스',label:labelFor(c),meta:c.meta?deep(c.meta):null};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
   }
   // TT-0.51 1_2: physical availability and NPC preference are separate contracts.
   // The candidate engine always evaluates a live-space CARRY; low NPC score may rank it last,
@@ -252,9 +262,14 @@ function gapReady(s,importance){const def=modeDef(s),age=s.m.time-s.lastPauseAt;
 function episodeKeepsRestart(s,ep){const r=s.m.restart;return!!(r&&ep&&r.team===ep.team&&['CORNER','FREE_KICK','THROW_IN'].includes(r.kind));}
 function updateEpisodeState(s){
   const ep=s.activeEpisode;if(!ep){if(!s.pending&&!s.resultTracker&&!s.forceNextChoice&&s.m.protagonistInteractiveEpisode?.active)s.m.protagonistInteractiveEpisode=null;return;}
-  if(s.m.completed||s.m.time>(ep.hardUntil||ep.until||0)){s.activeEpisode=null;return;}
+  if(s.m.completed){s.activeEpisode=null;return;}
+  // V0.5 set-piece continuity: an attacking corner/free-kick/throw earned inside the live
+  // episode is explicitly part of that episode.  Dead-clock compression may advance match
+  // time by 10-30 seconds in the same physics tick, so check this ownership before applying
+  // the open-play hard timeout and refresh the visible continuation window from setup time.
+  if(episodeKeepsRestart(s,ep)){ep.lostAt=null;ep.hardUntil=Math.max(ep.hardUntil||0,s.m.time+8.0);ep.until=Math.max(ep.until||0,s.m.time+7.0);return;}
+  if(s.m.time>(ep.hardUntil||ep.until||0)){s.activeEpisode=null;return;}
   if(s.m.restart&&!episodeKeepsRestart(s,ep)){s.activeEpisode=null;return;}
-  if(episodeKeepsRestart(s,ep)){ep.lostAt=null;ep.until=Math.min(ep.hardUntil||s.m.time+28,Math.max(ep.until||0,s.m.time+7.0));return;}
   if(s.m.possession!==ep.team){if(ep.lostAt==null)ep.lostAt=s.m.time;if(s.m.time-ep.lostAt>=0.85)s.activeEpisode=null;}
   else{ep.lostAt=null;const snap=E.snapshot(s.m),bx=ep.team==='HOME'?snap.ball.x:105-snap.ball.x,stillAttack=bx>=57||snap.phase==='FINAL_THIRD'||snap.phase==='CHANCE';if(stillAttack)ep.until=Math.min(ep.hardUntil||s.m.time+28,Math.max(ep.until||0,s.m.time+4.0));}
 }
@@ -369,9 +384,17 @@ function resultNarrative(s,tr,terminal=null){
     const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));
     if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};
   }
-  if(['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(choice)){
+  if(['THROUGH_PASS','LOFTED_THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(choice)){
+    // V0.5: a pass/cross result owns the actual downstream consequence of the selected
+    // action while that attacking tempo is still being tracked.  In V0.4 a teammate could
+    // score from the selected pass, yet the later kickoff possession overwrote the receipt
+    // as POSSESSION_LOST.  Never infer a goal: only elevate a real GOAL event already
+    // observed after a real downstream shot in this tracker.
+    const downstreamShot=tr.newEvents.find(e=>e.t>=tr.startedAt+0.35&&e.type==='SHOT');
+    const downstreamGoal=downstreamShot&&tr.newEvents.find(e=>e.t>=downstreamShot.t&&e.type==='GOAL');
+    if(downstreamGoal)return{code:'GOAL',headline:`${tr.label} → 동료 득점`,detail:`${flow||downstreamGoal.text||'선택한 패스 이후 같은 공격에서 득점이 나왔습니다.'} 득점 세리머니까지 실제 장면으로 이어졌습니다.`,terminalEvent:deep(downstreamGoal)};
     const bad=tr.newEvents.find(e=>['INTERCEPT','PASS_MISCONTROL','PASS_BOBBLE','OFFSIDE','PASS_OUT','THROW_IN'].includes(e.type));
-    if(bad){const miss=bad.type==='PASS_OUT';return{code:bad.type,headline:miss?`${tr.label} → 패스 미스`:`${tr.label} 결과`,detail:flow||bad.text,terminalEvent:deep(bad)};}
+    if(bad){const headline=bad.type==='PASS_OUT'?`${tr.label} → 패스 미스`:bad.type==='OFFSIDE'?`${tr.label} → 오프사이드`:bad.type==='INTERCEPT'?`${tr.label} → 차단됨`:`${tr.label} 결과`;return{code:bad.type,headline,detail:flow||bad.text,terminalEvent:deep(bad)};}
     const last=scene?.postFrames?.[scene.postFrames.length-1],target=tr.targetId&&last?.players?.find(p=>p.id===tr.targetId),owner=last?.ball?.ownerId;
     if(target&&owner===target.id)return{code:'CONNECTED',headline:`${tr.label} → 연결`,detail:flow||`패스가 ${target.name}에게 연결되어 공격이 이어졌습니다.`,terminalEvent:null};
     if(last?.possession===scene?.checkpointInspect?.team)return{code:'POSSESSION_KEPT',headline:`${tr.label} → 공격 지속`,detail:flow||'선택한 패스 이후 같은 팀의 다음 플레이까지 이어졌습니다.',terminalEvent:null};
@@ -443,13 +466,23 @@ function updateResultTracker(s){
   // later dead-ball outcome is the natural terminal state, not the instant of impact.
   if(isShotChoice(tr.choiceId)&&tr.terminalEvent?.type==='BLOCK'){const later=tr.newEvents.find(e=>e.t>=(tr.terminalAt||0)&&['CORNER','GOAL_KICK','GOAL'].includes(e.type));if(later){tr.terminalEvent=deep(later);tr.terminalAt=Number(later.t);}}
   if(s.m.possession!==tr.startPossession&&tr.possessionChangedAt==null){tr.possessionChangedAt=s.m.time;if(s.m.userChoiceControl?.playerId===s.heroPlayerId&&s.m.userChoiceControl?.mode!=='POST_TACKLE_SETTLE')s.m.userChoiceControl=null;}
+  // V0.5 goal-presentation authority: promote a real downstream pass/cross goal before
+  // deriving terminal type/age.  Compressed dead-clock can advance match time by 25s in the
+  // same physics tick as GOAL; if terminal type is still null here, the ordinary pass deadline
+  // would finalize immediately and capture only one celebration frame.
+  if((tr.family==='패스'||tr.family==='크로스')&&tr.terminalEvent?.type!=='GOAL'){const ds=[...tr.newEvents].reverse().find(e=>e.t>=tr.startedAt+0.35&&e.type==='SHOT'),dg=ds&&tr.newEvents.find(e=>e.t>=ds.t&&e.type==='GOAL');if(dg){tr.terminalEvent=deep(dg);tr.terminalAt=Number(dg.t);}}
+  if((tr.family==='패스'||tr.family==='크로스')&&!tr.terminalEvent){const db=tr.newEvents.find(e=>['OFFSIDE','CORNER','GOAL_KICK','THROW_IN','FOUL'].includes(e.type));if(db){tr.terminalEvent=deep(db);tr.terminalAt=Number(db.t);}}
   const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
   let ready=false;
   if(tt==='GOAL'){const visibleGoalAge=s.m.goalCelebration?now-Number(s.m.goalCelebration.startedAt||now):null;ready=(s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))||(visibleGoalAge!=null&&visibleGoalAge>=4.8);}
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
-    const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY';
-    if(tt==='GOAL_KICK'||tt==='CORNER')ready=(now>=tr.minimumUntil)&&((ballReady&&ratio>=0.52)||!s.m.restart||age>=6.40);
-    else ready=(now>=tr.minimumUntil)&&(ratio>=0.55||age>=4.60||!s.m.restart);
+    const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY',visibleRestartAge=s.m.restart&&Number.isFinite(Number(s.m.restart.setupStartedAt))?Math.max(0,now-Number(s.m.restart.setupStartedAt)):age;
+    // V0.5: dead-clock compression advances match time without showing those seconds.  Result
+    // readability therefore uses visible restart-setup age, not terminal-event clock age, so an
+    // offside/corner cannot collapse to a single frame just because 15-30 dead seconds were
+    // compressed in the same simulation tick.
+    if(tt==='GOAL_KICK'||tt==='CORNER')ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.35&&((ballReady&&ratio>=0.52)||!s.m.restart||visibleRestartAge>=6.40);
+    else ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.10&&(ratio>=0.55||visibleRestartAge>=4.60||!s.m.restart);
   }else if(['BLOCK','SAVE','CHIP_SAVE','CHIP_PARRY'].includes(tt)){
     const follow=tr.newEvents.find(e=>e.t>(tr.terminalAt||0)+0.30&&['PASS','SHOT','TAKE_ON','CLEARANCE'].includes(e.type));
     // If the direct rebound returns to the protagonist, hand control back BEFORE owner AI
@@ -472,6 +505,11 @@ function updateResultTracker(s){
     else{
       const downstreamShot=[...tr.newEvents].reverse().find(e=>e.t>=tr.startedAt+0.35&&e.type==='SHOT');
       const shotOutcome=downstreamShot&&tr.newEvents.find(e=>e.t>=downstreamShot.t&&['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK'].includes(e.type));
+      // V0.5: downstream goal is a material terminal for a pass/cross choice too.  This is
+      // based only on events produced after the user action; no future result is precomputed.
+      // Keeping it on the tracker also prevents the ordinary pass deadline from cutting the
+      // five-second visible celebration down to a single frame after compressed dead-clock.
+      if(shotOutcome?.type==='GOAL'&&tr.terminalEvent?.type!=='GOAL'){tr.terminalEvent=deep(shotOutcome);tr.terminalAt=Number(shotOutcome.t);}
       if(shotOutcome){
         const sa=now-shotOutcome.t;
         if(['CORNER','GOAL_KICK'].includes(shotOutcome.type)){
@@ -488,7 +526,7 @@ function updateResultTracker(s){
       }else ready=now>=tr.startedAt+4.4&&ballSettled;
     }
   }else if(['DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(tr.choiceId))ready=now>=tr.startedAt+2.2||tr.possessionChangedAt!=null&&now-tr.possessionChangedAt>=1.1;
-  const goalPresentationActive=tt==='GOAL'&&s.m.phase==='GOAL_CELEBRATION'&&!!s.m.goalCelebration;if(ready||(!goalPresentationActive&&now>=tr.deadline)||s.m.completed)return finalizeResult(s,terminal);
+  const goalPresentationActive=tt==='GOAL'&&s.m.phase==='GOAL_CELEBRATION'&&!!s.m.goalCelebration,deadBallPresentationActive=['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)&&!!s.m.restart;const terminalPresentationActive=goalPresentationActive||deadBallPresentationActive;if(ready||(!terminalPresentationActive&&now>=tr.deadline)||s.m.completed)return finalizeResult(s,terminal);
   return null;
 }
 function applyChoice(s,choiceId,targetId=null,inputMeta={}){
