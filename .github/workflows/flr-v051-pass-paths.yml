@@ -1,0 +1,23 @@
+name: FLR V0.5.1 Pass Path Inventory
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v051-pass-paths-request.json']
+permissions: {contents: write}
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('runtime/continuous_match_core.js').read_text().splitlines()
+          out=[]
+          for i,line in enumerate(s):
+            if 'executePass(m,owner' in line or 'COMMITTED_BOX_CARRY' in line or 'boxCarry' in line:
+              a=max(0,i-2);b=min(len(s),i+3);out.append(f'--- {i+1} ---\n'+'\n'.join(f'{j+1}: {s[j]}' for j in range(a,b)))
+          Path('.flr/v051-pass-path-inventory.txt').write_text('\n'.join(out))
+          PY
+          git config user.name 'FLR V0.5.1 Diagnostic';git config user.email 'actions@users.noreply.github.com';git add .flr/v051-pass-path-inventory.txt;git commit -m 'Record V0.5.1 pass execution paths';git push origin HEAD:main
