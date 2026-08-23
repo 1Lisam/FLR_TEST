@@ -86,4 +86,29 @@ function spatialSnapshot"""
 s=s[:m.start()]+adv_new+s[m.end():]
 p.write_text(s,encoding='utf-8')
 
-print('APPLIED_V05_FOLLOWUP_3')
+# 4) A runner who controls a THROUGH ball keeps the physical run through the first touch.
+# Generic shape/probe logic must not zero the momentum immediately after reception. This is
+# a short current-state movement continuation only; the next live AI/user action still owns
+# the outcome and can replace the continuation target at any time.
+p=Path('runtime/continuous_match_core.js')
+s=p.read_text(encoding='utf-8')
+assert 'receiveRunContinuationUntil' not in s
+needle="    let touchVec;if(kind==='THROUGH'&&sp>0.75)touchVec=norm(moveVec.x*.78+goalVec.x*.22,moveVec.y*.78+goalVec.y*.22);else if(sp>0.45)touchVec=norm(moveVec.x*.62+incomingTravel.x*.20+goalVec.x*.18,moveVec.y*.62+incomingTravel.y*.20+goalVec.y*.18);else touchVec=norm(incomingTravel.x*.78+goalVec.x*.22,incomingTravel.y*.78+goalVec.y*.22);\n    const continuation=kind==='THROUGH'?2.75:kind==='CUTBACK'?1.20:kind==='LONG_PASS'?1.05:1.15;\n    p.tx=clamp(p.x+touchVec.x*continuation,1,104);p.ty=clamp(p.y+touchVec.y*continuation,1,67);p.tacticalTask='FIRST_TOUCH_FLOW';"
+assert needle in s
+replacement="    let touchVec;if(kind==='THROUGH'&&sp>0.75)touchVec=norm(moveVec.x*.78+goalVec.x*.22,moveVec.y*.78+goalVec.y*.22);else if(sp>0.45)touchVec=norm(moveVec.x*.62+incomingTravel.x*.20+goalVec.x*.18,moveVec.y*.62+incomingTravel.y*.20+goalVec.y*.18);else touchVec=norm(incomingTravel.x*.78+goalVec.x*.22,incomingTravel.y*.78+goalVec.y*.22);\n    const throughMomentum=kind==='THROUGH'&&sp>0.75,continuation=throughMomentum?clamp(sp*.92,4.2,5.8):kind==='THROUGH'?3.10:kind==='CUTBACK'?1.20:kind==='LONG_PASS'?1.05:1.15;\n    p.tx=clamp(p.x+touchVec.x*continuation,1,104);p.ty=clamp(p.y+touchVec.y*continuation,1,67);p.tacticalTask='FIRST_TOUCH_FLOW';p.sprint=throughMomentum;if(throughMomentum)p.receiveRunContinuationUntil=m.time+1.05;"
+s=s.replace(needle,replacement,1)
+needle="    p.lockTargetUntil=m.time+Math.min(settle,0.62);p.nextThink=m.time+settle;p.receiveFlowUntil=p.nextThink;"
+assert needle in s
+replacement="    const flowTargetHold=throughMomentum?Math.max(1.05,settle):Math.min(settle,0.62);p.lockTargetUntil=m.time+flowTargetHold;p.nextThink=m.time+settle;p.receiveFlowUntil=m.time+flowTargetHold;"
+s=s.replace(needle,replacement,1)
+needle="    else if(p.id===m.ball.ownerId){\n      if((p.lockTargetUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);lx=q.x;ly=q.y;action=p.action||'CARRY';sprint=p.sprint;}"
+assert needle in s
+replacement="    else if(p.id===m.ball.ownerId){\n      if((p.receiveRunContinuationUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);lx=q.x;ly=q.y;action='FIRST_TOUCH_FLOW';sprint=true;}\n      else if((p.lockTargetUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);lx=q.x;ly=q.y;action=p.action||'CARRY';sprint=p.sprint;}"
+s=s.replace(needle,replacement,1)
+needle="function applyResolvedOwnerAction(m,owner,action){\n  if(!owner||!action)return false;"
+assert needle in s
+replacement="function applyResolvedOwnerAction(m,owner,action){\n  if(!owner||!action)return false;owner.receiveRunContinuationUntil=0;"
+s=s.replace(needle,replacement,1)
+p.write_text(s,encoding='utf-8')
+
+print('APPLIED_V05_FOLLOWUP_4')
