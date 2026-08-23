@@ -1,8 +1,18 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 24,
+  "count": 25,
   "reports": [
+    {
+      "report_id": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
+      "build": "USER-MATCH-TEST-V0.5",
+      "created_at": "2026-08-23T10:04:14.530Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "공간 침투패스를 받은 후 그대로 달려나가는것이 정상이지만 공간 침투 패스를 달려가서 잡은 후 멈춰버림",
+      "size_bytes": 6097518,
+      "chunk_count": 1
+    },
     {
       "report_id": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
       "build": "USER-MATCH-TEST-V0.5",
@@ -244,7 +254,7 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
+  "latestAttachedReportId": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -254,13 +264,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
+      "reportId": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
       "build": "USER-MATCH-TEST-V0.5",
       "step": 78,
-      "description": "이 부분에 대해서는 분명히 공이 날아오는것 을 보여주고 선택지가 나오기로 했는데 출발도 전에 선택지가 나오는 현상 유지중임",
+      "description": "공간 침투패스를 받은 후 그대로 달려나가는것이 정상이지만 공간 침투 패스를 달려가서 잡은 후 멈춰버림",
       "category": "패스/공격",
-      "priority": 4,
-      "reportedAt": "2026-08-23T09:03:40.817Z"
+      "priority": 3,
+      "reportedAt": "2026-08-23T10:02:33.756Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -283,18 +293,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 3975.0999999997853,
-      "endSecond": 4002.7,
+      "startSecond": 3115.399999999885,
+      "endSecond": 3130.1,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 3752.7999999997924,
-      "endSecond": 3759.1,
+      "startSecond": 2972.3999999999114,
+      "endSecond": 3001.4,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 3058624,
-    "previousSerializedBytes": 1037646
+    "currentSerializedBytes": 2303232,
+    "previousSerializedBytes": 4506580
   }
 }
