@@ -8,7 +8,7 @@
   if(typeof module==='object'&&module.exports)module.exports=api;else root.FLRPG_PROTAGONIST_MATCH_CONTROLLER=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(E,R38,M,A){
 'use strict';
-const VERSION='TT051-PROTAGONIST-MATCH-CONTROLLER-1.7-CARRY-CADENCE-GUARD';
+const VERSION='TT051-PROTAGONIST-MATCH-CONTROLLER-1.8-HISTORICAL-CLOSURE';
 const MODES={
   FULL_MATCH:{id:'FULL_MATCH',label:'전체 경기',presentation:'LIVE',threshold:0,minGap:0.8,description:'경기 전체를 보면서 모든 유효한 주인공 판단을 표시'},
   PLAYER_ALL:{id:'PLAYER_ALL',label:'내 플레이 보기',presentation:'HIGHLIGHT',threshold:0,minGap:0.8,description:'경기는 고속 계산하고 주인공 판단 장면은 모두 직전 10초부터 재생'},
@@ -193,6 +193,15 @@ function onBallOptions(frame){
   if(release&&!out.some(o=>o.id==='THROUGH_PASS'&&o.targetId===release.targetId)){
     if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='CARRY');if(ix>=0)out.splice(ix,1);}
     if(out.length<6){const row={id:release.id,targetId:release.targetId||null,targetName:release.targetName||null,family:'패스',label:labelFor(release),meta:release.meta?deep(release.meta):null};row.hint=tooltipFor(release,frame);row.tooltip=row.hint;out.push(row);}
+  }
+  // V0.4 historical far-side committed-run floor: Candidate ranking and physical pass
+  // availability are separate contracts. If a winger is currently making a real, unblocked
+  // lead run, the six-option display cap must not erase that live passing lane merely because
+  // another candidate family ranked higher. Execution still re-checks the current pass geometry.
+  const committedWide=(frame?._frame?.opts||[]).filter(o=>o?.p&&o.p.role==='WF'&&o.block===0&&o.open>=.45&&o.forward>1.5&&o.running===true&&Math.hypot(o.p.vx||0,o.p.vy||0)>=1.1&&Number(o.leadForward||0)>=2.5).sort((a,b)=>Number(b.leadForward||0)-Number(a.leadForward||0))[0]||null;
+  if(committedWide&&!out.some(o=>o.family==='패스'&&o.targetId===committedWide.p.id)){
+    if(out.length>=6){const ix=out.findIndex(o=>['HOLD','RECYCLE','CARRY','SAFE_PASS'].includes(o.id));if(ix>=0)out.splice(ix,1);}
+    if(out.length<6){const c={id:'THROUGH_PASS',targetId:committedWide.p.id,targetName:`같은 팀 ${committedWide.p.slot}`,meta:{targetId:committedWide.p.id,targetSlot:committedWide.p.slot,runnerTask:committedWide.p.tacticalTask||null,leadForward:Number(committedWide.leadForward||0),physicalCommittedRun:true}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
   }
   // PLAYER risk floor: the raw live pass geometry, not NPC ranking, decides whether a risky
   // pass can be shown. One blocker / tight pressure / a marginal offside shoulder remains a
