@@ -2,7 +2,7 @@
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
   "build": "USER-MATCH-TEST-V0.5.1",
   "limit": 50,
-  "requestedAt": "2026-08-23T21:11:00+09:00",
-  "purpose": "Read the newly submitted V0.5.1 user retest reports after deployment for classification only; no engine development in this audit step",
-  "runNonce": "user-match-test-v0-5-1-feedback-audit-20260823-2111"
+  "requestedAt": "2026-08-23T21:23:00+09:00",
+  "purpose": "Refresh V0.5.1 report audit to include the one newly submitted user report; classification only, no engine development",
+  "runNonce": "user-match-test-v0-5-1-feedback-audit-20260823-2123"
 }
