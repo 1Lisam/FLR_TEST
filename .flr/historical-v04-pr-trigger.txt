@@ -1,3 +1,3 @@
 V21 refined historical closure audit trigger.
 Exact engine authority under test: 53c9a69bdc6a99608c167b5523b2f83dfb0fb25a
-Audit revision: 1.2 repeated-CARRY cadence discriminator.
+Audit revision: 1.3 apply causal repeated-CARRY guard to V0.4 candidate.
