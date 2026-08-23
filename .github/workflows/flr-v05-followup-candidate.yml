@@ -1,4 +1,4 @@
-name: FLR V0.5 Follow-up Candidate
+name: FLR V0.5 Feedback Fix Candidate
 
 on:
   push:
@@ -36,7 +36,8 @@ jobs:
           node --check step71_hybrid_v06_ui.js
           node --check runtime/protagonist_match_controller.js
           node --check live_hybrid_session_v02.js
-      - name: Direct regression for the three user reports
+          node --check runtime/continuous_match_core.js
+      - name: Direct regression for four user reports
         shell: bash
         run: |
           node <<'NODE'
@@ -46,7 +47,7 @@ jobs:
           const H=require('./live_hybrid_session_v02.js');
           const checks=[]; const pass=(name,detail={})=>checks.push({name,pass:true,...detail});
 
-          // #1 chained incoming choice: no direct showPending bypass remains.
+          // #1: chained incoming-ball choice must replay the actual flight before options.
           const ui=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
           assert(ui.includes('function showPendingCausally()'));
           assert(ui.includes("p.kind==='INCOMING_BALL'&&p.chained"));
@@ -55,7 +56,7 @@ jobs:
           assert(ui.includes("startReplay(clip,'CHOICE','다가오는 공 → 선택 직전 실제 경기')"));
           pass('CHAINED_INCOMING_REPLAY_BEFORE_OPTIONS');
 
-          // #2 exact geometry from the V0.5 report: open LW must remain a PLAYER option.
+          // #2: exact geometry from the V0.5 report - open LW remains a PLAYER option.
           const sess=P.create('V05-FOLLOWUP-OPEN-LW',{heroPlayerId:'H-ST',mode:'PLAYER_ALL'});
           const originalBridge=E.choiceStateBridge;
           const fake={kind:'ON_BALL',playerId:'H-ST',team:'HOME',role:'ST',slot:'ST',time:66.55,localX:78.78,localY:35.06,pressure:2.384,space:.90,
@@ -74,12 +75,12 @@ jobs:
           const inspected=P.inspect(sess);
           E.choiceStateBridge=originalBridge;
           const lw=(inspected.options||[]).find(o=>o.targetId==='H-LW');
-          assert(lw, 'open H-LW disappeared from PLAYER options');
+          assert(lw,'open H-LW disappeared from PLAYER options');
           assert.strictEqual(lw.meta?.targetId,'H-LW');
           assert.strictEqual(!!sess.futureOutcomePrecomputed,false);
           pass('OPEN_WIDE_OUTLET_PRESERVED',{id:lw.id,targetId:lw.targetId});
 
-          // #3 spatial model: code must preserve exact V0.6 asymmetry with slow off-ball relaxation.
+          // #3: Hybrid retains exact V0.6 spatial asymmetry rather than quickly returning to rails.
           const hs=fs.readFileSync('live_hybrid_session_v02.js','utf8');
           assert(hs.includes("fromExact=sp.source==='V06_HANDOFF_EXACT'"));
           assert(hs.includes("fromExact ? .82 : .50"));
@@ -90,7 +91,28 @@ jobs:
           assert(h.state?.spatial?.players?.['H-LCM']);
           pass('HYBRID_SPATIAL_ASYMMETRY_POLICY_PRESENT',{source:h.state.spatial.source});
 
-          console.log(JSON.stringify({status:'PASS',checks},null,2));
+          // #4: a moving THROUGH receiver must keep run momentum through first control.
+          const m=E.createMatch('V05-FOLLOWUP-THROUGH-RECEIVE',{});
+          m.restart=null;m.phase='OPEN_PLAY';m.time=100;m.nextShape=100;m.protagonistControllerId='H-LW';m.protagonistExplicitActionRequired=true;
+          const B=E.choiceActionBridge(),runner=B.playerById(m,'H-LW');
+          runner.x=76;runner.y=18;runner.vx=5.0;runner.vy=.15;runner.tx=82;runner.ty=18.3;runner.sprint=true;
+          m.ball.x=75.55;m.ball.y=18;m.ball.z=0;m.ball.mode='LOOSE';m.ball.ownerId=null;m.possession='HOME';
+          B.setControlled(m,runner,true,{flow:true,flightKind:'THROUGH',deliveryMode:'GROUND',sourceId:'H-ST',incomingVx:15,incomingVy:.3});
+          const firstTargetDist=Math.hypot(runner.tx-runner.x,runner.ty-runner.y);
+          assert.strictEqual(runner.tacticalTask,'FIRST_TOUCH_FLOW');
+          assert.strictEqual(runner.sprint,true);
+          assert(runner.receiveRunContinuationUntil>=100.99,'through-run continuation window too short');
+          assert(firstTargetDist>=4.0,'through receiver target does not carry momentum forward');
+          const x0=runner.x;
+          E.step(m,.10);E.step(m,.10);E.step(m,.10);
+          assert(runner.x>x0+.08,'through receiver did not continue physically after first touch');
+          assert((runner.receiveRunContinuationUntil||0)>m.time,'shape tick erased through-run continuation');
+          const core=fs.readFileSync('runtime/continuous_match_core.js','utf8');
+          assert(core.includes('owner.receiveRunContinuationUntil=0;'));
+          pass('THROUGH_RECEPTION_MOMENTUM_CONTINUES',{firstTargetDist:Number(firstTargetDist.toFixed(3)),advance:Number((runner.x-x0).toFixed(3)),continuationUntil:runner.receiveRunContinuationUntil});
+
+          assert.strictEqual(!!m.futureOutcomePrecomputed,false);
+          console.log(JSON.stringify({status:'PASS',checks,futureOutcomePrecomputed:false},null,2));
           NODE
       - name: Historical regression shards
         shell: bash
@@ -104,19 +126,21 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .flr/qa-results
-          cat > .flr/qa-results/V05_FOLLOWUP_3_REPORTS.json <<'JSON'
+          cat > .flr/qa-results/V05_FOLLOWUP_4_REPORTS.json <<'JSON'
           {
-            "schemaVersion":"FLR_V05_FOLLOWUP_3_REPORTS_1.0",
+            "schemaVersion":"FLR_V05_FOLLOWUP_4_REPORTS_1.0",
             "status":"PASS",
             "reports":[
               "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
               "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
-              "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80"
+              "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
+              "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0"
             ],
             "checks":[
               "chained incoming-ball replay before choices",
               "open lateral wide outlet preserved as player option",
               "Hybrid spatial asymmetry retention policy",
+              "through-pass reception momentum continuity",
               "historical presentation discontinuity",
               "historical far-side committed runner",
               "historical open gates"
@@ -126,7 +150,7 @@ jobs:
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add step71_hybrid_v06_ui.js runtime/protagonist_match_controller.js live_hybrid_session_v02.js .flr/qa-results/V05_FOLLOWUP_3_REPORTS.json
+          git add step71_hybrid_v06_ui.js runtime/protagonist_match_controller.js live_hybrid_session_v02.js runtime/continuous_match_core.js .flr/qa-results/V05_FOLLOWUP_4_REPORTS.json
           if git diff --cached --quiet; then echo 'No candidate changes'; exit 1; fi
-          git commit -m 'Fix three V0.5 user retest reports'
+          git commit -m 'Fix four V0.5 user retest reports'
           git push origin HEAD:candidate/v05-followup-20260823
