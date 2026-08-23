@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "FLR_V05_FOLLOWUP4_HISTORICAL_1.0",
+  "status": "FAIL",
+  "jobs": {
+    "presentation": "success",
+    "farside": "success",
+    "openGates": "failure"
+  }
+}
