@@ -1,0 +1,138 @@
+name: FLR V0.5 Report Inspect
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v05-report-inspect-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-v05-report-inspect
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Query V0.5 reports
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest d1 list --json > /tmp/dbs.json
+          dbid="$(python -c "import json; j=json.load(open('/tmp/dbs.json')); print(next(((r.get('uuid') or r.get('id') or '') for r in j if r.get('name')=='flr-bug-reports'),''))")"
+          test -n "$dbid"
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H 'Content-Type: application/json' --data '{"sql":"SELECT report_id, build, created_at, category, priority, description, size_bytes, chunk_count FROM bug_reports WHERE build = ''USER-MATCH-TEST-V0.5'' ORDER BY created_at ASC LIMIT 50"}' > /tmp/q.json
+          mkdir -p /tmp/v05
+          python - <<'PY' > /tmp/ids.tsv
+          import json
+          q=json.load(open('/tmp/q.json'))
+          assert q.get('success') is True, q
+          for r in ((q.get('result') or [{}])[0].get('results') or []):
+              if int(r.get('chunk_count') or 0)>0: print(r['report_id']+'\t'+r['build'])
+          PY
+          while IFS=$'\t' read -r rid build; do
+            [ -n "$rid" ] || continue
+            curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" > "/tmp/v05/${rid}.json"
+          done < /tmp/ids.tsv
+      - name: Summarize full V0.5 frames
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, math, pathlib
+          q=json.load(open('/tmp/q.json'))
+          rows=((q.get('result') or [{}])[0].get('results') or [])
+          def num(v,d=None):
+              try:return float(v)
+              except:return d
+          def pl(frame,pid):
+              return next((p for p in ((frame or {}).get('players') or []) if p.get('id')==pid),None)
+          def compact_player(p):
+              if not p:return None
+              return {k:p.get(k) for k in ('id','team','role','slot','x','y','vx','vy','action','tacticalTask','markTargetId','bodyAngle') if p.get(k) is not None}
+          def frame_row(f,hero):
+              if not isinstance(f,dict):return None
+              b=f.get('ball') or {}; h=pl(f,hero); d=None
+              if h:d=math.hypot((num(h.get('x'),0)-num(b.get('x'),0)),(num(h.get('y'),0)-num(b.get('y'),0)))
+              return {'t':f.get('time'),'phase':f.get('phase'),'possession':f.get('possession'),'ball':{k:b.get(k) for k in ('mode','x','y','z','ownerId','lastTouchTeam')},'hero':compact_player(h),'heroBallDistance':round(d,3) if d is not None else None}
+          def sample_frames(frames,hero):
+              if not frames:return []
+              inds=sorted(set([0,len(frames)//4,len(frames)//2,(3*len(frames))//4,len(frames)-1]))
+              return [frame_row(frames[i],hero) for i in inds]
+          def team_motion(frame):
+              out={}
+              for team in ('HOME','AWAY'):
+                  ps=[p for p in ((frame or {}).get('players') or []) if p.get('team')==team]
+                  speeds=[math.hypot(num(p.get('vx'),0),num(p.get('vy'),0)) for p in ps]
+                  xs=[num(p.get('x')) for p in ps if num(p.get('x')) is not None]; ys=[num(p.get('y')) for p in ps if num(p.get('y')) is not None]
+                  out[team]={'count':len(ps),'movingGt0_75':sum(s>.75 for s in speeds),'movingGt2':sum(s>2 for s in speeds),'avgSpeed':round(sum(speeds)/len(speeds),3) if speeds else None,'xSpan':round(max(xs)-min(xs),3) if xs else None,'ySpan':round(max(ys)-min(ys),3) if ys else None}
+              return out
+          def point_seg_dist(px,py,ax,ay,bx,by):
+              dx,dy=bx-ax,by-ay; den=dx*dx+dy*dy
+              if den<=1e-9:return math.hypot(px-ax,py-ay),0
+              t=max(0,min(1,((px-ax)*dx+(py-ay)*dy)/den)); qx,qy=ax+t*dx,ay+t*dy
+              return math.hypot(px-qx,py-qy),t
+          def target_analysis(frame,hero,target='H-LW'):
+              h=pl(frame,hero); t=pl(frame,target)
+              if not h or not t:return None
+              opp=[p for p in (frame.get('players') or []) if p.get('team')!=h.get('team')]
+              near=min((math.hypot(num(p.get('x'),0)-num(t.get('x'),0),num(p.get('y'),0)-num(t.get('y'),0)) for p in opp),default=None)
+              blockers=[]
+              for p in opp:
+                  d,u=point_seg_dist(num(p.get('x'),0),num(p.get('y'),0),num(h.get('x'),0),num(h.get('y'),0),num(t.get('x'),0),num(t.get('y'),0))
+                  if .08<u<.96 and d<1.8:blockers.append({'id':p.get('id'),'d':round(d,2),'u':round(u,2)})
+              return {'hero':compact_player(h),'target':compact_player(t),'targetDistance':round(math.hypot(num(h.get('x'),0)-num(t.get('x'),0),num(h.get('y'),0)-num(t.get('y'),0)),2),'nearestOpponentToTarget':round(near,2) if near is not None else None,'laneBlockersWithin1_8m':blockers}
+          def continuity(hb,entry):
+              candidates=[]
+              state=(hb or {}).get('state') or {}
+              for key in ('players','playerStates','spatialPlayers'):
+                  if isinstance(state.get(key),list):candidates=state[key];break
+              if not candidates or not isinstance(entry,dict):return {'available':False,'hybridStateKeys':list(state.keys())[:30]}
+              em={p.get('id'):p for p in entry.get('players') or []}; ds=[]
+              for p in candidates:
+                  q=em.get(p.get('id'))
+                  if q and num(p.get('x')) is not None and num(p.get('y')) is not None:ds.append(math.hypot(num(p['x'])-num(q.get('x'),0),num(p['y'])-num(q.get('y'),0)))
+              return {'available':bool(ds),'count':len(ds),'maxDistance':round(max(ds),4) if ds else None,'meanDistance':round(sum(ds)/len(ds),4) if ds else None,'hybridStateKeys':list(state.keys())[:30]}
+          def summarize(d):
+              hb=d.get('hybridBefore') or {}; hr=d.get('highResolution') or {}; dec=hr.get('decision') or {}; hero=(hb.get('boundary') or {}).get('heroPlayerId') or 'H-ST'
+              pre=hr.get('preActionFrames') or []; ep=hr.get('episodeFrames') or []; post=hr.get('postActionFrames') or []
+              decision_frame=dec.get('state') if isinstance(dec.get('state'),dict) and dec.get('state',{}).get('players') else (pre[-1] if pre else hr.get('entrySnapshot'))
+              opts=[]
+              for o in dec.get('options') or []:
+                  opts.append({'id':o.get('id'),'targetId':o.get('targetId'),'label':o.get('label'),'meta':o.get('meta')})
+              first=pre[0] if pre else hr.get('entrySnapshot'); last=pre[-1] if pre else decision_frame
+              return {'boundary':hb.get('boundary'),'entryTime':(hr.get('entrySnapshot') or {}).get('time'),'searchSeconds':hr.get('searchSeconds'),'preActionSpan':hr.get('preActionSpan'),'decisionAt':dec.get('at'),'decisionKind':dec.get('kind'),'pre':{'count':len(pre),'start':pre[0].get('time') if pre else None,'end':pre[-1].get('time') if pre else None,'duration':round(num(pre[-1].get('time'),0)-num(pre[0].get('time'),0),3) if len(pre)>1 else 0,'samples':sample_frames(pre,hero),'startMotion':team_motion(first),'endMotion':team_motion(last)},'episodeFrameCount':len(ep),'postFrameCount':len(post),'decisionFrame':frame_row(decision_frame,hero),'targetLW':target_analysis(decision_frame,hero,'H-LW'),'options':opts,'optionsToLW':[o for o in opts if o.get('targetId')=='H-LW'],'entryPlayers':[compact_player(p) for p in ((hr.get('entrySnapshot') or {}).get('players') or [])],'decisionPlayers':[compact_player(p) for p in ((decision_frame or {}).get('players') or [])],'continuity':continuity(hb,hr.get('entrySnapshot') or {})}
+          out=[]
+          for r in rows:
+              p=pathlib.Path('/tmp/v05')/(r['report_id']+'.json')
+              try:
+                  d=json.loads(p.read_text())
+                  out.append({'meta':r,'context':d.get('bugReportContext'),'current':summarize(d.get('currentSituation') or {}),'previous':summarize(d.get('previousSituation') or {}) if d.get('previousSituation') else None})
+              except Exception as e:out.append({'meta':r,'error':repr(e)})
+          pathlib.Path('/tmp/v05-status.json').write_text(json.dumps({'schemaVersion':'FLR_V05_REPORT_INSPECT_1.0','count':len(out),'reports':out},ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Persist inspection
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR V0.5 Report Inspector'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/v05-status.json .flr/v05-report-inspect-status.json
+          git add .flr/v05-report-inspect-status.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record V0.5 user report frame inspection'
+          git push origin HEAD:main
