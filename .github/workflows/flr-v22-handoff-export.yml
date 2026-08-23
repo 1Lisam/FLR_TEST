@@ -64,13 +64,14 @@ jobs:
           done
           cat > export/EXPORT_META.json <<'JSON'
           {
-            "schemaVersion": "FLR_V22_HANDOFF_EXPORT_1.0",
+            "schemaVersion": "FLR_V22_HANDOFF_EXPORT_1.1",
             "publicV04DeployCommit": "ffba8f8e2011894e7435c1c843dd219b4b9e41e7",
             "publicV04PagesRefreshCommit": "6bfefec2c178b2993a2172ed9b8cb70f3b77ef6d",
             "validatedCandidateCommit": "1e112838840805cae39a771688b0eb72c3d72f76",
             "auditMainAtExport": "__AUDIT_SHA__",
             "reportBuild": "USER-MATCH-TEST-V0.4",
-            "rawReportCount": 9
+            "rawReportCount": 9,
+            "hiddenFilesIncluded": true
           }
           JSON
           sha="$(git -C audit rev-parse HEAD)"
@@ -83,4 +84,5 @@ jobs:
           name: flr-v22-handoff-export
           path: export
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
