@@ -25,7 +25,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Run historical closure audit with captured diagnostics
+      - name: Run historical closure and attacking-behavior audits
         shell: bash
         run: |
           set +e
@@ -41,19 +41,32 @@ jobs:
             LOG="$(tail -c 12000 /tmp/historical-audit.log 2>/dev/null | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')"
             printf '{"schemaVersion":"FLR_HISTORICAL_CLOSURE_AUDIT_1.1","status":"FAILED_TO_RUN","errorTail":%s}\n' "$LOG" > /tmp/historical-closure-status.json
           fi
+          : > /tmp/historical-attack.log
+          node --check .flr/historical_attack_audit.js >> /tmp/historical-attack.log 2>&1
+          arc=$?
+          if [ "$arc" -eq 0 ]; then
+            node .flr/historical_attack_audit.js /tmp/historical-attack-status.json >> /tmp/historical-attack.log 2>&1
+            arc=$?
+          fi
+          if [ "$arc" -ne 0 ] || [ ! -s /tmp/historical-attack-status.json ]; then
+            ALOG="$(tail -c 12000 /tmp/historical-attack.log 2>/dev/null | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')"
+            printf '{"schemaVersion":"FLR_HISTORICAL_ATTACK_AUDIT_1.0","status":"FAILED_TO_RUN","errorTail":%s}\n' "$ALOG" > /tmp/historical-attack-status.json
+          fi
           exit 0
-      - name: Record audit result
+      - name: Record audit results
         if: always()
         shell: bash
         run: |
           set +e
           test -s /tmp/historical-closure-status.json || printf '{"schemaVersion":"FLR_HISTORICAL_CLOSURE_AUDIT_1.1","status":"FAILED_TO_RUN","errorTail":"no output"}\n' > /tmp/historical-closure-status.json
+          test -s /tmp/historical-attack-status.json || printf '{"schemaVersion":"FLR_HISTORICAL_ATTACK_AUDIT_1.0","status":"FAILED_TO_RUN","errorTail":"no output"}\n' > /tmp/historical-attack-status.json
           git config user.name 'FLR Historical Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
           git reset --hard HEAD
           git pull --rebase origin main || git reset --hard origin/main
           cp /tmp/historical-closure-status.json .flr/historical-closure-status.json
-          git add .flr/historical-closure-status.json
+          cp /tmp/historical-attack-status.json .flr/historical-attack-status.json
+          git add .flr/historical-closure-status.json .flr/historical-attack-status.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Record historical bug closure audit'
+          git commit -m 'Record historical closure and attack audits'
           git push origin HEAD:main
