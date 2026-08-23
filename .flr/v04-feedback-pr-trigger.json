@@ -1,0 +1,5 @@
+{
+  "schemaVersion": "FLR_V04_FEEDBACK_PR_TRIGGER_1.0",
+  "requestedAt": "2026-08-23T14:44:00+09:00",
+  "purpose": "Trigger full D1/R2 feedback audit for USER-MATCH-TEST-V0.4 after the user reported a large feedback batch"
+}
