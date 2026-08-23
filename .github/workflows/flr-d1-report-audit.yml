@@ -58,16 +58,41 @@ jobs:
           fi
           RID="$rid" python -c "import json,pathlib,os; q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); assert q.get('success') is True; rows=((q.get('result') or [{}])[0].get('results') or []); d=json.load(open('/tmp/flr_latest_report.json',encoding='utf-8')); cur=d.get('currentSituation'); prev=d.get('previousSituation'); slim={'schemaVersion':'FLR_D1_REPORT_AUDIT_1.3','status':'PASS','count':len(rows),'reports':rows,'latestAttachedReportId':os.environ.get('RID') or None,'latestBundle':{'schemaVersion':d.get('schemaVersion'),'scope':d.get('scope'),'bugReportContext':d.get('bugReportContext'),'currentSituationPresent':cur is not None,'previousSituationPresent':prev is not None,'currentSituationKeys':list(cur.keys()) if isinstance(cur,dict) else [],'previousSituationKeys':list(prev.keys()) if isinstance(prev,dict) else [],'currentReportScope':cur.get('reportScope') if isinstance(cur,dict) else None,'previousReportScope':prev.get('reportScope') if isinstance(prev,dict) else None,'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0}}; pathlib.Path('/tmp/flr_d1_report_status.json').write_text(json.dumps(slim,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')"
 
+      - name: Deep-audit all V0.4 attached reports
+        id: deep
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/flr_v04_reports
+          python - <<'PY' > /tmp/flr_v04_ids.tsv
+          import json
+          q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8'))
+          rows=((q.get('result') or [{}])[0].get('results') or [])
+          for r in rows:
+              if r.get('build')=='USER-MATCH-TEST-V0.4' and int(r.get('chunk_count') or 0)>0:
+                  print(r['report_id']+'\t'+r['build'])
+          PY
+          while IFS=$'\t' read -r rid build; do
+            [ -n "$rid" ] || continue
+            curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" > "/tmp/flr_v04_reports/${rid}.json"
+          done < /tmp/flr_v04_ids.tsv
+          python .flr/v04_feedback_deep_audit.py /tmp/flr_d1_query.json /tmp/flr_v04_reports /tmp/flr_v04_feedback_deep_status.json
+
       - name: Record audit result without failing notification
         if: always()
         continue-on-error: true
         shell: bash
         env:
           OUTCOME: ${{ steps.audit.outcome }}
+          DEEP_OUTCOME: ${{ steps.deep.outcome }}
         run: |
           set +e
           if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_d1_report_status.json ]; then
             printf '{"schemaVersion":"FLR_D1_REPORT_AUDIT_1.3","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_d1_report_status.json
+          fi
+          if [ "${DEEP_OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_v04_feedback_deep_status.json ]; then
+            printf '{"schemaVersion":"FLR_V04_FEEDBACK_DEEP_AUDIT_1.0","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_v04_feedback_deep_status.json
           fi
           git config user.name 'FLR D1 Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
@@ -75,12 +100,13 @@ jobs:
           git pull --rebase origin main || git reset --hard origin/main
           mkdir -p .flr
           cp /tmp/flr_d1_report_status.json .flr/d1-report-audit-status.json
-          git add .flr/d1-report-audit-status.json
+          cp /tmp/flr_v04_feedback_deep_status.json .flr/v04-feedback-deep-audit-status.json
+          git add .flr/d1-report-audit-status.json .flr/v04-feedback-deep-audit-status.json
           if git diff --cached --quiet; then
             echo 'AUDIT_STATUS_UNCHANGED'
             exit 0
           fi
-          git commit -m 'Record latest FLR D1 bug reports' || exit 0
+          git commit -m 'Record latest FLR V0.4 feedback deep audit' || exit 0
           for attempt in 1 2 3; do
             git push origin HEAD:main && exit 0
             sleep 2
