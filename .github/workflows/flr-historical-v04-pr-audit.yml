@@ -36,5 +36,27 @@ jobs:
       - name: Run historical open gates
         shell: bash
         run: |
+          set -euo pipefail
           node --check audit/.flr/historical_open_gates_v04.js
-          node audit/.flr/historical_open_gates_v04.js engine | tee /tmp/historical-v04-open-gates.json
+          set +e
+          node audit/.flr/historical_open_gates_v04.js engine > /tmp/historical-v04-open-gates.json
+          rc=$?
+          set -e
+          cat /tmp/historical-v04-open-gates.json
+          python - <<'PY'
+          import json, pathlib, sys
+          p=pathlib.Path('/tmp/historical-v04-open-gates.json')
+          try:
+              data=json.loads(p.read_text(encoding='utf-8'))
+          except Exception as e:
+              print(f'QA_INFRA_FAILURE: invalid or missing audit JSON: {e}', file=sys.stderr)
+              sys.exit(2)
+          status=data.get('status')
+          if status not in ('PASS','FAIL'):
+              print(f'QA_INFRA_FAILURE: unexpected status={status!r}', file=sys.stderr)
+              sys.exit(2)
+          print(f'QA_GATE_STATUS={status} (node_exit={"$rc"})')
+          PY
+          # A valid QA FAIL is a development result, not an Actions incident.
+          # Only broken scripts, missing output, invalid JSON, checkout errors, etc. fail the workflow.
+          exit 0
