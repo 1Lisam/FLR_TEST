@@ -78,6 +78,7 @@ jobs:
             curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" > "/tmp/flr_v04_reports/${rid}.json"
           done < /tmp/flr_v04_ids.tsv
           python .flr/v04_feedback_deep_audit.py /tmp/flr_d1_query.json /tmp/flr_v04_reports /tmp/flr_v04_feedback_deep_status.json
+          python .flr/v04_feedback_compact_summary.py /tmp/flr_v04_feedback_deep_status.json /tmp/flr_v04_feedback_compact_status.json
 
       - name: Record audit result without failing notification
         if: always()
@@ -94,6 +95,9 @@ jobs:
           if [ "${DEEP_OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_v04_feedback_deep_status.json ]; then
             printf '{"schemaVersion":"FLR_V04_FEEDBACK_DEEP_AUDIT_1.0","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_v04_feedback_deep_status.json
           fi
+          if [ "${DEEP_OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_v04_feedback_compact_status.json ]; then
+            printf '{"schemaVersion":"FLR_V04_FEEDBACK_COMPACT_SUMMARY_1.0","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_v04_feedback_compact_status.json
+          fi
           git config user.name 'FLR D1 Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
           git reset --hard HEAD
@@ -101,7 +105,8 @@ jobs:
           mkdir -p .flr
           cp /tmp/flr_d1_report_status.json .flr/d1-report-audit-status.json
           cp /tmp/flr_v04_feedback_deep_status.json .flr/v04-feedback-deep-audit-status.json
-          git add .flr/d1-report-audit-status.json .flr/v04-feedback-deep-audit-status.json
+          cp /tmp/flr_v04_feedback_compact_status.json .flr/v04-feedback-compact-status.json
+          git add .flr/d1-report-audit-status.json .flr/v04-feedback-deep-audit-status.json .flr/v04-feedback-compact-status.json
           if git diff --cached --quiet; then
             echo 'AUDIT_STATUS_UNCHANGED'
             exit 0
