@@ -34,7 +34,7 @@ jobs:
         with:
           ref: 1e112838840805cae39a771688b0eb72c3d72f76
           path: cand
-          fetch-depth: 1
+          fetch-depth: 0
       - name: Verify validated candidate and production scope
         shell: bash
         run: |
