@@ -3,6 +3,10 @@ name: FLR User Match Test V0.4 Promote
 on:
   issues:
     types: [opened]
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v04-promote-trigger.json'
 
 permissions:
   contents: write
@@ -13,7 +17,7 @@ concurrency:
 
 jobs:
   promote:
-    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.4 HISTORICAL CLOSURE'
+    if: github.event_name == 'push' || github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.4 HISTORICAL CLOSURE'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
