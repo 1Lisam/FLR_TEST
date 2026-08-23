@@ -1,16 +1,18 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "TT-0.51-SHOOT-AUDIT-V2",
-  "candidateBranch": "tt051-shoot-audit-v2",
-  "baselineRef": "main",
+  "version": "HIST-CLOSURE-V04-REFINED",
+  "candidateBranch": "historical-closure-v04-candidate",
+  "baselineRef": "53c9a69bdc6a99608c167b5523b2f83dfb0fb25a",
   "applyScripts": [],
-  "validationScript": ".flr/tt051_shoot_audit_v2.js",
+  "validationScript": ".flr/historical_closure_v04_validation.js",
   "changedFiles": [
-    "runtime/continuous_match_core.js"
+    "step71_hybrid_v06_ui.js",
+    "full_time_presentation.js"
   ],
   "syntaxChecks": [
-    "runtime/continuous_match_core.js"
+    "step71_hybrid_v06_ui.js",
+    "full_time_presentation.js"
   ],
-  "resultDir": ".flr/qa-results/TT-0.51-shoot-audit-v2",
-  "runNonce": "2026-08-21T14:02+09:00-shoot-priority-100-corrected"
+  "resultDir": ".flr/qa-results/HIST-CLOSURE-V04-REFINED",
+  "runNonce": "2026-08-23T12:26+09:00-v21-historical-closure-refined"
 }
