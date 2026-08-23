@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "FLR_HISTORICAL_FIX_REQUEST_1.0",
+  "requestedAt": "2026-08-23T11:50:00+09:00",
+  "targetBranch": "historical-closure-v04-candidate",
+  "scope": ["restart-position visual speed discontinuity", "full-time walkoff pace +20%"],
+  "runNonce": "historical-fix-confirmed-20260823-1150"
+}
