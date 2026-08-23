@@ -1,0 +1,2 @@
+V21 refined historical closure audit trigger.
+Exact engine authority under test: 53c9a69bdc6a99608c167b5523b2f83dfb0fb25a
