@@ -1,3 +1,3 @@
 V21 refined historical closure audit trigger.
 Exact engine authority under test: 53c9a69bdc6a99608c167b5523b2f83dfb0fb25a
-Audit revision: 1.1 exact live action frame for TT-0.49 #9.
+Audit revision: 1.2 repeated-CARRY cadence discriminator.
