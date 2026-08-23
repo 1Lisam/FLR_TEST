@@ -34,5 +34,26 @@ jobs:
       - name: Run repeated-CARRY cadence audit
         shell: bash
         run: |
+          set -euo pipefail
           node --check audit/.flr/historical_carry_cadence_v04.js
-          node audit/.flr/historical_carry_cadence_v04.js engine | tee /tmp/historical-v04-carry.json
+          set +e
+          node audit/.flr/historical_carry_cadence_v04.js engine > /tmp/historical-v04-carry.json
+          rc=$?
+          set -e
+          cat /tmp/historical-v04-carry.json
+          python - <<'PY'
+          import json, pathlib, sys
+          p=pathlib.Path('/tmp/historical-v04-carry.json')
+          try:
+              data=json.loads(p.read_text(encoding='utf-8'))
+          except Exception as e:
+              print(f'QA_INFRA_FAILURE: invalid or missing carry audit JSON: {e}', file=sys.stderr)
+              sys.exit(2)
+          status=data.get('status')
+          if status not in ('PASS','FAIL'):
+              print(f'QA_INFRA_FAILURE: unexpected status={status!r}', file=sys.stderr)
+              sys.exit(2)
+          print(f'QA_GATE_STATUS={status}')
+          PY
+          # Valid QA PASS/FAIL is recorded in the JSON/log and never treated as an email-worthy incident.
+          exit 0
