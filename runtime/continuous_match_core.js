@@ -90,8 +90,8 @@ function setControlled(m,p,snap=true,receiveMeta=null){
     // into the attacking view instead of continuing a baseball-style chase through the ball.
     const incomingTravel=incomingSpeed>0.2?norm(Number(receiveMeta.incomingVx)||0,Number(receiveMeta.incomingVy)||0):moveVec;
     let touchVec;if(kind==='THROUGH'&&sp>0.75)touchVec=norm(moveVec.x*.78+goalVec.x*.22,moveVec.y*.78+goalVec.y*.22);else if(sp>0.45)touchVec=norm(moveVec.x*.62+incomingTravel.x*.20+goalVec.x*.18,moveVec.y*.62+incomingTravel.y*.20+goalVec.y*.18);else touchVec=norm(incomingTravel.x*.78+goalVec.x*.22,incomingTravel.y*.78+goalVec.y*.22);
-    const continuation=kind==='THROUGH'?2.75:kind==='CUTBACK'?1.20:kind==='LONG_PASS'?1.05:1.15;
-    p.tx=clamp(p.x+touchVec.x*continuation,1,104);p.ty=clamp(p.y+touchVec.y*continuation,1,67);p.tacticalTask='FIRST_TOUCH_FLOW';
+    const throughMomentum=kind==='THROUGH'&&sp>0.75,continuation=throughMomentum?clamp(sp*.92,4.2,5.8):kind==='THROUGH'?3.10:kind==='CUTBACK'?1.20:kind==='LONG_PASS'?1.05:1.15;
+    p.tx=clamp(p.x+touchVec.x*continuation,1,104);p.ty=clamp(p.y+touchVec.y*continuation,1,67);p.tacticalTask='FIRST_TOUCH_FLOW';p.sprint=throughMomentum;if(throughMomentum)p.receiveRunContinuationUntil=m.time+1.05;
     // Pre-contact scan opens the body between the incoming ball and the attacking view. Through
     // runners remain more run-facing; other receivers are visibly half-open before the first touch.
     const faceVec=kind==='THROUGH'&&sp>0.75?norm(moveVec.x*.70+goalVec.x*.30,moveVec.y*.70+goalVec.y*.30):norm(incomingFace.x*.44+goalVec.x*.56,incomingFace.y*.44+goalVec.y*.56);
@@ -102,7 +102,7 @@ function setControlled(m,p,snap=true,receiveMeta=null){
     // instantly ping-pong the ball again after 0.1~0.2s. Through-ball receivers still
     // decide fastest; aerial/pressured receptions need a little longer to settle.
     const pressure=nearestOppDistance(m,p),settle=delivery==='AERIAL'?(0.70+m.r()*0.22):pressure<1.55?(0.56+m.r()*0.20):kind==='THROUGH'?(0.34+m.r()*0.15):(0.53+m.r()*0.18);
-    p.lockTargetUntil=m.time+Math.min(settle,0.62);p.nextThink=m.time+settle;p.receiveFlowUntil=p.nextThink;
+    const flowTargetHold=throughMomentum?Math.max(1.05,settle):Math.min(settle,0.62);p.lockTargetUntil=m.time+flowTargetHold;p.nextThink=m.time+settle;p.receiveFlowUntil=m.time+flowTargetHold;
     m.stats.flowReceives=(m.stats.flowReceives||0)+1;if(delivery==='AERIAL')m.stats.flowAerialReceives=(m.stats.flowAerialReceives||0)+1;else m.stats.flowGroundReceives=(m.stats.flowGroundReceives||0)+1;
     m.stats.maxFlowReceiveDelay=Math.max(m.stats.maxFlowReceiveDelay||0,settle);
   }
@@ -329,7 +329,8 @@ function assignShape(m){
       const useIntended=!!m.ball.receiverIntentLock,px=clamp((useIntended?m.ball.intendedTargetX:m.ball.targetX)??p.x,1,104),py=clamp((useIntended?m.ball.intendedTargetY:m.ball.targetY)??p.y,1,67),q=worldToLocal(p.team,px,py);lx=q.x;ly=q.y;action=m.ball.kind==='THROUGH'?'CHASE_THROUGH':'RECEIVE';sprint=dist(p,{x:px,y:py})>2.2;
     }else if(p.role==='GK'){lx=clamp(6+progress*0.025,5,9);ly=lerp(34,ballLocalPoss.y,0.08);action='GK_SUPPORT';}
     else if(p.id===m.ball.ownerId){
-      if((p.lockTargetUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);lx=q.x;ly=q.y;action=p.action||'CARRY';sprint=p.sprint;}
+      if((p.receiveRunContinuationUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);lx=q.x;ly=q.y;action='FIRST_TOUCH_FLOW';sprint=true;}
+      else if((p.lockTargetUntil||0)>m.time){const q=worldToLocal(p.team,p.tx,p.ty);lx=q.x;ly=q.y;action=p.action||'CARRY';sprint=p.sprint;}
       else{const probe=forwardSpace(m,p,8),canProbe=p.role!=='GK'&&local.x<88&&probe>2.0;lx=canProbe?local.x+Math.min(1.15,probe*0.18):local.x;ly=canProbe?clamp(local.y+(34-local.y)*0.018,4,64):local.y;action=canProbe?'PROBE_WITH_BALL':'SCAN_WITH_BALL';sprint=false;}
     }else if((p.runUntil||0)>m.time){const q=worldToLocal(p.team,p.runTx,p.runTy);lx=q.x;ly=q.y;action=p.runType||'ATTACK_RUN';sprint=true;}
     else if(p.role==='ST'){
@@ -1159,6 +1160,8 @@ function choosePassDelivery(m,owner,target,kind,option,pd){
   return'GROUND';
 }
 function executePass(m,owner,target,kind,option=null,actionReason=null){
+  const npcPassDecision=!(m.protagonistExplicitActionRequired===true&&m.protagonistControllerId===owner.id);
+  if(npcPassDecision&&target){const ol=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,target.x,target.y),backward=tl.x<ol.x-4.0;if(backward){const sa=shotAssessment(m,owner),blockers=Array.isArray(sa.blockers)?sa.blockers.length:Number(sa.blockers||0),central=Math.abs(ol.y-34),bodyReady=!!sa.oneVOne||(!sa.turningRequired&&Number(sa.facingAlignment??1)>=.38),strongFinish=!!sa.inBox&&!!sa.openWindow&&blockers===0&&sa.dGoal<=18.5&&central<=12.5&&bodyReady&&['ST','WF','CM'].includes(owner.role);if(strongFinish){m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;return executeShot(m,owner,'STRONG_ATTACK_NO_HARMFUL_BACKPASS');}}}
   if(!target)return;const frontRoles=new Set(['ST','WF']),frontCombo=(kind==='PASS'||kind==='THROUGH')&&frontRoles.has(owner.role)&&frontRoles.has(target.role);if(frontCombo)m.frontPassChain[owner.team]=(m.frontPassChain[owner.team]||0)+1;else m.frontPassChain[owner.team]=0;m.stats.maxFrontPassChain=Math.max(m.stats.maxFrontPassChain,m.frontPassChain[owner.team]||0);
   const d=dist(owner,target),running=option?.running||(target.runUntil||0)>m.time,feetIntent=actionReason==='CANDIDATE_SAFE'||actionReason==='CANDIDATE_RECYCLE';let tp;
   if(kind==='THROUGH'&&running){tp=option?.lead?{x:option.lead.x,y:option.lead.y}:{x:target.runTx,y:target.runTy};}
@@ -2039,7 +2042,19 @@ function step(m,dt=m.dt){
 }
 
 function applyResolvedOwnerAction(m,owner,action){
-  if(!owner||!action)return false;
+  if(!owner||!action)return false;owner.receiveRunContinuationUntil=0;
+  const npcDecision=!(m.protagonistExplicitActionRequired===true&&m.protagonistControllerId===owner.id);
+  if(npcDecision&&action.type==='PASS'&&action.target){
+    const ol=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,action.target.x,action.target.y),backward=tl.x<ol.x-4.0;
+    if(backward){
+      const sa=shotAssessment(m,owner),blockers=Array.isArray(sa.blockers)?sa.blockers.length:Number(sa.blockers||0),central=Math.abs(ol.y-34),bodyReady=!!sa.oneVOne||(!sa.turningRequired&&Number(sa.facingAlignment??1)>=.38),strongFinish=!!sa.inBox&&!!sa.openWindow&&blockers===0&&sa.dGoal<=18.5&&central<=12.5&&bodyReady&&['ST','WF','CM'].includes(owner.role);
+      if(strongFinish){action={type:'SHOT',reason:'STRONG_ATTACK_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}
+      else{
+        const opts=passOptions(m,owner,true),runner=opts.filter(o=>o?.p?.role==='ST'&&!o.offsideRisk&&o.block===0&&o.open>=1.2&&o.forward>=2.5&&(o.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p?.tacticalTask))&&o.leadForward>=2.5).sort((a,b)=>b.leadForward-a.leadForward)[0]||null;
+        if(runner){action={type:'PASS',target:runner.p,kind:'THROUGH',option:runner,reason:'COMMITTED_RUNNER_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}
+      }
+    }
+  }
   owner.lastActionAt=m.time;owner.lastDecision=action.type;if(inOppPenaltyArea(owner.team,owner.x,owner.y)&&['ST','WF','CM'].includes(owner.role))m.stats.boxFinalActions++;
   if(action.type==='SHOT')executeShot(m,owner,action.reason||'GENERAL');
   else if(action.type==='DRAW_FOUL')executeDrawFoul(m,owner);

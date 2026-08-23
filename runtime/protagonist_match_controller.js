@@ -75,7 +75,7 @@ function create(seed='step40',opts={}){
   const heroPlayerId=opts.heroPlayerId||'H-ST',mode=normalizeMode(opts.mode||'PLAYER_ALL'),m=E.createMatch(seed,{telemetry:{focusPlayerId:heroPlayerId}});m.protagonistControllerId=heroPlayerId;
   if(A){for(const p of m.players)A.assign(m,p.id,A.baseProfile(60));if(opts.heroAbilityProfile)A.assign(m,heroPlayerId,opts.heroAbilityProfile);}
   if(M&&typeof M.init==='function')M.init(m,opts.managerProfiles||{HOME:'BALANCED',AWAY:'BALANCED'});
-  const s={version:VERSION,seed,m,heroPlayerId,mode,pending:null,lastPauseAt:-99,lastPauseControlledSince:-999,lastChoiceAt:-99,lastChoice:null,pauses:[],autoResolved:0,modeThreshold:MODES[mode].threshold,futureOutcomePrecomputed:false,replaySeconds:clamp(Number(opts.replaySeconds)||10,6,12),history:[],passReleases:[],lastPassReleaseSig:null,scenes:[],currentScene:null,resultTracker:null,lastResult:null,choiceHistory:[],forceNextChoice:false,forceFromSceneId:null,activeEpisode:null,episodeSeq:0,appearanceStatus:opts.appearanceStatus==='SUBSTITUTE'?'SUBSTITUTE':'STARTER',performance:{rating:6.5,recklessFailures:0,substitutionPressure:0,managerUsageTrustDelta:0,lastImpact:null,history:[]}};
+  const s={version:VERSION,seed,m,heroPlayerId,mode,pending:null,lastPauseAt:-99,lastPauseControlledSince:-999,lastChoiceAt:-99,lastChoice:null,carryContinuationGuard:null,pauses:[],autoResolved:0,modeThreshold:MODES[mode].threshold,futureOutcomePrecomputed:false,replaySeconds:clamp(Number(opts.replaySeconds)||10,6,12),history:[],passReleases:[],lastPassReleaseSig:null,scenes:[],currentScene:null,resultTracker:null,lastResult:null,choiceHistory:[],forceNextChoice:false,forceFromSceneId:null,activeEpisode:null,episodeSeq:0,appearanceStatus:opts.appearanceStatus==='SUBSTITUTE'?'SUBSTITUTE':'STARTER',performance:{rating:6.5,recklessFailures:0,substitutionPressure:0,managerUsageTrustDelta:0,lastImpact:null,history:[]}};
   pushHistory(s);return s;
 }
 function hero(s){return B().playerById(s.m,s.heroPlayerId);}
@@ -213,6 +213,16 @@ function onBallOptions(frame){
     if(out.length>=6){const ix=out.findIndex(o=>['HOLD','RECYCLE','CARRY','SAFE_PASS'].includes(o.id));if(ix>=0)out.splice(ix,1);}
     if(out.length<6){const c={id:'THROUGH_PASS',targetId:committedWide.p.id,targetName:`같은 팀 ${committedWide.p.slot}`,meta:{targetId:committedWide.p.id,targetSlot:committedWide.p.slot,runnerTask:committedWide.p.tacticalTask||null,leadForward:Number(committedWide.leadForward||0),physicalCommittedRun:true}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
   }
+  // V0.5 follow-up: an obviously open wide outlet is a PLAYER option even when it is
+  // slightly lateral/backward. NPC forward-progress preference may rank it low, but it must
+  // not erase a real winger with receiving space. Execution still re-checks live geometry,
+  // so a blocker may intercept it and no success outcome is preselected here.
+  const openWideOutlet=(frame?._frame?.opts||[]).filter(o=>o?.p&&o.p.role==='WF'&&o.d>=3&&o.d<=32&&o.block<=1&&o.open>=3.0&&o.forward>=-5.0&&!o.offsideRisk)
+    .sort((a,b)=>(b.open-a.open)+(b.forward-a.forward)*.05+(Number(b.running)-Number(a.running))*.35)[0]||null;
+  if(openWideOutlet&&!out.some(o=>o.family==='패스'&&o.targetId===openWideOutlet.p.id)){
+    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='CARRY'||o.id==='RECYCLE');if(ix>=0)out.splice(ix,1);}
+    if(out.length<6){const c={id:'AVAILABLE_PASS',targetId:openWideOutlet.p.id,targetName:`같은 팀 ${openWideOutlet.p.slot}`,meta:{targetId:openWideOutlet.p.id,targetSlot:openWideOutlet.p.slot,forward:Number(openWideOutlet.forward||0),d:Number(openWideOutlet.d||0),receiverPressure:Number(openWideOutlet.open||0),contested:openWideOutlet.block>0,laneBlockers:Number(openWideOutlet.block||0),offsideRisk:false,lateralOutlet:true}};const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
+  }
   // PLAYER risk floor: the raw live pass geometry, not NPC ranking, decides whether a risky
   // pass can be shown. One blocker / tight pressure / a marginal offside shoulder remains a
   // player choice; the live engine still decides interception or OFFSIDE after execution.
@@ -233,7 +243,7 @@ function onBallOptions(frame){
   // but must not erase it from a protagonist checkpoint while there is actual forward space.
   const physicalCarry=ranked.find(c=>c.id==='CARRY'&&Number(c.meta?.space??frame.space??0)>=0.75);
   if(physicalCarry&&!out.some(o=>o.id==='CARRY')){
-    if(out.length>=6){const ix=out.findIndex(o=>o.id==='HOLD'||o.id==='RECYCLE'||(o.id==='AVAILABLE_PASS'&&!o.meta?.offsideRisk&&!o.meta?.contested&&!(o.meta?.laneBlockers>0))||o.id==='SAFE_PASS');if(ix>=0)out.splice(ix,1);}
+    if(out.length>=6){const protectedCommittedId=committedWide?.p?.id||null;const ix=out.findIndex(o=>o.targetId!==protectedCommittedId&&(o.id==='HOLD'||o.id==='RECYCLE'||(o.id==='AVAILABLE_PASS'&&!o.meta?.offsideRisk&&!o.meta?.contested&&!(o.meta?.laneBlockers>0))||o.id==='SAFE_PASS'));if(ix>=0)out.splice(ix,1);}
     const row={id:'CARRY',targetId:null,targetName:null,family:'돌파',label:labelFor(physicalCarry),meta:physicalCarry.meta?deep(physicalCarry.meta):null};row.hint=tooltipFor(physicalCarry,frame);row.tooltip=row.hint;out.push(row);
   }
   if(ranked.some(c=>c.id==='HOLD')&&!out.some(c=>c.id==='HOLD')&&out.length<6){const c=ranked.find(x=>x.id==='HOLD'),row={id:'HOLD',targetId:null,targetName:null,family:'볼 유지',label:'볼 지키기'};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);}
@@ -321,6 +331,10 @@ function readyForDefPause(s,f,importance){if(f.kind!=='DEFENDING')return false;c
 function sanitizeFrameForScene(q){if(!q)return null;const f=q.frame||{};return{kind:f.kind,playerId:f.playerId,team:f.team,role:f.role,slot:f.slot,time:Number((f.time||0).toFixed(3)),localX:Number.isFinite(f.localX)?Number(f.localX.toFixed(3)):null,localY:Number.isFinite(f.localY)?Number(f.localY.toFixed(3)):null,pressure:Number.isFinite(f.pressure)?Number(f.pressure.toFixed(3)):null,space:Number.isFinite(f.space)?Number(f.space.toFixed(3)):null,held:Number.isFinite(f.held)?Number(f.held.toFixed(3)):null,shot:f.shot?deep(f.shot):null,distance:Number.isFinite(f.distance)?Number(f.distance.toFixed(3)):null,opponentId:f.opponentId||null,opponentName:f.opponentName||null,opponentAttackX:Number.isFinite(f.opponentAttackX)?Number(f.opponentAttackX.toFixed(3)):null,goalSideMargin:Number.isFinite(f.goalSideMargin)?Number(f.goalSideMargin.toFixed(3)):null,threatTarget:f.threatTarget?deep(f.threatTarget):null,threatShot:f.threatShot?deep(f.threatShot):null,eta:Number.isFinite(f.eta)?Number(f.eta.toFixed(3)):null,contactX:Number.isFinite(f.contactX)?Number(f.contactX.toFixed(3)):null,contactY:Number.isFinite(f.contactY)?Number(f.contactY.toFixed(3)):null,contactZ:Number.isFinite(f.contactZ)?Number(f.contactZ.toFixed(3)):null,incomingSpeed:Number.isFinite(f.incomingSpeed)?Number(f.incomingSpeed.toFixed(3)):null,flightKind:f.flightKind||null,sourceId:f.sourceId||null,candidates:(f.candidates||[]).map(c=>({id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,score:c.score,meta:c.meta?deep(c.meta):null}))};}
 function maybeCheckpoint(s){
   updateEpisodeState(s);const def=modeDef(s);if(s.pending||s.resultTracker||def.presentation==='SKIP'||s.m.completed||s.m.restart)return null;const q=inspect(s);
+  // V0.5.1 consolidated retest: keep one selected CARRY as one continuous movement
+  // intention instead of reopening another choice after 1.0-1.4s of tiny displacement.
+  // A materially new critical finishing state may still interrupt immediately.
+  if(s.carryContinuationGuard){const h=hero(s),g=s.carryContinuationGuard,heroOwn=!!h&&s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId,sameControl=heroOwn&&Math.abs(Number(h.controlledSince||0)-Number(g.controlledSince||0))<.001;if(!sameControl){s.carryContinuationGuard=null;}else{const age=s.m.time-g.startedAt,disp=Math.hypot(h.x-g.x,h.y-g.y),blockers=Array.isArray(q?.frame?.shot?.blockers)?q.frame.shot.blockers.length:Number(q?.frame?.shot?.blockers??99),critical=!!(q?.frame?.shot?.oneVOne||(q?.frame?.shot?.inBox&&q?.frame?.shot?.openWindow&&blockers<=1));if(critical||age>=2.2||disp>=3.0){s.carryContinuationGuard=null;}else{s.m.stats.userCarryContinuationCheckpointDeferrals=(s.m.stats.userCarryContinuationCheckpointDeferrals||0)+1;return null;}}}
   // V0.4 historical #5: if a chosen CARRY was physically stopped almost immediately by tight
   // pressure, the very next checkpoint must not offer the identical generic CARRY again.
   // This is a one-checkpoint semantic guard, not a time quota: passes/take-on/shot remain live,
@@ -548,6 +562,7 @@ function applyChoice(s,choiceId,targetId=null,inputMeta={}){
     res.inputSource=inputSource;res.requestedTargetId=opt.targetId||null;
     if(opt.targetId!=null&&(res.targetId||null)!==opt.targetId)return{ok:false,reason:'CHOICE_TARGET_RESOLUTION_MISMATCH',requestedTargetId:opt.targetId,resolvedTargetId:res.targetId||null};
     s.lastChoiceAt=s.m.time;s.lastChoice={at:Number(s.m.time.toFixed(2)),choice:opt.id,label:opt.label,targetId:opt.targetId||null,targetName:opt.targetName||null,family:opt.family||family(opt.id),kind:s.pending.kind,inputSource,futureOutcomePrecomputed:false};
+    if(opt.id==='CARRY'){const ch=hero(s);if(ch)s.carryContinuationGuard={startedAt:s.m.time,x:ch.x,y:ch.y,controlledSince:ch.controlledSince};}else s.carryContinuationGuard=null;
     const h=hero(s),pendingEpisode=s.pending?.episodeId||null;if(h){let ep=s.activeEpisode;if(!ep||ep.team!==h.team||s.m.time>(ep.hardUntil||ep.until||0))ep={id:pendingEpisode||`EP-${++s.episodeSeq}`,team:h.team,startedAt:s.m.time,hardUntil:s.m.time+20};ep.id=pendingEpisode||ep.id;ep.hardUntil=ep.hardUntil||ep.startedAt+20;ep.lastSceneId=s.currentScene?.sceneId||ep.lastSceneId;ep.lastChoiceAt=s.m.time;ep.until=Math.min(ep.hardUntil,s.m.time+7.0);ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
     if(s.currentScene)s.currentScene.choicePendingSnapshot=deep(s.pending);s.pending=null;beginResultTracker(s,opt,res,before);updateResultTracker(s);
   }
