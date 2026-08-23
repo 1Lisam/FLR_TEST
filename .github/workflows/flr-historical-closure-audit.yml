@@ -1,0 +1,48 @@
+name: FLR Historical Closure Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/historical-closure-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-historical-closure-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run historical closure audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check .flr/historical_closure_audit.js
+          node .flr/historical_closure_audit.js /tmp/historical-closure-status.json
+      - name: Record audit result
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          test -s /tmp/historical-closure-status.json || printf '{"schemaVersion":"FLR_HISTORICAL_CLOSURE_AUDIT_1.0","status":"FAILED_TO_RUN"}\n' > /tmp/historical-closure-status.json
+          git config user.name 'FLR Historical Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/historical-closure-status.json .flr/historical-closure-status.json
+          git add .flr/historical-closure-status.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record historical bug closure audit'
+          git push origin HEAD:main
