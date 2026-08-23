@@ -1,0 +1,2620 @@
+{
+  "schemaVersion": "FLR_V05_FOURTH_REPORT_INSPECT_1.0",
+  "reportId": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
+  "description": "공간 침투패스를 받은 후 그대로 달려나가는것이 정상이지만 공간 침투 패스를 달려가서 잡은 후 멈춰버림",
+  "bugReportContext": {
+    "reportId": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
+    "build": "USER-MATCH-TEST-V0.5",
+    "step": 78,
+    "description": "공간 침투패스를 받은 후 그대로 달려나가는것이 정상이지만 공간 침투 패스를 달려가서 잡은 후 멈춰버림",
+    "category": "패스/공격",
+    "priority": 3,
+    "reportedAt": "2026-08-23T10:02:33.756Z"
+  },
+  "current": {
+    "boundary": {
+      "id": "HW0009",
+      "type": "PROTAGONIST_2D_WINDOW",
+      "sceneId": "HW0009",
+      "atSecond": 3115.399999999885,
+      "sourceEventId": "PROMOTE-E00491",
+      "reason": "ATTACKING_INVOLVEMENT",
+      "heroPlayerId": "H-ST",
+      "heroRole": "ST",
+      "heroTeam": "HOME",
+      "protagonistPerformance": {
+        "rating": 6.5,
+        "recklessFailures": 0,
+        "substitutionPressure": 0,
+        "managerUsageTrustDelta": 0,
+        "lastImpact": null,
+        "history": []
+      },
+      "stateSnapshot": {
+        "second": 3115.399999999885,
+        "score": {
+          "HOME": 0,
+          "AWAY": 0
+        },
+        "possession": "HOME",
+        "zone": "FINAL_THIRD",
+        "phase": "FINAL_THIRD",
+        "danger": 0.21723965663621217,
+        "ball": {
+          "team": "HOME",
+          "lane": "CENTER",
+          "progress": 0.6591058709982318,
+          "ownerId": "H-ST"
+        },
+        "structure": {
+          "HOME": {
+            "midfieldOccupancy": 3,
+            "backLineOccupancy": 4,
+            "width": 56.42370016989298,
+            "lineHeight": 55,
+            "transitionDebt": 0.13181419878069617
+          },
+          "AWAY": {
+            "midfieldOccupancy": 3,
+            "backLineOccupancy": 4,
+            "width": 47.46174877858721,
+            "lineHeight": 45,
+            "transitionDebt": 0.08183883305450017
+          }
+        },
+        "spatial": {
+          "atSecond": 3115.399999999885,
+          "source": "V06_HANDOFF_EXACT",
+          "players": {
+            "H-GK": {
+              "id": "H-GK",
+              "x": 9.131925662306344,
+              "y": 33.99999634383986,
+              "vx": 0.029091631560521285,
+              "vy": 8.059073428918444e-07
+            },
+            "H-LB": {
+              "id": "H-LB",
+              "x": 28.126574126247114,
+              "y": 5.771619128455193,
+              "vx": 0.030271241325963722,
+              "vy": 0.0036437906959803407
+            },
+            "H-LCB": {
+              "id": "H-LCB",
+              "x": 25.126574341736568,
+              "y": 23.837780676633354,
+              "vx": 0.030271193826804068,
+              "vy": 0.0013122517028893047
+            },
+            "H-RCB": {
+              "id": "H-RCB",
+              "x": 25.127592128786716,
+              "y": 44.15839049606813,
+              "vx": 0.030046848605132022,
+              "vy": -0.0004682842846496068
+            },
+            "H-RB": {
+              "id": "H-RB",
+              "x": 28.126574164682474,
+              "y": 62.22837356023715,
+              "vx": 0.0302712328538673,
+              "vy": -0.0036421791045019142
+            },
+            "H-LCM": {
+              "id": "H-LCM",
+              "x": 66.47754963485417,
+              "y": 18.688605533133266,
+              "vx": 0.11516087079748973,
+              "vy": -0.10739999139798735
+            },
+            "H-CM": {
+              "id": "H-CM",
+              "x": 58.86439059334647,
+              "y": 33.999999826140886,
+              "vx": -0.19053288136022672,
+              "vy": 3.832281184453937e-08
+            },
+            "H-RCM": {
+              "id": "H-RCM",
+              "x": 66.34415743404134,
+              "y": 49.789292321961554,
+              "vx": 0.14456378259163014,
+              "vy": 0.0020595862293341888
+            },
+            "H-LW": {
+              "id": "H-LW",
+              "x": 73.75138374149994,
+              "y": 4.642485230999595,
+              "vx": 0.05480111936621971,
+              "vy": 0.0037892475267017494
+            },
+            "H-ST": {
+              "id": "H-ST",
+              "x": 64.17863041667708,
+              "y": 33.9999996842286,
+              "vx": -0.20192645095097614,
+              "vy": 3.569526358303067e-07
+            },
+            "H-RW": {
+              "id": "H-RW",
+              "x": 73.75138371334256,
+              "y": 63.35750745975706,
+              "vx": 0.054801125572796296,
+              "vy": -0.0037876363902488003
+            },
+            "A-GK": {
+              "id": "A-GK",
+              "x": 100.96985653718596,
+              "y": 33.99999634231041,
+              "vx": 0.00664435831248105,
+              "vy": 8.062444710584973e-07
+            },
+            "A-LB": {
+              "id": "A-LB",
+              "x": 83.12648243053303,
+              "y": 57.751427931733225,
+              "vx": 0.030291453309694866,
+              "vy": -0.004530504720117433
+            },
+            "A-LCB": {
+              "id": "A-LCB",
+              "x": 86.12649931725582,
+              "y": 42.55051318779732,
+              "vx": 0.030287731061938366,
+              "vy": -0.0016307904530563633
+            },
+            "A-RCB": {
+              "id": "A-RCB",
+              "x": 86.12649927658242,
+              "y": 25.449479750287306,
+              "vx": 0.030287740027353443,
+              "vy": 0.0016323470723601677
+            },
+            "A-RB": {
+              "id": "A-RB",
+              "x": 83.12649946804086,
+              "y": 10.24856035457723,
+              "vx": 0.030287697825215787,
+              "vy": 0.004533086704508804
+            },
+            "A-LCM": {
+              "id": "A-LCM",
+              "x": 63.12612253054919,
+              "y": 47.30080046777425,
+              "vx": 0.030370784090770542,
+              "vy": -0.0025372647147230104
+            },
+            "A-CM": {
+              "id": "A-CM",
+              "x": 63.12611187002667,
+              "y": 33.99999898433627,
+              "vx": 0.03037313393132633,
+              "vy": 2.238771900562954e-07
+            },
+            "A-RCM": {
+              "id": "A-RCM",
+              "x": 63.12612565002941,
+              "y": 20.699192584056142,
+              "vx": 0.030370096480843194,
+              "vy": 0.0025387962616701793
+            },
+            "A-LW": {
+              "id": "A-LW",
+              "x": 43.12649165913936,
+              "y": 58.70146790079725,
+              "vx": 0.030289419098580645,
+              "vy": -0.004707945024002973
+            },
+            "A-ST": {
+              "id": "A-ST",
+              "x": 38.12617366672463,
+              "y": 33.99999991521722,
+              "vx": 0.030359512423864032,
+              "vy": 1.868820374641343e-08
+            },
+            "A-RW": {
+              "id": "A-RW",
+              "x": 43.12649575663236,
+              "y": 9.29850333945508,
+              "vx": 0.03028851591065416,
+              "vy": 0.004714284377571281
+            }
+          },
+          "ball": {
+            "x": 64.17863041667708,
+            "y": 33.9999996842286,
+            "ownerId": "H-ST"
+          }
+        }
+      },
+      "preContext": [
+        {
+          "id": "E00482",
+          "t": 3059.399999999885,
+          "minute": 50.99,
+          "kind": "TURNOVER_DANGER",
+          "team": "HOME",
+          "zone": "OWN_THIRD",
+          "phase": "TRANSITION",
+          "detail": {
+            "actorId": "H-LCM",
+            "actorRole": "CM",
+            "wonFrom": "AWAY",
+            "progress": 0.08,
+            "danger": 0.5858321874570102
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.586,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.08,
+              "ownerId": "H-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 46.8239238767419,
+                "lineHeight": 45,
+                "transitionDebt": 0.25686583624371717
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 55.69375652819872,
+                "lineHeight": 55,
+                "transitionDebt": 0.28335201076924
+              }
+            }
+          }
+        },
+        {
+          "id": "E00483",
+          "t": 3067.399999999885,
+          "minute": 51.12,
+          "kind": "RECYCLE",
+          "team": "HOME",
+          "zone": "OWN_THIRD",
+          "phase": "BUILD_UP",
+          "detail": {
+            "actorId": "H-RCB",
+            "actorRole": "CB",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.10604883722797967,
+            "lane": "CENTER",
+            "danger": 0.05
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.05,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.10604883722797967,
+              "ownerId": "H-RCB"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 54.524673990672454,
+                "lineHeight": 52.342762572690845,
+                "transitionDebt": 0.3901434020954764
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 46.038935407297686,
+                "lineHeight": 47.54798415675759,
+                "transitionDebt": 0.3928334477538528
+              }
+            }
+          }
+        },
+        {
+          "id": "E00484",
+          "t": 3074.399999999885,
+          "minute": 51.24,
+          "kind": "PROGRESS",
+          "team": "HOME",
+          "zone": "OWN_THIRD",
+          "phase": "BUILD_UP",
+          "detail": {
+            "actorId": "H-RCB",
+            "actorRole": "CB",
+            "targetId": "H-RCM",
+            "targetRole": "CM",
+            "progress": 0.2616616174466908,
+            "lane": "CENTER",
+            "danger": 0.05
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.05,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.2616616174466908,
+              "ownerId": "H-RCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.46463745762594,
+                "lineHeight": 55,
+                "transitionDebt": 0.30610324950874296
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 46.12726457626559,
+                "lineHeight": 45,
+                "transitionDebt": 0.291660082382774
+              }
+            }
+          }
+        },
+        {
+          "id": "E00485",
+          "t": 3083.399999999885,
+          "minute": 51.39,
+          "kind": "PROGRESS",
+          "team": "HOME",
+          "zone": "MIDFIELD",
+          "phase": "PROGRESSION",
+          "detail": {
+            "actorId": "H-RCM",
+            "actorRole": "CM",
+            "targetId": "H-LCM",
+            "targetRole": "CM",
+            "progress": 0.40345179573190404,
+            "lane": "CENTER",
+            "danger": 0.05
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.05,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.40345179573190404,
+              "ownerId": "H-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 55.14723533927463,
+                "lineHeight": 55,
+                "transitionDebt": 0.24559433964629493
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 48.44596176198684,
+                "lineHeight": 45,
+                "transitionDebt": 0.21881525931559728
+              }
+            }
+          }
+        },
+        {
+          "id": "E00486",
+          "t": 3088.399999999885,
+          "minute": 51.47,
+          "kind": "PROGRESS",
+          "team": "HOME",
+          "zone": "MIDFIELD",
+          "phase": "PROGRESSION",
+          "detail": {
+            "actorId": "H-CM",
+            "actorRole": "CM",
+            "targetId": "H-LCM",
+            "targetRole": "CM",
+            "progress": 0.5443319261563011,
+            "lane": "CENTER",
+            "danger": 0.10640506001468754
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.106,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.5443319261563011,
+              "ownerId": "H-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.696423317771405,
+                "lineHeight": 55,
+                "transitionDebt": 0.20202792454533233
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 45.50116555043496,
+                "lineHeight": 45,
+                "transitionDebt": 0.16636698670723002
+              }
+            }
+          }
+        },
+        {
+          "id": "E00487",
+          "t": 3096.399999999885,
+          "minute": 51.61,
+          "kind": "RECYCLE",
+          "team": "HOME",
+          "zone": "MIDFIELD",
+          "phase": "PROGRESSION",
+          "detail": {
+            "actorId": "H-LCM",
+            "actorRole": "CM",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.5850114858832677,
+            "lane": "CENTER",
+            "danger": 0.12615986806890006
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.126,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.5850114858832677,
+              "ownerId": "H-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 57.41054626391269,
+                "lineHeight": 55,
+                "transitionDebt": 0.17066010567263928
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 45.891154180746526,
+                "lineHeight": 45,
+                "transitionDebt": 0.1286042304292056
+              }
+            }
+          }
+        },
+        {
+          "id": "E00488",
+          "t": 3108.399999999885,
+          "minute": 51.81,
+          "kind": "RECYCLE",
+          "team": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "detail": {
+            "actorId": "H-CM",
+            "actorRole": "CM",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.6285851584796329,
+            "lane": "CENTER",
+            "danger": 0.296356958566513
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.296,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.6285851584796329,
+              "ownerId": "H-CM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.584842502838,
+                "lineHeight": 55,
+                "transitionDebt": 0.14807527608430027
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 48.116179714910686,
+                "lineHeight": 45,
+                "transitionDebt": 0.10141504590902803
+              }
+            }
+          }
+        },
+        {
+          "id": "E00489",
+          "t": 3115.399999999885,
+          "minute": 51.92,
+          "kind": "RECYCLE",
+          "team": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "detail": {
+            "actorId": "H-ST",
+            "actorRole": "ST",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.6591058709982318,
+            "lane": "CENTER",
+            "danger": 0.21723965663621217
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.217,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.6591058709982318,
+              "ownerId": "H-ST"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.42370016989298,
+                "lineHeight": 55,
+                "transitionDebt": 0.13181419878069617
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.46174877858721,
+                "lineHeight": 45,
+                "transitionDebt": 0.08183883305450017
+              }
+            }
+          }
+        }
+      ],
+      "futureOutcomePrecomputed": false,
+      "choicePrecomputed": false
+    },
+    "highResolutionKeys": [
+      "legacyVersion",
+      "entrySnapshot",
+      "searchSeconds",
+      "preActionSpan",
+      "preActionFrames",
+      "decision",
+      "selectedChoice",
+      "choiceSteps",
+      "applyReceipt",
+      "postActionFrames",
+      "actualEvents",
+      "actualResult",
+      "actualResults",
+      "episodeFrames"
+    ],
+    "decision": {
+      "at": 3117,
+      "kind": "ON_BALL",
+      "selected": null,
+      "options": [
+        {
+          "id": "THROUGH_PASS",
+          "targetId": "H-LW",
+          "label": "공간 침투 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "leadForward": 11.286955267254385,
+            "offsideRisk": false,
+            "offsideMargin": 0,
+            "runnerTask": "FAR_SIDE_RUN",
+            "running": true,
+            "leadX": 81.603,
+            "leadY": 22.193,
+            "targetSlot": "LW"
+          }
+        },
+        {
+          "id": "SWITCH_PASS",
+          "targetId": "H-LW",
+          "label": "전환 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "targetSlot": "LW"
+          }
+        },
+        {
+          "id": "SHOT",
+          "targetId": null,
+          "label": "중거리 슛",
+          "meta": {
+            "dGoal": 34.68385401803326,
+            "inBox": false,
+            "oneVOne": false,
+            "openWindow": false,
+            "longRange": true,
+            "turningRequired": false,
+            "backToGoal": false,
+            "facingAlignment": 0.9999999691685786
+          }
+        },
+        {
+          "id": "THROUGH_PASS",
+          "targetId": "H-RW",
+          "label": "공간 침투 패스 → 같은 팀 RW",
+          "meta": {
+            "targetId": "H-RW",
+            "targetSlot": "RW",
+            "runLead": true,
+            "leadX": 81.595,
+            "leadY": 45.805,
+            "leadForward": 11.279,
+            "receiverTravel": 12.237,
+            "receiverPressure": 1.311,
+            "leadOpen": 4.241,
+            "leadBlockers": 0,
+            "runnerTask": "FAR_SIDE_RUN"
+          }
+        },
+        {
+          "id": "AVAILABLE_PASS",
+          "targetId": "H-RW",
+          "label": "전진 패스 → 같은 팀 RW",
+          "meta": {
+            "targetId": "H-RW",
+            "targetSlot": "RW",
+            "forward": 6.925019482830038,
+            "d": 24.26348014452012,
+            "receiverPressure": 1.3106920341538086,
+            "contested": true,
+            "laneBlockers": 0,
+            "offsideRisk": false,
+            "offsideMargin": 0
+          }
+        },
+        {
+          "id": "LOFTED_THROUGH_PASS",
+          "targetId": "H-LW",
+          "label": "로빙 침투 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "leadForward": 11.286955267254385,
+            "offsideRisk": false,
+            "offsideMargin": 0,
+            "runnerTask": "FAR_SIDE_RUN",
+            "running": true,
+            "leadX": 81.603,
+            "leadY": 22.193,
+            "targetSlot": "LW",
+            "deliveryMode": "AERIAL",
+            "trajectory": "LOFTED_THROUGH"
+          }
+        },
+        {
+          "id": "CARRY",
+          "targetId": null,
+          "label": "공간 전진",
+          "meta": {
+            "space": 13,
+            "pressure": 1.782075675209745,
+            "clearRunway": true
+          }
+        }
+      ]
+    },
+    "actualResult": {
+      "sceneId": "STEP40-1",
+      "at": 3121.9,
+      "choiceId": "THROUGH_PASS",
+      "label": "공간 침투 패스 → 같은 팀 LW",
+      "targetId": "H-LW",
+      "targetName": "같은 팀 LW",
+      "family": "패스",
+      "selectedChoice": {
+        "id": "THROUGH_PASS",
+        "label": "공간 침투 패스 → 같은 팀 LW",
+        "targetId": "H-LW",
+        "targetName": "같은 팀 LW"
+      },
+      "code": "POSSESSION_KEPT",
+      "headline": "공간 침투 패스 → 같은 팀 LW → 공격 지속",
+      "detail": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다. → 블루팀 LW이 레드팀 RCB을 상대로 돌파를 시도합니다. → 블루팀 LW의 돌파 과정에서 공이 흘렀습니다. → 블루팀 LW이 블루팀 LCM 쪽으로 강한 지상 패스했습니다.",
+      "terminalEvent": null,
+      "events": [
+        {
+          "t": 3116.9999999998836,
+          "type": "PASS",
+          "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다.",
+          "actorId": "H-ST",
+          "team": "HOME",
+          "targetId": "H-LW",
+          "passKind": "THROUGH"
+        },
+        {
+          "t": 3119.2999999998815,
+          "type": "TAKE_ON",
+          "text": "블루팀 LW이 레드팀 RCB을 상대로 돌파를 시도합니다."
+        },
+        {
+          "t": 3119.999999999881,
+          "type": "TAKE_ON_LOOSE",
+          "text": "블루팀 LW의 돌파 과정에서 공이 흘렀습니다."
+        },
+        {
+          "t": 3120.69999999988,
+          "type": "PASS",
+          "text": "블루팀 LW이 블루팀 LCM 쪽으로 강한 지상 패스했습니다.",
+          "actorId": "H-LW",
+          "team": "HOME",
+          "targetId": "H-LCM",
+          "passKind": "PASS"
+        }
+      ],
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      },
+      "possession": "HOME",
+      "performanceImpact": {
+        "at": 3121.9,
+        "appearanceStatus": "STARTER",
+        "choiceId": "THROUGH_PASS",
+        "resultCode": "POSSESSION_KEPT",
+        "reckless": false,
+        "saferOption": {
+          "id": "PROGRESSIVE_PASS",
+          "targetId": "H-LW",
+          "targetName": "블루팀 LW",
+          "score": 4.925
+        },
+        "chosenScore": 5.532,
+        "ratingDelta": 0,
+        "rating": 6.5,
+        "substitutionPressureDelta": 0,
+        "substitutionPressure": 0,
+        "managerUsageTrustDelta": 0,
+        "managerUsageTrustTotal": 0,
+        "reason": "NO_PENALTY"
+      }
+    },
+    "events": [
+      {
+        "t": 3116.9999999998836,
+        "type": "PASS",
+        "actorId": "H-ST",
+        "targetId": "H-LW",
+        "team": "HOME",
+        "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 3116.9999999998836,
+        "type": "USER_CHOICE",
+        "actorId": null,
+        "targetId": null,
+        "team": null,
+        "text": "H-ST: THROUGH_PASS -> H-LW",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 3120.69999999988,
+        "type": "PASS",
+        "actorId": "H-LW",
+        "targetId": "H-LCM",
+        "team": "HOME",
+        "text": "블루팀 LW이 블루팀 LCM 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 3124.399999999877,
+        "type": "PASS",
+        "actorId": "H-LCM",
+        "targetId": "H-RW",
+        "team": "HOME",
+        "text": "블루팀 LCM이 블루팀 RW 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 3128.0999999998735,
+        "type": "PASS",
+        "actorId": "H-RW",
+        "targetId": "H-RCM",
+        "team": "HOME",
+        "text": "블루팀 RW이 블루팀 RCM 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 3129.899999999872,
+        "type": "PASS",
+        "actorId": "H-RCM",
+        "targetId": "H-ST",
+        "team": "HOME",
+        "text": "블루팀 RCM이 블루팀 ST 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      }
+    ],
+    "frames": {
+      "preActionFrames": {
+        "count": 16,
+        "start": 3115.5,
+        "end": 3117,
+        "samples": [
+          {
+            "t": 3115.5,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 64.401,
+              "y": 33.993,
+              "vx": 2.222,
+              "vy": -0.065,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": 8.812217105895415e-10
+            },
+            "heroSpeed": 2.223,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 64.821,
+              "y": 33.993,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.42
+          },
+          {
+            "t": 3115.9,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 65.818,
+              "y": 33.986,
+              "vx": 4.33,
+              "vy": 0.003,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": 0.0007334350747624782
+            },
+            "heroSpeed": 4.33,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 66.238,
+              "y": 33.986,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.42
+          },
+          {
+            "t": 3116.3,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 67.431,
+              "y": 33.986,
+              "vx": 3.736,
+              "vy": 0,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": -3.188041761693249e-05
+            },
+            "heroSpeed": 3.736,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 67.851,
+              "y": 33.986,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.42
+          },
+          {
+            "t": 3116.7,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 69.087,
+              "y": 33.986,
+              "vx": 4.274,
+              "vy": 0,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": 3.7815016395059595e-05
+            },
+            "heroSpeed": 4.274,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 69.507,
+              "y": 33.986,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.42
+          },
+          {
+            "t": 3117,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 70.316,
+              "y": 33.987,
+              "vx": 4.273,
+              "vy": 0,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": 3.7683278777843365e-05
+            },
+            "heroSpeed": 4.273,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 70.736,
+              "y": 33.987,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.42
+          }
+        ]
+      },
+      "postActionFrames": {
+        "count": 131,
+        "start": 3117.1,
+        "end": 3130.1,
+        "samples": [
+          {
+            "t": 3117.1,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 70.743,
+              "y": 33.987,
+              "vx": 4.273,
+              "vy": 0,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": 3.775306113787691e-05
+            },
+            "heroSpeed": 4.273,
+            "ball": {
+              "mode": "FLIGHT",
+              "x": 71.756,
+              "y": 32.655,
+              "z": 0,
+              "vx": 9.678,
+              "vy": -12.634,
+              "ownerId": null,
+              "intendedReceiverId": "H-LW",
+              "kind": "THROUGH",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 1.673
+          },
+          {
+            "t": 3120.3,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 81.572,
+              "y": 38.511,
+              "vx": 2.866,
+              "vy": -0.754,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": -0.7305283759162526
+            },
+            "heroSpeed": 2.964,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 83.563,
+              "y": 19.228,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 19.386
+          },
+          {
+            "t": 3123.6,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 80.243,
+              "y": 37.802,
+              "vx": -1.862,
+              "vy": 0.03,
+              "action": "PIN_AND_RUN",
+              "tacticalTask": "PIN_AND_RUN",
+              "bodyAngle": 3.030945549995028
+            },
+            "heroSpeed": 1.862,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 69.553,
+              "y": 25.914,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LCM",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 15.988
+          },
+          {
+            "t": 3126.9,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 80.435,
+              "y": 34.064,
+              "vx": 4.053,
+              "vy": 0.535,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 6.414504016537827
+            },
+            "heroSpeed": 4.088,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 83.153,
+              "y": 50.445,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-RW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 16.605
+          },
+          {
+            "t": 3130.1,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 84.751,
+              "y": 30.218,
+              "vx": -2.71,
+              "vy": -0.452,
+              "action": "MOVE_TO_RECEIVE",
+              "tacticalTask": "PIN_AND_RUN",
+              "bodyAngle": 3.306875922241264
+            },
+            "heroSpeed": 2.747,
+            "ball": {
+              "mode": "FLIGHT",
+              "x": 74.715,
+              "y": 39.952,
+              "z": 0,
+              "vx": 9.799,
+              "vy": -9.681,
+              "ownerId": null,
+              "intendedReceiverId": "H-ST",
+              "kind": "PASS",
+              "lastTouchPlayer": "H-RCM"
+            },
+            "heroBallDistance": 13.981
+          }
+        ]
+      },
+      "episodeFrames": {
+        "count": 147,
+        "start": 3115.5,
+        "end": 3130.1,
+        "samples": [
+          {
+            "t": 3115.5,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 64.401,
+              "y": 33.993,
+              "vx": 2.222,
+              "vy": -0.065,
+              "action": "CARRY_SCAN",
+              "tacticalTask": "CARRY_SCAN",
+              "bodyAngle": 8.812217105895415e-10
+            },
+            "heroSpeed": 2.223,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 64.821,
+              "y": 33.993,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.42
+          },
+          {
+            "t": 3119.1,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 79.269,
+              "y": 40.102,
+              "vx": 2.391,
+              "vy": 0.938,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 0.09276569741455476
+            },
+            "heroSpeed": 2.568,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 81.187,
+              "y": 19.769,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 20.423
+          },
+          {
+            "t": 3122.8,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 81.17,
+              "y": 37.932,
+              "vx": -2.404,
+              "vy": 0.558,
+              "action": "PIN_AND_RUN",
+              "tacticalTask": "PIN_AND_RUN",
+              "bodyAngle": 2.9136804576727657
+            },
+            "heroSpeed": 2.468,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 68.196,
+              "y": 25.273,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LCM",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 18.127
+          },
+          {
+            "t": 3126.5,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 78.828,
+              "y": 34.081,
+              "vx": 3.42,
+              "vy": -1.078,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 6.312800415910376
+            },
+            "heroSpeed": 3.586,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 82.654,
+              "y": 50.434,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-RW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 16.795
+          },
+          {
+            "t": 3130.1,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 84.751,
+              "y": 30.218,
+              "vx": -2.71,
+              "vy": -0.452,
+              "action": "MOVE_TO_RECEIVE",
+              "tacticalTask": "PIN_AND_RUN",
+              "bodyAngle": 3.306875922241264
+            },
+            "heroSpeed": 2.747,
+            "ball": {
+              "mode": "FLIGHT",
+              "x": 74.715,
+              "y": 39.952,
+              "z": 0,
+              "vx": 9.799,
+              "vy": -9.681,
+              "ownerId": null,
+              "intendedReceiverId": "H-ST",
+              "kind": "PASS",
+              "lastTouchPlayer": "H-RCM"
+            },
+            "heroBallDistance": 13.981
+          }
+        ]
+      }
+    }
+  },
+  "previous": {
+    "boundary": {
+      "id": "HW0008",
+      "type": "PROTAGONIST_2D_WINDOW",
+      "sceneId": "HW0008",
+      "atSecond": 2972.3999999999114,
+      "sourceEventId": "PROMOTE-E00461",
+      "reason": "ATTACKING_INVOLVEMENT",
+      "heroPlayerId": "H-ST",
+      "heroRole": "ST",
+      "heroTeam": "HOME",
+      "protagonistPerformance": {
+        "rating": 6.5,
+        "recklessFailures": 0,
+        "substitutionPressure": 0,
+        "managerUsageTrustDelta": 0,
+        "lastImpact": null,
+        "history": []
+      },
+      "stateSnapshot": {
+        "second": 2972.3999999999114,
+        "score": {
+          "HOME": 0,
+          "AWAY": 0
+        },
+        "possession": "HOME",
+        "zone": "FINAL_THIRD",
+        "phase": "TRANSITION",
+        "danger": 0.3446533695801045,
+        "ball": {
+          "team": "HOME",
+          "lane": "CENTER",
+          "progress": 0.6854815784294624,
+          "ownerId": "H-LCM"
+        },
+        "structure": {
+          "HOME": {
+            "midfieldOccupancy": 3,
+            "backLineOccupancy": 4,
+            "width": 45.84783558663912,
+            "lineHeight": 45,
+            "transitionDebt": 0.1399848807523426
+          },
+          "AWAY": {
+            "midfieldOccupancy": 3,
+            "backLineOccupancy": 4,
+            "width": 55.022872189758345,
+            "lineHeight": 55,
+            "transitionDebt": 0.17122775477127358
+          }
+        },
+        "spatial": {
+          "atSecond": 2972.3999999999114,
+          "source": "V06_HANDOFF_EXACT",
+          "players": {
+            "H-GK": {
+              "id": "H-GK",
+              "x": 10.92999818744432,
+              "y": 33.99999999999999,
+              "vx": 0.07746213662425845,
+              "vy": 1.4210854715202005e-15
+            },
+            "H-LB": {
+              "id": "H-LB",
+              "x": 29.929998187444664,
+              "y": 12.347736633218497,
+              "vx": 0.0774621366241938,
+              "vy": 0.10657439825549098
+            },
+            "H-LCB": {
+              "id": "H-LCB",
+              "x": 26.929998187444664,
+              "y": 26.20518518795865,
+              "vx": 0.0774621366241938,
+              "vy": 0.03836678337197839
+            },
+            "H-RCB": {
+              "id": "H-RCB",
+              "x": 26.929998187444664,
+              "y": 41.79481481204135,
+              "vx": 0.0774621366241938,
+              "vy": -0.038366783371976965
+            },
+            "H-RB": {
+              "id": "H-RB",
+              "x": 29.92999818744467,
+              "y": 55.652263366781554,
+              "vx": 0.07746213662419307,
+              "vy": -0.10657439825550057
+            },
+            "H-LCM": {
+              "id": "H-LCM",
+              "x": 64.58659524261894,
+              "y": 33.430501551452984,
+              "vx": 0.5379046057440633,
+              "vy": 0.42948533940306105
+            },
+            "H-CM": {
+              "id": "H-CM",
+              "x": 49.952984330907725,
+              "y": 34,
+              "vx": 0.07310518649769335,
+              "vy": 0
+            },
+            "H-RCM": {
+              "id": "H-RCM",
+              "x": 49.99591481842297,
+              "y": 46.10879262175427,
+              "vx": 0.06496784961423714,
+              "vy": -0.05655890520376374
+            },
+            "H-LW": {
+              "id": "H-LW",
+              "x": 69.93465343422693,
+              "y": 11.481646098547184,
+              "vx": 0.07657974945518334,
+              "vy": 0.11083737418572107
+            },
+            "H-ST": {
+              "id": "H-ST",
+              "x": 74.96026866884411,
+              "y": 34,
+              "vx": 0.07172446349192114,
+              "vy": 0
+            },
+            "H-RW": {
+              "id": "H-RW",
+              "x": 69.93465343422689,
+              "y": 56.51835390145269,
+              "vx": 0.07657974945519186,
+              "vy": -0.11083737418569654
+            },
+            "A-GK": {
+              "id": "A-GK",
+              "x": 102,
+              "y": 33.99999999999994,
+              "vx": 0.01016310223126311,
+              "vy": 9.947598300641402e-15
+            },
+            "A-LB": {
+              "id": "A-LB",
+              "x": 84.62576072038323,
+              "y": 60.08202209515598,
+              "vx": 0.059310654159497746,
+              "vy": -0.14623553082711993
+            },
+            "A-LCB": {
+              "id": "A-LCB",
+              "x": 87.62576072038318,
+              "y": 43.38952795425605,
+              "vx": 0.05931065415950343,
+              "vy": -0.05264479109774527
+            },
+            "A-RCB": {
+              "id": "A-RCB",
+              "x": 82.26554614794209,
+              "y": 27.076807978451,
+              "vx": 1.0753222176914563,
+              "vy": -0.41484131292281745
+            },
+            "A-RB": {
+              "id": "A-RB",
+              "x": 84.62576072038323,
+              "y": 7.9179779048440055,
+              "vx": 0.059310654159497746,
+              "vy": 0.1462355308271217
+            },
+            "A-LCM": {
+              "id": "A-LCM",
+              "x": 66.41240801359915,
+              "y": 47.39182495952932,
+              "vx": -0.2793426376682902,
+              "vy": 0.1482382878398795
+            },
+            "A-CM": {
+              "id": "A-CM",
+              "x": 64.62604256178027,
+              "y": 34,
+              "vx": 0.0592572320222672,
+              "vy": 0
+            },
+            "A-RCM": {
+              "id": "A-RCM",
+              "x": 65.20176535974558,
+              "y": 19.803834210403576,
+              "vx": -0.04986918674632932,
+              "vy": 0.0042219492130740836
+            },
+            "A-LW": {
+              "id": "A-LW",
+              "x": 44.625760721003616,
+              "y": 61.12530297852431,
+              "vx": 0.0593106540419015,
+              "vy": -0.15208495197719998
+            },
+            "A-ST": {
+              "id": "A-ST",
+              "x": 39.625760723096214,
+              "y": 34.00000000003963,
+              "vx": 0.05931065364525523,
+              "vy": -7.510436716984259e-12
+            },
+            "A-RW": {
+              "id": "A-RW",
+              "x": 44.62576072038329,
+              "y": 6.874697021037696,
+              "vx": 0.059310654159483535,
+              "vy": 0.1520849520602205
+            }
+          },
+          "ball": {
+            "x": 64.58659524261894,
+            "y": 33.430501551452984,
+            "ownerId": "H-LCM"
+          }
+        }
+      },
+      "preContext": [
+        {
+          "id": "E00452",
+          "t": 2914.3999999999114,
+          "minute": 48.57,
+          "kind": "RECYCLE",
+          "team": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "detail": {
+            "actorId": "H-LCM",
+            "actorRole": "CM",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.7803866793648341,
+            "lane": "CENTER",
+            "danger": 0.38709779891353113
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.387,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.7803866793648341,
+              "ownerId": "H-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 57.444897134555504,
+                "lineHeight": 51.60267922282219,
+                "transitionDebt": 0.345009688654201
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.85624684416689,
+                "lineHeight": 41.28948531486094,
+                "transitionDebt": 0.32823481090886114
+              }
+            }
+          }
+        },
+        {
+          "id": "E00453",
+          "t": 2926.3999999999114,
+          "minute": 48.77,
+          "kind": "RECYCLE",
+          "team": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "detail": {
+            "actorId": "H-RCM",
+            "actorRole": "CM",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.8042475530002268,
+            "lane": "CENTER",
+            "danger": 0.48064586021676675
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.481,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.8042475530002268,
+              "ownerId": "H-RCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 54.75501450547017,
+                "lineHeight": 55,
+                "transitionDebt": 0.2736069758310247
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 46.81804881780408,
+                "lineHeight": 45,
+                "transitionDebt": 0.24514906385438
+              }
+            }
+          }
+        },
+        {
+          "id": "E00454",
+          "t": 2936.3999999999114,
+          "minute": 48.94,
+          "kind": "PROGRESS",
+          "team": "HOME",
+          "zone": "BOX",
+          "phase": "CHANCE",
+          "detail": {
+            "actorId": "H-LCM",
+            "actorRole": "CM",
+            "targetId": "H-ST",
+            "targetRole": "ST",
+            "progress": 0.9518958206819372,
+            "lane": "CENTER",
+            "danger": 0.5464090093862268
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.546,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.9518958206819372,
+              "ownerId": "H-ST"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 55.035523576661944,
+                "lineHeight": 55,
+                "transitionDebt": 0.2221970225983378
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 45.66837314446457,
+                "lineHeight": 45,
+                "transitionDebt": 0.18532732597515358
+              }
+            }
+          }
+        },
+        {
+          "id": "E00455",
+          "t": 2942.3999999999114,
+          "minute": 49.04,
+          "kind": "TURNOVER_DANGER",
+          "team": "AWAY",
+          "zone": "OWN_THIRD",
+          "phase": "TRANSITION",
+          "detail": {
+            "actorId": "A-LCM",
+            "actorRole": "CM",
+            "wonFrom": "HOME",
+            "progress": 0.08,
+            "danger": 0.5680138532736806
+          },
+          "context": {
+            "possession": "AWAY",
+            "danger": 0.568,
+            "ball": {
+              "team": "AWAY",
+              "lane": "CENTER",
+              "progress": 0.08,
+              "ownerId": "A-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 55.07356293313205,
+                "lineHeight": 55,
+                "transitionDebt": 0.1851818562708032
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.50287415133789,
+                "lineHeight": 45,
+                "transitionDebt": 0.14225567470211056
+              }
+            }
+          }
+        },
+        {
+          "id": "E00456",
+          "t": 2953.3999999999114,
+          "minute": 49.22,
+          "kind": "RECYCLE",
+          "team": "AWAY",
+          "zone": "OWN_THIRD",
+          "phase": "BUILD_UP",
+          "detail": {
+            "actorId": "A-RCM",
+            "actorRole": "CM",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.12260950497537851,
+            "lane": "CENTER",
+            "danger": 0.05
+          },
+          "context": {
+            "possession": "AWAY",
+            "danger": 0.05,
+            "ball": {
+              "team": "AWAY",
+              "lane": "CENTER",
+              "progress": 0.12260950497537851,
+              "ownerId": "A-RCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 46.949735048925504,
+                "lineHeight": 44.853904305025935,
+                "transitionDebt": 0.3221509365149783
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 56.85147630912252,
+                "lineHeight": 58.193885492160916,
+                "transitionDebt": 0.3076240857855196
+              }
+            }
+          }
+        },
+        {
+          "id": "E00457",
+          "t": 2959.3999999999114,
+          "minute": 49.32,
+          "kind": "PROGRESS",
+          "team": "AWAY",
+          "zone": "OWN_THIRD",
+          "phase": "BUILD_UP",
+          "detail": {
+            "actorId": "A-RCM",
+            "actorRole": "CM",
+            "targetId": "A-LCM",
+            "targetRole": "CM",
+            "progress": 0.2764874276011251,
+            "lane": "CENTER",
+            "danger": 0.05
+          },
+          "context": {
+            "possession": "AWAY",
+            "danger": 0.05,
+            "ball": {
+              "team": "AWAY",
+              "lane": "CENTER",
+              "progress": 0.2764874276011251,
+              "ownerId": "A-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 47.94198198383674,
+                "lineHeight": 45,
+                "transitionDebt": 0.24076867429078436
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 55.311164705315605,
+                "lineHeight": 55,
+                "transitionDebt": 0.24668934176557408
+              }
+            }
+          }
+        },
+        {
+          "id": "E00458",
+          "t": 2967.3999999999114,
+          "minute": 49.46,
+          "kind": "RECYCLE",
+          "team": "AWAY",
+          "zone": "MIDFIELD",
+          "phase": "BUILD_UP",
+          "detail": {
+            "actorId": "A-RCB",
+            "actorRole": "CB",
+            "targetId": null,
+            "targetRole": null,
+            "progress": 0.29986631478997877,
+            "lane": "CENTER",
+            "danger": 0.05
+          },
+          "context": {
+            "possession": "AWAY",
+            "danger": 0.05,
+            "ball": {
+              "team": "AWAY",
+              "lane": "CENTER",
+              "progress": 0.29986631478997877,
+              "ownerId": "A-RCB"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 45.59255639044568,
+                "lineHeight": 45,
+                "transitionDebt": 0.18217344548936473
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 57.37845467380248,
+                "lineHeight": 55,
+                "transitionDebt": 0.20281632607121333
+              }
+            }
+          }
+        },
+        {
+          "id": "E00459",
+          "t": 2972.3999999999114,
+          "minute": 49.54,
+          "kind": "TURNOVER",
+          "team": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "TRANSITION",
+          "detail": {
+            "actorId": "H-LCM",
+            "actorRole": "CM",
+            "wonFrom": "AWAY",
+            "progress": 0.6854815784294624,
+            "danger": 0.3446533695801045
+          },
+          "context": {
+            "possession": "HOME",
+            "danger": 0.345,
+            "ball": {
+              "team": "HOME",
+              "lane": "CENTER",
+              "progress": 0.6854815784294624,
+              "ownerId": "H-LCM"
+            },
+            "structure": {
+              "HOME": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 45.84783558663912,
+                "lineHeight": 45,
+                "transitionDebt": 0.1399848807523426
+              },
+              "AWAY": {
+                "midfieldOccupancy": 3,
+                "backLineOccupancy": 4,
+                "width": 55.022872189758345,
+                "lineHeight": 55,
+                "transitionDebt": 0.17122775477127358
+              }
+            }
+          }
+        }
+      ],
+      "futureOutcomePrecomputed": false,
+      "choicePrecomputed": false
+    },
+    "highResolutionKeys": [
+      "legacyVersion",
+      "entrySnapshot",
+      "searchSeconds",
+      "preActionSpan",
+      "preActionFrames",
+      "decision",
+      "selectedChoice",
+      "choiceSteps",
+      "applyReceipt",
+      "postActionFrames",
+      "actualEvents",
+      "actualResult",
+      "actualResults",
+      "episodeFrames"
+    ],
+    "decision": {
+      "at": 2981.3,
+      "kind": "ON_BALL",
+      "selected": null,
+      "options": [
+        {
+          "id": "SHOT",
+          "targetId": null,
+          "label": "슈팅",
+          "meta": {
+            "dGoal": 12.32404842322326,
+            "inBox": true,
+            "oneVOne": false,
+            "openWindow": false,
+            "longRange": false,
+            "turningRequired": false,
+            "backToGoal": false,
+            "facingAlignment": 0.9706853020585817
+          }
+        },
+        {
+          "id": "TAKE_ON",
+          "targetId": null,
+          "label": "1대1 돌파",
+          "meta": {
+            "defenderId": "A-LCB",
+            "defenderDistance": 1.1948413215587634,
+            "spaceBehind": 9.5,
+            "skillAdvantage": -7.105427357601002e-15,
+            "wide": false
+          }
+        },
+        {
+          "id": "SAFE_PASS",
+          "targetId": "H-LCM",
+          "label": "안전한 패스 → 같은 팀 LCM",
+          "meta": {
+            "targetId": "H-LCM",
+            "targetSlot": "LCM",
+            "forward": -10.805314838500948,
+            "d": 11.519542136744223,
+            "receiverPressure": 11.294697394441462,
+            "directSafe": true
+          }
+        },
+        {
+          "id": "AVAILABLE_PASS",
+          "targetId": "H-LW",
+          "label": "전진 패스 → 같은 팀 LW",
+          "meta": {
+            "targetId": "H-LW",
+            "targetSlot": "LW",
+            "forward": -0.6423878953178104,
+            "d": 21.835084417831723,
+            "receiverPressure": 2.7522342327681786,
+            "contested": true,
+            "laneBlockers": 1,
+            "offsideRisk": false,
+            "offsideMargin": 0
+          }
+        },
+        {
+          "id": "AVAILABLE_PASS",
+          "targetId": "H-RW",
+          "label": "전진 패스 → 같은 팀 RW",
+          "meta": {
+            "targetId": "H-RW",
+            "targetSlot": "RW",
+            "forward": 0.18985771759096792,
+            "d": 16.326495009003196,
+            "receiverPressure": 1.1122981315569074,
+            "contested": true,
+            "laneBlockers": 0,
+            "offsideRisk": false,
+            "offsideMargin": 0
+          }
+        },
+        {
+          "id": "SAFE_PASS",
+          "targetId": "H-RCM",
+          "label": "안전한 패스 → 같은 팀 RCM",
+          "meta": {
+            "targetId": "H-RCM",
+            "targetSlot": "RCM",
+            "forward": -4.511213674646243,
+            "d": 11.61910584674529,
+            "receiverPressure": 3.6128282283071944,
+            "directSafe": true
+          }
+        }
+      ]
+    },
+    "actualResult": {
+      "sceneId": "STEP40-1",
+      "at": 2986.3,
+      "choiceId": "SAFE_PASS",
+      "label": "안전한 패스 → 같은 팀 RCM",
+      "targetId": "H-RCM",
+      "targetName": "같은 팀 RCM",
+      "family": "패스",
+      "selectedChoice": {
+        "id": "SAFE_PASS",
+        "label": "안전한 패스 → 같은 팀 RCM",
+        "targetId": "H-RCM",
+        "targetName": "같은 팀 RCM"
+      },
+      "code": "POSSESSION_KEPT",
+      "headline": "안전한 패스 → 같은 팀 RCM → 공격 지속",
+      "detail": "블루팀 ST이 블루팀 RCM 쪽으로 강한 지상 패스했습니다. → 블루팀 RCM이 블루팀 LCM 쪽으로 강한 지상 패스했습니다. → 블루팀 LCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다.",
+      "terminalEvent": null,
+      "events": [
+        {
+          "t": 2981.2999999999033,
+          "type": "PASS",
+          "text": "블루팀 ST이 블루팀 RCM 쪽으로 강한 지상 패스했습니다.",
+          "actorId": "H-ST",
+          "team": "HOME",
+          "targetId": "H-RCM",
+          "passKind": "PASS"
+        },
+        {
+          "t": 2982.899999999902,
+          "type": "PASS",
+          "text": "블루팀 RCM이 블루팀 LCM 쪽으로 강한 지상 패스했습니다.",
+          "actorId": "H-RCM",
+          "team": "HOME",
+          "targetId": "H-LCM",
+          "passKind": "PASS"
+        },
+        {
+          "t": 2984.7999999999,
+          "type": "PASS",
+          "text": "블루팀 LCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다.",
+          "actorId": "H-LCM",
+          "team": "HOME",
+          "targetId": "H-LW",
+          "passKind": "PASS"
+        }
+      ],
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      },
+      "possession": "HOME",
+      "performanceImpact": {
+        "at": 2986.3,
+        "appearanceStatus": "STARTER",
+        "choiceId": "SAFE_PASS",
+        "resultCode": "POSSESSION_KEPT",
+        "reckless": false,
+        "saferOption": {
+          "id": "SAFE_PASS",
+          "targetId": "H-LCM",
+          "targetName": "블루팀 LCM",
+          "score": 1.843
+        },
+        "chosenScore": 0.86,
+        "ratingDelta": 0,
+        "rating": 6.5,
+        "substitutionPressureDelta": 0,
+        "substitutionPressure": 0,
+        "managerUsageTrustDelta": 0,
+        "managerUsageTrustTotal": 0,
+        "reason": "NO_PENALTY"
+      }
+    },
+    "events": [
+      {
+        "t": 2973.2999999999106,
+        "type": "PASS",
+        "actorId": "H-LCM",
+        "targetId": "H-LW",
+        "team": "HOME",
+        "text": "블루팀 LCM이 블루팀 LW 쪽으로 공간 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2979.599999999905,
+        "type": "PASS",
+        "actorId": "H-LW",
+        "targetId": "H-ST",
+        "team": "HOME",
+        "text": "블루팀 LW이 블루팀 ST 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2981.2999999999033,
+        "type": "PASS",
+        "actorId": "H-ST",
+        "targetId": "H-RCM",
+        "team": "HOME",
+        "text": "블루팀 ST이 블루팀 RCM 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2981.2999999999033,
+        "type": "USER_CHOICE",
+        "actorId": null,
+        "targetId": null,
+        "team": null,
+        "text": "H-ST: SAFE_PASS -> H-RCM",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2982.899999999902,
+        "type": "PASS",
+        "actorId": "H-RCM",
+        "targetId": "H-LCM",
+        "team": "HOME",
+        "text": "블루팀 RCM이 블루팀 LCM 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2984.7999999999,
+        "type": "PASS",
+        "actorId": "H-LCM",
+        "targetId": "H-LW",
+        "team": "HOME",
+        "text": "블루팀 LCM이 블루팀 LW 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2988.5999999998967,
+        "type": "PASS",
+        "actorId": "H-LW",
+        "targetId": "H-LB",
+        "team": "HOME",
+        "text": "블루팀 LW이 블루팀 LB 쪽으로 긴 땅볼패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2994.4999999998913,
+        "type": "PASS",
+        "actorId": "H-LB",
+        "targetId": "H-RW",
+        "team": "HOME",
+        "text": "블루팀 LB이 블루팀 RW 쪽으로 공중 롱패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2996.6999999998893,
+        "type": "PASS",
+        "actorId": "H-RW",
+        "targetId": "H-RCM",
+        "team": "HOME",
+        "text": "블루팀 RW이 블루팀 RCM 쪽으로 짧은 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      },
+      {
+        "t": 2997.999999999888,
+        "type": "PASS",
+        "actorId": "H-RCM",
+        "targetId": "H-CM",
+        "team": "HOME",
+        "text": "블루팀 RCM이 블루팀 CM 쪽으로 강한 지상 패스했습니다.",
+        "kind": null,
+        "intendedReceiverId": null
+      }
+    ],
+    "frames": {
+      "preActionFrames": {
+        "count": 89,
+        "start": 2972.5,
+        "end": 2981.3,
+        "samples": [
+          {
+            "t": 2972.5,
+            "phase": "TRANSITION",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 75.02,
+              "y": 34,
+              "vx": 0.602,
+              "vy": 0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 0
+            },
+            "heroSpeed": 0.602,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 65.093,
+              "y": 33.422,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LCM",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 9.944
+          },
+          {
+            "t": 2974.7,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 79.141,
+              "y": 34,
+              "vx": -0.982,
+              "vy": 0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 3.141592653589793
+            },
+            "heroSpeed": 0.982,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 78.687,
+              "y": 15.128,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 18.877
+          },
+          {
+            "t": 2976.9,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 82.057,
+              "y": 32.762,
+              "vx": 2.696,
+              "vy": -2.929,
+              "action": "ATTACK_NEAR_POST",
+              "tacticalTask": "ATTACK_NEAR_POST",
+              "bodyAngle": -0.7533344329064288
+            },
+            "heroSpeed": 3.981,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 86.63,
+              "y": 14.22,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 19.098
+          },
+          {
+            "t": 2979.1,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 91.479,
+              "y": 30.64,
+              "vx": 3.188,
+              "vy": -0.139,
+              "action": "ATTACK_NEAR_POST",
+              "tacticalTask": "ATTACK_NEAR_POST",
+              "bodyAngle": -0.04359369675374462
+            },
+            "heroSpeed": 3.191,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 94.54,
+              "y": 14.59,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 16.339
+          },
+          {
+            "t": 2981.3,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 92.816,
+              "y": 32.148,
+              "vx": 0.367,
+              "vy": 2.267,
+              "action": "FIRST_TOUCH_FLOW",
+              "tacticalTask": "FIRST_TOUCH_FLOW",
+              "bodyAngle": -0.1933006501579
+            },
+            "heroSpeed": 2.297,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 93.236,
+              "y": 32.148,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-ST",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 0.42
+          }
+        ]
+      },
+      "postActionFrames": {
+        "count": 201,
+        "start": 2981.4,
+        "end": 3001.4,
+        "samples": [
+          {
+            "t": 2981.4,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 92.844,
+              "y": 32.323,
+              "vx": 0.282,
+              "vy": 1.743,
+              "action": "FIRST_TOUCH_FLOW",
+              "tacticalTask": "FIRST_TOUCH_FLOW",
+              "bodyAngle": -0.1933006501579
+            },
+            "heroSpeed": 1.766,
+            "ball": {
+              "mode": "FLIGHT",
+              "x": 92.741,
+              "y": 33.177,
+              "z": 0,
+              "vx": -4.899,
+              "vy": 10.176,
+              "ownerId": null,
+              "intendedReceiverId": "H-RCM",
+              "kind": "PASS",
+              "lastTouchPlayer": "H-ST"
+            },
+            "heroBallDistance": 0.86
+          },
+          {
+            "t": 2986.4,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 88.201,
+              "y": 34.607,
+              "vx": -1.453,
+              "vy": -1.093,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 3.7866420509107046
+            },
+            "heroSpeed": 1.818,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 89.313,
+              "y": 3.919,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 30.708
+          },
+          {
+            "t": 2991.4,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 88.726,
+              "y": 33.718,
+              "vx": -4.947,
+              "vy": 0.248,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 9.38263755109947
+            },
+            "heroSpeed": 4.953,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 63.066,
+              "y": 15.821,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LB",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 31.285
+          },
+          {
+            "t": 2996.4,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 78.437,
+              "y": 33.999,
+              "vx": 0,
+              "vy": 0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 7.364212212404073
+            },
+            "heroSpeed": 0.0,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 78.803,
+              "y": 49.509,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-RW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LB"
+            },
+            "heroBallDistance": 15.514
+          },
+          {
+            "t": 3001.4,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 76.196,
+              "y": 31.724,
+              "vx": -0.094,
+              "vy": 3.977,
+              "action": "PIN_AND_RUN",
+              "tacticalTask": "PIN_AND_RUN",
+              "bodyAngle": 1.591042178902644
+            },
+            "heroSpeed": 3.978,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 62.401,
+              "y": 33.991,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-CM",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-RCM"
+            },
+            "heroBallDistance": 13.98
+          }
+        ]
+      },
+      "episodeFrames": {
+        "count": 290,
+        "start": 2972.5,
+        "end": 3001.4,
+        "samples": [
+          {
+            "t": 2972.5,
+            "phase": "TRANSITION",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 75.02,
+              "y": 34,
+              "vx": 0.602,
+              "vy": 0,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 0
+            },
+            "heroSpeed": 0.602,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 65.093,
+              "y": 33.422,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LCM",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 9.944
+          },
+          {
+            "t": 2979.7,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 92.438,
+              "y": 30.648,
+              "vx": 0.806,
+              "vy": 0.461,
+              "action": "MOVE_TO_RECEIVE",
+              "tacticalTask": "MOVE_TO_RECEIVE",
+              "bodyAngle": -0.44159369675374865
+            },
+            "heroSpeed": 0.929,
+            "ball": {
+              "mode": "FLIGHT",
+              "x": 94.179,
+              "y": 16.995,
+              "z": 0,
+              "vx": -1.49,
+              "vy": 14.147,
+              "ownerId": null,
+              "intendedReceiverId": "H-ST",
+              "kind": "PASS",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 13.764
+          },
+          {
+            "t": 2987,
+            "phase": "CHANCE",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 88.215,
+              "y": 33.818,
+              "vx": 0.382,
+              "vy": -2.478,
+              "action": "ATTACK_NEAR_POST",
+              "tacticalTask": "ATTACK_NEAR_POST",
+              "bodyAngle": 4.901741246768457
+            },
+            "heroSpeed": 2.507,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 89.97,
+              "y": 2.961,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LW",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LCM"
+            },
+            "heroBallDistance": 30.907
+          },
+          {
+            "t": 2994.2,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 78.182,
+              "y": 33.99,
+              "vx": -0.327,
+              "vy": 0.036,
+              "action": "ATTACK_OPEN_CHANNEL",
+              "tacticalTask": "ATTACK_OPEN_CHANNEL",
+              "bodyAngle": 8.956212212404072
+            },
+            "heroSpeed": 0.329,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 73.589,
+              "y": 17.327,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-LB",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-LW"
+            },
+            "heroBallDistance": 17.284
+          },
+          {
+            "t": 3001.4,
+            "phase": "FINAL_THIRD",
+            "possession": "HOME",
+            "hero": {
+              "id": "H-ST",
+              "x": 76.196,
+              "y": 31.724,
+              "vx": -0.094,
+              "vy": 3.977,
+              "action": "PIN_AND_RUN",
+              "tacticalTask": "PIN_AND_RUN",
+              "bodyAngle": 1.591042178902644
+            },
+            "heroSpeed": 3.978,
+            "ball": {
+              "mode": "CONTROLLED",
+              "x": 62.401,
+              "y": 33.991,
+              "z": 0,
+              "vx": 0,
+              "vy": 0,
+              "ownerId": "H-CM",
+              "intendedReceiverId": null,
+              "kind": "CONTROL",
+              "lastTouchPlayer": "H-RCM"
+            },
+            "heroBallDistance": 13.98
+          }
+        ]
+      }
+    }
+  }
+}
