@@ -1,0 +1,46 @@
+name: FLR V0.5 Fourth Report Compact
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v05-fourth-report-compact-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  compact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Compact diagnosis
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          d=json.load(open('.flr/v05-fourth-report-inspect-status.json',encoding='utf-8'))
+          def slim_side(s):
+              if not isinstance(s,dict): return None
+              b=s.get('boundary') or {}; dec=s.get('decision') or {}
+              frames={}
+              for k,v in (s.get('frames') or {}).items():
+                  frames[k]={'count':v.get('count'),'start':v.get('start'),'end':v.get('end'),'samples':v.get('samples')}
+              return {'boundary':{k:b.get(k) for k in ('id','sceneId','atSecond','reason','heroPlayerId','heroRole')},
+                      'decision':dec,'actualResult':s.get('actualResult'),'events':s.get('events'),'frames':frames}
+          out={'schemaVersion':'FLR_V05_FOURTH_REPORT_COMPACT_1.0','reportId':d.get('reportId'),'description':d.get('description'),'current':slim_side(d.get('current')),'previous':slim_side(d.get('previous'))}
+          pathlib.Path('/tmp/out.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Persist
+        shell: bash
+        run: |
+          git config user.name 'FLR V0.5 Report Inspector'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/out.json .flr/v05-fourth-report-compact.json
+          git add .flr/v05-fourth-report-compact.json
+          git commit -m 'Compact fourth V0.5 report diagnosis'
+          git push origin HEAD:main
