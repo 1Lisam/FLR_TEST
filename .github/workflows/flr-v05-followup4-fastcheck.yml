@@ -1,0 +1,53 @@
+name: FLR V0.5 Four Report Fastcheck
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v05-followup4-fastcheck-request.json']
+permissions: {contents: write}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v05-followup4-20260823, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Apply patch and run direct checks
+        id: direct
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v05_followup_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node --check step71_hybrid_v06_ui.js
+          node --check runtime/protagonist_match_controller.js
+          node --check live_hybrid_session_v02.js
+          node --check runtime/continuous_match_core.js
+          node <<'NODE'
+          const fs=require('fs'),a=require('assert'),E=require('./runtime/continuous_match_core.js'),P=require('./runtime/protagonist_match_controller.js');
+          const ui=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');a(ui.includes('function showPendingCausally()'));a(!ui.includes('if(session.pending?.chained){showPending();return}'));
+          const s=P.create('F4-LW',{heroPlayerId:'H-ST'}),old=E.choiceStateBridge,f={kind:'ON_BALL',playerId:'H-ST',team:'HOME',role:'ST',slot:'ST',time:1,localX:78.78,localY:35.06,pressure:2.38,space:.9,shot:{dGoal:26,inBox:false,oneVOne:false,openWindow:false,blockers:1},candidates:[{id:'CARRY',score:2,meta:{}},{id:'HOLD',score:1.9,meta:{}},{id:'SAFE_PASS',targetId:'H-RCM',score:1.8,meta:{targetSlot:'RCM'}},{id:'SHOT',score:1.7,meta:{}},{id:'SAFE_PASS',targetId:'H-CM',score:1.6,meta:{targetSlot:'CM'}}],_frame:{opts:[{p:{id:'H-LW',role:'WF',slot:'LW',vx:.69,vy:2.52},block:1,d:16.23,open:6.06,forward:-1.19,running:true,offsideRisk:false}]}};E.choiceStateBridge=()=>({inspect:()=>f});const o=P.inspect(s);E.choiceStateBridge=old;a(o.options.some(x=>x.targetId==='H-LW'));
+          const hs=fs.readFileSync('live_hybrid_session_v02.js','utf8');a(hs.includes('HYBRID_CONTINUOUS_FROM_V06'));a(hs.includes("fromExact?24:18"));
+          const m=E.createMatch('F4-R',{});m.restart=null;m.phase='OPEN_PLAY';m.time=100;m.nextShape=100;m.protagonistControllerId='H-LW';m.protagonistExplicitActionRequired=true;const B=E.choiceActionBridge(),r=B.playerById(m,'H-LW');r.x=76;r.y=18;r.vx=5;r.vy=.15;r.tx=82;r.ty=18.3;r.sprint=true;m.ball={...m.ball,x:75.55,y:18,z:0,mode:'LOOSE',ownerId:null};m.possession='HOME';B.setControlled(m,r,true,{flow:true,flightKind:'THROUGH',deliveryMode:'GROUND',sourceId:'H-ST',incomingVx:15,incomingVy:.3});const x0=r.x,d=Math.hypot(r.tx-r.x,r.ty-r.y);a(r.sprint===true);a(r.receiveRunContinuationUntil>=100.99);a(d>=4);E.step(m,.1);E.step(m,.1);E.step(m,.1);a(r.x>x0+.08);a(r.receiveRunContinuationUntil>m.time);a(fs.readFileSync('runtime/continuous_match_core.js','utf8').includes('owner.receiveRunContinuationUntil=0;'));
+          console.log(JSON.stringify({status:'PASS',openLW:true,throughTargetDistance:d,throughAdvance:r.x-x0,futureOutcomePrecomputed:false}));
+          NODE
+      - name: Persist fastcheck status
+        if: always()
+        env:
+          OUTCOME: ${{ steps.direct.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset --hard HEAD
+          git fetch origin main
+          git checkout -B qa-record origin/main
+          mkdir -p .flr
+          printf '{"schemaVersion":"FLR_V05_FOLLOWUP4_FASTCHECK_1.0","status":"%s"}\n' "$( [ "$OUTCOME" = success ] && echo PASS || echo FAIL )" > .flr/v05-followup4-fastcheck-status.json
+          git config user.name 'FLR V0.5 Fastcheck'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/v05-followup4-fastcheck-status.json
+          git commit -m 'Record V0.5 four-report fastcheck' || true
+          git push origin HEAD:main
+          [ "$OUTCOME" = success ]
