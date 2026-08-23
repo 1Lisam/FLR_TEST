@@ -1,0 +1,23 @@
+name: FLR V0.5.1 Consolidated V2 Watch
+on:
+  workflow_run:
+    workflows: ['FLR V0.5.1 Consolidated Retest V2']
+    types: [completed]
+permissions: {contents: write}
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - env:
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HTML_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          python - <<'PY'
+          import os,json,pathlib
+          pathlib.Path('.flr/v051-consolidated-v2-status.json').write_text(json.dumps({'runId':int(os.environ['RUN_ID']),'conclusion':os.environ['CONCLUSION'],'headSha':os.environ['HEAD_SHA'],'htmlUrl':os.environ['HTML_URL']},indent=2)+'\n')
+          PY
+          git config user.name 'FLR V0.5.1 V2 Watch';git config user.email 'actions@users.noreply.github.com';git pull --rebase origin main;git add .flr/v051-consolidated-v2-status.json;git commit -m 'Record V0.5.1 consolidated V2 result' || exit 0;git push origin HEAD:main
