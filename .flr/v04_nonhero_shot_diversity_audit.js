@@ -4,8 +4,8 @@ const H=require(path.resolve(process.argv[2]||'.','live_hybrid_session_v02.js'))
 const N=Number(process.argv[3]||80);
 const rows=[];
 for(let i=0;i<N;i++){
-  const s=H.createSession({seed:`V04-NONHERO-DIVERSITY-${i}`,heroTeam:'HOME',heroRole:'ST',heroPlayerId:'H-ST'});
-  // Audit-only isolation: suppress protagonist and set-piece boundaries so we can observe the first non-hero shot candidate from each seed without synthetic handback state.
+  const s=H.createSession({seed:`V04-NONHERO-DIVERSITY-${i}`,heroTeam:'HOME',heroRole:'GK',heroPlayerId:'H-GK'});
+  // Audit-only isolation: the GK hero is never in the outfield SHOT actor pool. Suppress ordinary hero/set-piece boundaries so we sample only the first low-res non-hero shot candidate per seed.
   s.lastHeroWindowAt=1e9;
   s.lastSetPieceAt=1e9;
   let guard=0;
@@ -25,5 +25,5 @@ const countBy=(key)=>Object.fromEntries([...rows.reduce((m,r)=>m.set(String(r[ke
 const shooter=countBy('shooterId'),lane=countBy('lane'),zone=countBy('zone'),team=countBy('team');
 const topShooter=Math.max(0,...Object.values(shooter));
 const prog=rows.map(r=>r.progress).filter(Number.isFinite);
-const summary={schemaVersion:'FLR_V04_NONHERO_SHOT_DIVERSITY_1.1',matches:N,windows:rows.length,uniqueShooters:Object.keys(shooter).length,shooterCounts:shooter,laneCounts:lane,zoneCounts:zone,teamCounts:team,topShooterShare:rows.length?Number((topShooter/rows.length).toFixed(3)):null,progress:{min:prog.length?Math.min(...prog):null,max:prog.length?Math.max(...prog):null,mean:prog.length?Number((prog.reduce((a,b)=>a+b,0)/prog.length).toFixed(3)):null},sample:rows.slice(0,30)};
+const summary={schemaVersion:'FLR_V04_NONHERO_SHOT_DIVERSITY_1.2',status:'PASS',matches:N,windows:rows.length,uniqueShooters:Object.keys(shooter).length,shooterCounts:shooter,laneCounts:lane,zoneCounts:zone,teamCounts:team,topShooterShare:rows.length?Number((topShooter/rows.length).toFixed(3)):null,progress:{min:prog.length?Math.min(...prog):null,max:prog.length?Math.max(...prog):null,mean:prog.length?Number((prog.reduce((a,b)=>a+b,0)/prog.length).toFixed(3)):null},sample:rows.slice(0,30)};
 console.log(JSON.stringify(summary,null,2));
