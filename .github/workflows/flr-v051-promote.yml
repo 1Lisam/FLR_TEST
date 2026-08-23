@@ -1,0 +1,64 @@
+name: FLR V0.5.1 Validated Promote
+
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v051-promote-request.json']
+
+permissions: {contents: write}
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Validate request and candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib, subprocess
+          req=json.loads(pathlib.Path('.flr/v051-promote-request.json').read_text())
+          cand=req['candidateCommit']; expected=req['expectedQaStatus']
+          subprocess.run(['git','fetch','origin','candidate/v051-consolidated-retest-20260823'],check=True)
+          qa=subprocess.check_output(['git','show',f'{cand}:.flr/qa-results/V051_CONSOLIDATED_RETEST.json'],text=True)
+          q=json.loads(qa)
+          assert q['status']==expected=='PASS_FOR_USER_RETEST'
+          assert q['futureOutcomePrecomputed'] is False
+          assert all(q['gates'].values())
+          pathlib.Path('/tmp/candidate.sha').write_text(cand+'\n')
+          print('CANDIDATE_VALIDATED',cand)
+          PY
+      - name: Promote only validated game files
+        shell: bash
+        run: |
+          set -euo pipefail
+          CAND=$(cat /tmp/candidate.sha)
+          git checkout "$CAND" -- \
+            index.html \
+            step71_hybrid_v06_ui.js \
+            runtime/protagonist_match_controller.js \
+            live_hybrid_session_v02.js \
+            runtime/continuous_match_core.js
+          node --check step71_hybrid_v06_ui.js
+          node --check runtime/protagonist_match_controller.js
+          node --check live_hybrid_session_v02.js
+          node --check runtime/continuous_match_core.js
+          grep -q 'Match Engine User Test V0.5.1' index.html
+          grep -q '매치엔진 사용자 테스트 V0.5.1' index.html
+          git diff --name-only --cached > /tmp/changed.txt
+          cat /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          got=set(Path('/tmp/changed.txt').read_text().splitlines())
+          want={'index.html','step71_hybrid_v06_ui.js','runtime/protagonist_match_controller.js','live_hybrid_session_v02.js','runtime/continuous_match_core.js'}
+          assert got and got <= want, (got,want)
+          PY
+          git config user.name 'FLR V0.5.1 Promote Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git commit -m 'Deploy Match Engine User Test V0.5.1'
+          git pull --rebase origin main
+          git push origin HEAD:main
