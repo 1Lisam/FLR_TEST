@@ -1,1 +1,3323 @@
-{"schemaVersion":"FLR_HISTORICAL_CLOSURE_AUDIT_1.1","status":"FAILED_TO_RUN","errorTail":"no output"}
+{
+  "schemaVersion": "FLR_HISTORICAL_CLOSURE_AUDIT_1.1",
+  "generatedAt": "2026-08-23T02:51:41.265Z",
+  "summary": {
+    "stAutoRuns": 5,
+    "trapRuns": 4,
+    "carryRuns": 4,
+    "maxStDuelSeconds": 4.5,
+    "maxStRcmOverlapSeconds": 1.9,
+    "restartSpeedJumpCount": 0,
+    "nonRestartSpeedJumpCount": 22,
+    "maxHeroFrameSpeed": 656.84,
+    "traps": 87,
+    "trapAutoMaterialActions": 0,
+    "carries": 40,
+    "carrySamples": 40,
+    "carryStalls": 0,
+    "farSideWindows": 35,
+    "farSideMissing": 14
+  },
+  "syntheticThrough": {
+    "available": true,
+    "applied": true,
+    "intendedReceiverId": "H-LW",
+    "targetX": 83.76,
+    "targetY": 17.25,
+    "receiver": {
+      "x": 78,
+      "y": 18,
+      "vx": 4.2,
+      "vy": -0.2
+    },
+    "leadDx": 5.76,
+    "leadDy": -0.75,
+    "ballSpeed": 22,
+    "candidates": [
+      [
+        "THROUGH_PASS",
+        "H-LW"
+      ],
+      [
+        "PROGRESSIVE_PASS",
+        "H-LW"
+      ],
+      [
+        "SAFE_PASS",
+        "H-LW"
+      ],
+      [
+        "CARRY",
+        null
+      ],
+      [
+        "HOLD",
+        null
+      ],
+      [
+        "TURN_BACK",
+        null
+      ]
+    ]
+  },
+  "carryStallExamples": [],
+  "farSideMissingExamples": [
+    {
+      "seed": "HIST-ST-1",
+      "t": 557.5,
+      "hero": [
+        81.67,
+        26.78
+      ],
+      "ball": [
+        82.09,
+        26.78
+      ],
+      "viable": [
+        {
+          "id": "H-LW",
+          "forward": 1.49,
+          "open": 1.82,
+          "block": 0,
+          "running": false,
+          "task": "FAR_SIDE_SHOULDER",
+          "leadForward": 1.49
+        }
+      ],
+      "shown": [
+        [
+          "CARRY",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LW"
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "AVAILABLE_PASS",
+          "H-RW"
+        ],
+        [
+          "HOLD",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-1",
+      "t": 647.3,
+      "hero": [
+        71.25,
+        42.06
+      ],
+      "ball": [
+        71.67,
+        42.06
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 1.29,
+          "open": 3.31,
+          "block": 1,
+          "running": false,
+          "task": "FAR_SIDE_RUN",
+          "leadForward": 1.29
+        }
+      ],
+      "shown": [
+        [
+          "THROUGH_PASS",
+          "H-LW"
+        ],
+        [
+          "SWITCH_PASS",
+          "H-LW"
+        ],
+        [
+          "TAKE_ON",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-RCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-1",
+      "t": 1922.8,
+      "hero": [
+        77.27,
+        34.58
+      ],
+      "ball": [
+        77.69,
+        34.58
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 2.3,
+          "open": 2.68,
+          "block": 0,
+          "running": false,
+          "task": "ST_RELEASE_RUN",
+          "leadForward": 2.3
+        }
+      ],
+      "shown": [
+        [
+          "SAFE_PASS",
+          "H-RW"
+        ],
+        [
+          "CARRY",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "AVAILABLE_PASS",
+          "H-LW"
+        ],
+        [
+          "AVAILABLE_PASS",
+          "H-RCM"
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-1",
+      "t": 1926.1,
+      "hero": [
+        78.47,
+        34.69
+      ],
+      "ball": [
+        78.89,
+        34.69
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 2.48,
+          "open": 2.68,
+          "block": 0,
+          "running": false,
+          "task": "ST_RELEASE_RUN",
+          "leadForward": 2.48
+        }
+      ],
+      "shown": [
+        [
+          "THROUGH_PASS",
+          "H-LW"
+        ],
+        [
+          "SWITCH_PASS",
+          "H-LW"
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-1",
+      "t": 2060.5,
+      "hero": [
+        82.48,
+        35.94
+      ],
+      "ball": [
+        82.9,
+        35.94
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 3.18,
+          "open": 1.13,
+          "block": 0,
+          "running": false,
+          "task": "ST_RELEASE_RUN",
+          "leadForward": 3.18
+        }
+      ],
+      "shown": [
+        [
+          "THROUGH_PASS",
+          "H-LW"
+        ],
+        [
+          "SWITCH_PASS",
+          "H-LW"
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-2",
+      "t": 1928.7,
+      "hero": [
+        90.77,
+        32.67
+      ],
+      "ball": [
+        90.64,
+        33.3
+      ],
+      "viable": [
+        {
+          "id": "H-LW",
+          "forward": 1.69,
+          "open": 5.84,
+          "block": 0,
+          "running": false,
+          "task": "WIDE_DELIVERY_HOLD",
+          "leadForward": 1.69
+        }
+      ],
+      "shown": [
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "AVAILABLE_PASS",
+          "H-RW"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-RCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LW"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-2",
+      "t": 2072.2,
+      "hero": [
+        80.12,
+        34.07
+      ],
+      "ball": [
+        80.54,
+        34.07
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 5.34,
+          "open": 1.39,
+          "block": 1,
+          "running": false,
+          "task": "ST_RELEASE_RUN",
+          "leadForward": 5.34
+        }
+      ],
+      "shown": [
+        [
+          "THROUGH_PASS",
+          "H-LW"
+        ],
+        [
+          "SWITCH_PASS",
+          "H-LW"
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-3",
+      "t": 3.1,
+      "hero": [
+        46.3,
+        35.01
+      ],
+      "ball": [
+        46.72,
+        35.01
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 2.42,
+          "open": 1.73,
+          "block": 1,
+          "running": false,
+          "task": "HOLD_WIDTH",
+          "leadForward": 2.42
+        },
+        {
+          "id": "H-LW",
+          "forward": 1.98,
+          "open": 1.27,
+          "block": 1,
+          "running": false,
+          "task": "HOLD_WIDTH",
+          "leadForward": 1.98
+        }
+      ],
+      "shown": [
+        [
+          "TAKE_ON",
+          null
+        ],
+        [
+          "SWITCH_PASS",
+          "H-LB"
+        ],
+        [
+          "SAFE_PASS",
+          "H-RB"
+        ],
+        [
+          "SAFE_PASS",
+          "H-RCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCB"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-3",
+      "t": 142.2,
+      "hero": [
+        82.85,
+        31.52
+      ],
+      "ball": [
+        83.27,
+        31.52
+      ],
+      "viable": [
+        {
+          "id": "H-LW",
+          "forward": 3.2,
+          "open": 1.05,
+          "block": 0,
+          "running": false,
+          "task": "ST_RELEASE_RUN",
+          "leadForward": 3.2
+        }
+      ],
+      "shown": [
+        [
+          "THROUGH_PASS",
+          "H-RW"
+        ],
+        [
+          "SWITCH_PASS",
+          "H-RW"
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-3",
+      "t": 1118.8,
+      "hero": [
+        76.93,
+        31.2
+      ],
+      "ball": [
+        77.6,
+        30.56
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 1.61,
+          "open": 2.42,
+          "block": 0,
+          "running": false,
+          "task": "FAR_SIDE_HOLD",
+          "leadForward": 1.61
+        }
+      ],
+      "shown": [
+        [
+          "CARRY",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LW"
+        ],
+        [
+          "HOLD",
+          null
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-3",
+      "t": 2040.3,
+      "hero": [
+        78.83,
+        37.53
+      ],
+      "ball": [
+        79.25,
+        37.53
+      ],
+      "viable": [
+        {
+          "id": "H-RW",
+          "forward": 3.71,
+          "open": 2.39,
+          "block": 0,
+          "running": false,
+          "task": "ST_RELEASE_RUN",
+          "leadForward": 3.71
+        }
+      ],
+      "shown": [
+        [
+          "THROUGH_PASS",
+          "H-LW"
+        ],
+        [
+          "SWITCH_PASS",
+          "H-LW"
+        ],
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-CM"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    },
+    {
+      "seed": "HIST-ST-4",
+      "t": 737.6,
+      "hero": [
+        92.32,
+        30.72
+      ],
+      "ball": [
+        92.41,
+        30.57
+      ],
+      "viable": [
+        {
+          "id": "H-LW",
+          "forward": 2.55,
+          "open": 6.61,
+          "block": 0,
+          "running": false,
+          "task": "WIDE_DELIVERY_HOLD",
+          "leadForward": 2.55
+        }
+      ],
+      "shown": [
+        [
+          "SHOT",
+          null
+        ],
+        [
+          "AVAILABLE_PASS",
+          "H-RW"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-RCM"
+        ],
+        [
+          "SAFE_PASS",
+          "H-LW"
+        ],
+        [
+          "CARRY",
+          null
+        ]
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "seed": "HIST-ST-1",
+      "role": "ST",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 2
+      },
+      "choices": 77,
+      "traps": 20,
+      "trapAuto": 0,
+      "carries": 2,
+      "carryResults": [
+        {
+          "elapsed": 1.1,
+          "move": 1.61,
+          "forward": 1.46,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.21,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 9.59,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 3.2,
+      "maxRcmOverlapSeconds": 1.1,
+      "farSideWindows": 8,
+      "farSideMissing": 5,
+      "farSideMissingExamples": [
+        {
+          "t": 557.5,
+          "hero": [
+            81.67,
+            26.78
+          ],
+          "ball": [
+            82.09,
+            26.78
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 1.49,
+              "open": 1.82,
+              "block": 0,
+              "running": false,
+              "task": "FAR_SIDE_SHOULDER",
+              "leadForward": 1.49
+            }
+          ],
+          "shown": [
+            [
+              "CARRY",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-RW"
+            ],
+            [
+              "HOLD",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 647.3,
+          "hero": [
+            71.25,
+            42.06
+          ],
+          "ball": [
+            71.67,
+            42.06
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 1.29,
+              "open": 3.31,
+              "block": 1,
+              "running": false,
+              "task": "FAR_SIDE_RUN",
+              "leadForward": 1.29
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "TAKE_ON",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 1922.8,
+          "hero": [
+            77.27,
+            34.58
+          ],
+          "ball": [
+            77.69,
+            34.58
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 2.3,
+              "open": 2.68,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 2.3
+            }
+          ],
+          "shown": [
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-LW"
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-RCM"
+            ]
+          ]
+        },
+        {
+          "t": 1926.1,
+          "hero": [
+            78.47,
+            34.69
+          ],
+          "ball": [
+            78.89,
+            34.69
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 2.48,
+              "open": 2.68,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 2.48
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 2060.5,
+          "hero": [
+            82.48,
+            35.94
+          ],
+          "ball": [
+            82.9,
+            35.94
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 3.18,
+              "open": 1.13,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 3.18
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ST-2",
+      "role": "ST",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 2
+      },
+      "choices": 54,
+      "traps": 16,
+      "trapAuto": 0,
+      "carries": 1,
+      "carryResults": [
+        {
+          "elapsed": 1.2,
+          "move": 2.35,
+          "forward": -0.67,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 574.6,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 2354.7,
+          "v": 574.6,
+          "from": [
+            91.88,
+            64.29
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 3.4,
+      "maxRcmOverlapSeconds": 1.5,
+      "farSideWindows": 4,
+      "farSideMissing": 2,
+      "farSideMissingExamples": [
+        {
+          "t": 1928.7,
+          "hero": [
+            90.77,
+            32.67
+          ],
+          "ball": [
+            90.64,
+            33.3
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 1.69,
+              "open": 5.84,
+              "block": 0,
+              "running": false,
+              "task": "WIDE_DELIVERY_HOLD",
+              "leadForward": 1.69
+            }
+          ],
+          "shown": [
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-RW"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 2072.2,
+          "hero": [
+            80.12,
+            34.07
+          ],
+          "ball": [
+            80.54,
+            34.07
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 5.34,
+              "open": 1.39,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 5.34
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ST-3",
+      "role": "ST",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 2,
+        "AWAY": 2
+      },
+      "choices": 82,
+      "traps": 20,
+      "trapAuto": 0,
+      "carries": 1,
+      "carryResults": [
+        {
+          "elapsed": 1.2,
+          "move": 4.8,
+          "forward": 4.73,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 617.18,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 1429.3,
+          "v": 617.2,
+          "from": [
+            99.69,
+            58.51
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        },
+        {
+          "t": 1788.6,
+          "v": 609.6,
+          "from": [
+            99.15,
+            57.84
+          ],
+          "to": [
+            43.05,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 4.5,
+      "maxRcmOverlapSeconds": 0.7,
+      "farSideWindows": 12,
+      "farSideMissing": 4,
+      "farSideMissingExamples": [
+        {
+          "t": 3.1,
+          "hero": [
+            46.3,
+            35.01
+          ],
+          "ball": [
+            46.72,
+            35.01
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 2.42,
+              "open": 1.73,
+              "block": 1,
+              "running": false,
+              "task": "HOLD_WIDTH",
+              "leadForward": 2.42
+            },
+            {
+              "id": "H-LW",
+              "forward": 1.98,
+              "open": 1.27,
+              "block": 1,
+              "running": false,
+              "task": "HOLD_WIDTH",
+              "leadForward": 1.98
+            }
+          ],
+          "shown": [
+            [
+              "TAKE_ON",
+              null
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LB"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RB"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCB"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 142.2,
+          "hero": [
+            82.85,
+            31.52
+          ],
+          "ball": [
+            83.27,
+            31.52
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 3.2,
+              "open": 1.05,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 3.2
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-RW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 1118.8,
+          "hero": [
+            76.93,
+            31.2
+          ],
+          "ball": [
+            77.6,
+            30.56
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 1.61,
+              "open": 2.42,
+              "block": 0,
+              "running": false,
+              "task": "FAR_SIDE_HOLD",
+              "leadForward": 1.61
+            }
+          ],
+          "shown": [
+            [
+              "CARRY",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LW"
+            ],
+            [
+              "HOLD",
+              null
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ]
+          ]
+        },
+        {
+          "t": 2040.3,
+          "hero": [
+            78.83,
+            37.53
+          ],
+          "ball": [
+            79.25,
+            37.53
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 3.71,
+              "open": 2.39,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 3.71
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ST-4",
+      "role": "ST",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 3
+      },
+      "choices": 62,
+      "traps": 13,
+      "trapAuto": 0,
+      "carries": 2,
+      "carryResults": [
+        {
+          "elapsed": 1.2,
+          "move": 1.51,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.23,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 563.62,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 2288.4,
+          "v": 563.6,
+          "from": [
+            93.06,
+            59.99
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 3.5,
+      "maxRcmOverlapSeconds": 0.9,
+      "farSideWindows": 4,
+      "farSideMissing": 1,
+      "farSideMissingExamples": [
+        {
+          "t": 737.6,
+          "hero": [
+            92.32,
+            30.72
+          ],
+          "ball": [
+            92.41,
+            30.57
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 2.55,
+              "open": 6.61,
+              "block": 0,
+              "running": false,
+              "task": "WIDE_DELIVERY_HOLD",
+              "leadForward": 2.55
+            }
+          ],
+          "shown": [
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-RW"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ST-5",
+      "role": "ST",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 3,
+        "AWAY": 4
+      },
+      "choices": 54,
+      "traps": 7,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 646.95,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 92,
+          "v": 595.6,
+          "from": [
+            94.83,
+            4.6
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        },
+        {
+          "t": 682.7,
+          "v": 646.9,
+          "from": [
+            100.91,
+            5.08
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        },
+        {
+          "t": 1631.1,
+          "v": 600.4,
+          "from": [
+            94.82,
+            64.41
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 2.6,
+      "maxRcmOverlapSeconds": 1.9,
+      "farSideWindows": 7,
+      "farSideMissing": 2,
+      "farSideMissingExamples": [
+        {
+          "t": 3.1,
+          "hero": [
+            46.2,
+            35.06
+          ],
+          "ball": [
+            46.62,
+            35.06
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 2.77,
+              "open": 2.23,
+              "block": 0,
+              "running": false,
+              "task": "HOLD_WIDTH",
+              "leadForward": 2.77
+            },
+            {
+              "id": "H-RW",
+              "forward": 2.54,
+              "open": 1.76,
+              "block": 1,
+              "running": false,
+              "task": "HOLD_WIDTH",
+              "leadForward": 2.54
+            }
+          ],
+          "shown": [
+            [
+              "TAKE_ON",
+              null
+            ],
+            [
+              "SWITCH_PASS",
+              "H-RB"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RB"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCB"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 1343.5,
+          "hero": [
+            75.69,
+            29.68
+          ],
+          "ball": [
+            76.11,
+            29.68
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 5.44,
+              "open": 3.49,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 5.44
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "CARRY",
+              null
+            ],
+            [
+              "HOLD",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-CM-1",
+      "role": "CM",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 1
+      },
+      "choices": 47,
+      "traps": 5,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 38.66,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 1674.5,
+          "v": 38.7,
+          "from": [
+            48.7,
+            34.29
+          ],
+          "to": [
+            52.55,
+            34
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CM-2",
+      "role": "CM",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 3
+      },
+      "choices": 41,
+      "traps": 5,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 88.94,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 1151.1,
+          "v": 82.1,
+          "from": [
+            44.37,
+            34.75
+          ],
+          "to": [
+            52.55,
+            34
+          ],
+          "phase": "OPEN_PLAY"
+        },
+        {
+          "t": 1523.1,
+          "v": 27.4,
+          "from": [
+            49.82,
+            34.19
+          ],
+          "to": [
+            52.55,
+            34
+          ],
+          "phase": "OPEN_PLAY"
+        },
+        {
+          "t": 1581.6,
+          "v": 88.9,
+          "from": [
+            43.66,
+            34.24
+          ],
+          "to": [
+            52.55,
+            34
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CM-3",
+      "role": "CM",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 1
+      },
+      "choices": 48,
+      "traps": 6,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 64.75,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 1128,
+          "v": 64.8,
+          "from": [
+            46.09,
+            33.51
+          ],
+          "to": [
+            52.55,
+            34
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CM-4",
+      "role": "CM",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 0
+      },
+      "choices": 36,
+      "traps": 1,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 7.68,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CM-5",
+      "role": "CM",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 2,
+        "AWAY": 0
+      },
+      "choices": 43,
+      "traps": 2,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 616.14,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 951.3,
+          "v": 616.1,
+          "from": [
+            94.64,
+            14.95
+          ],
+          "to": [
+            36.04,
+            34
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CB-1",
+      "role": "CB",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 0
+      },
+      "choices": 28,
+      "traps": 0,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 60.04,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 619.1,
+          "v": 60,
+          "from": [
+            24.53,
+            26.77
+          ],
+          "to": [
+            18.53,
+            27
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CB-2",
+      "role": "CB",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 2
+      },
+      "choices": 26,
+      "traps": 1,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 60.77,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 736.5,
+          "v": 60.8,
+          "from": [
+            24.61,
+            26.79
+          ],
+          "to": [
+            18.53,
+            27
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CB-3",
+      "role": "CB",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 2
+      },
+      "choices": 43,
+      "traps": 2,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 7.6,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CB-4",
+      "role": "CB",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 0
+      },
+      "choices": 42,
+      "traps": 1,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 60.59,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 755,
+          "v": 60.6,
+          "from": [
+            24.59,
+            26.77
+          ],
+          "to": [
+            18.53,
+            27
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CB-5",
+      "role": "CB",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 1,
+        "AWAY": 2
+      },
+      "choices": 39,
+      "traps": 2,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 53.42,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 1536.5,
+          "v": 53.4,
+          "from": [
+            23.87,
+            26.75
+          ],
+          "to": [
+            18.53,
+            27
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-GK-1",
+      "role": "GK",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      },
+      "choices": 3,
+      "traps": 0,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 4.71,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-GK-2",
+      "role": "GK",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 2
+      },
+      "choices": 4,
+      "traps": 0,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 6.2,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-GK-3",
+      "role": "GK",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      },
+      "choices": 12,
+      "traps": 1,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 6.2,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-GK-4",
+      "role": "GK",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 2
+      },
+      "choices": 9,
+      "traps": 0,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 4.67,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-GK-5",
+      "role": "GK",
+      "mode": "AUTO",
+      "score": {
+        "HOME": 0,
+        "AWAY": 2
+      },
+      "choices": 5,
+      "traps": 0,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 6.2,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 0,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-TRAP-1",
+      "role": "ST",
+      "mode": "TRAP",
+      "score": {
+        "HOME": 1,
+        "AWAY": 2
+      },
+      "choices": 50,
+      "traps": 22,
+      "trapAuto": 0,
+      "carries": 2,
+      "carryResults": [
+        {
+          "elapsed": 1.1,
+          "move": 1.21,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.99,
+          "forward": 1.63,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 644.58,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 789.3,
+          "v": 644.6,
+          "from": [
+            100.85,
+            5.5
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 3.6,
+      "maxRcmOverlapSeconds": 0.6,
+      "farSideWindows": 6,
+      "farSideMissing": 1,
+      "farSideMissingExamples": [
+        {
+          "t": 3.1,
+          "hero": [
+            46.33,
+            34.79
+          ],
+          "ball": [
+            46.75,
+            34.79
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 3.13,
+              "open": 2.88,
+              "block": 0,
+              "running": false,
+              "task": "HOLD_WIDTH",
+              "leadForward": 3.13
+            },
+            {
+              "id": "H-RW",
+              "forward": 1.91,
+              "open": 1.19,
+              "block": 0,
+              "running": false,
+              "task": "HOLD_WIDTH",
+              "leadForward": 1.91
+            }
+          ],
+          "shown": [
+            [
+              "TAKE_ON",
+              null
+            ],
+            [
+              "SWITCH_PASS",
+              "H-RB"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RB"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCB"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-TRAP-2",
+      "role": "ST",
+      "mode": "TRAP",
+      "score": {
+        "HOME": 1,
+        "AWAY": 0
+      },
+      "choices": 48,
+      "traps": 23,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 619,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 1285.9,
+          "v": 619,
+          "from": [
+            97.57,
+            63.31
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 3.7,
+      "maxRcmOverlapSeconds": 0.2,
+      "farSideWindows": 4,
+      "farSideMissing": 3,
+      "farSideMissingExamples": [
+        {
+          "t": 186.8,
+          "hero": [
+            83.61,
+            33.9
+          ],
+          "ball": [
+            84.03,
+            33.9
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 3.03,
+              "open": 1.16,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 3.03
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-RW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 286.3,
+          "hero": [
+            75.19,
+            32.19
+          ],
+          "ball": [
+            75.33,
+            32.74
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 4.61,
+              "open": 2.66,
+              "block": 0,
+              "running": false,
+              "task": "FAR_SIDE_HOLD",
+              "leadForward": 4.61
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-RCM"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-LW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 1231.5,
+          "hero": [
+            82.14,
+            34.62
+          ],
+          "ball": [
+            82.56,
+            34.62
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 6.03,
+              "open": 1.05,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 6.03
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-TRAP-3",
+      "role": "ST",
+      "mode": "TRAP",
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      },
+      "choices": 47,
+      "traps": 27,
+      "trapAuto": 0,
+      "carries": 1,
+      "carryResults": [
+        {
+          "elapsed": 1.1,
+          "move": 1.2,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 8.77,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 4.3,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 7,
+      "farSideMissing": 4,
+      "farSideMissingExamples": [
+        {
+          "t": 691.9,
+          "hero": [
+            84.31,
+            32.96
+          ],
+          "ball": [
+            84.73,
+            32.96
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 2.53,
+              "open": 1.08,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 2.53
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-RW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 712.3,
+          "hero": [
+            93,
+            31.41
+          ],
+          "ball": [
+            93.42,
+            31.41
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 2.44,
+              "open": 1.81,
+              "block": 1,
+              "running": true,
+              "task": "WIDE_RELEASE_OUTLET",
+              "leadForward": 1.64
+            }
+          ],
+          "shown": [
+            [
+              "SWITCH_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 993.7,
+          "hero": [
+            79.17,
+            34.7
+          ],
+          "ball": [
+            79.59,
+            34.7
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 1.47,
+              "open": 2.71,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 1.47
+            }
+          ],
+          "shown": [
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "CARRY",
+              null
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ]
+          ]
+        },
+        {
+          "t": 1392.3,
+          "hero": [
+            88.42,
+            30.67
+          ],
+          "ball": [
+            88.84,
+            30.67
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 2.01,
+              "open": 1.45,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 2.01
+            }
+          ],
+          "shown": [
+            [
+              "SWITCH_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-TRAP-4",
+      "role": "ST",
+      "mode": "TRAP",
+      "score": {
+        "HOME": 1,
+        "AWAY": 3
+      },
+      "choices": 36,
+      "traps": 15,
+      "trapAuto": 0,
+      "carries": 0,
+      "carryResults": [],
+      "maxHeroFrameSpeed": 656.84,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 549,
+          "v": 656.8,
+          "from": [
+            101.48,
+            4
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 4.1,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 3,
+      "farSideMissing": 1,
+      "farSideMissingExamples": [
+        {
+          "t": 1106.1,
+          "hero": [
+            84.85,
+            31.36
+          ],
+          "ball": [
+            85.27,
+            31.36
+          ],
+          "viable": [
+            {
+              "id": "H-LW",
+              "forward": 2.73,
+              "open": 1.05,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 2.73
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-RW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-CARRY-1",
+      "role": "ST",
+      "mode": "CARRY",
+      "score": {
+        "HOME": 1,
+        "AWAY": 1
+      },
+      "choices": 29,
+      "traps": 7,
+      "trapAuto": 0,
+      "carries": 5,
+      "carryResults": [
+        {
+          "elapsed": 1.1,
+          "move": 1.22,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.13,
+          "forward": 1.12,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 3.02,
+          "forward": 2.94,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.33,
+          "forward": 1.19,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.28,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 611.3,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 125.4,
+          "v": 611.3,
+          "from": [
+            98.42,
+            59.9
+          ],
+          "to": [
+            43.05,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 3.2,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 0,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CARRY-2",
+      "role": "ST",
+      "mode": "CARRY",
+      "score": {
+        "HOME": 0,
+        "AWAY": 0
+      },
+      "choices": 27,
+      "traps": 5,
+      "trapAuto": 0,
+      "carries": 2,
+      "carryResults": [
+        {
+          "elapsed": 1.2,
+          "move": 1.57,
+          "forward": 1.19,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.48,
+          "forward": 1.12,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 7.7,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 3.1,
+      "maxRcmOverlapSeconds": 0.5,
+      "farSideWindows": 1,
+      "farSideMissing": 0,
+      "farSideMissingExamples": []
+    },
+    {
+      "seed": "HIST-CARRY-3",
+      "role": "ST",
+      "mode": "CARRY",
+      "score": {
+        "HOME": 0,
+        "AWAY": 1
+      },
+      "choices": 39,
+      "traps": 5,
+      "trapAuto": 0,
+      "carries": 21,
+      "carryResults": [
+        {
+          "elapsed": 1.2,
+          "move": 1.2,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.41,
+          "forward": 1.08,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.38,
+          "forward": 1.09,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.42,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.17,
+          "forward": 0.99,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.54,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.5,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.32,
+          "forward": 1.17,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.24,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 0.3,
+          "move": 0.3,
+          "forward": 0.26,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.45,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.58,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.68,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.37,
+          "forward": 1.19,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 0.8,
+          "move": 1.19,
+          "forward": 1.14,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 26,
+          "move": 0.68,
+          "forward": 0.5,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 2.46,
+          "forward": 2.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.48,
+          "forward": 0.65,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1,
+          "move": 1.02,
+          "forward": -0.25,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.23,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.31,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        }
+      ],
+      "maxHeroFrameSpeed": 7.99,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [],
+      "maxDuelSeconds": 4,
+      "maxRcmOverlapSeconds": 0,
+      "farSideWindows": 5,
+      "farSideMissing": 1,
+      "farSideMissingExamples": [
+        {
+          "t": 250.5,
+          "hero": [
+            79.68,
+            36.97
+          ],
+          "ball": [
+            80.1,
+            36.97
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 4.19,
+              "open": 1.55,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 4.19
+            }
+          ],
+          "shown": [
+            [
+              "THROUGH_PASS",
+              "H-LW"
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "HIST-CARRY-4",
+      "role": "ST",
+      "mode": "CARRY",
+      "score": {
+        "HOME": 1,
+        "AWAY": 0
+      },
+      "choices": 33,
+      "traps": 10,
+      "trapAuto": 0,
+      "carries": 12,
+      "carryResults": [
+        {
+          "elapsed": 1.1,
+          "move": 4.5,
+          "forward": 4.46,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.24,
+          "forward": 0.71,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.47,
+          "forward": 0.69,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 0.2,
+          "move": 0.13,
+          "forward": -0.04,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.69,
+          "forward": -0.34,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 4.11,
+          "forward": 4.11,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 0.1,
+          "move": 0.05,
+          "forward": 0.05,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.61,
+          "forward": -0.39,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.21,
+          "forward": -0.45,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.1,
+          "move": 1.34,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 1.2,
+          "move": 1.47,
+          "forward": 1.2,
+          "stillOwner": true,
+          "pending": false,
+          "terminal": null,
+          "reason": "TIME_SAMPLE"
+        },
+        {
+          "elapsed": 0.8,
+          "move": 1.18,
+          "forward": 1.16,
+          "stillOwner": false,
+          "pending": false,
+          "terminal": null,
+          "reason": "POSSESSION_ENDED"
+        }
+      ],
+      "maxHeroFrameSpeed": 532.82,
+      "restartSpeedJumps": [],
+      "nonRestartSpeedJumps": [
+        {
+          "t": 923.4,
+          "v": 532.8,
+          "from": [
+            94.26,
+            19.32
+          ],
+          "to": [
+            43.04,
+            34.01
+          ],
+          "phase": "OPEN_PLAY"
+        }
+      ],
+      "maxDuelSeconds": 4.2,
+      "maxRcmOverlapSeconds": 0.8,
+      "farSideWindows": 5,
+      "farSideMissing": 2,
+      "farSideMissingExamples": [
+        {
+          "t": 451.7,
+          "hero": [
+            92.66,
+            34.55
+          ],
+          "ball": [
+            93.08,
+            34.55
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 1.85,
+              "open": 1.11,
+              "block": 1,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 1.85
+            }
+          ],
+          "shown": [
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SWITCH_PASS",
+              "H-LW"
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-RCM"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        },
+        {
+          "t": 1026.2,
+          "hero": [
+            86.2,
+            37.18
+          ],
+          "ball": [
+            86.62,
+            37.18
+          ],
+          "viable": [
+            {
+              "id": "H-RW",
+              "forward": 1.41,
+              "open": 1.46,
+              "block": 0,
+              "running": false,
+              "task": "ST_RELEASE_RUN",
+              "leadForward": 1.41
+            }
+          ],
+          "shown": [
+            [
+              "SAFE_PASS",
+              "H-RW"
+            ],
+            [
+              "SHOT",
+              null
+            ],
+            [
+              "SAFE_PASS",
+              "H-CM"
+            ],
+            [
+              "SAFE_PASS",
+              "H-LCM"
+            ],
+            [
+              "AVAILABLE_PASS",
+              "H-LW"
+            ],
+            [
+              "CARRY",
+              null
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "gates": {
+    "protagonistAuthority": true,
+    "duelStall": true,
+    "rcmStOverlap": true,
+    "carrySemantics": true,
+    "farSideChoice": false,
+    "nonRestartSpeedContinuity": false,
+    "throughLead": true
+  },
+  "status": "FAIL"
+}
