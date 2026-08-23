@@ -1,0 +1,39 @@
+name: FLR V0.5 Public Open Gates Baseline
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v05-public-open-gates-baseline-request.json']
+permissions: {contents: write}
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Run exact public V0.5 historical open gates
+        shell: bash
+        run: |
+          set +e
+          node .flr/historical_open_gates_v04.js > /tmp/full.json
+          code=$?
+          cat /tmp/full.json
+          python - <<'PY'
+          import json,pathlib
+          d=json.load(open('/tmp/full.json'))
+          out={'schemaVersion':'FLR_V05_PUBLIC_OPEN_GATES_BASELINE_1.0','status':d.get('status'),'summary':d.get('summary'),'gates':d.get('gates')}
+          pathlib.Path('/tmp/summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          PY
+          exit 0
+      - name: Persist baseline
+        shell: bash
+        run: |
+          git pull --rebase origin main
+          cp /tmp/summary.json .flr/v05-public-open-gates-baseline.json
+          git config user.name 'FLR V0.5 Baseline QA'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/v05-public-open-gates-baseline.json
+          git commit -m 'Record public V0.5 open-gates baseline' || true
+          git push origin HEAD:main
