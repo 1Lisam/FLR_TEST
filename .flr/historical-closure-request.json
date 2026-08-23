@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "FLR_HISTORICAL_CLOSURE_REQUEST_1.1",
-  "requestedAt": "2026-08-23T11:50:00+09:00",
+  "schemaVersion": "FLR_HISTORICAL_CLOSURE_REQUEST_1.2",
+  "requestedAt": "2026-08-23T11:58:00+09:00",
   "scope": "TT-0.48 through USER MATCH TEST V0.3 historical user-reported match-engine regressions",
-  "purpose": "Refined current-code audit before any V0.4 promotion",
-  "runNonce": "historical-closure-refined-push-20260823-1150"
+  "purpose": "Run closure audit plus NPC attacking/backpass, one-touch, and CARRY cadence audit",
+  "runNonce": "historical-closure-plus-attack-20260823-1158"
 }
