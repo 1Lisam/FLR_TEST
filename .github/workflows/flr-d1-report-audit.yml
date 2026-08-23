@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - '.flr/d1-report-audit-request.json'
+  pull_request:
+    types: [opened, synchronize]
 
 permissions:
   contents: write
@@ -15,6 +17,7 @@ concurrency:
 
 jobs:
   audit:
+    if: github.event_name == 'push' || github.event.pull_request.title == '[FLR_AUDIT] V0.4 FEEDBACK BATCH'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
