@@ -22,105 +22,76 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Query reports and download V0.5 bundles
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Download the three submitted V0.5 bundles
         shell: bash
         run: |
           set -euo pipefail
-          npx --yes wrangler@latest d1 list --json > /tmp/dbs.json
-          dbid="$(python -c "import json; j=json.load(open('/tmp/dbs.json')); print(next(((r.get('uuid') or r.get('id') or '') for r in j if r.get('name')=='flr-bug-reports'),''))")"
-          test -n "$dbid"
-          curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H 'Content-Type: application/json' \
-            --data '{"sql":"SELECT report_id, build, created_at, category, priority, description, size_bytes, chunk_count FROM bug_reports ORDER BY created_at DESC LIMIT 50"}' \
-            > /tmp/q.json
           mkdir -p /tmp/v05
-          python - <<'PY' > /tmp/ids.tsv
-          import json
-          q=json.load(open('/tmp/q.json'))
-          assert q.get('success') is True, q
-          rows=((q.get('result') or [{}])[0].get('results') or [])
-          for r in rows:
-              if r.get('build')=='USER-MATCH-TEST-V0.5' and int(r.get('chunk_count') or 0)>0:
-                  print(r['report_id']+'\t'+r['build'])
-          PY
-          while IFS=$'\t' read -r rid build; do
-            [ -n "$rid" ] || continue
-            curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" > "/tmp/v05/${rid}.json"
-          done < /tmp/ids.tsv
+          base='https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5'
+          for rid in \
+            umt05-94f72953-e6dd-4a49-82d9-2639d15870a6 \
+            umt05-bca7cf28-9efa-407c-9692-10e3c63e3610 \
+            umt05-95769221-3144-4b0b-b702-e06fa6e7dd80; do
+            curl -fsS "$base/$rid.json" > "/tmp/v05/$rid.json"
+            python -m json.tool "/tmp/v05/$rid.json" >/dev/null
+          done
       - name: Inspect causal frames and decision state
         shell: bash
         run: |
           python - <<'PY'
           import json, math, pathlib
-          q=json.load(open('/tmp/q.json'))
-          rows=[r for r in ((q.get('result') or [{}])[0].get('results') or []) if r.get('build')=='USER-MATCH-TEST-V0.5']
+          ids=[
+          ('umt05-94f72953-e6dd-4a49-82d9-2639d15870a6','여전히 우리 팀의 포메이션에서 ST만 특출나고 나머지 우리팀과 상대팀의 포메이션은 너무 정갈함'),
+          ('umt05-bca7cf28-9efa-407c-9692-10e3c63e3610','LW 가 무방비 임에도 패스 옵션이 활성화가 안됨'),
+          ('umt05-95769221-3144-4b0b-b702-e06fa6e7dd80','공이 날아오는 것을 보여주기 전에 선택지가 나오는 현상 유지')]
           def n(v,d=None):
               try:return float(v)
               except:return d
-          def player(f,pid):
-              return next((p for p in ((f or {}).get('players') or []) if p.get('id')==pid),None)
+          def player(f,pid):return next((p for p in ((f or {}).get('players') or []) if p.get('id')==pid),None)
           def cp(p):
               if not p:return None
               return {k:p.get(k) for k in ('id','team','role','slot','x','y','vx','vy','action','tacticalTask','markTargetId','bodyAngle') if p.get(k) is not None}
-          def fr(f,hero):
+          def frame(f,hero):
               if not isinstance(f,dict):return None
               b=f.get('ball') or {}; h=player(f,hero); dist=None
               if h:dist=math.hypot(n(h.get('x'),0)-n(b.get('x'),0),n(h.get('y'),0)-n(b.get('y'),0))
               return {'t':f.get('time'),'phase':f.get('phase'),'possession':f.get('possession'),'ball':{k:b.get(k) for k in ('mode','x','y','z','ownerId','lastTouchTeam')},'hero':cp(h),'heroBallDistance':round(dist,3) if dist is not None else None}
-          def samples(fs,hero):
+          def samp(fs,hero):
               if not fs:return []
-              ix=sorted(set([0,len(fs)//4,len(fs)//2,3*len(fs)//4,len(fs)-1]))
-              return [fr(fs[i],hero) for i in ix]
+              ix=sorted(set([0,len(fs)//4,len(fs)//2,3*len(fs)//4,len(fs)-1]));return [frame(fs[i],hero) for i in ix]
           def motion(f):
               out={}
               for team in ('HOME','AWAY'):
-                  ps=[p for p in ((f or {}).get('players') or []) if p.get('team')==team]
-                  ss=[math.hypot(n(p.get('vx'),0),n(p.get('vy'),0)) for p in ps]
-                  out[team]={'count':len(ps),'movingGt0_75':sum(x>.75 for x in ss),'movingGt2':sum(x>2 for x in ss),'avgSpeed':round(sum(ss)/len(ss),3) if ss else None}
+                  ps=[p for p in ((f or {}).get('players') or []) if p.get('team')==team]; ss=[math.hypot(n(p.get('vx'),0),n(p.get('vy'),0)) for p in ps]
+                  out[team]={'count':len(ps),'movingGt0_75':sum(s>.75 for s in ss),'movingGt2':sum(s>2 for s in ss),'avgSpeed':round(sum(ss)/len(ss),3) if ss else None}
               return out
-          def segdist(p,a,b):
-              px,py=n(p.get('x'),0),n(p.get('y'),0); ax,ay=n(a.get('x'),0),n(a.get('y'),0); bx,by=n(b.get('x'),0),n(b.get('y'),0)
-              dx,dy=bx-ax,by-ay; den=dx*dx+dy*dy
+          def seg(p,a,b):
+              px,py=n(p.get('x'),0),n(p.get('y'),0);ax,ay=n(a.get('x'),0),n(a.get('y'),0);bx,by=n(b.get('x'),0),n(b.get('y'),0);dx,dy=bx-ax,by-ay;den=dx*dx+dy*dy
               if den<1e-9:return math.hypot(px-ax,py-ay),0
-              u=max(0,min(1,((px-ax)*dx+(py-ay)*dy)/den)); return math.hypot(px-(ax+u*dx),py-(ay+u*dy)),u
-          def target(f,hero,tid):
-              h=player(f,hero); t=player(f,tid)
+              u=max(0,min(1,((px-ax)*dx+(py-ay)*dy)/den));return math.hypot(px-(ax+u*dx),py-(ay+u*dy)),u
+          def target(f,hero,tid='H-LW'):
+              h=player(f,hero);t=player(f,tid)
               if not h or not t:return None
-              opp=[p for p in (f.get('players') or []) if p.get('team')!=h.get('team')]
-              near=min((math.hypot(n(p.get('x'),0)-n(t.get('x'),0),n(p.get('y'),0)-n(t.get('y'),0)) for p in opp),default=None)
-              blockers=[]
+              opp=[p for p in (f.get('players') or []) if p.get('team')!=h.get('team')]; near=min((math.hypot(n(p.get('x'),0)-n(t.get('x'),0),n(p.get('y'),0)-n(t.get('y'),0)) for p in opp),default=None); blockers=[]
               for p in opp:
-                  d,u=segdist(p,h,t)
+                  d,u=seg(p,h,t)
                   if .08<u<.96 and d<1.8:blockers.append({'id':p.get('id'),'d':round(d,2),'u':round(u,2)})
               return {'hero':cp(h),'target':cp(t),'distance':round(math.hypot(n(h.get('x'),0)-n(t.get('x'),0),n(h.get('y'),0)-n(t.get('y'),0)),2),'nearestOpponentToTarget':round(near,2) if near is not None else None,'laneBlockersWithin1_8m':blockers}
-          def cont(hb,entry):
-              st=(hb or {}).get('state') or {}; ps=st.get('players') if isinstance(st.get('players'),list) else []
-              em={p.get('id'):p for p in ((entry or {}).get('players') or [])}; ds=[]
+          def continuity(hb,entry):
+              st=(hb or {}).get('state') or {};ps=st.get('players') if isinstance(st.get('players'),list) else [];em={p.get('id'):p for p in ((entry or {}).get('players') or [])};ds=[]
               for p in ps:
                   q=em.get(p.get('id'))
                   if q and n(p.get('x')) is not None and n(p.get('y')) is not None:ds.append(math.hypot(n(p.get('x'))-n(q.get('x'),0),n(p.get('y'))-n(q.get('y'),0)))
               return {'hybridStateKeys':list(st.keys())[:30],'available':bool(ds),'count':len(ds),'maxDistance':round(max(ds),4) if ds else None,'meanDistance':round(sum(ds)/len(ds),4) if ds else None}
           def sit(s):
               if not isinstance(s,dict):return None
-              hb=s.get('hybridBefore') or {}; hr=s.get('highResolution') or {}; dec=hr.get('decision') or {}; hero=(hb.get('boundary') or {}).get('heroPlayerId') or 'H-ST'
-              pre=hr.get('preActionFrames') or []; entry=hr.get('entrySnapshot') or {}; df=dec.get('state') if isinstance(dec.get('state'),dict) and dec.get('state',{}).get('players') else (pre[-1] if pre else entry)
-              opts=[{'id':o.get('id'),'targetId':o.get('targetId'),'label':o.get('label'),'meta':o.get('meta')} for o in (dec.get('options') or [])]
-              return {'boundary':hb.get('boundary'),'entryTime':entry.get('time'),'searchSeconds':hr.get('searchSeconds'),'preActionSpan':hr.get('preActionSpan'),'decisionAt':dec.get('at'),'decisionKind':dec.get('kind'),'pre':{'count':len(pre),'start':pre[0].get('time') if pre else None,'end':pre[-1].get('time') if pre else None,'duration':round(n(pre[-1].get('time'),0)-n(pre[0].get('time'),0),3) if len(pre)>1 else 0,'samples':samples(pre,hero),'startMotion':motion(pre[0] if pre else entry),'endMotion':motion(pre[-1] if pre else df)},'decisionFrame':fr(df,hero),'targetLW':target(df,hero,'H-LW'),'options':opts,'optionsToLW':[o for o in opts if o.get('targetId')=='H-LW'],'entryPlayers':[cp(p) for p in (entry.get('players') or [])],'decisionPlayers':[cp(p) for p in ((df or {}).get('players') or [])],'continuity':cont(hb,entry),'actualResult':hr.get('actualResult'),'actualEvents':hr.get('actualEvents')}
+              hb=s.get('hybridBefore') or {};hr=s.get('highResolution') or {};dec=hr.get('decision') or {};hero=(hb.get('boundary') or {}).get('heroPlayerId') or 'H-ST';pre=hr.get('preActionFrames') or [];entry=hr.get('entrySnapshot') or {};df=dec.get('state') if isinstance(dec.get('state'),dict) and dec.get('state',{}).get('players') else (pre[-1] if pre else entry);opts=[{'id':o.get('id'),'targetId':o.get('targetId'),'label':o.get('label'),'meta':o.get('meta')} for o in (dec.get('options') or [])]
+              return {'boundary':hb.get('boundary'),'entryTime':entry.get('time'),'searchSeconds':hr.get('searchSeconds'),'preActionSpan':hr.get('preActionSpan'),'decisionAt':dec.get('at'),'decisionKind':dec.get('kind'),'pre':{'count':len(pre),'start':pre[0].get('time') if pre else None,'end':pre[-1].get('time') if pre else None,'duration':round(n(pre[-1].get('time'),0)-n(pre[0].get('time'),0),3) if len(pre)>1 else 0,'samples':samp(pre,hero),'startMotion':motion(pre[0] if pre else entry),'endMotion':motion(pre[-1] if pre else df)},'decisionFrame':frame(df,hero),'targetLW':target(df,hero),'options':opts,'optionsToLW':[o for o in opts if o.get('targetId')=='H-LW'],'entryPlayers':[cp(p) for p in (entry.get('players') or [])],'decisionPlayers':[cp(p) for p in ((df or {}).get('players') or [])],'continuity':continuity(hb,entry),'actualResult':hr.get('actualResult'),'actualEvents':hr.get('actualEvents')}
           out=[]
-          for r in sorted(rows,key=lambda x:x.get('created_at','')):
-              p=pathlib.Path('/tmp/v05')/(r['report_id']+'.json')
-              try:
-                  d=json.loads(p.read_text(encoding='utf-8'))
-                  out.append({'meta':r,'context':d.get('bugReportContext'),'current':sit(d.get('currentSituation')),'previous':sit(d.get('previousSituation'))})
-              except Exception as e:out.append({'meta':r,'error':repr(e)})
-          pathlib.Path('/tmp/v05-status.json').write_text(json.dumps({'schemaVersion':'FLR_V05_REPORT_INSPECT_1.1','count':len(out),'reports':out},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          for rid,desc in ids:
+              d=json.loads((pathlib.Path('/tmp/v05')/(rid+'.json')).read_text(encoding='utf-8'))
+              out.append({'reportId':rid,'description':desc,'context':d.get('bugReportContext'),'current':sit(d.get('currentSituation')),'previous':sit(d.get('previousSituation'))})
+          pathlib.Path('/tmp/v05-status.json').write_text(json.dumps({'schemaVersion':'FLR_V05_REPORT_INSPECT_1.2','count':len(out),'reports':out},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
       - name: Persist inspection
         shell: bash
