@@ -1,0 +1,180 @@
+name: FLR V0.5.1 Consolidated Retest Candidate
+
+on:
+  push:
+    branches: [main]
+    paths: ['.flr/v051-consolidated-retest-request.json']
+
+permissions: {contents: write}
+
+jobs:
+  direct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Apply consolidated patch
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node --check step71_hybrid_v06_ui.js
+          node --check runtime/protagonist_match_controller.js
+          node --check live_hybrid_session_v02.js
+          node --check runtime/continuous_match_core.js
+      - name: Direct regression for all user-retest contracts
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),a=require('assert');
+          const E=require('./runtime/continuous_match_core.js'),P=require('./runtime/protagonist_match_controller.js'),H=require('./live_hybrid_session_v02.js');
+          const checks=[];const ok=(name,detail={})=>checks.push({name,pass:true,...detail});
+
+          // A. Current four reports.
+          const ui=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          a(ui.includes('function showPendingCausally()'));a(ui.includes("p.kind==='INCOMING_BALL'&&p.chained"));a(!ui.includes('if(session.pending?.chained){showPending();return}'));a(ui.includes("startReplay(clip,'CHOICE','다가오는 공 → 선택 직전 실제 경기')"));ok('CHAINED_INCOMING_REPLAY_BEFORE_OPTIONS');
+
+          let s=P.create('V051-OPEN-LW',{heroPlayerId:'H-ST',mode:'PLAYER_ALL'}),old=E.choiceStateBridge;
+          let fake={kind:'ON_BALL',playerId:'H-ST',team:'HOME',role:'ST',slot:'ST',time:66.55,localX:78.78,localY:35.06,pressure:2.384,space:.9,shot:{dGoal:26.24,inBox:false,oneVOne:false,openWindow:false,longRange:false,turningRequired:false,backToGoal:false,bodyAngleDiff:.2,blockers:1},candidates:[{id:'TAKE_ON',score:2.3,meta:{}},{id:'CARRY',score:2.1,meta:{}},{id:'HOLD',score:2,meta:{}},{id:'SAFE_PASS',targetId:'H-RCM',score:1.9,meta:{targetSlot:'RCM'}},{id:'SHOT',score:1.8,meta:{}},{id:'SAFE_PASS',targetId:'H-CM',score:1.7,meta:{targetSlot:'CM'}}],_frame:{opts:[{p:{id:'H-LW',role:'WF',slot:'LW',vx:.693,vy:2.524,tacticalTask:'ST_RELEASE_RUN'},block:1,d:16.23,open:6.06,forward:-1.19,running:true,offsideRisk:false}]}};
+          E.choiceStateBridge=()=>({inspect:()=>fake});let q=P.inspect(s);E.choiceStateBridge=old;let lw=q.options.find(x=>x.targetId==='H-LW');a(lw);a.strictEqual(lw.meta.targetId,'H-LW');a.strictEqual(!!s.futureOutcomePrecomputed,false);ok('OPEN_LATERAL_LW_OPTION',{targetId:lw.targetId});
+
+          const hs=fs.readFileSync('live_hybrid_session_v02.js','utf8');a(hs.includes("fromExact=sp.source==='V06_HANDOFF_EXACT'"));a(hs.includes("fromExact?24:18"));a(hs.includes('HYBRID_CONTINUOUS_FROM_V06'));a(hs.includes("nearSide=(nearLeft&&['LB','LCM','LW'].includes(slot))"));ok('HYBRID_SPATIAL_ASYMMETRY_RETENTION_POLICY');
+
+          let m=E.createMatch('V051-THROUGH-RECEIVE',{});m.restart=null;m.phase='OPEN_PLAY';m.time=100;m.nextShape=999;m.protagonistControllerId='H-LW';m.protagonistExplicitActionRequired=true;let B=E.choiceActionBridge(),r=B.playerById(m,'H-LW');r.x=76;r.y=18;r.vx=5;r.vy=.15;r.tx=82;r.ty=18.3;r.sprint=true;m.ball={...m.ball,x:75.55,y:18,z:0,mode:'LOOSE',ownerId:null};m.possession='HOME';B.setControlled(m,r,true,{flow:true,flightKind:'THROUGH',deliveryMode:'GROUND',sourceId:'H-ST',incomingVx:15,incomingVy:.3});let x0=r.x,d=Math.hypot(r.tx-r.x,r.ty-r.y);a(r.sprint===true);a(r.receiveRunContinuationUntil>=100.99);a(d>=4);E.step(m,.1);E.step(m,.1);E.step(m,.1);a(r.x>x0+.08);a(r.receiveRunContinuationUntil>m.time);ok('THROUGH_RECEIVE_MOMENTUM_CONTINUES',{targetDistance:+d.toFixed(3),advance:+(r.x-x0).toFixed(3)});
+
+          // B. Previously fixed items that still needed user visual verification.
+          // Explicit lofted through option: same live receiver, different AERIAL trajectory.
+          s=P.create('V051-LOFT',{heroPlayerId:'H-ST',mode:'PLAYER_ALL'});old=E.choiceStateBridge;
+          fake={kind:'ON_BALL',playerId:'H-ST',team:'HOME',role:'ST',slot:'ST',time:50,localX:70,localY:34,pressure:2.1,space:4,shot:{dGoal:35,inBox:false,oneVOne:false,openWindow:false,blockers:1},candidates:[{id:'THROUGH_PASS',score:3,targetId:'H-LW',targetName:'블루팀 LW',meta:{targetId:'H-LW',targetSlot:'LW',runLead:true,running:true,leadForward:12}},{id:'CARRY',score:2.2,meta:{space:4}},{id:'HOLD',score:1.5,meta:{}}],_frame:{opts:[]}};
+          E.choiceStateBridge=()=>({inspect:()=>fake});q=P.inspect(s);E.choiceStateBridge=old;const ground=q.options.find(x=>x.id==='THROUGH_PASS'&&x.targetId==='H-LW'),loft=q.options.find(x=>x.id==='LOFTED_THROUGH_PASS'&&x.targetId==='H-LW');a(ground&&loft);a.strictEqual(loft.meta.deliveryMode,'AERIAL');a.strictEqual(loft.meta.trajectory,'LOFTED_THROUGH');const core=fs.readFileSync('runtime/continuous_match_core.js','utf8');a(core.includes('LOFTED_THROUGH_PASS'));a(core.includes('forceAerial:true'));ok('LOFTED_THROUGH_SAME_TARGET_AERIAL',{targetId:loft.targetId});
+
+          // Scan-facing ±PI jitter lock.
+          m=E.createMatch('V051-SCAN-JITTER',{});m.restart=null;m.phase='OPEN_PLAY';m.time=10;m.nextShape=999;B=E.choiceActionBridge();let h=B.playerById(m,'H-ST');h.x=70;h.y=34;h.tx=70;h.ty=34;h.vx=h.vy=0;B.setControlled(m,h);h.action=h.tacticalTask='PROTECT_SCAN';h.bodyAngle=-3.12;h.faceTargetAngle=null;h.nextThink=999;h.lockTargetUntil=999;E.step(m,.1);const side1=h.scanFacingSide,lock1=h.scanFacingSideUntil;h.bodyAngle=3.12;h.action=h.tacticalTask='PROTECT_SCAN';h.nextThink=999;h.lockTargetUntil=999;E.step(m,.1);const side2=h.scanFacingSide;a(side1===1||side1===-1);a.strictEqual(side2,side1);a(lock1>10);ok('SCAN_FACING_WRAP_LOCK',{side:side1});
+
+          // Pass -> teammate goal: real observed GOAL event must wait on visible celebration age.
+          s=P.create('V051-GOAL-TRACK',{heroPlayerId:'H-ST'});s.m.time=125;s.m.restart=null;s.m.phase='GOAL_CELEBRATION';s.m.goalCelebration={startedAt:125};s.m.events=[{t:100.6,type:'SHOT',actorId:'H-RCM',team:'HOME',text:'RCM 슈팅'},{t:101.0,type:'GOAL',actorId:'H-RCM',team:'HOME',text:'RCM 득점'}];s.m.possession='AWAY';s.currentScene={sceneId:'G',heroPlayerId:'H-ST',checkpointInspect:{team:'HOME',candidates:[]},checkpointState:{player:{x:70,y:34}},postFrames:[]};s.resultTracker={sceneId:'G',startedAt:100,minimumUntil:100.9,deadline:108,choiceId:'SAFE_PASS',targetId:'H-RCM',targetName:'블루팀 RCM',label:'안전한 패스',family:'패스',action:{type:'PASS'},intentUntil:null,seen:new Set(),newEvents:[],startScore:{HOME:0,AWAY:0},startPossession:'HOME',startOwnerId:'H-ST',terminalEvent:null,terminalAt:null,possessionChangedAt:null,done:false};P.step(s,.1);a(s.resultTracker,'goal tracker finalized before visible celebration');s.m.time=129.9;s.m.phase='GOAL_CELEBRATION';s.m.goalCelebration={startedAt:125};P.step(s,.02);a(s.lastResult);a.strictEqual(s.lastResult.code,'GOAL');a(s.lastResult.headline.includes('동료 득점'));ok('PASS_TO_TEAMMATE_GOAL_VISIBLE_CELEBRATION',{code:s.lastResult.code});
+
+          // Offside readability: compressed match clock cannot finalize before visible restart setup.
+          s=P.create('V051-OFFSIDE-READ',{heroPlayerId:'H-ST'});s.m.time=117;s.m.phase='OFFSIDE';s.m.restart={kind:'OFFSIDE',team:'AWAY',setupStartedAt:117,setup:{readyRatio:0},ballReturn:null};s.m.events=[{t:100.7,type:'OFFSIDE',team:'HOME',text:'오프사이드'}];s.m.possession='AWAY';s.currentScene={sceneId:'O',heroPlayerId:'H-ST',checkpointInspect:{team:'HOME',candidates:[]},checkpointState:{player:{x:70,y:34}},postFrames:[]};s.resultTracker={sceneId:'O',startedAt:100,minimumUntil:100.9,deadline:108,choiceId:'THROUGH_PASS',targetId:'H-LW',targetName:'블루팀 LW',label:'공간 침투 패스',family:'패스',action:{type:'PASS'},intentUntil:null,seen:new Set(),newEvents:[],startScore:{HOME:0,AWAY:0},startPossession:'HOME',startOwnerId:'H-ST',terminalEvent:null,terminalAt:null,possessionChangedAt:null,done:false};P.step(s,.02);a(s.resultTracker,'offside finalized without visible linger');s.m.time=118.2;s.m.phase='OFFSIDE';s.m.restart={kind:'OFFSIDE',team:'AWAY',setupStartedAt:117,setup:{readyRatio:.8},ballReturn:null};P.step(s,.02);a(s.lastResult);a.strictEqual(s.lastResult.code,'OFFSIDE');a(s.lastResult.headline.includes('오프사이드'));ok('OFFSIDE_VISIBLE_RESULT_LINGER');
+
+          // Earned attacking set piece remains in the same Episode despite dead-clock jump.
+          s=P.create('V051-SETPIECE',{heroPlayerId:'H-ST'});s.activeEpisode={id:'EP-QA',team:'HOME',startedAt:100,hardUntil:105,until:104,lostAt:null,lastChoiceAt:100};s.m.time=120;s.m.restart={kind:'CORNER',team:'HOME'};P.maybeCheckpoint(s);a(s.activeEpisode&&s.activeEpisode.id==='EP-QA');a(s.activeEpisode.hardUntil>=128);a(s.activeEpisode.until>=127);ok('EARNED_SETPIECE_EPISODE_CONTINUITY',{hardUntil:s.activeEpisode.hardUntil});
+
+          // Canonical future-outcome safeguards remain false.
+          a.strictEqual(!!s.futureOutcomePrecomputed,false);a(core.includes('futureOutcomePrecomputed:false'));ok('FUTURE_OUTCOME_PRECOMPUTE_FALSE');
+
+          console.log(JSON.stringify({status:'PASS',checks},null,2));
+          NODE
+
+  presentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_presentation_discontinuity_v04.js
+
+  farside:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_far_side_committed_v04.js
+
+  carry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_carry_cadence_v04.js
+
+  open_gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/historical_open_gates_v04.js
+
+  nonhero:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          node .flr/v04_nonhero_shot_diversity_audit.js "$PWD" 240 > /tmp/nonhero.json
+          cat /tmp/nonhero.json
+          node - <<'NODE'
+          const d=require('/tmp/nonhero.json'),a=require('assert');
+          const ft=Number(d.zoneCounts?.FINAL_THIRD||0),box=Number(d.zoneCounts?.BOX||0),n=Number(d.windows||0);
+          a(n>=180);a(d.uniqueShooters>=8);a(d.topShooterShare<=.30);a(ft/n>=.15);a(box/n<=.85);
+          console.log(JSON.stringify({status:'PASS',windows:n,uniqueShooters:d.uniqueShooters,topShooterShare:d.topShooterShare,finalThirdShare:ft/n,boxShare:box/n}));
+          NODE
+
+  commit_candidate:
+    if: success()
+    needs: [direct, presentation, farside, carry, open_gates, nonhero]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: candidate/v051-consolidated-retest-20260823, fetch-depth: 0}
+      - name: Apply validated patch and label candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply.py -o /tmp/apply.py
+          python /tmp/apply.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html');s=p.read_text()
+          s=s.replace('Match Engine User Test V0.5','Match Engine User Test V0.5.1').replace('매치엔진 사용자 테스트 V0.5','매치엔진 사용자 테스트 V0.5.1').replace('USER MATCH TEST <strong>V0.5</strong>','USER MATCH TEST <strong>V0.5.1</strong>')
+          p.write_text(s)
+          PY
+          mkdir -p .flr/qa-results
+          cat > .flr/qa-results/V051_CONSOLIDATED_RETEST.json <<'JSON'
+          {
+            "schemaVersion":"FLR_V051_CONSOLIDATED_RETEST_1.0",
+            "status":"PASS_FOR_USER_RETEST",
+            "scope":["4 new V0.5 reports","lofted through-pass","scan jitter","pass-to-teammate goal celebration","offside readability","set-piece continuity","far-side committed runner","carry cadence","dead-clock presentation","nonhero shot diversity","strong-attack harmful backpass"],
+            "gates":{"direct":true,"presentation":true,"farside":true,"carry":true,"openGates":true,"nonhero":true},
+            "futureOutcomePrecomputed":false
+          }
+          JSON
+          node --check step71_hybrid_v06_ui.js
+          node --check runtime/protagonist_match_controller.js
+          node --check live_hybrid_session_v02.js
+          node --check runtime/continuous_match_core.js
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html step71_hybrid_v06_ui.js runtime/protagonist_match_controller.js live_hybrid_session_v02.js runtime/continuous_match_core.js .flr/qa-results/V051_CONSOLIDATED_RETEST.json
+          git commit -m 'Prepare User Match Test V0.5.1 consolidated retest'
+          git push origin HEAD:candidate/v051-consolidated-retest-20260823
