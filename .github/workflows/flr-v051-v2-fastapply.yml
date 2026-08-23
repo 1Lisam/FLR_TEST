@@ -17,7 +17,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/main/.flr/v051_consolidated_retest_apply_v2.py -o /tmp/a.py
+          curl -fsSL https://raw.githubusercontent.com/1Lisam/FLR_TEST/4c39a9a37087a65c6a0ca1e945ac48f78303d4b3/.flr/v051_consolidated_retest_apply_v2.py -o /tmp/a.py
           python /tmp/a.py > /tmp/fastapply.log 2>&1
           code=$?
           if [ $code -eq 0 ]; then node --check runtime/continuous_match_core.js >> /tmp/fastapply.log 2>&1; code=$?; fi
@@ -34,6 +34,6 @@ jobs:
           python - <<'PY'
           import json,os,pathlib
           p=pathlib.Path('/tmp/fastapply.log');log=p.read_text(errors='replace')[-6000:] if p.exists() else 'NO_LOG'
-          pathlib.Path('.flr/v051-v2-fastapply-status.json').write_text(json.dumps({'status':'PASS' if os.environ['OUTCOME']=='success' else 'FAIL','log':log},indent=2)+'\n')
+          pathlib.Path('.flr/v051-v2-fastapply-status.json').write_text(json.dumps({'status':'PASS' if os.environ['OUTCOME']=='success' else 'FAIL','patchCommit':'4c39a9a37087a65c6a0ca1e945ac48f78303d4b3','log':log},indent=2)+'\n')
           PY
-          git config user.name 'FLR V0.5.1 Fast';git config user.email 'actions@users.noreply.github.com';git add .flr/v051-v2-fastapply-status.json;git commit -m 'Record V0.5.1 V2 fast apply detail' || true;git push origin HEAD:main;[ "$OUTCOME" = success ]
+          git config user.name 'FLR V0.5.1 Fast';git config user.email 'actions@users.noreply.github.com';git add .flr/v051-v2-fastapply-status.json;git commit -m 'Record pinned V0.5.1 V2 fast apply' || true;git push origin HEAD:main;[ "$OUTCOME" = success ]
