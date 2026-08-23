@@ -1,0 +1,521 @@
+{
+  "schemaVersion": "FLR_HISTORICAL_CLOSURE_V04_VALIDATION_1.0",
+  "summary": {
+    "matches": 24,
+    "strongWindows": 818,
+    "strongActions": 44,
+    "harmfulBackpasses": 7,
+    "deadAttackStalls": 0,
+    "npcOneTouchPasses": 1382,
+    "carryChoices": 204,
+    "carryFollowups": 92,
+    "badRapidCarryReprompts": 5,
+    "minCarryFollowupDelay": 1
+  },
+  "gates": {
+    "historicalRegression": false,
+    "npcOneTouch": true,
+    "npcGoodAttackNoDeadStall": true,
+    "strongAttackNoHarmfulBackpass": false,
+    "carryCadence": false
+  },
+  "status": "FAIL",
+  "legacyStatus": "FAIL",
+  "npc": [
+    {
+      "seed": "HIST-V04-NPC-1",
+      "score": {
+        "HOME": 0,
+        "AWAY": 5
+      },
+      "strongWindows": 33,
+      "strongActions": 2,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 48,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-2",
+      "score": {
+        "HOME": 4,
+        "AWAY": 1
+      },
+      "strongWindows": 34,
+      "strongActions": 0,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 55,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-3",
+      "score": {
+        "HOME": 5,
+        "AWAY": 3
+      },
+      "strongWindows": 33,
+      "strongActions": 1,
+      "harmfulBackpasses": 1,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 72,
+      "examples": [
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 83,
+          "owner": "H-RCM",
+          "fromX": 81.54,
+          "target": "H-LCM",
+          "targetX": 69.81,
+          "cleanShot": false,
+          "runnerLane": true,
+          "runnerId": "H-ST",
+          "runnerLead": 10.39
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-NPC-4",
+      "score": {
+        "HOME": 2,
+        "AWAY": 2
+      },
+      "strongWindows": 45,
+      "strongActions": 5,
+      "harmfulBackpasses": 1,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 53,
+      "examples": [
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 115.3,
+          "owner": "H-LW",
+          "fromX": 96.82,
+          "target": "H-RW",
+          "targetX": 92.29,
+          "cleanShot": true,
+          "runnerLane": false,
+          "runnerId": null,
+          "runnerLead": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-NPC-5",
+      "score": {
+        "HOME": 4,
+        "AWAY": 8
+      },
+      "strongWindows": 28,
+      "strongActions": 1,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 50,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-6",
+      "score": {
+        "HOME": 2,
+        "AWAY": 2
+      },
+      "strongWindows": 28,
+      "strongActions": 0,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 53,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-7",
+      "score": {
+        "HOME": 7,
+        "AWAY": 0
+      },
+      "strongWindows": 37,
+      "strongActions": 0,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 65,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-8",
+      "score": {
+        "HOME": 0,
+        "AWAY": 3
+      },
+      "strongWindows": 34,
+      "strongActions": 0,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 72,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-9",
+      "score": {
+        "HOME": 4,
+        "AWAY": 3
+      },
+      "strongWindows": 24,
+      "strongActions": 6,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 65,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-10",
+      "score": {
+        "HOME": 4,
+        "AWAY": 4
+      },
+      "strongWindows": 26,
+      "strongActions": 1,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 66,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-11",
+      "score": {
+        "HOME": 1,
+        "AWAY": 3
+      },
+      "strongWindows": 36,
+      "strongActions": 3,
+      "harmfulBackpasses": 2,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 73,
+      "examples": [
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 54.9,
+          "owner": "H-ST",
+          "fromX": 93.37,
+          "target": "H-RW",
+          "targetX": 89.27,
+          "cleanShot": true,
+          "runnerLane": false,
+          "runnerId": null,
+          "runnerLead": null
+        },
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 167.7,
+          "owner": "H-LW",
+          "fromX": 91.85,
+          "target": "H-RCM",
+          "targetX": 83.7,
+          "cleanShot": true,
+          "runnerLane": false,
+          "runnerId": null,
+          "runnerLead": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-NPC-12",
+      "score": {
+        "HOME": 1,
+        "AWAY": 4
+      },
+      "strongWindows": 38,
+      "strongActions": 2,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 52,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-13",
+      "score": {
+        "HOME": 2,
+        "AWAY": 2
+      },
+      "strongWindows": 42,
+      "strongActions": 0,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 50,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-14",
+      "score": {
+        "HOME": 0,
+        "AWAY": 4
+      },
+      "strongWindows": 45,
+      "strongActions": 3,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 47,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-15",
+      "score": {
+        "HOME": 6,
+        "AWAY": 3
+      },
+      "strongWindows": 21,
+      "strongActions": 2,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 65,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-16",
+      "score": {
+        "HOME": 3,
+        "AWAY": 5
+      },
+      "strongWindows": 33,
+      "strongActions": 3,
+      "harmfulBackpasses": 1,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 61,
+      "examples": [
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 38.6,
+          "owner": "A-LCM",
+          "fromX": 85.17,
+          "target": "A-RCM",
+          "targetX": 70.81,
+          "cleanShot": false,
+          "runnerLane": true,
+          "runnerId": "A-ST",
+          "runnerLead": 6.37
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-NPC-17",
+      "score": {
+        "HOME": 4,
+        "AWAY": 6
+      },
+      "strongWindows": 30,
+      "strongActions": 2,
+      "harmfulBackpasses": 1,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 58,
+      "examples": [
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 36.4,
+          "owner": "A-ST",
+          "fromX": 90.21,
+          "target": "A-RCM",
+          "targetX": 74.5,
+          "cleanShot": true,
+          "runnerLane": false,
+          "runnerId": null,
+          "runnerLead": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-NPC-18",
+      "score": {
+        "HOME": 2,
+        "AWAY": 5
+      },
+      "strongWindows": 33,
+      "strongActions": 1,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 53,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-19",
+      "score": {
+        "HOME": 4,
+        "AWAY": 3
+      },
+      "strongWindows": 33,
+      "strongActions": 3,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 50,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-20",
+      "score": {
+        "HOME": 6,
+        "AWAY": 2
+      },
+      "strongWindows": 39,
+      "strongActions": 2,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 47,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-21",
+      "score": {
+        "HOME": 2,
+        "AWAY": 6
+      },
+      "strongWindows": 32,
+      "strongActions": 2,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 58,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-22",
+      "score": {
+        "HOME": 3,
+        "AWAY": 3
+      },
+      "strongWindows": 37,
+      "strongActions": 1,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 56,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-23",
+      "score": {
+        "HOME": 2,
+        "AWAY": 2
+      },
+      "strongWindows": 38,
+      "strongActions": 0,
+      "harmfulBackpasses": 0,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 54,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-NPC-24",
+      "score": {
+        "HOME": 5,
+        "AWAY": 5
+      },
+      "strongWindows": 39,
+      "strongActions": 4,
+      "harmfulBackpasses": 1,
+      "deadAttackStalls": 0,
+      "npcOneTouchPasses": 59,
+      "examples": [
+        {
+          "kind": "HARMFUL_BACKPASS",
+          "t": 162.1,
+          "owner": "A-LW",
+          "fromX": 82.61,
+          "target": "A-LB",
+          "targetX": 68,
+          "cleanShot": false,
+          "runnerLane": true,
+          "runnerId": "A-ST",
+          "runnerLead": 4.25
+        }
+      ]
+    }
+  ],
+  "carry": [
+    {
+      "seed": "HIST-V04-CARRY-1",
+      "carries": 11,
+      "followups": 6,
+      "badRapidCarryReprompts": 0,
+      "minDelay": 3.3,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-CARRY-2",
+      "carries": 32,
+      "followups": 15,
+      "badRapidCarryReprompts": 0,
+      "minDelay": 1.4,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-CARRY-3",
+      "carries": 25,
+      "followups": 10,
+      "badRapidCarryReprompts": 0,
+      "minDelay": 3.2,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-CARRY-4",
+      "carries": 22,
+      "followups": 12,
+      "badRapidCarryReprompts": 0,
+      "minDelay": 3,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-CARRY-5",
+      "carries": 24,
+      "followups": 9,
+      "badRapidCarryReprompts": 0,
+      "minDelay": 3.2,
+      "examples": []
+    },
+    {
+      "seed": "HIST-V04-CARRY-6",
+      "carries": 42,
+      "followups": 17,
+      "badRapidCarryReprompts": 4,
+      "minDelay": 1.4,
+      "examples": [
+        {
+          "t": 2240.2,
+          "delay": 1.9,
+          "displacement": 0.72
+        },
+        {
+          "t": 2244.9,
+          "delay": 1.4,
+          "displacement": 2.31
+        },
+        {
+          "t": 2246.8,
+          "delay": 1.9,
+          "displacement": 2.16
+        },
+        {
+          "t": 2248.2,
+          "delay": 1.4,
+          "displacement": 1.96
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-CARRY-7",
+      "carries": 24,
+      "followups": 11,
+      "badRapidCarryReprompts": 1,
+      "minDelay": 1,
+      "examples": [
+        {
+          "t": 554,
+          "delay": 1,
+          "displacement": 0.39
+        }
+      ]
+    },
+    {
+      "seed": "HIST-V04-CARRY-8",
+      "carries": 24,
+      "followups": 12,
+      "badRapidCarryReprompts": 0,
+      "minDelay": 3.2,
+      "examples": []
+    }
+  ]
+}
