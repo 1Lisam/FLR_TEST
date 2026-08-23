@@ -1,6 +1,9 @@
 from pathlib import Path
-import runpy,re
-runpy.run_path('.flr/v051_consolidated_retest_apply.py', run_name='__main__')
+import runpy,re,urllib.request
+BASE_PATCH_COMMIT='9d1577c26c7411e411df03a1420c934ce38805aa'
+base_url=f'https://raw.githubusercontent.com/1Lisam/FLR_TEST/{BASE_PATCH_COMMIT}/.flr/v051_consolidated_retest_apply.py'
+urllib.request.urlretrieve(base_url,'/tmp/v051_consolidated_base.py')
+runpy.run_path('/tmp/v051_consolidated_base.py', run_name='__main__')
 p=Path('runtime/continuous_match_core.js')
 s=p.read_text(encoding='utf-8')
 
