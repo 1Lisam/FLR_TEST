@@ -1,0 +1,2226 @@
+{
+  "schemaVersion": "FLR_HISTORICAL_ATTACK_AUDIT_1.0",
+  "generatedAt": "2026-08-23T03:05:31.633Z",
+  "summary": {
+    "matches": 24,
+    "highValueWfActions": 81,
+    "harmfulBackpasses": 33,
+    "ditherLosses": 197,
+    "npcOneTouchPasses": 1474,
+    "carryChoices": 37,
+    "shortCarryReprompts": 1,
+    "minCarryRepromptDelay": 1.8
+  },
+  "npc": [
+    {
+      "seed": "HIST-ATTACK-NPC-1",
+      "score": {
+        "HOME": 1,
+        "AWAY": 8
+      },
+      "highValueWfActions": 3,
+      "harmfulBackpasses": 0,
+      "ditherLosses": 7,
+      "npcOneTouchPasses": 49,
+      "examples": [
+        {
+          "kind": "DITHER_LOSS",
+          "t": 122.8,
+          "owner": "A-RW",
+          "fromX": 91.5,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 643.2,
+          "owner": "H-LW",
+          "fromX": 86.03,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 2.1
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1194.9,
+          "owner": "A-RW",
+          "fromX": 92.42,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3330.4,
+          "owner": "A-RW",
+          "fromX": 92.51,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3400.4,
+          "owner": "A-LW",
+          "fromX": 92.91,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3738.4,
+          "owner": "H-RW",
+          "fromX": 92.17,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4953.4,
+          "owner": "A-RW",
+          "fromX": 89.49,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-2",
+      "score": {
+        "HOME": 4,
+        "AWAY": 5
+      },
+      "highValueWfActions": 5,
+      "harmfulBackpasses": 2,
+      "ditherLosses": 9,
+      "npcOneTouchPasses": 49,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 107.7,
+          "owner": "A-RW",
+          "fromX": 90.44,
+          "target": "A-LCM",
+          "targetX": 75.85,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 154.1,
+          "owner": "A-LW",
+          "fromX": 91.81,
+          "target": "A-RCM",
+          "targetX": 74,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 504.5,
+          "owner": "H-RW",
+          "fromX": 92.63,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1345.1,
+          "owner": "A-LW",
+          "fromX": 90.58,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1640.8,
+          "owner": "A-RW",
+          "fromX": 92.1,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1695.7,
+          "owner": "A-RW",
+          "fromX": 91.76,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2460.4,
+          "owner": "H-LW",
+          "fromX": 90.69,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3432.9,
+          "owner": "H-RW",
+          "fromX": 91.74,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-3",
+      "score": {
+        "HOME": 3,
+        "AWAY": 3
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 2,
+      "ditherLosses": 12,
+      "npcOneTouchPasses": 56,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 82.8,
+          "owner": "H-RW",
+          "fromX": 91.29,
+          "target": "H-RCM",
+          "targetX": 79.52,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 247,
+          "owner": "A-RW",
+          "fromX": 91.02,
+          "target": "A-RB",
+          "targetX": 72.25,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 807.8,
+          "owner": "A-RW",
+          "fromX": 92.96,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1863.1,
+          "owner": "H-RW",
+          "fromX": 91.84,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2278.3,
+          "owner": "A-RW",
+          "fromX": 83.19,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.38
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2532.3,
+          "owner": "H-RW",
+          "fromX": 92.13,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3339.9,
+          "owner": "A-LW",
+          "fromX": 92.02,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3546.2,
+          "owner": "H-RW",
+          "fromX": 91.05,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-4",
+      "score": {
+        "HOME": 8,
+        "AWAY": 0
+      },
+      "highValueWfActions": 1,
+      "harmfulBackpasses": 0,
+      "ditherLosses": 5,
+      "npcOneTouchPasses": 60,
+      "examples": [
+        {
+          "kind": "DITHER_LOSS",
+          "t": 650.6,
+          "owner": "H-RW",
+          "fromX": 91.03,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1154.1,
+          "owner": "H-RW",
+          "fromX": 90.65,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1961.8,
+          "owner": "H-LW",
+          "fromX": 91.98,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2229.9,
+          "owner": "A-LW",
+          "fromX": 91.79,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 5284,
+          "owner": "A-RW",
+          "fromX": 91.86,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-5",
+      "score": {
+        "HOME": 4,
+        "AWAY": 2
+      },
+      "highValueWfActions": 7,
+      "harmfulBackpasses": 3,
+      "ditherLosses": 8,
+      "npcOneTouchPasses": 54,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 73.1,
+          "owner": "H-RW",
+          "fromX": 91.42,
+          "target": "H-RCM",
+          "targetX": 80.18,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 128.1,
+          "owner": "H-LW",
+          "fromX": 91.88,
+          "target": "H-LB",
+          "targetX": 71.38,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 168.1,
+          "owner": "H-RW",
+          "fromX": 91.62,
+          "target": "H-LCM",
+          "targetX": 74,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 750.7,
+          "owner": "H-LW",
+          "fromX": 90.8,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1820.6,
+          "owner": "A-RW",
+          "fromX": 91.25,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3087,
+          "owner": "H-LW",
+          "fromX": 83.39,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 3.71
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4286,
+          "owner": "A-RW",
+          "fromX": 90.86,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4315.1,
+          "owner": "A-RW",
+          "fromX": 89.28,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-6",
+      "score": {
+        "HOME": 5,
+        "AWAY": 3
+      },
+      "highValueWfActions": 5,
+      "harmfulBackpasses": 3,
+      "ditherLosses": 9,
+      "npcOneTouchPasses": 55,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 70.3,
+          "owner": "H-RW",
+          "fromX": 81.55,
+          "target": "H-RB",
+          "targetX": 71.18,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 1.16
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 227.2,
+          "owner": "A-LW",
+          "fromX": 91.88,
+          "target": "A-LCM",
+          "targetX": 82.14,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 232.4,
+          "owner": "A-RW",
+          "fromX": 90.43,
+          "target": "A-LCM",
+          "targetX": 84.7,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 370.1,
+          "owner": "A-LW",
+          "fromX": 92.35,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 920.6,
+          "owner": "A-RW",
+          "fromX": 81.31,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.76
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1519.5,
+          "owner": "H-RW",
+          "fromX": 92.49,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1915.1,
+          "owner": "A-LW",
+          "fromX": 91.5,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2158.6,
+          "owner": "A-LW",
+          "fromX": 91.98,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-7",
+      "score": {
+        "HOME": 5,
+        "AWAY": 5
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 7,
+      "npcOneTouchPasses": 56,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 263.5,
+          "owner": "H-LW",
+          "fromX": 91.58,
+          "target": "H-LCM",
+          "targetX": 85.59,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1364.2,
+          "owner": "H-RW",
+          "fromX": 89.78,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1559,
+          "owner": "H-LW",
+          "fromX": 91.91,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2491.9,
+          "owner": "H-RW",
+          "fromX": 82.29,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 3.35
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2692,
+          "owner": "H-RW",
+          "fromX": 92.24,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3280.3,
+          "owner": "A-LW",
+          "fromX": 93.8,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4294.7,
+          "owner": "A-RW",
+          "fromX": 85.62,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 2.1
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 5204.7,
+          "owner": "A-LW",
+          "fromX": 92.79,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-8",
+      "score": {
+        "HOME": 2,
+        "AWAY": 3
+      },
+      "highValueWfActions": 1,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 10,
+      "npcOneTouchPasses": 63,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 334.2,
+          "owner": "A-RW",
+          "fromX": 91.73,
+          "target": "A-LCM",
+          "targetX": 78.1,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 425,
+          "owner": "H-LW",
+          "fromX": 95.69,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 943.6,
+          "owner": "H-RW",
+          "fromX": 83.82,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 1.33
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1014,
+          "owner": "H-LW",
+          "fromX": 92.18,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1786.1,
+          "owner": "A-LW",
+          "fromX": 92.5,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3380.1,
+          "owner": "A-RW",
+          "fromX": 90.83,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3675.1,
+          "owner": "A-RW",
+          "fromX": 92.05,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4347.6,
+          "owner": "A-RW",
+          "fromX": 82.66,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.4
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-9",
+      "score": {
+        "HOME": 2,
+        "AWAY": 6
+      },
+      "highValueWfActions": 3,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 8,
+      "npcOneTouchPasses": 68,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 68.2,
+          "owner": "A-RW",
+          "fromX": 88.54,
+          "target": "A-RCM",
+          "targetX": 74.4,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 805.2,
+          "owner": "A-RW",
+          "fromX": 87.01,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.19
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1672.3,
+          "owner": "H-RW",
+          "fromX": 89.4,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2122.4,
+          "owner": "H-RW",
+          "fromX": 91.82,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2244.2,
+          "owner": "H-LW",
+          "fromX": 85.51,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 2.57
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3224.3,
+          "owner": "A-LW",
+          "fromX": 94.35,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": "A-ST",
+          "stForward": 2.52
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4080.1,
+          "owner": "A-RW",
+          "fromX": 91.93,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4917.7,
+          "owner": "H-RW",
+          "fromX": 90.85,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-10",
+      "score": {
+        "HOME": 2,
+        "AWAY": 6
+      },
+      "highValueWfActions": 2,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 9,
+      "npcOneTouchPasses": 62,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 55.3,
+          "owner": "A-RW",
+          "fromX": 90.11,
+          "target": "A-LCM",
+          "targetX": 75.69,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1136.3,
+          "owner": "H-RW",
+          "fromX": 95.95,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1168,
+          "owner": "A-LW",
+          "fromX": 91.94,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1248.6,
+          "owner": "A-LW",
+          "fromX": 92.21,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1354,
+          "owner": "A-RW",
+          "fromX": 91.38,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1751.7,
+          "owner": "H-LW",
+          "fromX": 94.39,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3103.6,
+          "owner": "H-LW",
+          "fromX": 88.58,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3857.8,
+          "owner": "H-RW",
+          "fromX": 90.53,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-11",
+      "score": {
+        "HOME": 3,
+        "AWAY": 3
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 2,
+      "ditherLosses": 9,
+      "npcOneTouchPasses": 77,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 273.1,
+          "owner": "A-RW",
+          "fromX": 85.67,
+          "target": "A-RB",
+          "targetX": 76.18,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.22
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 391.3,
+          "owner": "A-RW",
+          "fromX": 92.18,
+          "target": "A-RB",
+          "targetX": 73.29,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 446,
+          "owner": "H-LW",
+          "fromX": 91.01,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 667.6,
+          "owner": "H-LW",
+          "fromX": 92.48,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 818.6,
+          "owner": "H-RW",
+          "fromX": 92.31,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1009.9,
+          "owner": "A-LW",
+          "fromX": 88.96,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2055.6,
+          "owner": "H-LW",
+          "fromX": 95.23,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3989.2,
+          "owner": "H-LW",
+          "fromX": 92.78,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-12",
+      "score": {
+        "HOME": 4,
+        "AWAY": 3
+      },
+      "highValueWfActions": 2,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 2,
+      "npcOneTouchPasses": 71,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 24.4,
+          "owner": "H-RW",
+          "fromX": 82.26,
+          "target": "H-RB",
+          "targetX": 69.07,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 2.51
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1415.9,
+          "owner": "H-RW",
+          "fromX": 92.44,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2937.2,
+          "owner": "A-LW",
+          "fromX": 88.9,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-13",
+      "score": {
+        "HOME": 2,
+        "AWAY": 4
+      },
+      "highValueWfActions": 6,
+      "harmfulBackpasses": 3,
+      "ditherLosses": 3,
+      "npcOneTouchPasses": 65,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 26.1,
+          "owner": "H-LW",
+          "fromX": 91.36,
+          "target": "H-RCM",
+          "targetX": 80.56,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 127.6,
+          "owner": "A-RW",
+          "fromX": 91.45,
+          "target": "A-RB",
+          "targetX": 76.62,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 226.8,
+          "owner": "H-RW",
+          "fromX": 92.49,
+          "target": "H-LCM",
+          "targetX": 84.18,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4514.8,
+          "owner": "A-LW",
+          "fromX": 91.3,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4570.5,
+          "owner": "A-LW",
+          "fromX": 91.88,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 5280.3,
+          "owner": "H-RW",
+          "fromX": 88.63,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-14",
+      "score": {
+        "HOME": 3,
+        "AWAY": 6
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 0,
+      "ditherLosses": 8,
+      "npcOneTouchPasses": 59,
+      "examples": [
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1475.8,
+          "owner": "A-LW",
+          "fromX": 92.45,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1705.7,
+          "owner": "H-LW",
+          "fromX": 91.34,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1910.1,
+          "owner": "A-RW",
+          "fromX": 86.1,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2077.8,
+          "owner": "H-RW",
+          "fromX": 92.33,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2215,
+          "owner": "H-RW",
+          "fromX": 84.69,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 1.5
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2265.1,
+          "owner": "A-RW",
+          "fromX": 84.23,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.38
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3618.9,
+          "owner": "H-LW",
+          "fromX": 92.1,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4100.9,
+          "owner": "A-LW",
+          "fromX": 93.47,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-15",
+      "score": {
+        "HOME": 3,
+        "AWAY": 10
+      },
+      "highValueWfActions": 2,
+      "harmfulBackpasses": 0,
+      "ditherLosses": 7,
+      "npcOneTouchPasses": 53,
+      "examples": [
+        {
+          "kind": "DITHER_LOSS",
+          "t": 720.9,
+          "owner": "A-RW",
+          "fromX": 85.95,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 2.14
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 795.9,
+          "owner": "A-RW",
+          "fromX": 92.29,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1307.6,
+          "owner": "H-LW",
+          "fromX": 84.42,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 3.6
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3440.9,
+          "owner": "A-LW",
+          "fromX": 90.44,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3793.1,
+          "owner": "A-RW",
+          "fromX": 92.33,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4582.7,
+          "owner": "A-RW",
+          "fromX": 92.92,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4706.9,
+          "owner": "A-RW",
+          "fromX": 93.92,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-16",
+      "score": {
+        "HOME": 6,
+        "AWAY": 5
+      },
+      "highValueWfActions": 6,
+      "harmfulBackpasses": 5,
+      "ditherLosses": 12,
+      "npcOneTouchPasses": 59,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 16.5,
+          "owner": "A-LW",
+          "fromX": 90.68,
+          "target": "A-LCM",
+          "targetX": 81.28,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 86.7,
+          "owner": "H-LW",
+          "fromX": 91.15,
+          "target": "H-LB",
+          "targetX": 70.03,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 108.5,
+          "owner": "H-RW",
+          "fromX": 90.99,
+          "target": "H-RB",
+          "targetX": 69.06,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 267.2,
+          "owner": "A-LW",
+          "fromX": 81.71,
+          "target": "A-LCM",
+          "targetX": 69.76,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 2.34
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 280.7,
+          "owner": "A-RW",
+          "fromX": 92.44,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 339.5,
+          "owner": "A-RW",
+          "fromX": 90.82,
+          "target": "A-RB",
+          "targetX": 74.62,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 771.1,
+          "owner": "A-RW",
+          "fromX": 91.75,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 802.8,
+          "owner": "A-LW",
+          "fromX": 92.32,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-17",
+      "score": {
+        "HOME": 5,
+        "AWAY": 6
+      },
+      "highValueWfActions": 5,
+      "harmfulBackpasses": 2,
+      "ditherLosses": 10,
+      "npcOneTouchPasses": 60,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 83.4,
+          "owner": "A-RW",
+          "fromX": 88.82,
+          "target": "A-LCM",
+          "targetX": 74.05,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 250.9,
+          "owner": "H-LW",
+          "fromX": 83.89,
+          "target": "H-LB",
+          "targetX": 69.13,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 2.39
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1062.7,
+          "owner": "A-RW",
+          "fromX": 91.63,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2220.9,
+          "owner": "A-RW",
+          "fromX": 84.7,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 2.1
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2581.8,
+          "owner": "H-LW",
+          "fromX": 92.7,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3319.8,
+          "owner": "H-RW",
+          "fromX": 94.06,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4045.8,
+          "owner": "H-LW",
+          "fromX": 91.31,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4588.4,
+          "owner": "H-RW",
+          "fromX": 92.22,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-18",
+      "score": {
+        "HOME": 5,
+        "AWAY": 5
+      },
+      "highValueWfActions": 2,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 8,
+      "npcOneTouchPasses": 63,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 11.4,
+          "owner": "A-RW",
+          "fromX": 91.48,
+          "target": "A-RCM",
+          "targetX": 74,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 320.9,
+          "owner": "A-LW",
+          "fromX": 90.74,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1046.3,
+          "owner": "H-RW",
+          "fromX": 91.5,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1528.3,
+          "owner": "A-RW",
+          "fromX": 92.15,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2328.1,
+          "owner": "A-RW",
+          "fromX": 90.87,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2564.4,
+          "owner": "H-LW",
+          "fromX": 96.78,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2941.7,
+          "owner": "H-LW",
+          "fromX": 90.4,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3247.5,
+          "owner": "H-RW",
+          "fromX": 89.14,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-19",
+      "score": {
+        "HOME": 4,
+        "AWAY": 7
+      },
+      "highValueWfActions": 0,
+      "harmfulBackpasses": 0,
+      "ditherLosses": 9,
+      "npcOneTouchPasses": 62,
+      "examples": [
+        {
+          "kind": "DITHER_LOSS",
+          "t": 961,
+          "owner": "H-LW",
+          "fromX": 91.51,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1003.2,
+          "owner": "H-RW",
+          "fromX": 88.88,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1709.1,
+          "owner": "H-LW",
+          "fromX": 91.89,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2498.6,
+          "owner": "H-LW",
+          "fromX": 91.33,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2774.6,
+          "owner": "H-LW",
+          "fromX": 90.37,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2955.1,
+          "owner": "A-RW",
+          "fromX": 90.57,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3177.8,
+          "owner": "A-LW",
+          "fromX": 89.19,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4399.5,
+          "owner": "H-RW",
+          "fromX": 91.86,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-20",
+      "score": {
+        "HOME": 4,
+        "AWAY": 2
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 11,
+      "npcOneTouchPasses": 54,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 58,
+          "owner": "A-LW",
+          "fromX": 80.78,
+          "target": "A-LCM",
+          "targetX": 68.95,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 3.45
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 593.9,
+          "owner": "A-LW",
+          "fromX": 90.9,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1185.9,
+          "owner": "H-RW",
+          "fromX": 92.58,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1285.9,
+          "owner": "A-LW",
+          "fromX": 92.11,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1426.5,
+          "owner": "A-RW",
+          "fromX": 90.23,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3126.1,
+          "owner": "A-RW",
+          "fromX": 82.24,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 1.92
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3183.2,
+          "owner": "H-LW",
+          "fromX": 89.35,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3369.2,
+          "owner": "A-LW",
+          "fromX": 92.82,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-21",
+      "score": {
+        "HOME": 2,
+        "AWAY": 6
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 13,
+      "npcOneTouchPasses": 79,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 67.5,
+          "owner": "A-LW",
+          "fromX": 92.51,
+          "target": "A-LCM",
+          "targetX": 82.8,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 974,
+          "owner": "H-LW",
+          "fromX": 90.36,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1678.7,
+          "owner": "A-LW",
+          "fromX": 91.92,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1785.6,
+          "owner": "A-LW",
+          "fromX": 92.01,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1821,
+          "owner": "H-LW",
+          "fromX": 91.26,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1860,
+          "owner": "A-RW",
+          "fromX": 92.11,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2044.8,
+          "owner": "A-LW",
+          "fromX": 92.31,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2432.8,
+          "owner": "H-RW",
+          "fromX": 92.28,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-22",
+      "score": {
+        "HOME": 2,
+        "AWAY": 3
+      },
+      "highValueWfActions": 2,
+      "harmfulBackpasses": 1,
+      "ditherLosses": 7,
+      "npcOneTouchPasses": 63,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 107.7,
+          "owner": "A-RW",
+          "fromX": 91.72,
+          "target": "A-ST",
+          "targetX": 87.51,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2431.1,
+          "owner": "A-RW",
+          "fromX": 92.77,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2567.4,
+          "owner": "H-LW",
+          "fromX": 91.96,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2745.9,
+          "owner": "H-LW",
+          "fromX": 87.19,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 1.14
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3843.6,
+          "owner": "A-LW",
+          "fromX": 91.75,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4346.5,
+          "owner": "H-RW",
+          "fromX": 91.31,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 5102.7,
+          "owner": "H-RW",
+          "fromX": 90.17,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 5375.3,
+          "owner": "H-LW",
+          "fromX": 92.04,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-23",
+      "score": {
+        "HOME": 2,
+        "AWAY": 7
+      },
+      "highValueWfActions": 1,
+      "harmfulBackpasses": 0,
+      "ditherLosses": 5,
+      "npcOneTouchPasses": 73,
+      "examples": [
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1093.8,
+          "owner": "H-LW",
+          "fromX": 91.04,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2664.6,
+          "owner": "A-RW",
+          "fromX": 81.49,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "A-ST",
+          "stForward": 2.34
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2810.2,
+          "owner": "H-RW",
+          "fromX": 91.98,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 3239.1,
+          "owner": "H-RW",
+          "fromX": 83.55,
+          "shotOpen": false,
+          "inBox": false,
+          "stTarget": "H-ST",
+          "stForward": 1.12
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 4474.9,
+          "owner": "A-LW",
+          "fromX": 91.88,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    },
+    {
+      "seed": "HIST-ATTACK-NPC-24",
+      "score": {
+        "HOME": 3,
+        "AWAY": 5
+      },
+      "highValueWfActions": 4,
+      "harmfulBackpasses": 2,
+      "ditherLosses": 9,
+      "npcOneTouchPasses": 64,
+      "examples": [
+        {
+          "kind": "BACKPASS",
+          "t": 93.1,
+          "owner": "A-LW",
+          "fromX": 96.71,
+          "target": "A-ST",
+          "targetX": 92.4,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "BACKPASS",
+          "t": 141,
+          "owner": "H-RW",
+          "fromX": 90.34,
+          "target": "H-RCM",
+          "targetX": 80.69,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 326,
+          "owner": "H-LW",
+          "fromX": 92.84,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 911.9,
+          "owner": "A-RW",
+          "fromX": 90.37,
+          "shotOpen": true,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 1434.3,
+          "owner": "A-RW",
+          "fromX": 91.14,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2278.2,
+          "owner": "A-RW",
+          "fromX": 89.2,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2450.5,
+          "owner": "H-RW",
+          "fromX": 88.66,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        },
+        {
+          "kind": "DITHER_LOSS",
+          "t": 2661.9,
+          "owner": "A-RW",
+          "fromX": 92.82,
+          "shotOpen": false,
+          "inBox": true,
+          "stTarget": null,
+          "stForward": null
+        }
+      ]
+    }
+  ],
+  "carry": [
+    {
+      "seed": "HIST-CARRY-CADENCE-1",
+      "carries": 12,
+      "shortReprompts": 0,
+      "delays": [
+        3.3,
+        3.2,
+        3.2,
+        3.2,
+        3.3
+      ],
+      "examples": []
+    },
+    {
+      "seed": "HIST-CARRY-CADENCE-2",
+      "carries": 1,
+      "shortReprompts": 0,
+      "delays": [],
+      "examples": []
+    },
+    {
+      "seed": "HIST-CARRY-CADENCE-3",
+      "carries": 10,
+      "shortReprompts": 0,
+      "delays": [
+        3.3,
+        3.2,
+        3.2,
+        3.2,
+        3.3
+      ],
+      "examples": []
+    },
+    {
+      "seed": "HIST-CARRY-CADENCE-4",
+      "carries": 14,
+      "shortReprompts": 1,
+      "delays": [
+        3.3,
+        3.3,
+        3.3,
+        1.8,
+        3.3,
+        3.3
+      ],
+      "examples": [
+        {
+          "t": 1578.8,
+          "delay": 1.8,
+          "previous": "CARRY"
+        }
+      ]
+    }
+  ],
+  "gates": {
+    "boxBackpass": false,
+    "attackingDither": false,
+    "npcOneTouch": true,
+    "carryCadence": false
+  },
+  "status": "FAIL"
+}
