@@ -2,7 +2,7 @@
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
   "build": "USER-MATCH-TEST-V0.5",
   "limit": 50,
-  "requestedAt": "2026-08-23T18:29:00+09:00",
-  "purpose": "Inspect newly submitted Match Engine User Test V0.5 reports after the correction retest deployment, identify resolved V0.4 items, persistent regressions, and genuinely new issues before any further engine changes",
-  "runNonce": "user-match-test-v0-5-feedback-audit-20260823-1829"
+  "requestedAt": "2026-08-23T19:08:00+09:00",
+  "purpose": "Include the newly submitted fourth V0.5 user retest report in the active follow-up correction batch before any public retest deployment",
+  "runNonce": "user-match-test-v0-5-feedback-audit-20260823-1908"
 }
