@@ -1,0 +1,69 @@
+name: FLR V0.5.2 Core Metrics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v052-core-metrics-request.json'
+permissions:
+  contents: write
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Extract core metrics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,pathlib,math
+          s=json.loads(pathlib.Path('.flr/current-report-inspect-status.json').read_text(encoding='utf-8'))
+          R={r.get('meta',{}).get('report_id'):r for r in s.get('reports',[])}
+          ids={'deep':'umt052-95ad81d7-096b-45ec-b464-d9ac2bdbffb3','lb':'umt052-33b9e4a8-7f53-4fce-93f2-fccc560faa99','off1':'umt052-65749ef0-a4fb-420a-af16-f3cff1ebf37e','off2':'umt052-d90cd322-0396-4521-9382-0581b3e5f5f3'}
+          slots=['H-GK','H-LB','H-LCB','H-RCB','H-RB','H-LCM','H-CM','H-RCM','H-LW','H-ST','H-RW']
+          def bsum(cur):
+            b=(cur or {}).get('boundary') or {}; st=b.get('stateSnapshot') or {}; ball=st.get('ball') or {}; sp=(((st.get('spatial') or {}).get('players')) or {})
+            return {'t':b.get('atSecond'),'reason':b.get('reason'),'hero':b.get('heroPlayerId'),'phase':st.get('phase'),'zone':st.get('zone'),'possession':st.get('possession'),'ballOwner':ball.get('ownerId'),'ballProgress':ball.get('progress'),'positions':{k:round(float(sp[k].get('x')),2) for k in slots if k in sp and sp[k].get('x') is not None},'tasks':{k:{'kind':sp[k].get('intentKind'),'target':sp[k].get('intentTargetId'),'source':sp[k].get('sourceTask')} for k in slots if k in sp}}
+          def ppos(f):
+            if not f:return {}
+            ps=f.get('players') or []; return {k:round(float(next(p for p in ps if p.get('id')==k or p.get('slot')==k).get('x')),2) for k in slots if any(p.get('id')==k or p.get('slot')==k for p in ps)}
+          def lastf(cur):
+            for name in ['postActionSamples','episodeSamples','preActionSamples']:
+              a=(cur or {}).get(name) or []
+              if a:return a[-1]
+            return None
+          out={'build':s.get('build'),'shape':{},'offside':{}}
+          for name,rid in [('deep_start_cm',ids['deep']),('lb_gk_start',ids['lb'])]:
+            r=R[rid]; cur=r.get('current') or {}; en=cur.get('entrySnapshot') or {}; lf=lastf(cur)
+            out['shape'][name]={'description':r.get('meta',{}).get('description'),'boundary':bsum(cur),'entry':{'t':en.get('time'),'ball':en.get('ball'),'positions':ppos(en)},'last':{'t':(lf or {}).get('time'),'phase':(lf or {}).get('phase'),'possession':(lf or {}).get('possession'),'ball':(lf or {}).get('ball'),'positions':ppos(lf)}}
+          def oe(cur):
+            all=[]
+            for pool in [cur.get('actualEvents') or [],(cur.get('hybridBeforeState') or {}).get('resolvedEvents') or [],(cur.get('hybridAfterState') or {}).get('resolvedEvents') or []]:
+              for e in pool:
+                txt=json.dumps(e,ensure_ascii=False).upper()
+                if 'OFFSIDE' in txt or 'RESTART' in txt:
+                  tiny={k:e.get(k) for k in ['t','type','team','actorId','targetId','restartKind','kind','detail'] if e.get(k) is not None}
+                  if tiny not in all:all.append(tiny)
+            return all[-12:]
+          for name,rid in [('offside_end',ids['off1']),('offside_replay',ids['off2'])]:
+            r=R[rid]; cur=r.get('current') or {}; aft=cur.get('hybridAfterState') or {}; hero=(cur.get('boundary') or {}).get('heroPlayerId'); seq=[]
+            for source in ['preActionSamples','postActionSamples','episodeSamples']:
+              for f in cur.get(source) or []:
+                p=next((p for p in f.get('players',[]) if p.get('id')==hero),None)
+                seq.append({'src':source,'t':f.get('time'),'phase':f.get('phase'),'ballOwner':(f.get('ball') or {}).get('ownerId'),'heroX':round(float(p.get('x')),2) if p and p.get('x') is not None else None})
+            out['offside'][name]={'description':r.get('meta',{}).get('description'),'boundary':bsum(cur),'selectedChoice':cur.get('selectedChoice'),'result':cur.get('actualResult'),'events':oe(cur),'counts':{k:len(cur.get(k) or []) for k in ['preActionSamples','postActionSamples','episodeSamples']},'sequence':seq,'after':{'second':aft.get('second'),'phase':aft.get('phase'),'possession':aft.get('possession'),'ball':aft.get('ball'),'chain':(aft.get('chain') or [])[-6:]}}
+          pathlib.Path('.flr/v052-core-metrics.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Commit
+        shell: bash
+        run: |
+          git config user.name 'FLR Core Metrics Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main || true
+          git add .flr/v052-core-metrics.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record V0.5.2 core report metrics'
+          git push origin HEAD:main
