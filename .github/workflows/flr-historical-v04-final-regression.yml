@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in historical_open_gates_v04.js historical_carry_cadence_v04.js historical_far_side_committed_v04.js; do
+          for f in historical_open_gates_v04.js historical_carry_cadence_v04.js historical_far_side_committed_v04.js historical_presentation_discontinuity_v04.js; do
             node --check "control/.flr/$f"
           done
           node --check engine/.flr/historical_closure_audit.js
@@ -58,6 +58,8 @@ jobs:
           carry_rc=$?
           node control/.flr/historical_far_side_committed_v04.js engine > /tmp/farside.json
           farside_rc=$?
+          node control/.flr/historical_presentation_discontinuity_v04.js engine > /tmp/presentation.json
+          presentation_rc=$?
           node engine/.flr/historical_closure_audit.js /tmp/legacy.json > /tmp/legacy.log 2>&1
           legacy_rc=$?
           set -e
@@ -65,34 +67,38 @@ jobs:
           echo '--- OPEN GATES ---'; cat /tmp/open.json
           echo '--- CARRY ---'; cat /tmp/carry.json
           echo '--- FAR SIDE ---'; cat /tmp/farside.json
+          echo '--- PRESENTATION DISCONTINUITY ---'; cat /tmp/presentation.json
           echo '--- LEGACY SUMMARY ---'; tail -c 16000 /tmp/legacy.log || true
 
-          OPEN_RC="$open_rc" CARRY_RC="$carry_rc" FARSIDE_RC="$farside_rc" LEGACY_RC="$legacy_rc" python - <<'PY'
+          OPEN_RC="$open_rc" CARRY_RC="$carry_rc" FARSIDE_RC="$farside_rc" PRESENTATION_RC="$presentation_rc" LEGACY_RC="$legacy_rc" python - <<'PY'
           import json, os, pathlib, sys
           def load(path):
               p=pathlib.Path(path)
               try: return json.loads(p.read_text(encoding='utf-8'))
               except Exception as e:
                   print(f'QA_INFRA_FAILURE: {path}: {e}', file=sys.stderr); sys.exit(2)
-          op=load('/tmp/open.json'); ca=load('/tmp/carry.json'); fa=load('/tmp/farside.json'); le=load('/tmp/legacy.json')
+          op=load('/tmp/open.json'); ca=load('/tmp/carry.json'); fa=load('/tmp/farside.json'); pr=load('/tmp/presentation.json'); le=load('/tmp/legacy.json')
           checks={
             'npcOneTouch': bool(op.get('gates',{}).get('npcOneTouch')),
             'npcGoodAttackNoDeadStall': bool(op.get('gates',{}).get('npcGoodAttackNoDeadStall')),
             'strongAttackNoHarmfulBackpass': bool(op.get('gates',{}).get('strongAttackNoHarmfulBackpass')),
             'carryCadence': ca.get('status')=='PASS',
             'farSideCommittedRunner': fa.get('status')=='PASS',
+            'presentationDiscontinuitySnap': pr.get('status')=='PASS',
           }
           lg=le.get('gates',{})
-          for k in ['protagonistAuthority','duelStall','rcmStOverlap','carrySemantics','nonRestartSpeedContinuity','throughLead']:
+          for k in ['protagonistAuthority','duelStall','rcmStOverlap','carrySemantics','throughLead']:
               checks[k]=bool(lg.get(k))
           result={
-            'schemaVersion':'FLR_HISTORICAL_V04_FINAL_REGRESSION_1.0',
+            'schemaVersion':'FLR_HISTORICAL_V04_FINAL_REGRESSION_1.1',
             'candidateSha':os.popen('git -C engine rev-parse HEAD').read().strip(),
             'checks':checks,
             'openSummary':op.get('summary',{}),
             'carrySummary':ca.get('summary',{}),
             'farSideSummary':fa.get('summary',{}),
+            'presentation':pr,
             'legacySummary':le.get('summary',{}),
+            'informationalEngineNonRestartSpeedJumpCount':le.get('summary',{}).get('nonRestartSpeedJumpCount'),
             'status':'PASS' if all(checks.values()) else 'FAIL'
           }
           pathlib.Path('/tmp/final-regression.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
