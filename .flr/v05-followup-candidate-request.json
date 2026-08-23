@@ -6,7 +6,7 @@
     "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
     "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80"
   ],
-  "requestedAt": "2026-08-23T18:55:00+09:00",
-  "purpose": "Rerun isolated corrections with workflow result capture",
-  "nonce": "v05-followup-rerun-1855"
+  "requestedAt": "2026-08-23T19:06:00+09:00",
+  "workflowRevision": "c352462489e6b6bb98b7431b6fc958fa8f1a435f",
+  "purpose": "Apply and fully regress the three V0.5 user retest corrections before public retest"
 }
