@@ -1,1 +1,4 @@
-{"status":"FAIL"}
+{
+  "status": "FAIL",
+  "log": "Traceback (most recent call last):\n  File \"/tmp/a.py\", line 3, in <module>\n    runpy.run_path('.flr/v051_consolidated_retest_apply.py', run_name='__main__')\n  File \"<frozen runpy>\", line 285, in run_path\n  File \"<frozen runpy>\", line 254, in _get_code_from_file\nFileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/FLR_TEST/FLR_TEST/.flr/v051_consolidated_retest_apply.py'\n"
+}
