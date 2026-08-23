@@ -1,0 +1,5 @@
+{
+  "build": "USER-MATCH-TEST-V0.5",
+  "deployedCommit": "00c19090a84d6bb17864c68731b735ff4bd1af24",
+  "purpose": "trigger-pages-refresh-after-validated-v05-promotion"
+}
