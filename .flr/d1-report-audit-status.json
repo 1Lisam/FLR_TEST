@@ -1,8 +1,68 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 32,
+  "count": 38,
   "reports": [
+    {
+      "report_id": "umt052-65749ef0-a4fb-420a-af16-f3cff1ebf37e",
+      "build": "USER-MATCH-TEST-V0.5.2",
+      "created_at": "2026-08-23T23:19:26.235Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "해당 상황도 오프사이드 인데 오프사이드 이후 바로 우리 선수가 뒤로 이동하고 상황이 끊기니 현실성이 없음\n\n오프사이드 상황 이후 잠깐이나마 왜 오프사이드인지 선으로 보여줬으면 함 선은 구현되어 있으니까",
+      "size_bytes": 562768,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt052-d90cd322-0396-4521-9382-0581b3e5f5f3",
+      "build": "USER-MATCH-TEST-V0.5.2",
+      "created_at": "2026-08-23T23:17:16.792Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "이부분 다시보기 눌렀는데 재생이 안됨\n\n또한 오프사이드는 공격전개가 안되었을 경우에는 경기 진행 그대로 가는 경우도 잦음",
+      "size_bytes": 566409,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt052-31984cc7-cba8-4a12-9ec5-ec0d85aad37d",
+      "build": "USER-MATCH-TEST-V0.5.2",
+      "created_at": "2026-08-23T23:15:36.364Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "우려했던것 처럼 CM이 공을 졸졸 쫒아다니는 느낌임\n다른 선수들도 비슷",
+      "size_bytes": 3332031,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt052-95ad81d7-096b-45ec-b464-d9ac2bdbffb3",
+      "build": "USER-MATCH-TEST-V0.5.2",
+      "created_at": "2026-08-23T23:14:35.804Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "여전히 공격이 너무 깊숙한 곳에서 시작하고 있고 선택후 상황이 끝날때 즈음에는 CM들이 수비보다 아래로 내려감",
+      "size_bytes": 2832498,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt052-33b9e4a8-7f53-4fce-93f2-fccc560faa99",
+      "build": "USER-MATCH-TEST-V0.5.2",
+      "created_at": "2026-08-23T23:12:54.346Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "이전처럼 포메이션이 만들어진채 뿌려지는 건 아니지만 공이 LB에서 시작되는 타이밍에 플레이어와 공격진은 GK옆에서 스타트 하는건 이상하다",
+      "size_bytes": 1098513,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt051-a13ae7a5-73a6-4d99-88fe-9c41d53d7534",
+      "build": "USER-MATCH-TEST-V0.5.1",
+      "created_at": "2026-08-23T14:08:52.700Z",
+      "category": "기타",
+      "priority": 2,
+      "description": "1. 모든 포지션에 선택함에 있어 어떤 것이 확률적으로 좋은 선택일지 각 선택에 % 가 표기되면 좋을 것 같음\n\n2. 상황종료 후 3초후에 재개되는것이 흐름을 끊는 느낌\n버튼을 눌러 바로 진행가능하게 하는게 있긴하나 아래쪽에 배치되어 버튼이 없다가 생기는 상태라서 잘보이게 버튼 고정을 해두던지 아에 스페이스바 같은거 눌러서 바로 넘어갈 수 있게 하면좋을 둣\n\n3. 키퍼 다이빙 캐치, 펀칭 같은 선택지가 추가 되면 좋을둣\n\n4. 반칙이 구현 된다면 카드, 프리킥도 구현\n\n5. 경기 종료후 화면 가운데 종료, 승패(스코어) 글씨가 뜨면 좋을 듯\n(경기가 종료되었다는 느낌이 들지 않음)",
+      "size_bytes": 2028560,
+      "chunk_count": 1
+    },
     {
       "report_id": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
       "build": "USER-MATCH-TEST-V0.5.1",
@@ -324,26 +384,26 @@
       "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
+  "latestAttachedReportId": "umt052-65749ef0-a4fb-420a-af16-f3cff1ebf37e",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
       "currentSituation": true,
-      "previousSituation": true,
+      "previousSituation": false,
       "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
-      "build": "USER-MATCH-TEST-V0.5.1",
+      "reportId": "umt052-65749ef0-a4fb-420a-af16-f3cff1ebf37e",
+      "build": "USER-MATCH-TEST-V0.5.2",
       "step": 78,
-      "description": "7:0 이라는 수치가 나온것과 우리팀 득점 장면은 대부분 뜬금없이 포메이션이 다 구성된 곳에서 득점자 하나만 돌출 되어 ST와 함께 패널티 라인 안에 들어와 있고 수비수들은 모두 자기 포메이션을 유지 중인 상황인데 이게 맞나?\n\n이러면 '득점자만 앞에두고 나머지는 그냥 던져놓자' 라고 해서 갑자기 득점자만 툭 튀어나온 느낌이라 우리가 지향하는 '뒤에서 시뮬레이션 계산을 하던 포메이션을 그대로 드러나자'가 절대 아닌게 드러나는데?",
-      "category": "기타",
+      "description": "해당 상황도 오프사이드 인데 오프사이드 이후 바로 우리 선수가 뒤로 이동하고 상황이 끊기니 현실성이 없음\n\n오프사이드 상황 이후 잠깐이나마 왜 오프사이드인지 선으로 보여줬으면 함 선은 구현되어 있으니까",
+      "category": "2D 움직임",
       "priority": 3,
-      "reportedAt": "2026-08-23T12:21:36.187Z"
+      "reportedAt": "2026-08-23T23:19:25.453Z"
     },
     "currentSituationPresent": true,
-    "previousSituationPresent": true,
+    "previousSituationPresent": false,
     "currentSituationKeys": [
       "schemaVersion",
       "canonicalContract",
@@ -353,28 +413,15 @@
       "futureOutcomePrecomputed",
       "reportScope"
     ],
-    "previousSituationKeys": [
-      "schemaVersion",
-      "canonicalContract",
-      "hybridBefore",
-      "highResolution",
-      "hybridAfter",
-      "futureOutcomePrecomputed",
-      "reportScope"
-    ],
+    "previousSituationKeys": [],
     "currentReportScope": {
-      "startSecond": 5349.6000000001095,
-      "endSecond": 5371.200000000188,
+      "startSecond": 2406.7999999998965,
+      "endSecond": 2426.6,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "previousReportScope": {
-      "startSecond": 4831.69999999995,
-      "endSecond": 4863.6,
-      "cumulativeMatchHistoryIncluded": false,
-      "keepsFullSituationFrames": true
-    },
-    "currentSerializedBytes": 3382851,
-    "previousSerializedBytes": 1132052
+    "previousReportScope": null,
+    "currentSerializedBytes": 624535,
+    "previousSerializedBytes": 0
   }
 }
