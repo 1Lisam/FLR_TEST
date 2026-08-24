@@ -1,6 +1,6 @@
 {
   "schemaVersion": "FLR_V053_STAGED_PAYLOAD_AUDIT_1.0",
-  "allMatch": false,
+  "allMatch": true,
   "files": [
     {
       "path": "index.html",
@@ -26,10 +26,10 @@
     },
     {
       "path": "live_v06_scene_authority_browser.js",
-      "bytes": 21432,
+      "bytes": 21431,
       "expected": "ff3e7f660513af20cbc7cd93fa53c1e15c6cb5970be3abd125fd5c192b1a7798",
-      "actual": "ad54fbcf45e34741f5a2183f52572fffcfd3af97fb32231bec21a30d8e6a9faf",
-      "match": false,
+      "actual": "ff3e7f660513af20cbc7cd93fa53c1e15c6cb5970be3abd125fd5c192b1a7798",
+      "match": true,
       "parts": [
         ".flr/v053_payload/small/live_v06_scene_authority_browser.js.p00",
         ".flr/v053_payload/small/live_v06_scene_authority_browser.js.p01"
