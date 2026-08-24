@@ -1,0 +1,6 @@
+{
+  "requestedAt": "2026-08-24T22:14:00+09:00",
+  "purpose": "Run defence normalization against user HF3 fail seeds, CM-vs-ST sticky marking, second-ball support, and offside forced verification",
+  "sourceBuild": "USER-MATCH-TEST-V0.5.3-HF3",
+  "mainBaseline": "8965e9eb026d317be95db14bf8e80a135e6aef56"
+}
