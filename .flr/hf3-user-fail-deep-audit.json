@@ -1,0 +1,1986 @@
+{
+  "schemaVersion": "FLR_HF3_USER_FAIL_DEEP_AUDIT_1.0",
+  "status": "PASS",
+  "build": "USER-MATCH-TEST-V0.5.3-HF3",
+  "reportCount": 9,
+  "aggregate": {
+    "lbRbReversalReports": 6,
+    "cmBacklineReports": 2,
+    "crowd5AtLeast4Reports": 2,
+    "jitterReports": 8
+  },
+  "reports": [
+    {
+      "reportId": "umt053h3-a38dd18b-5674-47be-869f-49f2d658ddac",
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787573272419-1\n\n상대 CM이 공을 따라 내 LW 까지 죽자고 쫒아옴.",
+      "seeds": [
+        "DEV-RECENT-1787573272419-1"
+      ],
+      "category": "조작권/선택",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 851,
+        "lastTime": 860.000000000002,
+        "maxPlayersWithin3mOfBall": 2,
+        "maxPlayersWithin5mOfBall": 3,
+        "lbRbReversalFrameCount": 0,
+        "lbRbReversalExamples": [],
+        "cmAtOrBehindBacklineFrameCount": 4,
+        "cmBacklineExamples": [
+          {
+            "time": 859.7,
+            "team": "AWAY",
+            "id": "A-CM",
+            "slot": "CM",
+            "cmLocalX": 13.27,
+            "cbMeanLocalX": 12.29,
+            "task": "DROP_BETWEEN_LINES",
+            "markTargetId": null
+          },
+          {
+            "time": 859.8,
+            "team": "AWAY",
+            "id": "A-CM",
+            "slot": "CM",
+            "cmLocalX": 13.5,
+            "cbMeanLocalX": 12.71,
+            "task": "DROP_BETWEEN_LINES",
+            "markTargetId": null
+          },
+          {
+            "time": 859.9,
+            "team": "AWAY",
+            "id": "A-CM",
+            "slot": "CM",
+            "cmLocalX": 13.71,
+            "cbMeanLocalX": 13.18,
+            "task": "DROP_BETWEEN_LINES",
+            "markTargetId": null
+          },
+          {
+            "time": 860.0,
+            "team": "AWAY",
+            "id": "A-CM",
+            "slot": "CM",
+            "cmLocalX": 13.9,
+            "cbMeanLocalX": 13.66,
+            "task": "DROP_BETWEEN_LINES",
+            "markTargetId": null
+          }
+        ],
+        "markTargetChangeCounts": {
+          "A-RCB": 3,
+          "A-LB": 1,
+          "A-LCM": 1,
+          "A-RCM": 1
+        },
+        "topLateralJitter": [
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 37.521,
+            "markChanges": 1,
+            "tasks": [
+              "FAR_SIDE_TUCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "RECOVER_MIDFIELD_8",
+              "SECOND_BALL_TUCK"
+            ]
+          },
+          {
+            "id": "H-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 33.287,
+            "markChanges": 0,
+            "tasks": [
+              "BALL_SIDE_BLOCK",
+              "CUTBACK_EDGE",
+              "HALFSPACE_SECOND_LINE",
+              "HYBRID_ENTRY_LIVE",
+              "RECONNECT_8",
+              "SECOND_BALL"
+            ]
+          },
+          {
+            "id": "A-RCB",
+            "slot": "RCB",
+            "role": "CB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 20.269,
+            "markChanges": 3,
+            "tasks": [
+              "HYBRID_ENTRY_LIVE",
+              "LAST_COVER_SCREEN",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "REST_DEFENCE"
+            ]
+          },
+          {
+            "id": "A-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 2,
+            "totalMove": 38.277,
+            "markChanges": 0,
+            "tasks": [
+              "CARRY_SCAN",
+              "DRIBBLE_EVADE",
+              "ENGAGE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "PRESS_CONTAIN",
+              "WIN_BALL"
+            ]
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 45.074,
+            "markChanges": 1,
+            "tasks": [
+              "BALL_SIDE_RECOVER",
+              "CUTBACK_TRACK",
+              "EMERGENCY_TRACK",
+              "HYBRID_ENTRY_LIVE",
+              "MIDFIELD_LANE_SCREEN",
+              "RECONNECT_8"
+            ]
+          },
+          {
+            "id": "A-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 43.52,
+            "markChanges": 0,
+            "tasks": [
+              "DROP_BETWEEN_LINES",
+              "HYBRID_ENTRY_LIVE",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 29.251,
+            "markChanges": 0,
+            "tasks": [
+              "BOX_RECOVERY_LINE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "REST_DEFENCE"
+            ]
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 28.837,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_BACK_POST",
+              "ATTACK_FAR_CHANNEL",
+              "FAR_SIDE_HOLD",
+              "FAR_SIDE_RUN",
+              "FAR_SIDE_SHOULDER",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 28.548,
+            "markChanges": 0,
+            "tasks": [
+              "CARRY_FORWARD",
+              "CARRY_SCAN",
+              "DRIBBLE_EVADE",
+              "ENGAGE",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "MOVE_TO_RECEIVE",
+              "WIDE_COMBINE"
+            ]
+          },
+          {
+            "id": "H-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 22.723,
+            "markChanges": 0,
+            "tasks": [
+              "CARRY_FORWARD",
+              "CARRY_SCAN",
+              "FULLBACK_BALANCED_SUPPORT",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "A-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 22.357,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HOLD_WIDTH",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "A-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 1,
+            "totalMove": 20.242,
+            "markChanges": 0,
+            "tasks": [
+              "CONNECT_CENTRE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 851,
+        "endSecond": 860.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": false,
+      "currentBytes": 1416250
+    },
+    {
+      "reportId": "umt053h3-be39da54-9cb8-482e-97b0-9152f4745e3c",
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787575663982-11 · JSON/버그리포트 사용 가능\n\n상대 RCB가 더 깊숙한 곳에 있었는데 오프사이드 선언되는것 부터 일단 고쳐야 할 상황 오프사이드 라인의 판단을 확실하게 해야 할 듯",
+      "seeds": [
+        "DEV-RECENT-1787574476916-6",
+        "DEV-RECENT-1787575663982-11"
+      ],
+      "category": "조작권/선택",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 41,
+        "firstTime": 1475,
+        "lastTime": 1479,
+        "maxPlayersWithin3mOfBall": 1,
+        "maxPlayersWithin5mOfBall": 3,
+        "lbRbReversalFrameCount": 41,
+        "lbRbReversalExamples": [
+          {
+            "time": 1475.0,
+            "team": "AWAY",
+            "lbLocalY": 55.14,
+            "rbLocalY": 12.45
+          },
+          {
+            "time": 1475.1,
+            "team": "AWAY",
+            "lbLocalY": 55.1,
+            "rbLocalY": 12.49
+          },
+          {
+            "time": 1475.2,
+            "team": "AWAY",
+            "lbLocalY": 55.01,
+            "rbLocalY": 12.58
+          },
+          {
+            "time": 1475.3,
+            "team": "AWAY",
+            "lbLocalY": 54.88,
+            "rbLocalY": 12.71
+          },
+          {
+            "time": 1475.4,
+            "team": "AWAY",
+            "lbLocalY": 54.71,
+            "rbLocalY": 12.89
+          },
+          {
+            "time": 1475.5,
+            "team": "AWAY",
+            "lbLocalY": 54.48,
+            "rbLocalY": 13.12
+          },
+          {
+            "time": 1475.6,
+            "team": "AWAY",
+            "lbLocalY": 54.2,
+            "rbLocalY": 13.4
+          },
+          {
+            "time": 1475.7,
+            "team": "AWAY",
+            "lbLocalY": 53.87,
+            "rbLocalY": 13.73
+          },
+          {
+            "time": 1475.8,
+            "team": "AWAY",
+            "lbLocalY": 53.49,
+            "rbLocalY": 14.12
+          },
+          {
+            "time": 1475.9,
+            "team": "AWAY",
+            "lbLocalY": 53.06,
+            "rbLocalY": 14.55
+          },
+          {
+            "time": 1476.0,
+            "team": "AWAY",
+            "lbLocalY": 52.57,
+            "rbLocalY": 15.04
+          },
+          {
+            "time": 1476.1,
+            "team": "AWAY",
+            "lbLocalY": 52.04,
+            "rbLocalY": 15.59
+          }
+        ],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-LB": 2,
+          "A-LCB": 2,
+          "A-RB": 2,
+          "A-RCB": 2,
+          "A-RCM": 2
+        },
+        "topLateralJitter": [
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 17.651,
+            "markChanges": 2,
+            "tasks": [
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW",
+              "OFFSIDE_KICKER_READY",
+              "WIDE_RUN_TRACK"
+            ]
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 16.859,
+            "markChanges": 2,
+            "tasks": [
+              "FREE_KICK_ATTACK_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "OFFSIDE_CALL_REVIEW",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 14.783,
+            "markChanges": 0,
+            "tasks": [
+              "FREE_KICK_ATTACK_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW",
+              "PRESS_CONTAIN",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 14.403,
+            "markChanges": 0,
+            "tasks": [
+              "FREE_KICK_ATTACK_SETUP",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW"
+            ]
+          },
+          {
+            "id": "H-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 13.585,
+            "markChanges": 0,
+            "tasks": [
+              "CARRY_SCAN",
+              "FREE_KICK_DEFENCE_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW",
+              "POST_PASS_CONTINUE_RUN"
+            ]
+          },
+          {
+            "id": "H-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 13.536,
+            "markChanges": 0,
+            "tasks": [
+              "FREE_KICK_DEFENCE_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW",
+              "REST_BALANCE"
+            ]
+          },
+          {
+            "id": "H-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 13.372,
+            "markChanges": 0,
+            "tasks": [
+              "FREE_KICK_DEFENCE_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW",
+              "REST_BALANCE"
+            ]
+          },
+          {
+            "id": "A-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 1,
+            "totalMove": 12.953,
+            "markChanges": 0,
+            "tasks": [
+              "FREE_KICK_ATTACK_SETUP",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW"
+            ]
+          },
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 1,
+            "totalMove": 11.121,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_OPEN_CHANNEL",
+              "CLEAR_CARRIER_LANE",
+              "FREE_KICK_DEFENCE_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW"
+            ]
+          },
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 10.694,
+            "markChanges": 0,
+            "tasks": [
+              "FAR_SIDE_TUCK",
+              "FREE_KICK_ATTACK_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW"
+            ]
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 10.382,
+            "markChanges": 0,
+            "tasks": [
+              "FAR_SIDE_RECOVER",
+              "FAR_SIDE_SHOULDER",
+              "FREE_KICK_DEFENCE_SETUP",
+              "HYBRID_ENTRY_LIVE",
+              "OFFSIDE_CALL_REVIEW"
+            ]
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 10.247,
+            "markChanges": 0,
+            "tasks": [
+              "FREE_KICK_DEFENCE_SETUP",
+              "HALFSPACE_SECOND_WAVE",
+              "HYBRID_ENTRY_LIVE",
+              "LATE_BOX_ARRIVAL",
+              "OFFSIDE_CALL_REVIEW",
+              "RECOVER_MIDFIELD_8",
+              "SECOND_WAVE_8"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 1475,
+        "endSecond": 1479,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 789292
+    },
+    {
+      "reportId": "umt053h3-f553566d-ced2-4c7d-bfee-ff4933e57602",
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787575663982-11 · JSON/버그리포트 사용 가능\n\n또한 전진패스를 하자마자 상대 LB가 우리 RW를 두고 가운데로 오는 현상이 수정 되지 않았음",
+      "seeds": [
+        "DEV-RECENT-1787575663982-11",
+        "DEV-RECENT-1787575759215-12"
+      ],
+      "category": "조작권/선택",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 17,
+        "firstTime": 1082,
+        "lastTime": 1083.6,
+        "maxPlayersWithin3mOfBall": 1,
+        "maxPlayersWithin5mOfBall": 1,
+        "lbRbReversalFrameCount": 17,
+        "lbRbReversalExamples": [
+          {
+            "time": 1082.0,
+            "team": "AWAY",
+            "lbLocalY": 55.12,
+            "rbLocalY": 12.43
+          },
+          {
+            "time": 1082.1,
+            "team": "AWAY",
+            "lbLocalY": 55.08,
+            "rbLocalY": 12.47
+          },
+          {
+            "time": 1082.2,
+            "team": "AWAY",
+            "lbLocalY": 55.0,
+            "rbLocalY": 12.56
+          },
+          {
+            "time": 1082.3,
+            "team": "AWAY",
+            "lbLocalY": 54.87,
+            "rbLocalY": 12.69
+          },
+          {
+            "time": 1082.4,
+            "team": "AWAY",
+            "lbLocalY": 54.7,
+            "rbLocalY": 12.87
+          },
+          {
+            "time": 1082.5,
+            "team": "AWAY",
+            "lbLocalY": 54.47,
+            "rbLocalY": 13.1
+          },
+          {
+            "time": 1082.6,
+            "team": "AWAY",
+            "lbLocalY": 54.19,
+            "rbLocalY": 13.38
+          },
+          {
+            "time": 1082.7,
+            "team": "AWAY",
+            "lbLocalY": 53.86,
+            "rbLocalY": 13.71
+          },
+          {
+            "time": 1082.8,
+            "team": "AWAY",
+            "lbLocalY": 53.48,
+            "rbLocalY": 14.1
+          },
+          {
+            "time": 1082.9,
+            "team": "AWAY",
+            "lbLocalY": 53.05,
+            "rbLocalY": 14.53
+          },
+          {
+            "time": 1083.0,
+            "team": "AWAY",
+            "lbLocalY": 52.56,
+            "rbLocalY": 15.02
+          },
+          {
+            "time": 1083.1,
+            "team": "AWAY",
+            "lbLocalY": 52.03,
+            "rbLocalY": 15.56
+          }
+        ],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-LB": 1,
+          "A-LCB": 1,
+          "A-RB": 1
+        },
+        "topLateralJitter": []
+      },
+      "currentReportScope": {
+        "startSecond": 1082,
+        "endSecond": 1082,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 181026
+    },
+    {
+      "reportId": "umt053h3-79471388-9836-46df-a8f7-e19e4001652d",
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787575803967-13\n\n상황 시작 하자 마자 LB와 RB가 반대 위치에 존재해서 서로 자리를 바꾸는 상황임.",
+      "seeds": [
+        "DEV-RECENT-1787575663982-11",
+        "DEV-RECENT-1787575803967-13"
+      ],
+      "category": "2D 움직임",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 812,
+        "lastTime": 821.000000000002,
+        "maxPlayersWithin3mOfBall": 6,
+        "maxPlayersWithin5mOfBall": 6,
+        "lbRbReversalFrameCount": 35,
+        "lbRbReversalExamples": [
+          {
+            "time": 812.0,
+            "team": "AWAY",
+            "lbLocalY": 53.72,
+            "rbLocalY": 14.04
+          },
+          {
+            "time": 812.1,
+            "team": "AWAY",
+            "lbLocalY": 53.68,
+            "rbLocalY": 14.08
+          },
+          {
+            "time": 812.2,
+            "team": "AWAY",
+            "lbLocalY": 53.6,
+            "rbLocalY": 14.16
+          },
+          {
+            "time": 812.3,
+            "team": "AWAY",
+            "lbLocalY": 53.47,
+            "rbLocalY": 14.29
+          },
+          {
+            "time": 812.4,
+            "team": "AWAY",
+            "lbLocalY": 53.29,
+            "rbLocalY": 14.46
+          },
+          {
+            "time": 812.5,
+            "team": "AWAY",
+            "lbLocalY": 53.07,
+            "rbLocalY": 14.69
+          },
+          {
+            "time": 812.6,
+            "team": "AWAY",
+            "lbLocalY": 52.79,
+            "rbLocalY": 14.97
+          },
+          {
+            "time": 812.7,
+            "team": "AWAY",
+            "lbLocalY": 52.46,
+            "rbLocalY": 15.3
+          },
+          {
+            "time": 812.8,
+            "team": "AWAY",
+            "lbLocalY": 52.08,
+            "rbLocalY": 15.68
+          },
+          {
+            "time": 812.9,
+            "team": "AWAY",
+            "lbLocalY": 51.65,
+            "rbLocalY": 16.11
+          },
+          {
+            "time": 813.0,
+            "team": "AWAY",
+            "lbLocalY": 51.17,
+            "rbLocalY": 16.59
+          },
+          {
+            "time": 813.1,
+            "team": "AWAY",
+            "lbLocalY": 50.63,
+            "rbLocalY": 17.12
+          }
+        ],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-LCB": 3,
+          "A-RB": 2,
+          "A-CM": 2,
+          "A-LB": 1,
+          "A-LCM": 1,
+          "A-RCM": 1
+        },
+        "topLateralJitter": [
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 4,
+            "totalMove": 25.115,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_CENTRAL_CHANNEL",
+              "ATTACK_NEAR_POST",
+              "ATTACK_OPEN_CHANNEL",
+              "CLEAR_CARRIER_LANE",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 27.807,
+            "markChanges": 1,
+            "tasks": [
+              "BALL_SIDE_RECOVER",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN"
+            ]
+          },
+          {
+            "id": "A-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 25.327,
+            "markChanges": 2,
+            "tasks": [
+              "BOX_EDGE_SCREEN",
+              "DEEP_SCREEN",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "PRESS_CONTAIN",
+              "SECOND_BALL_TUCK"
+            ]
+          },
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 42.707,
+            "markChanges": 1,
+            "tasks": [
+              "HYBRID_ENTRY_LIVE",
+              "WIDE_RUN_TRACK"
+            ]
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 28.398,
+            "markChanges": 0,
+            "tasks": [
+              "CARRY_FORWARD",
+              "FAR_SIDE_RECOVER",
+              "FAR_SIDE_SHOULDER",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "MOVE_TO_RECEIVE",
+              "WIDE_DELIVERY_HOLD"
+            ]
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 28.346,
+            "markChanges": 1,
+            "tasks": [
+              "DEEP_TUCK",
+              "FAR_SIDE_TUCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "SECOND_BALL_TUCK"
+            ]
+          },
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 21.54,
+            "markChanges": 3,
+            "tasks": [
+              "BOX_RECOVERY_LINE",
+              "ENGAGE",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 19.899,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 812,
+        "endSecond": 821.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 1410301
+    },
+    {
+      "reportId": "umt053h3-f01306d4-c2bb-472e-9188-098df821d4d8",
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787575897894-18\n\n다른 상황으로 해봐도 LB와 RB가 서로 자리를 바꾸는 현상, CM이 갑자기 공을 잡으러 수비라인까지 달려들어버리는 현상, 중앙수비가 우왕좌왕 하는것은 그대로임",
+      "seeds": [
+        "DEV-RECENT-1787575896967-17",
+        "DEV-RECENT-1787575897894-18"
+      ],
+      "category": "2D 움직임",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 751,
+        "lastTime": 760.000000000002,
+        "maxPlayersWithin3mOfBall": 6,
+        "maxPlayersWithin5mOfBall": 6,
+        "lbRbReversalFrameCount": 36,
+        "lbRbReversalExamples": [
+          {
+            "time": 751.0,
+            "team": "AWAY",
+            "lbLocalY": 54.53,
+            "rbLocalY": 14.0
+          },
+          {
+            "time": 751.1,
+            "team": "AWAY",
+            "lbLocalY": 54.49,
+            "rbLocalY": 14.04
+          },
+          {
+            "time": 751.2,
+            "team": "AWAY",
+            "lbLocalY": 54.41,
+            "rbLocalY": 14.13
+          },
+          {
+            "time": 751.3,
+            "team": "AWAY",
+            "lbLocalY": 54.28,
+            "rbLocalY": 14.25
+          },
+          {
+            "time": 751.4,
+            "team": "AWAY",
+            "lbLocalY": 54.11,
+            "rbLocalY": 14.43
+          },
+          {
+            "time": 751.5,
+            "team": "AWAY",
+            "lbLocalY": 53.88,
+            "rbLocalY": 14.66
+          },
+          {
+            "time": 751.6,
+            "team": "AWAY",
+            "lbLocalY": 53.61,
+            "rbLocalY": 14.94
+          },
+          {
+            "time": 751.7,
+            "team": "AWAY",
+            "lbLocalY": 53.28,
+            "rbLocalY": 15.27
+          },
+          {
+            "time": 751.8,
+            "team": "AWAY",
+            "lbLocalY": 52.9,
+            "rbLocalY": 15.65
+          },
+          {
+            "time": 751.9,
+            "team": "AWAY",
+            "lbLocalY": 52.47,
+            "rbLocalY": 16.08
+          },
+          {
+            "time": 752.0,
+            "team": "AWAY",
+            "lbLocalY": 51.98,
+            "rbLocalY": 16.56
+          },
+          {
+            "time": 752.1,
+            "team": "AWAY",
+            "lbLocalY": 51.45,
+            "rbLocalY": 17.1
+          }
+        ],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-CM": 5,
+          "A-LCB": 4,
+          "A-LB": 3,
+          "A-LCM": 3,
+          "A-RB": 2,
+          "A-RCM": 2,
+          "A-RCB": 2
+        },
+        "topLateralJitter": [
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 5,
+            "totalMove": 23.955,
+            "markChanges": 4,
+            "tasks": [
+              "BOX_RECOVERY_LINE",
+              "ENGAGE",
+              "HYBRID_ENTRY_LIVE",
+              "LAST_COVER_SCREEN",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 5,
+            "totalMove": 19.463,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_BACK_POST",
+              "ATTACK_CENTRAL_CHANNEL",
+              "ATTACK_NEAR_POST",
+              "ATTACK_OPEN_CHANNEL",
+              "CLEAR_CARRIER_LANE",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "PIN_AND_RUN",
+              "PROTECT_SCAN"
+            ]
+          },
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 4,
+            "totalMove": 29.082,
+            "markChanges": 3,
+            "tasks": [
+              "BALL_SIDE_RECOVER",
+              "EMERGENCY_TRACK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "PRESS_CONTAIN"
+            ]
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 4,
+            "totalMove": 20.053,
+            "markChanges": 0,
+            "tasks": [
+              "BOX_EDGE_SUPPORT",
+              "EDGE_SHOT",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "LATE_BOX_ARRIVAL",
+              "MOVE_TO_RECEIVE",
+              "POST_PASS_CONTINUE_RUN",
+              "RECOVER_MIDFIELD_8",
+              "ST_WALL_SUPPORT"
+            ]
+          },
+          {
+            "id": "H-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 33.341,
+            "markChanges": 0,
+            "tasks": [
+              "FULLBACK_BALANCED_SUPPORT",
+              "HYBRID_ENTRY_LIVE",
+              "REST_BALANCE"
+            ]
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 28.86,
+            "markChanges": 2,
+            "tasks": [
+              "DEEP_TUCK",
+              "FAR_SIDE_TUCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 28.851,
+            "markChanges": 5,
+            "tasks": [
+              "BOX_EDGE_SCREEN",
+              "DEEP_SCREEN",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "PRESS_CONTAIN",
+              "SECOND_BALL_TUCK",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 21.577,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_BACK_POST",
+              "CARRY_FORWARD",
+              "FAR_SIDE_RECOVER",
+              "FAR_SIDE_SHOULDER",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "MOVE_TO_RECEIVE",
+              "WIDE_DELIVERY_HOLD",
+              "WIDE_RELEASE_OUTLET"
+            ]
+          },
+          {
+            "id": "A-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 21.368,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "A-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 2,
+            "totalMove": 46.689,
+            "markChanges": 2,
+            "tasks": [
+              "BOX_SIDE_RECOVERY",
+              "HYBRID_ENTRY_LIVE",
+              "PRESS_CONTAIN",
+              "WIDE_RUN_TRACK"
+            ]
+          },
+          {
+            "id": "A-RCB",
+            "slot": "RCB",
+            "role": "CB",
+            "lateralDirectionFlips": 2,
+            "totalMove": 26.773,
+            "markChanges": 2,
+            "tasks": [
+              "BOX_RECOVERY_LINE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "PRESS_CONTAIN",
+              "REST_DEFENCE",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 2,
+            "totalMove": 21.997,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 751,
+        "endSecond": 760.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 1497687
+    },
+    {
+      "reportId": "umt053h3-bcbfe33c-63b0-4fed-8e63-66e572cfe547",
+      "description": "검증 완료: ST 침투 레인 연속성 · seed=DEV-RECENT-1787575948505-19\n\n여전히 침투패스 상황에서 공격수가 좌우로 시야를 흔들면서 어쩔줄을 몰라함.\n버그가 고쳐지지 않았음",
+      "seeds": [
+        "DEV-RECENT-1787575948505-19",
+        "DEV-RECENT-1787575961389-20"
+      ],
+      "category": "패스/공격",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 1320,
+        "lastTime": 1328.9999999999918,
+        "maxPlayersWithin3mOfBall": 2,
+        "maxPlayersWithin5mOfBall": 3,
+        "lbRbReversalFrameCount": 0,
+        "lbRbReversalExamples": [],
+        "cmAtOrBehindBacklineFrameCount": 9,
+        "cmBacklineExamples": [
+          {
+            "time": 1324.7,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 24.18,
+            "cbMeanLocalX": 23.26,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1324.8,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 23.81,
+            "cbMeanLocalX": 22.99,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1324.9,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 23.41,
+            "cbMeanLocalX": 22.67,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1325.0,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 23.02,
+            "cbMeanLocalX": 22.31,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1325.1,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 22.66,
+            "cbMeanLocalX": 21.94,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1325.2,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 22.26,
+            "cbMeanLocalX": 21.54,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1325.3,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 21.87,
+            "cbMeanLocalX": 21.1,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1325.4,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 21.51,
+            "cbMeanLocalX": 20.66,
+            "task": "PRESS_CONTAIN",
+            "markTargetId": null
+          },
+          {
+            "time": 1325.5,
+            "team": "AWAY",
+            "id": "A-RCM",
+            "slot": "RCM",
+            "cmLocalX": 21.19,
+            "cbMeanLocalX": 20.21,
+            "task": "CUTBACK_TRACK",
+            "markTargetId": null
+          }
+        ],
+        "markTargetChangeCounts": {
+          "A-CM": 4,
+          "A-LCB": 3,
+          "A-LCM": 3,
+          "A-RB": 2,
+          "A-RCB": 2,
+          "A-LB": 1
+        },
+        "topLateralJitter": [
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 24.459,
+            "markChanges": 1,
+            "tasks": [
+              "BOX_SIDE_RECOVERY",
+              "HYBRID_ENTRY_LIVE",
+              "PRESS_CONTAIN",
+              "WIDE_RUN_TRACK"
+            ]
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 28.2,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_BACK_POST",
+              "CARRY_SCAN",
+              "FAR_SIDE_HOLD",
+              "FAR_SIDE_SHOULDER",
+              "HYBRID_ENTRY_LIVE",
+              "POST_SAFE_PASS_SUPPORT",
+              "WIDE_DELIVERY_HOLD"
+            ]
+          },
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 3,
+            "totalMove": 17.049,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_NEAR_POST",
+              "ATTACK_OPEN_CHANNEL",
+              "HYBRID_ENTRY_LIVE",
+              "PULL_OFF_FOR_CROSS"
+            ]
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 37.261,
+            "markChanges": 0,
+            "tasks": [
+              "BALL_SIDE_RECOVER",
+              "CUTBACK_TRACK",
+              "DEEP_TUCK",
+              "EMERGENCY_TRACK",
+              "HYBRID_ENTRY_LIVE",
+              "PRESS_CONTAIN",
+              "SECOND_BALL_TUCK"
+            ]
+          },
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 34.455,
+            "markChanges": 3,
+            "tasks": [
+              "FAR_SIDE_TUCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN"
+            ]
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 27.393,
+            "markChanges": 0,
+            "tasks": [
+              "HALFSPACE_SECOND_WAVE",
+              "HYBRID_ENTRY_LIVE",
+              "LATE_BOX_ARRIVAL",
+              "RECOVER_MIDFIELD_8"
+            ]
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 2,
+            "totalMove": 26.102,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_FAR_CHANNEL",
+              "CARRY_FORWARD",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "MOVE_TO_RECEIVE"
+            ]
+          },
+          {
+            "id": "A-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 2,
+            "totalMove": 19.344,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "A-RCB",
+            "slot": "RCB",
+            "role": "CB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 33.64,
+            "markChanges": 2,
+            "tasks": [
+              "BOX_RECOVERY_LINE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "LAST_COVER_SCREEN",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 1,
+            "totalMove": 30.793,
+            "markChanges": 3,
+            "tasks": [
+              "BOX_RECOVERY_LINE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 1,
+            "totalMove": 19.428,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          },
+          {
+            "id": "A-GK",
+            "slot": "GK",
+            "role": "GK",
+            "lateralDirectionFlips": 1,
+            "totalMove": 10.655,
+            "markChanges": 0,
+            "tasks": [
+              "GK_SET",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 1320,
+        "endSecond": 1328.9999999999918,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 1394986
+    },
+    {
+      "reportId": "umt053h3-4ff3da67-ec2f-4c6d-b629-634411b2d5bc",
+      "description": "이번 검증: 공격수 멈칫·SHIELD_SCAN 반복 방지 · seed=DEV-RECENT-1787576057595-34 · ST가 압박을 읽는 짧은 멈칫 뒤 다시 판단하고 움직이며, 같은 자리에서 SHIELD_SCAN을 반복하지 않는지 확인하세요.\n\n이번 검증은 적어도 짦은 멈칫은 공을 지킬때 나오는데 그게 공 지키느라 몸싸움 한다고 생각하면 크게 거슬리지는 않아서 이건 여러번 해봐도괜찮으니 통과로 봐도 될듯",
+      "seeds": [
+        "DEV-RECENT-1787576057309-33",
+        "DEV-RECENT-1787576057595-34"
+      ],
+      "category": "패스/공격",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 89,
+        "firstTime": 701,
+        "lastTime": 734.800000000002,
+        "maxPlayersWithin3mOfBall": 2,
+        "maxPlayersWithin5mOfBall": 3,
+        "lbRbReversalFrameCount": 0,
+        "lbRbReversalExamples": [],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-LB": 4,
+          "A-RB": 4,
+          "A-CM": 4,
+          "A-RCM": 4,
+          "A-RCB": 2,
+          "A-LCB": 2
+        },
+        "topLateralJitter": [
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 5,
+            "totalMove": 21.779,
+            "markChanges": 4,
+            "tasks": [
+              "BOX_SIDE_RECOVERY",
+              "ENGAGE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "PRESS_CONTAIN",
+              "RETURN_FOR_KICKOFF",
+              "WIDE_RUN_TRACK"
+            ]
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 5,
+            "totalMove": 17.3,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_BACK_POST",
+              "ATTACK_FAR_CHANNEL",
+              "DRIBBLE_EVADE",
+              "FIRST_TOUCH_FLOW",
+              "HYBRID_ENTRY_LIVE",
+              "JOIN_GOAL_CELEBRATION",
+              "MOVE_TO_RECEIVE",
+              "ST_RELEASE_RUN"
+            ]
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 4,
+            "totalMove": 26.55,
+            "markChanges": 0,
+            "tasks": [
+              "FAR_SIDE_RUN",
+              "HYBRID_ENTRY_LIVE",
+              "RETURN_FOR_KICKOFF",
+              "WIDE_DELIVERY_HOLD",
+              "WIDE_RELEASE_OUTLET"
+            ]
+          },
+          {
+            "id": "A-RCB",
+            "slot": "RCB",
+            "role": "CB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 25.427,
+            "markChanges": 2,
+            "tasks": [
+              "AERIAL_FIRST_BALL",
+              "BOX_RECOVERY_LINE",
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "PRESS_CONTAIN",
+              "RECOVERY_CHASE",
+              "RECOVER_SHAPE",
+              "RETURN_FOR_KICKOFF",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "A-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 22.871,
+            "markChanges": 4,
+            "tasks": [
+              "BOX_SIDE_RECOVERY",
+              "FAR_POST_TUCK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "RETURN_FOR_KICKOFF",
+              "WIDE_RUN_TRACK"
+            ]
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 29.792,
+            "markChanges": 4,
+            "tasks": [
+              "CUTBACK_TRACK",
+              "DEEP_TUCK",
+              "EMERGENCY_TRACK",
+              "HYBRID_ENTRY_LIVE",
+              "MARK_LANE_SCREEN",
+              "MIDFIELD_LANE_SCREEN",
+              "RETURN_FOR_KICKOFF",
+              "SECOND_BALL_TUCK"
+            ]
+          },
+          {
+            "id": "H-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 21.151,
+            "markChanges": 0,
+            "tasks": [
+              "COUNTER_GUARD",
+              "HYBRID_ENTRY_LIVE",
+              "PIVOT_SCREEN",
+              "RETURN_FOR_KICKOFF"
+            ]
+          },
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 32.44,
+            "markChanges": 0,
+            "tasks": [
+              "CUTBACK_TRACK",
+              "DEEP_TUCK",
+              "HYBRID_ENTRY_LIVE",
+              "RETURN_FOR_KICKOFF",
+              "SECOND_BALL_TUCK",
+              "SHOT_LANE_COVER"
+            ]
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 22.733,
+            "markChanges": 0,
+            "tasks": [
+              "BOX_EDGE_SUPPORT",
+              "HALFSPACE_SECOND_WAVE",
+              "HYBRID_ENTRY_LIVE",
+              "JOIN_GOAL_CELEBRATION",
+              "LATE_BOX_ARRIVAL",
+              "RECOVER_MIDFIELD_8",
+              "ST_WALL_SUPPORT"
+            ]
+          },
+          {
+            "id": "A-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 2,
+            "totalMove": 17.864,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "RETURN_FOR_KICKOFF"
+            ]
+          },
+          {
+            "id": "A-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 2,
+            "totalMove": 17.677,
+            "markChanges": 0,
+            "tasks": [
+              "HOLD_BLOCK",
+              "HYBRID_ENTRY_LIVE",
+              "RETURN_FOR_KICKOFF"
+            ]
+          },
+          {
+            "id": "A-GK",
+            "slot": "GK",
+            "role": "GK",
+            "lateralDirectionFlips": 2,
+            "totalMove": 10.251,
+            "markChanges": 0,
+            "tasks": [
+              "GK_SAVE_SET",
+              "GK_SET",
+              "HYBRID_ENTRY_LIVE",
+              "RETURN_FOR_KICKOFF"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 701,
+        "endSecond": 734.800000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 1454742
+    },
+    {
+      "reportId": "umt053h3-fa9eddb1-0a89-4110-a7d6-14a446ef9909",
+      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787576131788-41\n\n오프사이드 검사지만 별개로 RW에 선택지가 뜨지 않는 점이 있음 확인 바람",
+      "seeds": [
+        "DEV-RECENT-1787576112400-35",
+        "DEV-RECENT-1787576131788-41"
+      ],
+      "category": "패스/공격",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 17,
+        "firstTime": 996,
+        "lastTime": 997.6,
+        "maxPlayersWithin3mOfBall": 1,
+        "maxPlayersWithin5mOfBall": 1,
+        "lbRbReversalFrameCount": 17,
+        "lbRbReversalExamples": [
+          {
+            "time": 996.0,
+            "team": "AWAY",
+            "lbLocalY": 55.51,
+            "rbLocalY": 11.27
+          },
+          {
+            "time": 996.1,
+            "team": "AWAY",
+            "lbLocalY": 55.47,
+            "rbLocalY": 11.31
+          },
+          {
+            "time": 996.2,
+            "team": "AWAY",
+            "lbLocalY": 55.39,
+            "rbLocalY": 11.4
+          },
+          {
+            "time": 996.3,
+            "team": "AWAY",
+            "lbLocalY": 55.26,
+            "rbLocalY": 11.53
+          },
+          {
+            "time": 996.4,
+            "team": "AWAY",
+            "lbLocalY": 55.08,
+            "rbLocalY": 11.72
+          },
+          {
+            "time": 996.5,
+            "team": "AWAY",
+            "lbLocalY": 54.86,
+            "rbLocalY": 11.95
+          },
+          {
+            "time": 996.6,
+            "team": "AWAY",
+            "lbLocalY": 54.58,
+            "rbLocalY": 12.24
+          },
+          {
+            "time": 996.7,
+            "team": "AWAY",
+            "lbLocalY": 54.24,
+            "rbLocalY": 12.58
+          },
+          {
+            "time": 996.8,
+            "team": "AWAY",
+            "lbLocalY": 53.86,
+            "rbLocalY": 12.97
+          },
+          {
+            "time": 996.9,
+            "team": "AWAY",
+            "lbLocalY": 53.43,
+            "rbLocalY": 13.41
+          },
+          {
+            "time": 997.0,
+            "team": "AWAY",
+            "lbLocalY": 52.94,
+            "rbLocalY": 13.9
+          },
+          {
+            "time": 997.1,
+            "team": "AWAY",
+            "lbLocalY": 52.4,
+            "rbLocalY": 14.45
+          }
+        ],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-LB": 1,
+          "A-RCB": 1,
+          "A-RB": 1
+        },
+        "topLateralJitter": [
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 1,
+            "totalMove": 2.248,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_OPEN_CHANNEL",
+              "CLEAR_CARRIER_LANE",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 996,
+        "endSecond": 996,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 181745
+    },
+    {
+      "reportId": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
+      "description": "6번 항목은 몇번을 해도 오프사이드 상황이 나오지 않아서 검증이 안됨 강제 검증을 위해 상황을 다시 깔아주길 바람",
+      "seeds": [
+        "DEV-RECENT-1787576112400-35",
+        "DEV-RECENT-1787576275745-80"
+      ],
+      "category": "패스/공격",
+      "priority": 3,
+      "frameMetrics": {
+        "count": 17,
+        "firstTime": 1216,
+        "lastTime": 1217.6,
+        "maxPlayersWithin3mOfBall": 1,
+        "maxPlayersWithin5mOfBall": 1,
+        "lbRbReversalFrameCount": 17,
+        "lbRbReversalExamples": [
+          {
+            "time": 1216.0,
+            "team": "AWAY",
+            "lbLocalY": 55.38,
+            "rbLocalY": 12.17
+          },
+          {
+            "time": 1216.1,
+            "team": "AWAY",
+            "lbLocalY": 55.34,
+            "rbLocalY": 12.21
+          },
+          {
+            "time": 1216.2,
+            "team": "AWAY",
+            "lbLocalY": 55.26,
+            "rbLocalY": 12.3
+          },
+          {
+            "time": 1216.3,
+            "team": "AWAY",
+            "lbLocalY": 55.13,
+            "rbLocalY": 12.43
+          },
+          {
+            "time": 1216.4,
+            "team": "AWAY",
+            "lbLocalY": 54.95,
+            "rbLocalY": 12.61
+          },
+          {
+            "time": 1216.5,
+            "team": "AWAY",
+            "lbLocalY": 54.72,
+            "rbLocalY": 12.85
+          },
+          {
+            "time": 1216.6,
+            "team": "AWAY",
+            "lbLocalY": 54.44,
+            "rbLocalY": 13.13
+          },
+          {
+            "time": 1216.7,
+            "team": "AWAY",
+            "lbLocalY": 54.11,
+            "rbLocalY": 13.47
+          },
+          {
+            "time": 1216.8,
+            "team": "AWAY",
+            "lbLocalY": 53.73,
+            "rbLocalY": 13.86
+          },
+          {
+            "time": 1216.9,
+            "team": "AWAY",
+            "lbLocalY": 53.29,
+            "rbLocalY": 14.3
+          },
+          {
+            "time": 1217.0,
+            "team": "AWAY",
+            "lbLocalY": 52.81,
+            "rbLocalY": 14.8
+          },
+          {
+            "time": 1217.1,
+            "team": "AWAY",
+            "lbLocalY": 52.27,
+            "rbLocalY": 15.35
+          }
+        ],
+        "cmAtOrBehindBacklineFrameCount": 0,
+        "cmBacklineExamples": [],
+        "markTargetChangeCounts": {
+          "A-LB": 1,
+          "A-RCB": 1,
+          "A-RB": 1
+        },
+        "topLateralJitter": [
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 1,
+            "totalMove": 2.229,
+            "markChanges": 0,
+            "tasks": [
+              "ATTACK_OPEN_CHANNEL",
+              "CLEAR_CARRIER_LANE",
+              "HYBRID_ENTRY_LIVE"
+            ]
+          }
+        ]
+      },
+      "currentReportScope": {
+        "startSecond": 1216,
+        "endSecond": 1216,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousSituationPresent": true,
+      "currentBytes": 182967
+    }
+  ]
+}
