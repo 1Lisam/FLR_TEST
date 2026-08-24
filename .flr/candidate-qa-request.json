@@ -1,12 +1,13 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "V0.5.4-DEFENCE-NORMALIZATION-R3",
+  "version": "V0.5.4-DEFENCE-NORMALIZATION-R4",
   "candidateBranch": "test/v054-defense-normalization",
   "baselineRef": "8965e9eb026d317be95db14bf8e80a135e6aef56",
   "applyScripts": [
     ".flr/v054_defense_normalization_apply_bundle.py"
   ],
-  "validationScript": ".flr/v054_defense_normalization_validation.js",
+  "validationScript": ".flr/v054_defense_normalization_validation_r4.js",
+  "baselineScript": ".flr/v054_baseline_stats.js",
   "changedFiles": [
     "runtime/tactical_movement.js",
     "runtime/hybrid_spatial_intent_v2.js",
@@ -23,6 +24,6 @@
     "live_hybrid_session_v02.js",
     "live_v06_scene_authority_browser.js"
   ],
-  "resultDir": ".flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R3",
-  "runNonce": "2026-08-24T22:31+09:00-defence-normalization-law11-r3"
+  "resultDir": ".flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R4",
+  "runNonce": "2026-08-24T22:36+09:00-strict-second-ball-baseline-r4"
 }
