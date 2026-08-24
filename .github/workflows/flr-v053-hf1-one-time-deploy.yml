@@ -1,0 +1,47 @@
+name: FLR V0.5.3 HF1 one-time deploy
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.5.3 HF1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply validated HF1 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          # This one-time workflow only applies tiny text transforms over the already deployed
+          # V0.5.3 baseline. It intentionally does not alter football physics or outcome odds.
+          p=Path('runtime/protagonist_match_controller.js'); s=p.read_text()
+          old="""  if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){\n    const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));\n    if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};\n  }"""
+          new="""  if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){\n    if(['GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){\n      const gkOutcome=tr.newEvents.find(e=>['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY'].includes(e.type));\n      if(gkOutcome?.type==='GOAL')return{code:'GOAL_CONCEDED',headline:`${tr.label} → 실점`,detail:flow||gkOutcome.text||'상대 슈팅이 득점으로 이어졌습니다.',terminalEvent:deep(gkOutcome)};\n      if(['SAVE','CHIP_SAVE'].includes(gkOutcome?.type))return{code:'SAVED',headline:`${tr.label} → 선방`,detail:flow||gkOutcome.text||'골키퍼가 슈팅을 막았습니다.',terminalEvent:deep(gkOutcome)};\n      if(gkOutcome?.type==='CHIP_PARRY')return{code:'PARRIED',headline:`${tr.label} → 쳐냄`,detail:flow||gkOutcome.text||'골키퍼가 슈팅을 쳐냈습니다.',terminalEvent:deep(gkOutcome)};\n    }\n    const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));\n    if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};\n  }"""
+          assert old in s
+          s=s.replace(old,new)
+          old2="  const terminals=isShotChoice(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK']:tr.choiceId==='TAKE_ON'?['DRIBBLE_BEAT','TAKE_ON_TACKLED','TAKE_ON_LOOSE']:tr.choiceId==='TACKLE'?['TACKLE','FOUL','LOOSE']:[];"
+          new2="  const terminals=isShotChoice(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK']:['GK_HOLD_POSITION','GK_STEP_OUT'].includes(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY']:tr.choiceId==='TAKE_ON'?['DRIBBLE_BEAT','TAKE_ON_TACKLED','TAKE_ON_LOOSE']:tr.choiceId==='TACKLE'?['TACKLE','FOUL','LOOSE']:[];"
+          assert old2 in s
+          p.write_text(s.replace(old2,new2))
+          PY
+          node --check runtime/protagonist_match_controller.js
+      - name: Commit hotfix core only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR HF1 Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add runtime/protagonist_match_controller.js
+          git commit -m 'Hotfix V0.5.3 GK result consistency'
+          git push origin HEAD:main
