@@ -18,10 +18,26 @@ function phaseRuns(rows,id){
   if(cur)phases.push(cur);
   return phases.map(p=>({...p,start:n2(p.start),end:n2(p.end),travel:+p.travel.toFixed(3),startY:+p.startY.toFixed(3),endY:+p.endY.toFixed(3),tasks:[...p.tasks],owners:[...p.owners]}));
 }
+function shared(a,b){const s=new Set(a||[]);return(b||[]).filter(x=>s.has(x));}
 function meaningfulFlips(rows,id){
   const ph=phaseRuns(rows,id),flips=[];
-  for(let i=1;i<ph.length;i++){const a=ph[i-1],b=ph[i];if(a.travel>=.34&&b.travel>=.34&&a.samples>=2&&b.samples>=2)flips.push({at:b.start,from:a,to:b});}
-  return{count:flips.length,phases:ph,flips};
+  for(let i=1;i<ph.length;i++){
+    const a=ph[i-1],b=ph[i];
+    if(a.travel>=.34&&b.travel>=.34&&a.samples>=2&&b.samples>=2){
+      const sharedTasks=shared(a.tasks,b.tasks),sharedOwners=shared(a.owners,b.owners);
+      const previousAt=flips.length?flips.at(-1).at:null;
+      flips.push({at:b.start,from:a,to:b,sharedTasks,sharedOwners,sameTask:sharedTasks.length>0,sameOwner:sharedOwners.length>0,sameTaskAndOwner:sharedTasks.length>0&&sharedOwners.length>0,rapidRepeat:previousAt!=null&&b.start-previousAt<=1.25});
+    }
+  }
+  return{
+    count:flips.length,
+    sameTaskCount:flips.filter(f=>f.sameTask).length,
+    sameOwnerCount:flips.filter(f=>f.sameOwner).length,
+    sameTaskAndOwnerCount:flips.filter(f=>f.sameTaskAndOwner).length,
+    rapidRepeatCount:flips.filter(f=>f.rapidRepeat).length,
+    sameContextRapidRepeatCount:flips.filter(f=>f.sameTaskAndOwner&&f.rapidRepeat).length,
+    phases:ph,flips
+  };
 }
 function run(key,seed,ids,seconds=9){
   const d=H.createDeveloperScenario({key,seed});const env=A.seedMatch(d.boundary,{runtimeDir,seed:d.seed,explicitHeroChoiceRequired:false});env.state.mode='FULL_SKIP';
@@ -34,7 +50,7 @@ function run(key,seed,ids,seconds=9){
       if(lastSign&&sign!==lastSign)raw.push({t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,mark:b.markTargetId||null,x:n2(b.x),y:n2(b.y),tx:n2(b.tx),ty:n2(b.ty),ballOwner:fb.ball?.ownerId||null,ballX:n2(fb.ball?.x),ballY:n2(fb.ball?.y),prevMove:lastMove});
       lastSign=sign;lastMove={t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,tx:n2(b.tx),ty:n2(b.ty)};
     }
-    const meaningful=meaningfulFlips(rows,id);result.players[id]={rawFlipCount:raw.length,meaningfulFlipCount:meaningful.count,rawFlips:raw,meaningfulFlips:meaningful.flips,phases:meaningful.phases};
+    const meaningful=meaningfulFlips(rows,id);result.players[id]={rawFlipCount:raw.length,meaningfulFlipCount:meaningful.count,sameTaskMeaningfulFlipCount:meaningful.sameTaskCount,sameOwnerMeaningfulFlipCount:meaningful.sameOwnerCount,sameTaskAndOwnerMeaningfulFlipCount:meaningful.sameTaskAndOwnerCount,rapidMeaningfulRepeatCount:meaningful.rapidRepeatCount,sameContextRapidRepeatCount:meaningful.sameContextRapidRepeatCount,rawFlips:raw,meaningfulFlips:meaningful.flips,phases:meaningful.phases};
   }
   return result;
 }
