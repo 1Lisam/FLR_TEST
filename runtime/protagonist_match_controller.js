@@ -409,6 +409,12 @@ function resultNarrative(s,tr,terminal=null){
     if(x?.type==='TAKE_ON_LOOSE')return{code:'LOOSE',headline:'1대1 돌파 후 루즈볼',detail:flow||`${x.text} 이후 루즈볼 경합까지 이어졌습니다.`,terminalEvent:deep(x)};
   }
   if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){
+    if(['GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){
+      const gkOutcome=tr.newEvents.find(e=>['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY'].includes(e.type));
+      if(gkOutcome?.type==='GOAL')return{code:'GOAL_CONCEDED',headline:`${tr.label} → 실점`,detail:flow||gkOutcome.text||'상대 슈팅이 득점으로 이어졌습니다.',terminalEvent:deep(gkOutcome)};
+      if(['SAVE','CHIP_SAVE'].includes(gkOutcome?.type))return{code:'SAVED',headline:`${tr.label} → 선방`,detail:flow||gkOutcome.text||'골키퍼가 슈팅을 막았습니다.',terminalEvent:deep(gkOutcome)};
+      if(gkOutcome?.type==='CHIP_PARRY')return{code:'PARRIED',headline:`${tr.label} → 쳐냄`,detail:flow||gkOutcome.text||'골키퍼가 슈팅을 쳐냈습니다.',terminalEvent:deep(gkOutcome)};
+    }
     const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));
     if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};
   }
@@ -463,7 +469,7 @@ function finalizeResult(s,terminal=null){const tr=s.resultTracker;if(!tr||tr.don
 function updateResultTracker(s){
   const tr=s.resultTracker;if(!tr)return null;
   for(const e of s.m.events){const k=eventKey(e);if(tr.seen.has(k))continue;tr.seen.add(k);if(e.type==='USER_CHOICE')continue;if(e.t+0.001<tr.startedAt)continue;tr.newEvents.push(deep(e));}
-  const terminals=isShotChoice(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK']:tr.choiceId==='TAKE_ON'?['DRIBBLE_BEAT','TAKE_ON_TACKLED','TAKE_ON_LOOSE']:tr.choiceId==='TACKLE'?['TACKLE','FOUL','LOOSE']:[];
+  const terminals=isShotChoice(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK']:['GK_HOLD_POSITION','GK_STEP_OUT'].includes(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY']:tr.choiceId==='TAKE_ON'?['DRIBBLE_BEAT','TAKE_ON_TACKLED','TAKE_ON_LOOSE']:tr.choiceId==='TACKLE'?['TACKLE','FOUL','LOOSE']:[];
   if(!tr.terminalEvent){
     const terminal=tr.newEvents.find(e=>terminals.includes(e.type));
     if(terminal){
