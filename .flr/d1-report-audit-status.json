@@ -4,6 +4,126 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-af5a6d30-a4c4-4503-8874-2535af1df504",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:31:09.090Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787588844292-94\n\n오프 사이드 라인 자체가 이상함\n해당 시드, JSON에서는 RW가 공격진이 튀어 넘어간건데 저 상황에서 RW에게 동을 주면 오프사이드가 되어야 하지만\n\n라인도 빨간선(상대 오프사이드 라인) 가장 뒤에 있는 RCB가 아닌 RB를 기점으로 맞춰져 있고 파란팀의 오프사이드란도 가장 우선적으로 뛰어가는 RW나 ST와도 전혀 맞지 않은 위치임",
+      "size_bytes": 1420458,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-18245d39-7ced-4493-8aab-e8b34b6d748e",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:28:41.465Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787588795518-89\n\n분명히 선택이 되어야 하는 ST와 LW가 선택지에 들어있지 않음",
+      "size_bytes": 1419665,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-6f034593-1e7b-4ff1-8020-310d9e16d7e0",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:27:43.137Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787588740591-62 \n\n정작 오프사이드 환경이 나오질 않음 선택지가 나오지 않음",
+      "size_bytes": 1419596,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-24593e7a-9697-48a6-878b-ba834ddbebae",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:27:06.040Z",
+      "category": "UI/다시보기",
+      "priority": 3,
+      "description": "선택 항목 강제 검증 버튼을 누를 경우 자동으로 시드가 바뀌어 버림\n\n무슨 말이냐 하면 1 -> (다른시드로 강제 검증) 2로 만듬 -> (산택항목 강제검증) 3으로 바뀜\n\n이 부분 확인 필요함",
+      "size_bytes": 2666235,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-a53b7613-366d-46ce-b522-65f74d5a2262",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:26:23.874Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "검증 완료: 공격수 멈칫·SHIELD_SCAN 반복 방지 · seed=DEV-RECENT-1787588622837-59\n\n공격수 멈칫·SHIELD_SCAN 반복 방지  항목은 이전에 PASS 한 것으로 기억하는데 또 테스트를 해달라고 함.",
+      "size_bytes": 2666220,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-93338726-1115-428d-839e-f06893e30abf",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:24:58.161Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "검증 완료: ST 침투 레인 연속성 · seed=DEV-RECENT-1787588541783-53\n\n4. ST침투 레인 연속성은 이상하다 싶을 정도로 문제가 나진 않으니 PASS 해도 좋을 듯 함 다만 가끔 ST가 수비수 주위를 빙글 도는 위성형 움직임을 보이는건 있음",
+      "size_bytes": 2686150,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-3b821b47-3737-4e87-a2e8-fef422a86232",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:22:54.180Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787588289886-35\n\nCM이 자기 할 일을 마치고 마치 '정해진 곳으로 돌아가는 것' 처럼 상대 ST를 향해 달려감\n오프더 볼로 세컨볼을 LCM 과 RCM 처럼 지키고 서 있는게 정상이라 생각하는데 아닌 모양 \n\n또한 LB는 RW에서 너무 멀리 떨어져 있어서 여차하면 바로 뚫릴 수 있는 상황이라 RW쪽으로 조금 더 붙는게 좋은 상황임. 멀리서 멀뚱멀뚱하게 쳐다보고 있으면 안됨\n\n또한 RB는 마지막 상황 에서 공격수도 버리고 달려나가는지 모르겠음.\n\n일단 상대 공격수들이 포메이션 잡고 있는거 보면 자기네 진영에서 공이 있던 없던 아무 관심이 없어하는 움직임임 \n\n오프더볼을 좀 더 유기적으로 움직여서 자기팀 수비때는 역습을 위해 달려 나갈 수 있또록 볼을 받을 수 있는 위치에서 움직이고 있어야 하는데 이건 포메이션을 그냥 그대로 깔아놓은것 밖에는 안됨",
+      "size_bytes": 2616735,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-252604db-170f-4c3a-b391-923a81c492c2",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:19:04.568Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787588177858-21\n\n이건 다른 문제인데 상황이 볼이 넘겨지자 마자 ST가 갑자기 뒤로 전력질주 해버려서 미드필드들을 재치고 뒤로 달려나가버림.\n\n상황상 전혀 맞지 않는데다가 ST의 속도도 너무 빨라보임",
+      "size_bytes": 2266130,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-5ad72363-2bbe-432b-90a5-c67acea6bece",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:17:51.999Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787588129298-19 · JSON/버그리포트 사용 가능\n\n풀백은 이제 자리를 지키는것 같아서 OK인데 앞선 리포트에서 이야기 한 것 처럼 LB가 자꾸 달려나오는 문제는 해결 해야함",
+      "size_bytes": 3434367,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-8babcda1-6b23-42db-97da-b3918a085304",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:17:01.904Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "이번 검증: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787588061906-18\n\n몇번을 해봐도 CM이 측면 패스 후 자기 혼자 가운데로 달려가서 올라가버림\n\n강제검증이라 그런건지 아니면 패스 후 뒤로 빠지는것도, 앞으로 달려나가는것도 아닌 그냥 위로 이동만 하는 상황이 이 시드 말고도 여러 시드에서 동일하게 보임.",
+      "size_bytes": 3055949,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-3f7c69b2-6611-4769-b600-62dcba211037",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:15:34.192Z",
+      "category": "수비/전술",
+      "priority": 5,
+      "description": "늘 이야기 했던것 처럼 플레이를 시작했는데 포메이션이 정말 정갈하게 깔림\n축구를 하던 도중 선택지가 뜬게 아니라 지금부터 선택지가 떠야하니 포메이션을 깔아놓은것으로 밖에는 안보임\n\n*이것 필수적으로 확인해주기 바람. 10일째 안고쳐짐",
+      "size_bytes": 1453871,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-64d5f7fc-2a0c-4ad5-8c05-6c31c6e3977c",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "created_at": "2026-08-24T16:14:05.394Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787586978212-1\n\n우리팀 LB와 상대팀 LB 둘 다 자기 포지션을 안지키는거 같아.\n상황이 시작될때 우리 LB는 뜬금없이 많이 나와 있어서 추후 볼이 돌아갈때 상대 RW가 노마크 상태임",
+      "size_bytes": 1318347,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
       "build": "USER-MATCH-TEST-V0.5.3-HF3",
       "created_at": "2026-08-24T13:00:01.597Z",
@@ -382,129 +502,9 @@
       "description": "이 이전 상대방의 골 장면은 항상 동일한거 같음.\n어떤 테스트를 몇 번 하던 상대방 슈팅은 항상 저 위치에 저 포지션에 위치한 상태로 골이 들어갔다고 판단하는거 같은데 확인바람",
       "size_bytes": 539444,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-17cf3c19-791c-412b-b5b5-824f70601e2d",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:39:35.818Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "내 선택 결과\n안전한 패스 → 같은 팀 RCM → 안전한 패스 → 같은 팀 RCM → 소유권 변화\n내 선택\n안전한 패스 → 같은 팀 RCM → 안전한 패스 → 같은 팀 RCM → 소유권 변화\n\nRCM에게 줘서 어시스트가 들어왔고 득점이 되었는데 단순히 소유권 변화라고 표시되는건 상당히 밋밋함. 또한 골이 들어갔으면 골 세레머니 장면까지는 나오게 해달라고 했는데도 구현이 안됨",
-      "size_bytes": 962734,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-e0e67a53-024a-4085-ab49-5f3007f82db4",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:38:41.972Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "이 선택지 이전 선택지의 끝나는  상황에서는 코너킥이 되었는데 이건 기회가 아니라고 계싼 되어서 넘어간건지 궁금함",
-      "size_bytes": 3118196,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-4c414a83-b4eb-42a6-b3dd-2d8de7b294ff",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:38:01.674Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "여전히 선택 바로 직전에 공을 잡고 ST가 부들부들 어디로 시선을 옮기는지 모를 정도로 떨다가 선택지가 나옴. \n이건 1주일째 해결 안되는 문제",
-      "size_bytes": 2754381,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-ed9f5fbe-1573-48dc-a663-9a51c79d3644",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:37:15.970Z",
-      "category": "조작권/선택",
-      "priority": 3,
-      "description": "1. 이부분 플레이 시작되자 마자 여전히 ST의 위치가 정확하지 않음\n2. 또한 플레이 시작 되었는데 모든 포메이션이 정상 위치라는게 사실 '선택을 위해 포메이션을 뿌려줬다' 라고 밖에는 안느껴짐",
-      "size_bytes": 4306145,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "tt051-f42d0a99-3280-4119-9879-06117a3fca9c",
-      "build": "TT-0.51",
-      "created_at": "2026-08-22T19:19:56.670Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "공간 전진을 했으나 공을 들고 가만히 있음",
-      "size_bytes": 1288129,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "tt051-f7f30898-f3b1-423c-a9e6-94d5c6972ab2",
-      "build": "TT-0.51",
-      "created_at": "2026-08-22T19:19:33.013Z",
-      "category": "슈팅/GK",
-      "priority": 3,
-      "description": "득점을 하였으나 우리가 약속한 골세레머니가 나오지 않고 너무 빨리 장면이 끝남",
-      "size_bytes": 485993,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "tt051-3c57e69b-c7fc-42b1-ad0b-8b3379707845",
-      "build": "TT-0.51",
-      "created_at": "2026-08-22T18:58:01.910Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "역시 동일한 문제 ST 의 위치는 뒤에서 시작하고 상대 포지션은 다 정해진 상태",
-      "size_bytes": 1312669,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "tt051-64c478ef-3c53-4345-b932-8c70adc7a4e1",
-      "build": "TT-0.51",
-      "created_at": "2026-08-22T18:50:40.237Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "스타트 상황 여전히 상대의 포메이션은 완성 되어 있고 ST는 우리 수비진 최 후방에서 출발함 3일전부터 언급했었던 문제임",
-      "size_bytes": 3508064,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:34:27.415Z",
-      "category": "슈팅/GK",
-      "priority": 3,
-      "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
-      "size_bytes": 5647319,
-      "chunk_count": 4
-    },
-    {
-      "report_id": "tt051-cc852f58-6718-4b71-9e39-bc67abd66574",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:33:15.773Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "선수단 라커룸 복귀는 지금 속도보다 20% 정도 더 빨라져도 좋을거 같아.",
-      "size_bytes": 5647134,
-      "chunk_count": 4
-    },
-    {
-      "report_id": "tt051-53de8a05-f3f4-465c-9780-e51d381d66f8",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:32:35.837Z",
-      "category": "조작권/선택",
-      "priority": 3,
-      "description": "이전 선택지에서 '볼 트래핑' 이후 다시 ST에게 공이 들어왔으나 플레이어가 전혀 관여 하지 않은 패스가 나왔어. 이 부분 확인 해줘",
-      "size_bytes": 4703496,
-      "chunk_count": 4
-    },
-    {
-      "report_id": "tt051-ac85275c-b6a0-465c-851f-53296142d471",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:29:50.178Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "이건 왜 ST가 수비진영에서 나오고 있는건지 도저히 이해가 안됨. 수비 가담을 했다고 하기엔 모든 포메이션이 정상 포메이션이거든",
-      "size_bytes": 3074822,
-      "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
+  "latestAttachedReportId": "umt053h3-af5a6d30-a4c4-4503-8874-2535af1df504",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -514,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "reportId": "umt053h3-af5a6d30-a4c4-4503-8874-2535af1df504",
+      "build": "USER-MATCH-TEST-V0.5.4-R14",
       "step": 78,
-      "description": "6번 항목은 몇번을 해도 오프사이드 상황이 나오지 않아서 검증이 안됨 강제 검증을 위해 상황을 다시 깔아주길 바람",
-      "category": "패스/공격",
+      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787588844292-94\n\n오프 사이드 라인 자체가 이상함\n해당 시드, JSON에서는 RW가 공격진이 튀어 넘어간건데 저 상황에서 RW에게 동을 주면 오프사이드가 되어야 하지만\n\n라인도 빨간선(상대 오프사이드 라인) 가장 뒤에 있는 RCB가 아닌 RB를 기점으로 맞춰져 있고 파란팀의 오프사이드란도 가장 우선적으로 뛰어가는 RW나 ST와도 전혀 맞지 않은 위치임",
+      "category": "2D 움직임",
       "priority": 3,
-      "reportedAt": "2026-08-24T12:58:20.243Z"
+      "reportedAt": "2026-08-24T16:29:27.171Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -543,18 +543,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 1216,
-      "endSecond": 1216,
+      "startSecond": 1446,
+      "endSecond": 1446,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 1040,
-      "endSecond": 1043.3,
+      "startSecond": 1191,
+      "endSecond": 1199.9999999999918,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 182967,
-    "previousSerializedBytes": 578068
+    "currentSerializedBytes": 91659,
+    "previousSerializedBytes": 1469468
   }
 }
