@@ -499,17 +499,19 @@ function updateResultTracker(s){
   // same physics tick as GOAL; if terminal type is still null here, the ordinary pass deadline
   // would finalize immediately and capture only one celebration frame.
   if((tr.family==='패스'||tr.family==='크로스')&&tr.terminalEvent?.type!=='GOAL'){const ds=[...tr.newEvents].reverse().find(e=>e.t>=tr.startedAt+0.35&&e.type==='SHOT'),dg=ds&&tr.newEvents.find(e=>e.t>=ds.t&&e.type==='GOAL');if(dg){tr.terminalEvent=deep(dg);tr.terminalAt=Number(dg.t);}}
-  if((tr.family==='패스'||tr.family==='크로스')&&!tr.terminalEvent){const db=tr.newEvents.find(e=>['OFFSIDE','CORNER','GOAL_KICK','THROW_IN','FOUL'].includes(e.type));if(db){tr.terminalEvent=deep(db);tr.terminalAt=Number(db.t);}}
+  if((tr.family==='패스'||tr.family==='크로스')&&!tr.terminalEvent){const db=tr.newEvents.find(e=>['OFFSIDE','CORNER','GOAL_KICK','THROW_IN','FOUL'].includes(e.type));if(db){tr.terminalEvent=deep(db);tr.terminalAt=Number(db.t);if(db.type==='OFFSIDE'&&!Number.isFinite(Number(tr.offsideVisibleSince)))tr.offsideVisibleSince=Number(s.m.time);}}
   const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
   let ready=false;
   if(tt==='GOAL'){const visibleGoalAge=s.m.goalCelebration?now-Number(s.m.goalCelebration.startedAt||now):null;ready=(s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))||(visibleGoalAge!=null&&visibleGoalAge>=4.8);}
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
     const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY',visibleRestartAge=s.m.restart&&Number.isFinite(Number(s.m.restart.setupStartedAt))?Math.max(0,now-Number(s.m.restart.setupStartedAt)):age;
-    // V0.5: dead-clock compression advances match time without showing those seconds.  Result
-    // readability therefore uses visible restart-setup age, not terminal-event clock age, so an
-    // offside/corner cannot collapse to a single frame just because 15-30 dead seconds were
-    // compressed in the same simulation tick.
-    if(tt==='GOAL_KICK'||tt==='CORNER')ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.35&&((ballReady&&ratio>=0.52)||!s.m.restart||visibleRestartAge>=6.40);
+    // Dead-clock compression may jump the match clock, but user-facing readability is measured
+    // from when the controller first observes the terminal event. OFFSIDE gets a short dedicated
+    // review beat so the line/call can be understood without watching a long restart walk-back.
+    if(tt==='OFFSIDE'){
+      const visibleOffsideAge=Number.isFinite(Number(tr.offsideVisibleSince))?Math.max(0,now-Number(tr.offsideVisibleSince)):0;
+      ready=(now>=tr.minimumUntil)&&visibleOffsideAge>=1.20;
+    }else if(tt==='GOAL_KICK'||tt==='CORNER')ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.35&&((ballReady&&ratio>=0.52)||!s.m.restart||visibleRestartAge>=6.40);
     else ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.10&&(ratio>=0.55||visibleRestartAge>=4.60||!s.m.restart);
   }else if(['BLOCK','SAVE','CHIP_SAVE','CHIP_PARRY'].includes(tt)){
     const follow=tr.newEvents.find(e=>e.t>(tr.terminalAt||0)+0.30&&['PASS','SHOT','TAKE_ON','CLEARANCE'].includes(e.type));

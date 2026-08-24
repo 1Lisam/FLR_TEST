@@ -22,6 +22,8 @@ function other(team){return team==='HOME'?'AWAY':'HOME';}
 function attackDir(team){return team==='HOME'?1:-1;}
 function world(team,x,y){return team==='HOME'?{x,y}:{x:105-x,y:68-y};}
 function local(team,x,y){return team==='HOME'?{x,y}:{x:105-x,y:68-y};}
+function localProgressOf(team,x){return clamp((team==='HOME'?x:105-x)/105,.02,.98);}
+function attackLineLocal(players,team){const xs=Object.values(players).filter(q=>q.team!==team&&q.role!=='GK').map(q=>local(team,q.x,q.y).x).sort((a,b)=>a-b);return xs.length>=2?xs[xs.length-2]:92;}
 function dist(a,b){return Math.hypot((a?.x||0)-(b?.x||0),(a?.y||0)-(b?.y||0));}
 
 function abstractBallWorld(state){
@@ -262,20 +264,43 @@ function candidateIntent(state,players,p,assignments,now){
     return{kind:'RECOVER',target:base,targetId:null,score:.56};
   }
 
-  if(p.id===state.ball.ownerId){const bw=abstractBallWorld(state);return{kind:'SUPPORT',target:bw,targetId:null,score:.95};}
-  const prog=Number(state.ball.progress||.5);
+  // Spatial ownership is authoritative for live movement. The abstract progress can advance
+  // in compressed event time, but off-ball teammates must react to where the ball actually is.
+  if(p.id===state.ball.ownerId){const bw=abstractBallWorld(state),target=capAround({x:p.x,y:p.y},bw,12);return{kind:'SUPPORT',target,targetId:null,score:.95};}
+  const abstractProg=Number(state.ball.progress||.5),ownerLocal=owner?local(p.team,owner.x,owner.y):null,liveProg=ownerLocal?localProgressOf(p.team,owner.x):abstractProg,prog=Math.min(abstractProg,liveProg+.065);
   if((p.role==='ST'||p.role==='WF')&&prog>=.56&&['PROGRESSION','FINAL_THIRD','CHANCE'].includes(phase)){
-    const step=p.role==='ST'?7.2:6.4;
-    let laneY=p.y;
-    if(p.role==='ST')laneY=clamp(p.y+(state.ball.lane==='LEFT'?-2.5:state.ball.lane==='RIGHT'?2.5:0),18,50);
-    else laneY=clamp(p.y+(34-p.y)*.06,6,62);
-    return{kind:'RUN',target:{x:clamp(p.x+dir*step,5,100),y:laneY},targetId:owner?.id||null,score:.86};
+    const cur=local(p.team,p.x,p.y),step=p.role==='ST'?7.2:6.4,ballX=ownerLocal?.x??prog*105,defLine=attackLineLocal(players,p.team),maxGap=p.role==='ST'?22:20;
+    // A runner may legitimately cross the defensive line and become offside. What is forbidden
+    // is becoming detached 35-45m ahead of a ball that is still in midfield.
+    const connectionCeil=ballX+maxGap,lineCeil=defLine+4.5,forwardCeil=Math.min(100,connectionCeil,lineCeil);
+    if(cur.x>connectionCeil+2.5){
+      const recoverX=clamp(Math.min(cur.x-5.5,connectionCeil-1.0),5,98),laneY=p.role==='ST'?clamp(cur.y,18,50):clamp(cur.y+(34-cur.y)*.08,6,62),w=world(p.team,recoverX,laneY);
+      return{kind:'RECOVER',target:w,targetId:null,score:1.02};
+    }
+    let laneY=cur.y;
+    if(p.role==='ST')laneY=clamp(cur.y+(state.ball.lane==='LEFT'?-2.5:state.ball.lane==='RIGHT'?2.5:0),18,50);
+    else laneY=clamp(cur.y+(34-cur.y)*.06,6,62);
+    const targetLocal={x:clamp(Math.min(cur.x+step,forwardCeil),5,100),y:laneY},w=world(p.team,targetLocal.x,targetLocal.y);
+    return{kind:'RUN',target:w,targetId:owner?.id||null,score:.86};
   }
-  if(p.role==='CM'||p.role==='WF'||p.role==='FB'){
-    const rel=owner?predicted(owner,.30):abstractBallWorld(state),behind=p.role==='CM'?-6:p.role==='FB'?-9:-2;
+  if(p.role==='CM'){
+    const rel=owner?predicted(owner,.30):abstractBallWorld(state),ol=local(p.team,rel.x,rel.y),nearSlot=ol.y<30?'LCM':ol.y>38?'RCM':(state.ball.lane==='LEFT'?'LCM':state.ball.lane==='RIGHT'?'RCM':'LCM');
+    if(p.slot==='CM'){
+      const q=local(p.team,base.x,base.y),targetLocal={x:clamp(Math.min(q.x,ol.x-10),28,76),y:clamp(34+(ol.y-34)*.16,18,50)},w=world(p.team,targetLocal.x,targetLocal.y);
+      return{kind:'COVER',target:capAround(base,w,9),targetId:null,score:.84};
+    }
+    if(p.slot===nearSlot){
+      const lat=p.slot==='LCM'?-6:6,relation=world(p.team,clamp(ol.x-5,5,100),clamp(ol.y+lat,5,63));
+      return{kind:'SUPPORT',target:capAround(base,blend(base,relation,.44),10),targetId:owner?.id||null,score:.78};
+    }
+    const farY=p.slot==='LCM'?21:47,targetLocal={x:clamp(ol.x-8,30,82),y:farY},w=world(p.team,targetLocal.x,targetLocal.y);
+    return{kind:'SUPPORT',target:capAround(base,blend(base,w,.36),10),targetId:null,score:.73};
+  }
+  if(p.role==='WF'||p.role==='FB'){
+    const rel=owner?predicted(owner,.30):abstractBallWorld(state),behind=p.role==='FB'?-9:-2;
     const lateral=p.slot.includes('L')?-7:p.slot.includes('R')?7:0,relation={x:clamp(rel.x+dir*behind,5,100),y:clamp(rel.y+lateral,5,63)};
-    const w=p.role==='CM'?.42:p.role==='FB'?.22:.34,max=p.role==='CM'?10:p.role==='FB'?7:11;
-    return{kind:'SUPPORT',target:capAround(base,blend(base,relation,w),max),targetId:owner?.id||null,score:p.role==='CM'?.76:.68};
+    const w=p.role==='FB'?.22:.34,max=p.role==='FB'?7:11;
+    return{kind:'SUPPORT',target:capAround(base,blend(base,relation,w),max),targetId:owner?.id||null,score:.68};
   }
   return{kind:'SHAPE',target:base,targetId:null,score:.48};
 }
@@ -315,12 +340,12 @@ function updateIntents(state,players,now){
     const ownerControlSwitch=p.id===state.ball.ownerId&&p.intentKind!==cand.kind;
     if(releaseOldPress||releaseOldMark||ownerControlSwitch||shouldSwitch(p,cand,now,changed)){
       p.intentKind=cand.kind;p.intentTargetId=cand.targetId||null;p.intentTargetX=cand.target.x;p.intentTargetY=cand.target.y;
-      p.intentSince=now;p.intentMinUntil=now+minIntentDuration(cand.kind);p.intentMaxUntil=now+maxIntentDuration(cand.kind);p.intentScore=cand.score;switches++;
+      p.intentSince=now;p.intentMinUntil=now+minIntentDuration(cand.kind);p.intentMaxUntil=now+maxIntentDuration(cand.kind);p.intentScore=cand.score;p.sourceTask=`HYBRID_${cand.kind}`;switches++;
     }else if(p.intentKind===cand.kind){
       // Relation intents may follow a moving target. RUN keeps its committed lane until the
       // minimum intent window expires and the player actually reaches the target.
       const reached=Math.hypot(p.intentTargetX-p.x,p.intentTargetY-p.y)<1.8;
-      if(p.intentKind!=='RUN'){p.intentTargetX=cand.target.x;p.intentTargetY=cand.target.y;p.intentTargetId=cand.targetId||p.intentTargetId;}
+      if(p.intentKind!=='RUN'){p.intentTargetX=cand.target.x;p.intentTargetY=cand.target.y;p.intentTargetId=cand.targetId??null;}
       else if((now>=p.intentMinUntil&&reached)||now>=Number(p.intentMaxUntil||0)){p.intentTargetX=cand.target.x;p.intentTargetY=cand.target.y;p.intentSince=now;p.intentMinUntil=now+minIntentDuration('RUN');}
       if(now>=Number(p.intentMaxUntil||0))p.intentMaxUntil=now+maxIntentDuration(p.intentKind);
       p.intentScore=Math.max(p.intentScore||0,cand.score-.05);
