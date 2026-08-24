@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   hf2-qa:
-    if: github.event.issue.title == '[FLR_QA] V0.5.3 HF2 EXACT'
+    if: github.event.issue.title == '[FLR_QA] V0.5.3 HF2 EXACT V2'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -19,77 +19,93 @@ jobs:
           ref: test/v053-hf2-visualfix
           fetch-depth: 0
 
-      - name: Verify branch ancestry
+      - name: Verify main divergence is QA-only
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main
           git rev-parse HEAD > /tmp/hf2_preqa_sha
-          test "$(git merge-base HEAD origin/main)" = "$(git rev-parse origin/main)"
+          base=$(git merge-base HEAD origin/main)
+          mapfile -t delta < <(git diff --name-only "$base" origin/main)
+          printf 'main-only delta: %s\n' "${delta[*]:-<none>}"
+          for f in "${delta[@]}"; do
+            test "$f" = '.github/workflows/flr-v053-hf2-exact-qa.yml'
+          done
 
-      - name: Apply exact HF2 transformer
-        run: python .flr/apply_v053_hf2_visualfix.py
-
-      - name: Syntax and scope
+      - name: Apply HF2 transformer plus CB decision preservation
         shell: bash
         run: |
           set -euo pipefail
-          node --check runtime/tactical_movement.js
-          node --check runtime/continuous_match_core.js
-          node --check runtime/hybrid_spatial_intent_v2.js
-          node --check step71_hybrid_v06_ui.js
-          node --check live_hybrid_session_v02.js
-          node --check live_v06_scene_authority_browser.js
-          node --check runtime/protagonist_match_controller.js
+          python .flr/apply_v053_hf2_visualfix.py
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('live_hybrid_session_v02.js'); s=p.read_text(encoding='utf-8')
+          old=" else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';\n else if(role==='GK'"
+          new=" else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';\n else if(role==='CB'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.72&&['DANGEROUS_PASS','BOX_ENTRY','PROGRESS'].includes(e.kind)){const hp=s.spatial?.players?.[hid],bp=s.spatial?.ball,db=hp&&bp?Math.hypot(hp.x-bp.x,hp.y-bp.y):99,active=hp&&((hp.intentKind==='MARK'&&hp.intentTargetId)||hp.intentKind==='PRESS'||(hp.intentKind==='COVER'&&db<=11));if(active&&(s.zone==='BOX'||e.kind==='DANGEROUS_PASS'||s.danger>=.82))reason='DEFENSIVE_INVOLVEMENT';}\n else if(role==='GK'"
+          if old not in s: raise SystemExit('CB promotion marker missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          paths=['index.html','live_hybrid_session_v02.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','runtime/tactical_movement.js','step71_hybrid_v06_ui.js']
+          out={'schemaVersion':'FLR_V053_HF2_PATCH_1.1','files':[]}
+          for f in paths:
+            b=Path(f).read_bytes(); out['files'].append({'path':f,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          Path('.flr/v053_hf2_patch_manifest.json').write_text(json.dumps(out,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Syntax and exact scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in live_hybrid_session_v02.js live_v06_scene_authority_browser.js step71_hybrid_v06_ui.js runtime/tactical_movement.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js; do node --check "$f"; done
           git diff --check
           python - <<'PY'
           import subprocess
-          allowed={'index.html','runtime/tactical_movement.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','step71_hybrid_v06_ui.js','.flr/v053_hf2_patch_manifest.json'}
+          allowed={'index.html','live_hybrid_session_v02.js','runtime/tactical_movement.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','step71_hybrid_v06_ui.js','.flr/v053_hf2_patch_manifest.json'}
           changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).split())
-          bad=sorted(changed-allowed)
-          if bad: raise SystemExit('out-of-scope: '+', '.join(bad))
-          required={'index.html','runtime/tactical_movement.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','step71_hybrid_v06_ui.js'}
+          bad=sorted(changed-allowed); required=allowed- {'.flr/v053_hf2_patch_manifest.json'}
           missing=sorted(required-changed)
+          if bad: raise SystemExit('out-of-scope: '+', '.join(bad))
           if missing: raise SystemExit('missing expected changes: '+', '.join(missing))
           print('SCOPE PASS',sorted(changed))
           PY
           grep -q 'V0.5.3 HF2 TEST' index.html
           grep -q 'USER-MATCH-TEST-V0.5.3-HF2' step71_hybrid_v06_ui.js
           grep -q 'umt053h2-' step71_hybrid_v06_ui.js
+          grep -q "reason='DEFENSIVE_INVOLVEMENT'" live_hybrid_session_v02.js
 
-      - name: Exact user visual regression
-        run: node .flr/v053_hf2_user_visual_regression.js
+      - name: Core regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .flr/v053_hf2_user_visual_regression.js
+          node .flr/v053_visible_fix_regression.js
+          node .flr/v053_ui_event_e2e_vm.js
+          (cd .flr && node v052_intent_v2_wip_regression.js)
+          (cd .flr && node v053_intent_v2_extended_gate.js)
+          (cd .flr && node intent_v2_wip_long_multicycle_bench.js)
+          (cd .flr && node v053_final_window_continuity_regression.js)
+          (cd .flr && node v053_gk_result_hotfix_regression.js)
 
-      - name: Integrated ST 90
-        run: node .flr/v053_integrated_90_role_bench.js ST
-      - name: Integrated CM 90
-        run: node .flr/v053_integrated_90_role_bench.js CM
-      - name: Integrated CB 90
-        run: node .flr/v053_integrated_90_role_bench.js CB
-      - name: Integrated GK 90
-        run: node .flr/v053_integrated_90_role_bench.js GK
+      - name: Integrated ST CM CB GK 90
+        shell: bash
+        run: |
+          set -euo pipefail
+          for r in ST CM CB GK; do (cd .flr && node v053_integrated_90_role_bench.js "$r"); done
+          python - <<'PY'
+          import json
+          cb=json.load(open('.flr/v053_integrated_90_CB_status.json'))
+          s=cb.get('summary',{}); windows=(s.get('boundaryTypes') or {}).get('PROTAGONIST_2D_WINDOW',0); choices=s.get('choices',0)
+          print({'cbWindows':windows,'cbChoices':choices})
+          if windows<1 or choices<1: raise SystemExit('CB protagonist decisions disappeared')
+          PY
 
-      - name: Protected invariant spot gates
+      - name: Protected invariants
         shell: bash
         run: |
           set -euo pipefail
           node - <<'NODE'
-          const fs=require('fs');
-          const P=fs.readFileSync('runtime/protagonist_match_controller.js','utf8');
-          const H=fs.readFileSync('live_hybrid_session_v02.js','utf8');
-          const C=fs.readFileSync('runtime/continuous_match_core.js','utf8');
-          const UI=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
-          const checks={
-            noFuture:P.includes('futureOutcomePrecomputed:false'),
-            exactTarget:P.includes('CHOICE_TARGET_RESOLUTION_MISMATCH'),
-            gkGoal:P.includes("code:'GOAL_CONCEDED'"),
-            finalWindow:H.includes("type:'FINAL_2D_WINDOW'"),
-            offsideReview:C.includes("stage:deferredOffside?'CALL_REVIEW':'SETUP'"),
-            devReport:UI.includes("rememberCompletedSituation(latestIntegratedDebug,'DEV_VISUAL')"),
-            devSeed:UI.includes('developerScenarioActive?.seed||`${seed()}-${r.boundary.sceneId}`')
-          };
-          console.log(checks);
-          if(Object.values(checks).some(x=>!x))process.exit(1);
+          const fs=require('fs'),P=fs.readFileSync('runtime/protagonist_match_controller.js','utf8'),H=fs.readFileSync('live_hybrid_session_v02.js','utf8'),C=fs.readFileSync('runtime/continuous_match_core.js','utf8'),UI=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          const x={noFuture:P.includes('futureOutcomePrecomputed:false'),exactTarget:P.includes('CHOICE_TARGET_RESOLUTION_MISMATCH'),gkGoal:P.includes("code:'GOAL_CONCEDED'"),finalWindow:H.includes("type:'FINAL_2D_WINDOW'"),cbDecision:H.includes("reason='DEFENSIVE_INVOLVEMENT'"),offsideReview:C.includes("stage:deferredOffside?'CALL_REVIEW':'SETUP'"),devReport:UI.includes("rememberCompletedSituation(latestIntegratedDebug,'DEV_VISUAL')"),devSeed:UI.includes('developerScenarioActive?.seed||`${seed()}-${r.boundary.sceneId}`')}; console.log(x); if(Object.values(x).some(v=>!v))process.exit(1);
           NODE
 
       - name: Write authoritative QA record
@@ -97,28 +113,25 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json,datetime
+          import json,datetime,subprocess
           from pathlib import Path
           def load(p): return json.loads(Path(p).read_text(encoding='utf-8'))
-          visual=load('.flr/v053_hf2_user_visual_regression_status.json')
-          roles={r:load(f'.flr/v053_integrated_90_{r}_status.json') for r in ['ST','CM','CB','GK']}
-          manifest=load('.flr/v053_hf2_patch_manifest.json')
-          ok=visual.get('status')=='PASS' and all(x.get('status')=='PASS' for x in roles.values())
-          out={'schemaVersion':'FLR_V053_HF2_GITHUB_QA_1.0','status':'PASS' if ok else 'FAIL','branch':'test/v053-hf2-visualfix','preQaCommit':Path('/tmp/hf2_preqa_sha').read_text().strip(),'mainBase':__import__('subprocess').check_output(['git','rev-parse','origin/main'],text=True).strip(),'checkedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'visual':visual,'roles':roles,'manifest':manifest,'futureOutcomePrecomputed':False}
+          files={'visual':'.flr/v053_hf2_user_visual_regression_status.json','visible':'.flr/v053_visible_fix_regression_status.json','ui':'.flr/v053_ui_event_e2e_vm_status.json','intent':'.flr/intent_v2_wip_regression_status.json','extended':'.flr/v053_intent_v2_extended_gate_status.json','long':'.flr/intent_v2_wip_long_multicycle_bench_status.json','finalWindow':'.flr/v053_final_window_continuity_status.json','gkHotfix':'.flr/v053_gk_result_hotfix_regression_status.json'}
+          data={k:load(v) for k,v in files.items()}; roles={r:load(f'.flr/v053_integrated_90_{r}_status.json') for r in ['ST','CM','CB','GK']}
+          ok=all(x.get('status')=='PASS' for x in data.values()) and all(x.get('status')=='PASS' for x in roles.values())
+          cb=roles['CB'].get('summary',{}); ok=ok and (cb.get('boundaryTypes') or {}).get('PROTAGONIST_2D_WINDOW',0)>=1 and cb.get('choices',0)>=1
+          out={'schemaVersion':'FLR_V053_HF2_GITHUB_QA_1.1','status':'PASS' if ok else 'FAIL','branch':'test/v053-hf2-visualfix','preQaCommit':Path('/tmp/hf2_preqa_sha').read_text().strip(),'mainBase':subprocess.check_output(['git','rev-parse','origin/main'],text=True).strip(),'checkedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'required':{k:v.get('status') for k,v in data.items()},'roles':roles,'manifest':load('.flr/v053_hf2_patch_manifest.json'),'shortTenMinuteCadence':'HISTORICAL_WATCH_NOT_QUOTA','watch':['ST choice pace requires user visual retest; no quota adjustment applied.'],'futureOutcomePrecomputed':False}
           Path('.flr/v053_hf2_github_qa.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'status':out['status'],'mainBase':out['mainBase'],'cb':cb},ensure_ascii=False))
           if not ok: raise SystemExit('HF2 authoritative QA FAIL')
-          print(json.dumps({'status':out['status'],'mainBase':out['mainBase']}))
           PY
 
-      - name: Commit exact validated candidate to test branch
+      - name: Commit validated candidate to test branch
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'FLR HF2 QA Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add index.html runtime/tactical_movement.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js step71_hybrid_v06_ui.js \
-            .flr/v053_hf2_patch_manifest.json .flr/v053_hf2_user_visual_regression_status.json \
-            .flr/v053_integrated_90_ST_status.json .flr/v053_integrated_90_CM_status.json \
-            .flr/v053_integrated_90_CB_status.json .flr/v053_integrated_90_GK_status.json .flr/v053_hf2_github_qa.json
+          git add index.html live_hybrid_session_v02.js runtime/tactical_movement.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js step71_hybrid_v06_ui.js .flr/v053_hf2_patch_manifest.json .flr/v053_hf2_user_visual_regression_status.json .flr/v053_visible_fix_regression_status.json .flr/v053_ui_event_e2e_vm_status.json .flr/v053_intent_v2_extended_gate_status.json .flr/intent_v2_wip_long_multicycle_bench_status.json .flr/v053_final_window_continuity_status.json .flr/v053_gk_result_hotfix_regression_status.json .flr/v053_integrated_90_ST_status.json .flr/v053_integrated_90_CM_status.json .flr/v053_integrated_90_CB_status.json .flr/v053_integrated_90_GK_status.json .flr/v053_hf2_github_qa.json
           git commit -m 'Validate V0.5.3 HF2 visual realism candidate'
           git push origin HEAD:test/v053-hf2-visualfix
