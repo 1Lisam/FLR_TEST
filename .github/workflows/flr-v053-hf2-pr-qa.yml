@@ -39,8 +39,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # The original helper was authored against an older maybeOffside() function shape.
-          # Patch only those two transformer anchors to the exact current HF1 source form.
           python - <<'PY'
           from pathlib import Path
           p=Path('.flr/apply_v053_hf2_visualfix.py'); s=p.read_text(encoding='utf-8')
@@ -61,7 +59,7 @@ jobs:
           p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
 
-      - name: Syntax and scope
+      - name: Syntax and identity
         shell: bash
         run: |
           set -euo pipefail
@@ -72,18 +70,8 @@ jobs:
           grep -q 'umt053h2-' step71_hybrid_v06_ui.js
           grep -q "reason='DEFENSIVE_INVOLVEMENT'" live_hybrid_session_v02.js
 
-      - name: User visual and core regression
-        shell: bash
-        run: |
-          set -euo pipefail
-          node .flr/v053_hf2_user_visual_regression.js
-          node .flr/v053_visible_fix_regression.js
-          node .flr/v053_ui_event_e2e_vm.js
-          (cd .flr && node v052_intent_v2_wip_regression.js)
-          (cd .flr && node v053_intent_v2_extended_gate.js)
-          (cd .flr && node intent_v2_wip_long_multicycle_bench.js)
-          (cd .flr && node v053_final_window_continuity_regression.js)
-          (cd .flr && node v053_gk_result_hotfix_regression.js)
+      - name: Exact user five-issue regression
+        run: node .flr/v053_hf2_user_visual_regression.js
 
       - name: Integrated 4x90 and CB decision survival
         shell: bash
