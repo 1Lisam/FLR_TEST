@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "FLR_V053_STAGED_PAYLOAD_AUDIT_1.0",
+  "allMatch": false,
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 11087,
+      "expected": "d03d47333ed1370bdd753ad0e9616df505224acb06bf70b18dcdb1fe16c1d23f",
+      "actual": "d03d47333ed1370bdd753ad0e9616df505224acb06bf70b18dcdb1fe16c1d23f",
+      "match": true,
+      "parts": [
+        ".flr/v053_payload/index.html.part00"
+      ]
+    },
+    {
+      "path": "live_hybrid_session_v02.js",
+      "bytes": 37156,
+      "expected": "4ca3856fa994cc18401de1072a04063235f4195d493bf010e39feeb73bc8541e",
+      "actual": "4ca3856fa994cc18401de1072a04063235f4195d493bf010e39feeb73bc8541e",
+      "match": true,
+      "parts": [
+        ".flr/v053_payload/small/live_hybrid_session_v02.js.p00",
+        ".flr/v053_payload/small/live_hybrid_session_v02.js.p01",
+        ".flr/v053_payload/small/live_hybrid_session_v02.js.p02"
+      ]
+    },
+    {
+      "path": "live_v06_scene_authority_browser.js",
+      "bytes": 21432,
+      "expected": "ff3e7f660513af20cbc7cd93fa53c1e15c6cb5970be3abd125fd5c192b1a7798",
+      "actual": "ad54fbcf45e34741f5a2183f52572fffcfd3af97fb32231bec21a30d8e6a9faf",
+      "match": false,
+      "parts": [
+        ".flr/v053_payload/small/live_v06_scene_authority_browser.js.p00",
+        ".flr/v053_payload/small/live_v06_scene_authority_browser.js.p01"
+      ]
+    },
+    {
+      "path": "runtime/hybrid_spatial_intent_v2.js",
+      "bytes": 31961,
+      "expected": "ebaf882d3b2bd2edc11d575430b4a930cbaa4164a2d38d2e636b5b7269d512e8",
+      "actual": "ebaf882d3b2bd2edc11d575430b4a930cbaa4164a2d38d2e636b5b7269d512e8",
+      "match": true,
+      "parts": [
+        ".flr/v053_payload/small/runtime__hybrid_spatial_intent_v2.js.p00",
+        ".flr/v053_payload/small/runtime__hybrid_spatial_intent_v2.js.p01"
+      ]
+    },
+    {
+      "path": "runtime/protagonist_match_controller.js",
+      "bytes": 88457,
+      "expected": "572fe690129d0a8866720f5e2f850aa002b6ad12bdeebc8303c94e083cd4180f",
+      "actual": "572fe690129d0a8866720f5e2f850aa002b6ad12bdeebc8303c94e083cd4180f",
+      "match": true,
+      "parts": [
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p00x0",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p00x1",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p00x2",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p01",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p02",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p03",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p04",
+        ".flr/v053_payload/small/runtime__protagonist_match_controller.js.p05"
+      ]
+    },
+    {
+      "path": "step71_hybrid_v06_ui.js",
+      "bytes": 57358,
+      "expected": "1618b32c49bca7f9df527e08a11adb5b1f150c645f216d3bd14309f04f3eae4a",
+      "actual": "1618b32c49bca7f9df527e08a11adb5b1f150c645f216d3bd14309f04f3eae4a",
+      "match": true,
+      "parts": [
+        ".flr/v053_payload/small/step71_hybrid_v06_ui.js.p00",
+        ".flr/v053_payload/small/step71_hybrid_v06_ui.js.p01",
+        ".flr/v053_payload/small/step71_hybrid_v06_ui.js.p02",
+        ".flr/v053_payload/small/step71_hybrid_v06_ui.js.p03"
+      ]
+    }
+  ]
+}
