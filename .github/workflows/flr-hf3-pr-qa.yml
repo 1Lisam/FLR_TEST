@@ -46,3 +46,6 @@ jobs:
           if(!Number.isFinite(m.time)||m.players.length!==22)throw new Error('runtime smoke failed');
           console.log(JSON.stringify({time:m.time,score:m.score,offsides:m.stats.offsides,passes:m.stats.passes}));
           NODE
+
+      - name: Seven-report motion stability regression
+        run: node .flr/v053_hf3_motion_regression.js
