@@ -1,0 +1,84 @@
+name: FLR additional tester report inspect
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    if: github.event.issue.title == '[FLR_AUDIT] ADDITIONAL TESTER REPORT'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch and summarize report bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5.1/umt051-a13ae7a5-73a6-4d99-88fe-9c41d53d7534.json'
+          curl --max-time 30 -fsS "$url" > /tmp/report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.load(open('/tmp/report.json',encoding='utf-8'))
+          cur=d.get('currentSituation') if isinstance(d,dict) else None
+          prev=d.get('previousSituation') if isinstance(d,dict) else None
+          ctx=d.get('bugReportContext') if isinstance(d,dict) else None
+          hb=(cur or {}).get('hybridBefore') if isinstance(cur,dict) else None
+          hr=(cur or {}).get('highResolution') if isinstance(cur,dict) else None
+          boundary=(hb or {}).get('boundary') if isinstance(hb,dict) else None
+          decision=(hr or {}).get('decision') if isinstance(hr,dict) else None
+          result=(hr or {}).get('actualResult') if isinstance(hr,dict) else None
+          frames=[]
+          if isinstance(hr,dict):
+              frames=hr.get('episodeFrames') or hr.get('postActionFrames') or hr.get('preActionFrames') or []
+          first=frames[0] if isinstance(frames,list) and frames else None
+          last=frames[-1] if isinstance(frames,list) and frames else None
+          out={
+            'schemaVersion':'FLR_ADDITIONAL_TESTER_REPORT_INSPECT_1.0',
+            'reportId':'umt051-a13ae7a5-73a6-4d99-88fe-9c41d53d7534',
+            'build':'USER-MATCH-TEST-V0.5.1',
+            'bundleSchemaVersion':d.get('schemaVersion') if isinstance(d,dict) else None,
+            'scope':d.get('scope') if isinstance(d,dict) else None,
+            'bugReportContext':ctx,
+            'currentSituationPresent':cur is not None,
+            'previousSituationPresent':prev is not None,
+            'currentReportScope':(cur or {}).get('reportScope') if isinstance(cur,dict) else None,
+            'previousReportScope':(prev or {}).get('reportScope') if isinstance(prev,dict) else None,
+            'boundary':{
+              'id':(boundary or {}).get('id'),
+              'sceneId':(boundary or {}).get('sceneId'),
+              'atSecond':(boundary or {}).get('atSecond'),
+              'reason':(boundary or {}).get('reason'),
+              'heroPlayerId':(boundary or {}).get('heroPlayerId'),
+              'heroRole':(boundary or {}).get('heroRole')
+            } if isinstance(boundary,dict) else None,
+            'selectedChoice':(hr or {}).get('selectedChoice') if isinstance(hr,dict) else None,
+            'actualResult':result,
+            'decisionOptionCount':len((decision or {}).get('options') or []) if isinstance(decision,dict) else None,
+            'episodeFrameCount':len(frames) if isinstance(frames,list) else 0,
+            'firstFrameTime':first.get('time') if isinstance(first,dict) else None,
+            'lastFrameTime':last.get('time') if isinstance(last,dict) else None,
+            'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,
+            'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0
+          }
+          Path('.flr/additional-tester-report-inspect.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Persist inspection
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR Report Inspect Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .flr/additional-tester-report-inspect.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Inspect additional V0.5.1 tester report'
+          git push origin main
