@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "FLR_REPORT_EXPORT_INDEX_1.0",
+  "status": "PASS",
+  "workflowRunId": "32754477265",
+  "sourceCommit": "886d4f66c8a279f09b96aba2bb512628990390b8",
+  "requestedAt": "2026-08-25T02:03:00+09:00",
+  "collectedAt": "2026-08-24T17:04:44.786726Z",
+  "currentBuild": "USER-MATCH-TEST-V0.5.4-R14",
+  "sinceCreatedAt": "2026-08-24T12:30:00Z",
+  "safetyOverlapMinutes": 30,
+  "count": 20,
+  "currentBuildCount": 12,
+  "lateOlderBuildCount": 8,
+  "failedDownloads": 0,
+  "artifactId": "9530302384",
+  "artifactUrl": "https://github.com/1Lisam/FLR_TEST/actions/runs/32754477265/artifacts/9530302384",
+  "artifactDigest": "347d759ab416235a8799d3d2c49cff3ddfe61d2af9f07f143f8d111033cc763c"
+}
