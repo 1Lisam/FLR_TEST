@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "FLR_HF3_USER_FAIL_AUDIT_REQUEST_1.0",
+  "build": "USER-MATCH-TEST-V0.5.3-HF3",
+  "requestedAt": "2026-08-24T22:05:00+09:00",
+  "purpose": "Deep-audit all nine HF3 user bug reports after complete defensive visual FAIL. Inspection only; no engine changes.",
+  "runNonce": "hf3-defence-deep-audit-20260824-2205"
+}
