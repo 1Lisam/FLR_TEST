@@ -1,0 +1,27 @@
+'use strict';
+const fs=require('fs'),path=require('path');
+const H=require('../live_hybrid_session_v02.js');
+const A=require('../live_v06_scene_authority_browser.js');
+const E=require('../runtime/continuous_match_core.js');
+const P=require('../runtime/protagonist_match_controller.js');
+const runtimeDir=path.resolve(__dirname,'../runtime');
+const dist=(a,b)=>a&&b?Math.hypot(a.x-b.x,a.y-b.y):99;
+const player=(f,id)=>(f.players||[]).find(p=>p.id===id)||null;
+function visual(key,seed,seconds=9){const d=H.createDeveloperScenario({key,seed});const env=A.seedMatch(d.boundary,{runtimeDir,seed:d.seed,explicitHeroChoiceRequired:true});env.state.mode='FULL_SKIP';const rows=[E.snapshot(env.state.m)];const n=Math.round(seconds/.1);for(let i=0;i<n&&!env.state.m.completed;i++){P.step(env.state,.1);rows.push(E.snapshot(env.state.m));}return{d,env,rows};}
+function taskChanges(rows,id){const a=rows.map(f=>player(f,id)).filter(Boolean).map(p=>`${p.tacticalTask||p.action||''}|${p.markTargetId||''}`);let n=0;for(let i=1;i<a.length;i++)if(a[i]!==a[i-1])n++;return n;}
+function lateralFlips(rows,id,thr=.06){const s=[];for(let i=1;i<rows.length;i++){const a=player(rows[i-1],id),b=player(rows[i],id);if(!a||!b)continue;const dy=b.y-a.y;if(Math.abs(dy)>=thr)s.push(dy>0?1:-1);}let n=0;for(let i=1;i<s.length;i++)if(s[i]!==s[i-1])n++;return n;}
+function ownerFreeze(rows){let best=0,start=null,lastOwner=null;for(let i=1;i<rows.length;i++){const a=rows[i-1],b=rows[i],oid=b.ball?.ownerId,p=player(b,oid),q=player(a,oid),near=Math.min(...(b.players||[]).filter(x=>p&&x.team!==p.team).map(x=>dist(p,x)),99),move=dist(p,q);if(p&&q&&oid===lastOwner&&move<.06&&near<=1.8){if(start==null)start=a.time;best=Math.max(best,b.time-start);}else start=null;lastOwner=oid;}return +best.toFixed(3);}
+function motionCase(key,seed,ids){const v=visual(key,seed);const metrics={freeze:ownerFreeze(v.rows),players:{}};for(const id of ids)metrics.players[id]={taskChanges:taskChanges(v.rows,id),lateralFlips:lateralFlips(v.rows,id)};return{seed,key,metrics,rows:v.rows};}
+const cases=[];
+cases.push(motionCase('BALL_DEPTH_SYNC','DEV-RECENT-1787550734911-1',['H-ST','H-RW','A-LCB','A-RCB','A-LB','A-RB']));
+cases.push(motionCase('BALL_DEPTH_SYNC','DEV-RECENT-1787550810767-13',['H-ST','H-RW','A-LCB','A-RCB','A-LB','A-RB']));
+cases.push(motionCase('CM_SUPPORT_SPREAD','DEV-RECENT-1787550909999-20',['A-LB','A-LCB','A-RCB','A-RB','A-LCM','A-CM','A-RCM']));
+const early=visual('EARLY_ATTACK_ENTRY','DEV-RECENT-1787550979631-32');const earlyGaps=early.rows.map(f=>dist(player(f,'H-RB'),player(f,'A-LW'))).filter(Number.isFinite);const earlyMetrics={first:+earlyGaps[0].toFixed(3),max:+Math.max(...earlyGaps).toFixed(3),last:+earlyGaps.at(-1).toFixed(3),rbTaskChanges:taskChanges(early.rows,'H-RB')};
+function optionsOf(opened){return opened?.state?.pending?.options||opened?.pending?.options||[];}
+function findNaturalOffside(){const base='DEV-RECENT-1787551093991-33';for(let i=0;i<32;i++){const seed=i===0?base:`${base}-HF3-${String(i).padStart(2,'0')}`,d=H.createDeveloperScenario({key:'OFFSIDE_REVIEW',seed}),o=A.runToChoice(d.boundary,{runtimeDir,seed:d.seed,minPreSeconds:.8,maxSearchSeconds:8}),opts=optionsOf(o),risky=opts.find(x=>['H-ST','H-RW'].includes(x.targetId)&&['THROUGH_PASS','LOFTED_THROUGH_PASS'].includes(x.id));if(!risky||!o.state)continue;const m=o.state.m,t0=m.time,x0=m.ball.x,y0=m.ball.y,res=P.applyChoice(o.state,risky.id,risky.targetId,{source:'AUTO_SIMULATION'});if(!res.ok)continue;let call=null,maxMove=0;for(let k=0;k<40&&!m.completed;k++){P.step(o.state,.1);maxMove=Math.max(maxMove,Math.hypot(m.ball.x-x0,m.ball.y-y0));call=(m.events||[]).find(e=>e.type==='OFFSIDE'&&e.t>=t0-.01);if(call)break;}if(call)return{found:true,seed,choice:{id:risky.id,targetId:risky.targetId},callAge:+(call.t-t0).toFixed(3),maxBallMove:+maxMove.toFixed(3),futureOutcomePrecomputed:d.boundary.futureOutcomePrecomputed};}return{found:false};}
+const offside=findNaturalOffside();
+const checks=[];
+for(const c of cases){checks.push({id:`${c.seed}:OWNER_FREEZE`,pass:c.metrics.freeze<=1.20,value:c.metrics.freeze});for(const [id,m] of Object.entries(c.metrics.players)){checks.push({id:`${c.seed}:${id}:TASK_CHANGES`,pass:m.taskChanges<=8,value:m.taskChanges});checks.push({id:`${c.seed}:${id}:LATERAL_FLIPS`,pass:m.lateralFlips<=3,value:m.lateralFlips});}}
+checks.push({id:'EARLY_ENTRY_WIDE_RUNNER_FIRST_GAP',pass:earlyMetrics.first<=10.5,value:earlyMetrics.first});checks.push({id:'EARLY_ENTRY_WIDE_RUNNER_MAX_GAP',pass:earlyMetrics.max<=13.5,value:earlyMetrics.max});checks.push({id:'EARLY_ENTRY_RB_TASK_CHANGES',pass:earlyMetrics.rbTaskChanges<=8,value:earlyMetrics.rbTaskChanges});
+checks.push({id:'OFFSIDE_PRODUCTION_RISKY_TARGET_FOUND',pass:offside.found,value:offside});if(offside.found){checks.push({id:'OFFSIDE_MEANINGFUL_FLIGHT_BEFORE_CALL',pass:offside.callAge>=.45&&offside.maxBallMove>=3.0,value:offside});checks.push({id:'OFFSIDE_NO_FUTURE_PRECOMPUTE',pass:offside.futureOutcomePrecomputed===false,value:offside.futureOutcomePrecomputed});}
+const status=checks.every(x=>x.pass)?'PASS':'FAIL';const out={schemaVersion:'FLR_V053_HF3_MOTION_REGRESSION_1.0',status,checks,cases:cases.map(c=>({seed:c.seed,key:c.key,metrics:c.metrics})),earlyMetrics,offside};fs.writeFileSync(path.resolve(__dirname,'v053_hf3_motion_regression_status.json'),JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(status!=='PASS')process.exitCode=1;
