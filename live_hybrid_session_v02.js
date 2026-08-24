@@ -48,7 +48,7 @@ function spatialSnapshot(state){return state.spatial?deep(state.spatial):null;}
 function createState(opts={}){const home=opts.home||defaultTeam('HOME','블루팀',1),away=opts.away||defaultTeam('AWAY','레드팀',-1);const state={schemaVersion:'HYBRID_LIVE_STATE_0.4',second:0,minute:0,score:{HOME:0,AWAY:0},possession:'HOME',zone:'MIDFIELD',phase:'BUILD_UP',danger:.12,ball:{team:'HOME',lane:'CENTER',progress:.48,ownerId:'H-CM'},teams:{HOME:deep(home),AWAY:deep(away)},structure:{HOME:{midfieldOccupancy:3,backLineOccupancy:4,width:home.shape.width,lineHeight:home.shape.lineHeight,transitionDebt:0},AWAY:{midfieldOccupancy:3,backLineOccupancy:4,width:away.shape.width,lineHeight:away.shape.lineHeight,transitionDebt:0}},chain:[],resolvedEvents:[],sceneCandidates:[],counters:{actions:0,turnovers:0,shots:0,goals:0,heroWindows:0,highResChoices:0},lastHighRes:null,spatial:null};state.spatial=createSpatialState(state);return state;}
 function createSession(opts={}){const protagonistPerformance=deep(opts.protagonistPerformance||{rating:6.5,recklessFailures:0,substitutionPressure:0,managerUsageTrustDelta:0,lastImpact:null,history:[]}),protagonistMatchStats=deep(opts.protagonistMatchStats||{shots:0,goals:0,tacklesWon:0,fouls:0,interceptions:0,saves:0,parries:0,blocks:0,clearances:0,goalsConceded:0});return{schemaVersion:'HYBRID_LIVE_SESSION_0.3',status:'RUNNING',opts:deep(opts),durationSeconds:opts.durationSeconds||5400,stepMin:opts.stepMin||4,stepMax:opts.stepMax||12,rngState:hashSeed(opts.seed||'FLR-LIVE-HYBRID-02')||0x9e3779b9,state:createState(opts),protagonistPerformance,protagonistMatchStats,boundary:null,handledBoundaryIds:[],resumeCount:0,lastHeroWindowAt:-999,highResHistory:[],finalWindowDone:false,lastSetPieceAt:-999,fineStepUntil:-999,_promotionHistory:[]};}
 
-const DEV_RECENT_SCENARIOS=['BALL_DEPTH_SYNC','CM_SUPPORT_SPREAD','EARLY_ATTACK_ENTRY','OFFSIDE_REVIEW','GK_RESULT_CONSISTENCY'];
+const DEV_RECENT_SCENARIOS=['DEFENSIVE_ROLE_STABILITY','PASS_FLIGHT_WIDE_TRACK','MARK_TARGET_STABILITY','STRIKER_RUN_LANE','CARRIER_SHIELD_FLOW','OFFSIDE_INVOLVEMENT'];
 function devUnit(seed,salt){const h=hashSeed(`${seed}|${salt}`);return(h>>>0)/4294967296;}
 function developerSpatialFromProgress(s,progress){
  if(!V2REF)throw new Error('V2 reference prototype unavailable');
@@ -60,28 +60,36 @@ function developerSpatialFromProgress(s,progress){
 }
 function createDeveloperScenario(opts={}){
  const scenarioSeed=String(opts.seed||`DEV-RECENT-${Date.now()}`),requested=String(opts.key||''),ix=Math.floor(devUnit(scenarioSeed,'scenario')*DEV_RECENT_SCENARIOS.length),key=DEV_RECENT_SCENARIOS.includes(requested)?requested:DEV_RECENT_SCENARIOS[ix];
- const heroId=key==='OFFSIDE_REVIEW'?'H-CM':key==='GK_RESULT_CONSISTENCY'?'H-GK':'H-ST',heroRole=key==='OFFSIDE_REVIEW'?'CM':key==='GK_RESULT_CONSISTENCY'?'GK':'ST',session=createSession({...opts,seed:scenarioSeed,heroTeam:'HOME',heroRole,heroPlayerId:heroId,durationSeconds:1800});
+ const midfieldHero=key==='PASS_FLIGHT_WIDE_TRACK'||key==='OFFSIDE_INVOLVEMENT',heroId=midfieldHero?'H-CM':'H-ST',heroRole=midfieldHero?'CM':'ST',session=createSession({...opts,seed:scenarioSeed,heroTeam:'HOME',heroRole,heroPlayerId:heroId,durationSeconds:1800});
  const s=session.state,j=(salt,span=1)=>(devUnit(scenarioSeed,salt)-.5)*2*span;s.second=600+Math.floor(devUnit(scenarioSeed,'time')*900);s.minute=s.second/60;s.score={HOME:0,AWAY:0};s.possession='HOME';s.ball.team='HOME';s.danger=.48+j('danger',.08);s.structure.HOME.width=50+j('hw',5);s.structure.AWAY.width=50+j('aw',5);s.structure.HOME.lineHeight=50+j('hl',4);s.structure.AWAY.lineHeight=50+j('al',4);
  let label='',instruction='',actualProgress=.58,abstractProgress=.58,ownerId='H-LB',lane='LEFT',reason='ATTACKING_INVOLVEMENT';
- if(key==='BALL_DEPTH_SYNC'){
-  actualProgress=.51+j('actual',.035);abstractProgress=.80+j('abstract',.025);ownerId='H-LB';lane='LEFT';label='공 위치-공격수 거리 동기화';instruction='LB가 아직 중원에 있을 때 ST/RW가 골키퍼 옆까지 먼저 달아나지 않는지 확인하세요.';
- }else if(key==='CM_SUPPORT_SPREAD'){
-  actualProgress=.57+j('actual',.035);abstractProgress=.65+j('abstract',.025);ownerId=devUnit(scenarioSeed,'owner')>.5?'H-LB':'H-RB';lane=ownerId==='H-LB'?'LEFT':'RIGHT';label='3CM 지원 역할 분산';instruction='LCM·CM·RCM이 공 소유자 한 명을 같이 쫓지 않고 볼사이드/피벗/반대쪽 세컨드라인으로 나뉘는지 확인하세요.';
- }else if(key==='EARLY_ATTACK_ENTRY'){
-  actualProgress=.64+j('actual',.035);abstractProgress=.69+j('abstract',.025);ownerId=devUnit(scenarioSeed,'owner')>.5?'H-LCM':'H-RCM';lane=ownerId==='H-LCM'?'LEFT':'RIGHT';label='공격 장면 조기 진입';instruction='선택 장면이 이미 골라인 앞에서 시작하지 않고, 전진 과정과 주변 선수 움직임이 먼저 보이는지 확인하세요.';
- }else if(key==='OFFSIDE_REVIEW'){
-  actualProgress=.67+j('actual',.02);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';reason='MIDFIELD_INVOLVEMENT';label='오프사이드 판정/연출';instruction='ST/RW가 수비라인보다 앞선 상황입니다. 전방 침투 패스를 골라 오프사이드 라인 표시와 짧은 종료 연출, 다시보기를 확인하세요.';
+ if(key==='DEFENSIVE_ROLE_STABILITY'){
+  actualProgress=.64+j('actual',.02);abstractProgress=actualProgress;ownerId='H-LB';lane='LEFT';label='수비 역할·타깃 안정성';instruction='같은 공격 흐름에서 CB/FB/CM이 짧은 간격으로 역할을 계속 바꾸거나 좌우로 흔들리지 않는지 확인하세요.';
+ }else if(key==='PASS_FLIGHT_WIDE_TRACK'){
+  actualProgress=.66+j('actual',.015);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';reason='MIDFIELD_INVOLVEMENT';label='패스 비행 중 풀백 측면 추적';instruction='RW 또는 LW 쪽 전진 패스를 선택한 뒤 공이 비행하는 동안 해당 측면 풀백이 침투자를 놓고 HOLD로 풀리지 않는지 확인하세요.';
+ }else if(key==='MARK_TARGET_STABILITY'){
+  actualProgress=.72+j('actual',.015);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';label='같은 마크 대상 유지';instruction='수비수가 같은 공격수를 맡은 상황에서 mark 대상이 불필요하게 다른 선수로 튀거나 다시 돌아오는지 확인하세요.';
+ }else if(key==='STRIKER_RUN_LANE'){
+  actualProgress=.76+j('actual',.015);abstractProgress=actualProgress;ownerId='H-RW';lane='RIGHT';label='ST 침투 레인 연속성';instruction='측면에서 전개되는 동안 ST가 중앙/니어/파 포스트 의도를 너무 짧은 간격으로 번갈아 좌우 왕복하지 않는지 확인하세요.';
+ }else if(key==='CARRIER_SHIELD_FLOW'){
+  actualProgress=.77+j('actual',.012);abstractProgress=actualProgress;ownerId='H-ST';lane='CENTER';label='공격수 멈칫·SHIELD_SCAN 반복 방지';instruction='ST가 압박을 읽는 짧은 멈칫 뒤 다시 판단하고 움직이며, 같은 자리에서 SHIELD_SCAN을 반복하지 않는지 확인하세요.';
  }else{
-  actualProgress=.82+j('actual',.018);abstractProgress=actualProgress;ownerId='A-RCM';lane='CENTER';reason='GK_GOALKEEPING';label='GK 선택 결과 정합성';instruction='GK가 위협적인 슈팅 직전 상황에서 위치 유지/전진을 선택한 뒤 실제 선방·실점 결과와 결과 문구가 일치하는지 확인하세요.';s.possession='AWAY';s.ball.team='AWAY';s.danger=.90+j('gk-danger',.035);
+  actualProgress=.67+j('actual',.02);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';reason='MIDFIELD_INVOLVEMENT';label='오프사이드 실제 관여 시점';instruction='전방 침투 패스를 골라 오프사이드 위치가 패스 순간에 고정되고, 실제 공 관여 시점에 판정이 보이는지 확인하세요.';
  }
  s.ball.ownerId=ownerId;s.ball.lane=lane;s.ball.progress=clamp(abstractProgress,.05,.95);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);s.spatial=developerSpatialFromProgress({...s,ball:{...s.ball,progress:actualProgress}},actualProgress);
- if(key==='OFFSIDE_REVIEW'){
+ if(key==='PASS_FLIGHT_WIDE_TRACK'){
+  const ps=s.spatial.players,owner=ps['H-CM'],rw=ps['H-RW'],lw=ps['H-LW'];owner.x=68+j('pf-owner-x',.7);owner.y=34+j('pf-owner-y',1.2);owner.vx=1.0;owner.vy=0;rw.x=80+j('pf-rw-x',.5);rw.y=55+j('pf-rw-y',1.0);rw.vx=2.0;rw.vy=-.1;lw.x=78+j('pf-lw-x',.5);lw.y=13+j('pf-lw-y',1.0);lw.vx=1.7;lw.vy=.1;for(const [id,x,y] of [['A-LB',77,13],['A-LCB',80,27],['A-RCB',80,42],['A-RB',77,55]]){if(ps[id]){ps[id].x=x+j(id+'x',.55);ps[id].y=y+j(id+'y',.8);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
+ }else if(key==='OFFSIDE_INVOLVEMENT'){
   const ps=s.spatial.players,owner=ps['H-CM'],st=ps['H-ST'],rw=ps['H-RW'];owner.x=70+j('ox',1.2);owner.y=34+j('oy',2.0);owner.vx=1.2;owner.vy=0;st.x=83.7+j('stx',.35);st.y=38+j('sty',1.6);st.vx=2.0;st.vy=0;rw.x=83.9+j('rwx',.35);rw.y=53+j('rwy',1.6);rw.vx=2.4;rw.vy=-.2;for(const [id,x,y] of [['A-LB',82,13],['A-LCB',82.5,27],['A-RCB',83.2,42],['A-RB',81.5,56],['A-GK',99,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.7);ps[id].y=y+j(id+'y',1.0);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
- }else if(key==='GK_RESULT_CONSISTENCY'){
-  const ps=s.spatial.players,owner=ps['A-RCM'],gk=ps['H-GK'];owner.x=19+j('gk-ox',1.0);owner.y=34+j('gk-oy',2.2);owner.vx=-1.4;owner.vy=0;gk.x=6.3+j('gk-x',.35);gk.y=34+j('gk-y',1.2);gk.vx=0;gk.vy=0;for(const [id,x,y] of [['H-LB',18,12],['H-LCB',16.5,27],['H-RCB',17.5,42],['H-RB',18.5,56],['A-ST',21,38],['A-LW',25,14],['A-RW',24,54]]){if(ps[id]){ps[id].x=x+j(id+'x',.8);ps[id].y=y+j(id+'y',1.2);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'A-RCM'};s.ball.progress=localProgress('AWAY',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='CHANCE';s.danger=Math.max(.86,s.danger);
+ }else if(key==='DEFENSIVE_ROLE_STABILITY'){
+  const ps=s.spatial.players,owner=ps['H-LB'];owner.x=64+j('dr-owner-x',.8);owner.y=14+j('dr-owner-y',1.0);owner.vx=1.1;owner.vy=0;for(const [id,x,y] of [['H-LW',75,10],['H-ST',79,33],['H-LCM',65,23],['A-RB',74,12],['A-RCB',78,29],['A-CM',67,34],['A-RCM',69,47]]){if(ps[id]){ps[id].x=x+j(id+'x',.65);ps[id].y=y+j(id+'y',.9);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-LB'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
+ }else if(key==='MARK_TARGET_STABILITY'){
+  const ps=s.spatial.players,owner=ps['H-CM'];owner.x=75+j('mk-owner-x',.7);owner.y=34+j('mk-owner-y',.8);for(const [id,x,y] of [['H-ST',84,34],['H-LW',82,17],['H-RW',82,51],['A-LCB',81,27],['A-RCB',81,41],['A-LB',79,14],['A-RB',79,54],['A-CM',72,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.5);ps[id].y=y+j(id+'y',.7);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';
+ }else if(key==='STRIKER_RUN_LANE'){
+  const ps=s.spatial.players,owner=ps['H-RW'],st=ps['H-ST'];owner.x=80+j('st-owner-x',.6);owner.y=55+j('st-owner-y',.8);owner.vx=1.0;owner.vy=-.1;st.x=82+j('st-x',.5);st.y=34+j('st-y',1.0);st.vx=1.2;st.vy=0;for(const [id,x,y] of [['A-LCB',82,27],['A-RCB',82,41],['A-RB',79,55],['H-RCM',73,46]]){if(ps[id]){ps[id].x=x+j(id+'x',.5);ps[id].y=y+j(id+'y',.7);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-RW'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';
+ }else if(key==='CARRIER_SHIELD_FLOW'){
+  const ps=s.spatial.players,owner=ps['H-ST'];owner.x=80+j('sh-owner-x',.45);owner.y=34+j('sh-owner-y',.7);owner.vx=.4;owner.vy=0;for(const [id,x,y] of [['A-LCB',82.2,30],['A-RCB',82.5,39],['H-LW',78,14],['H-RW',78,54],['H-CM',70,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.45);ps[id].y=y+j(id+'y',.65);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-ST'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';s.danger=Math.max(.62,s.danger);
  }else{
-  // Run the exact production reconciliation/intent layer once. The scenario only forces the
-  // starting context; all resulting positions/choices remain generated by the current engine.
   advanceSpatial(session,1.5);
  }
  const e=addEvent(session,'DEVELOPER_RECENT_FIX','HOME',{scenario:key,label,ownerId:s.ball.ownerId,forcedContextOnly:true,futureOutcomePrecomputed:false});

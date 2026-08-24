@@ -18,11 +18,12 @@ function draw(s){if(!s)return;const W=canvas.width,Hh=canvas.height,padX=28,padY
 
 function roleInfo(){const id=$('heroPlayer').value;return{id,role:id==='H-ST'?'ST':id==='H-GK'?'GK':id==='H-LCB'?'CB':'CM'}}function seed(){return`LIVE-V03-${trial}-${$('heroPlayer').value}`}
 const DEV_RECENT_GUIDES={
- BALL_DEPTH_SYNC:{label:'공 위치-공격수 거리 동기화',watch:'LB가 아직 중원에 있을 때 ST/RW가 공과 단절된 채 골키퍼 옆까지 먼저 달아나지 않는지 봅니다.',normal:'정상: 공격수는 공과 연결된 간격을 유지하되 실제 라인 브레이킹 침투는 가능합니다.'},
- CM_SUPPORT_SPREAD:{label:'3CM 지원 역할 분산',watch:'LCM·CM·RCM 세 명이 공 소유자를 같은 방향으로 졸졸 따라가는지 봅니다.',normal:'정상: 볼사이드 지원 / 중앙 피벗 / 반대쪽 세컨드라인으로 역할이 나뉩니다.'},
- EARLY_ATTACK_ENTRY:{label:'공격 장면 조기 진입',watch:'선택 장면이 이미 골라인·박스 앞에 도착한 뒤 갑자기 시작하는지 봅니다.',normal:'정상: 전진 과정과 주변 선수 움직임이 선택 직전부터 연속적으로 보입니다.'},
- OFFSIDE_REVIEW:{label:'오프사이드 판정·연출·다시보기',watch:'오프사이드가 실제 패스 선택 뒤 판정되는지, 기준선이 읽힐 만큼 보이고 다시보기가 작동하는지 봅니다.',normal:'정상: 오프사이드 후보를 인위적으로 만들지 않으며 판정 후 짧은 리뷰와 다시보기가 이어집니다.'},
- GK_RESULT_CONSISTENCY:{label:'GK 선택 결과 정합성',watch:'GK 위치 유지/전진 선택 뒤 실제 슈팅 결과와 결과 문구가 일치하는지 봅니다.',normal:'정상: 실제 GOAL이면 실점, SAVE면 선방, PARRY면 쳐냄으로 표시됩니다. 슈팅 결과 자체는 강제하지 않습니다.'}
+ DEFENSIVE_ROLE_STABILITY:{label:'수비 역할·타깃 안정성',watch:'CB·FB·CM이 같은 공격 흐름에서 역할을 짧은 간격으로 계속 바꾸거나 좌우로 흔들리는지 봅니다.',normal:'정상: 실제 위협이나 소유권이 바뀌기 전에는 한 책임을 유지하면서 위치만 자연스럽게 조정합니다.'},
+ PASS_FLIGHT_WIDE_TRACK:{label:'패스 비행 중 풀백 측면 추적',watch:'측면 전진 패스를 선택한 뒤 공이 비행하는 동안 담당 풀백이 침투자를 놓고 멈추거나 중앙으로 풀리는지 봅니다.',normal:'정상: 공 소유자가 사라지는 FLIGHT 순간에도 intended receiver를 위협으로 이어 받아 추적합니다.'},
+ MARK_TARGET_STABILITY:{label:'같은 마크 대상 유지',watch:'한 수비수가 맡은 공격수가 그대로인데 markTarget이 다른 선수로 튀었다가 돌아오는지 봅니다.',normal:'정상: 더 긴급한 위협이 생기지 않는 한 같은 마크 책임을 유지합니다.'},
+ STRIKER_RUN_LANE:{label:'ST 침투 레인 연속성',watch:'측면 전개 중 ST가 중앙·니어·파포스트 목표를 너무 자주 바꾸며 좌우 왕복하는지 봅니다.',normal:'정상: 공격 의도는 잠깐 유지되고, 실제 전개 변화가 있을 때만 새 레인으로 전환합니다.'},
+ CARRIER_SHIELD_FLOW:{label:'공격수 멈칫 반복 방지',watch:'ST가 공을 지킨 뒤 같은 자리에서 SHIELD_SCAN/멈춤을 반복하는지 봅니다.',normal:'정상: 짧게 스캔한 뒤 패스·드리블·보호 등 다음 실제 판단으로 이어집니다.'},
+ OFFSIDE_INVOLVEMENT:{label:'오프사이드 실제 관여 시점',watch:'오프사이드 위치는 패스가 출발한 순간 기준인지, 판정 연출은 실제 공 관여 시점에 나타나는지 봅니다.',normal:'정상: 위치 판정 기준은 release 순간에 고정되고, 휘슬은 실제 관여가 확인될 때 표시됩니다.'}
 };
 function selectedRecentFixKey(){const sel=$('heroRecentFixSelect');return sel?.value||'BALL_DEPTH_SYNC';}
 function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GUIDES[key]||DEV_RECENT_GUIDES.BALL_DEPTH_SYNC,box=$('heroRecentFixGuide');if(box)box.innerHTML=`<strong>${g.label}</strong><br><span>무엇을 볼지: ${g.watch}</span><br><span class="muted">${g.normal}</span>`;}
@@ -129,7 +130,7 @@ function runRecentFixScenario(key=selectedRecentFixKey()){
  $('heroPlayer').value=d.boundary.heroPlayerId;world=d.session;session=null;opened=null;activeBoundary=null;beforeHybrid=null;selectedStepResults=[];phase='SEARCHING';
  if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent=`이번 검증: ${d.label} · seed=${d.seed} · ${d.instruction}`;
  $('heroPlayback').textContent=`개발자 강제 검증 · ${d.label}`;$('heroState').textContent='최근 수정 항목 강제 재현 · 결과 선계산 없음';$('heroEventLog').innerHTML+=`<div class="major-match-event"><strong>개발자 검증 · ${d.label}</strong> · ${d.instruction}<br><small>seed=${d.seed} · 시작 맥락만 강제, 이후 V0.6 실제 실행</small></div>`;
- if(!['OFFSIDE_REVIEW','GK_RESULT_CONSISTENCY'].includes(d.key)){runDeveloperVisualScenario(d);return;}
+ if(!['PASS_FLIGHT_WIDE_TRACK','OFFSIDE_INVOLVEMENT'].includes(d.key)){runDeveloperVisualScenario(d);return;}
  const held=handleSearchBoundary({status:'PAUSED',boundary:d.boundary,state:d.session.state});if(!held&&developerScenarioActive){finishDeveloperVisual();}
 }
 function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`);}
