@@ -1,10 +1,10 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "V0.5.4-ECOLOGY-AB-R9",
+  "version": "V0.5.4-BACKLINE-AB-R10",
   "candidateBranch": "test/v054-defense-normalization",
   "baselineRef": "8965e9eb026d317be95db14bf8e80a135e6aef56",
   "applyScripts": [
-    ".flr/v054_ecology_ab_apply.py"
+    ".flr/v054_backline_ab_apply.py"
   ],
   "validationScript": ".flr/v054_ecology_ab_validation.js",
   "changedFiles": [
@@ -23,6 +23,6 @@
     "live_hybrid_session_v02.js",
     "live_v06_scene_authority_browser.js"
   ],
-  "resultDir": ".flr/qa-results/V0.5.4-ECOLOGY-AB-R9",
-  "runNonce": "2026-08-24T23:13+09:00-staged-ecology-ab"
+  "resultDir": ".flr/qa-results/V0.5.4-BACKLINE-AB-R10",
+  "runNonce": "2026-08-24T23:18+09:00-backfour-integrity-ab"
 }
