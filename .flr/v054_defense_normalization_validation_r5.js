@@ -16,5 +16,5 @@ function forcePossession(m,id,x,y){const p=setLocal(m,id,x,y);E.choiceActionBrid
  check('PROTAGONIST_CM_NOT_ASSIGNED_ST_BODY_MARK',markFrames===0,{markFrames,sticky,minGap:+minGap.toFixed(2),rows});
  check('PROTAGONIST_CM_NOT_GLUE_DISTANCE',sticky<=1,{markFrames,sticky,minGap:+minGap.toFixed(2),rows});
 }
-const failedIds=checks.filter(x=>!x.pass).map(x=>x.id),status=(base.returncode===0&&failedIds.length===0)?'PASS':'FAIL';
-console.log(JSON.stringify({schemaVersion:'FLR_V054_DEFENCE_NORMALIZATION_VALIDATION_R5_DIAGNOSTIC',status,baseStatus:obj.status,baseReturnCode:base.returncode,baseStderr:String(base.stderr||'').slice(-4000),failedIds,checks,watches},null,2));if(status!=='PASS')process.exitCode=1;
+const failedIds=checks.filter(x=>!x.pass).map(x=>x.id),status=(base.status===0&&failedIds.length===0)?'PASS':'FAIL';
+console.log(JSON.stringify({schemaVersion:'FLR_V054_DEFENCE_NORMALIZATION_VALIDATION_R5_DIAGNOSTIC',status,baseStatus:obj.status,baseExitStatus:base.status,baseStderr:String(base.stderr||'').slice(-4000),failedIds,checks,watches},null,2));if(status!=='PASS')process.exitCode=1;
