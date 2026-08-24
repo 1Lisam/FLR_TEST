@@ -1,0 +1,152 @@
+name: FLR HF2 Visual Root Cause Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/hf2-visual-rootcause-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch seven HF2 bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hf2
+          base='https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5.3-HF2'
+          for rid in \
+            umt053h2-0098b8c8-46ba-470e-be72-51f831b74798 \
+            umt053h2-333ca294-e134-4bce-966f-c1a342f6336e \
+            umt053h2-cc50be09-59f1-4d7d-ae2e-c4e963cdedff \
+            umt053h2-791328ab-de52-462d-9dc0-fbf00d05d78a \
+            umt053h2-f61835ad-3445-427a-9adc-b4fb3959f735 \
+            umt053h2-3ceaa876-6397-46e6-8488-45350d5a081f \
+            umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4
+          do curl --max-time 40 -fsS "$base/$rid.json" > "/tmp/hf2/$rid.json"; done
+
+      - name: Analyze real frame motion
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,math,re
+          from pathlib import Path
+          R=Path('/tmp/hf2')
+          ids=[p.stem for p in R.glob('*.json')]
+          def walk(o):
+            yield o
+            if isinstance(o,dict):
+              for v in o.values(): yield from walk(v)
+            elif isinstance(o,list):
+              for v in o: yield from walk(v)
+          def frames(o):
+            a=[];seen=set()
+            for v in walk(o):
+              if isinstance(v,dict) and isinstance(v.get('players'),list) and isinstance(v.get('ball'),dict) and isinstance(v.get('time'),(int,float)):
+                k=(round(float(v['time']),4),tuple((p.get('id'),round(float(p.get('x',0)),3),round(float(p.get('y',0)),3)) for p in v['players'][:22]))
+                if k not in seen:seen.add(k);a.append(v)
+            return sorted(a,key=lambda x:float(x['time']))
+          def player(f,pid): return next((p for p in f.get('players',[]) if p.get('id')==pid),None)
+          def d(a,b): return math.hypot(float(a.get('x',0))-float(b.get('x',0)),float(a.get('y',0))-float(b.get('y',0))) if a and b else None
+          def flips(fs,pid,axis='y',thr=.06):
+            s=[]
+            for a,b in zip(fs,fs[1:]):
+              p,q=player(a,pid),player(b,pid)
+              if not p or not q:continue
+              dv=float(q.get(axis,0))-float(p.get(axis,0))
+              if abs(dv)>=thr:s.append(1 if dv>0 else -1)
+            return sum(x!=y for x,y in zip(s,s[1:]))
+          def task_changes(fs,pid):
+            vals=[]
+            for f in fs:
+              p=player(f,pid)
+              if p: vals.append((p.get('tacticalTask'),p.get('action'),p.get('markTargetId')))
+            return sum(a!=b for a,b in zip(vals,vals[1:]))
+          def longest_owner_freeze(fs):
+            best={'seconds':0,'ownerId':None,'nearestOpponent':None}; start=None; oid0=None
+            for i in range(1,len(fs)):
+              a,b=fs[i-1],fs[i]; oid=(b.get('ball') or {}).get('ownerId'); p=player(b,oid) if oid else None; q=player(a,oid) if oid else None
+              opp=min((d(p,x) for x in b.get('players',[]) if p and x.get('team')!=p.get('team')),default=99)
+              moved=d(p,q) if p and q else 99
+              if p and q and moved<.06 and opp<=1.8 and oid==oid0:
+                if start is None:start=float(a['time'])
+                dur=float(b['time'])-start
+                if dur>best['seconds']:best={'seconds':round(dur,3),'ownerId':oid,'nearestOpponent':round(opp,3)}
+              else:start=None
+              oid0=oid
+            return best
+          def option_rows(o):
+            cand=[]
+            for v in walk(o):
+              if isinstance(v,dict) and isinstance(v.get('options'),list):
+                rows=[]
+                for x in v['options']:
+                  if isinstance(x,dict): rows.append({'id':x.get('id') or x.get('choiceId'),'targetId':x.get('targetId'),'label':x.get('label') or x.get('text'),'risk':x.get('risk') or x.get('riskTier')})
+                if rows:cand.append(rows)
+            return max(cand,key=len) if cand else []
+          def evs(o):
+            z=[];seen=set()
+            for v in walk(o):
+              if isinstance(v,dict):
+                typ=v.get('type') or v.get('kind') or v.get('eventType'); t=v.get('time') if isinstance(v.get('time'),(int,float)) else v.get('at')
+                if isinstance(typ,str) and isinstance(t,(int,float)) and typ.upper() in {'PASS','OFFSIDE','SHOT','GOAL','SAVE'}:
+                  k=(round(float(t),3),typ.upper())
+                  if k not in seen:seen.add(k);z.append({'time':k[0],'type':k[1],'playerId':v.get('playerId') or v.get('actorId'),'targetId':v.get('targetId')})
+            return sorted(z,key=lambda x:x['time'])
+          out={}
+          for rid in ids:
+            data=json.load(open(R/f'{rid}.json',encoding='utf-8')); cur=data.get('currentSituation') or {}; fs=frames(cur); desc=(data.get('bugReportContext') or {}).get('description',''); seed=(re.findall(r'DEV-RECENT-[A-Za-z0-9_.-]+',desc) or [None])[0]
+            base={'seed':seed,'description':desc,'frameCount':len(fs),'start':fs[0]['time'] if fs else None,'end':fs[-1]['time'] if fs else None,'ownerFreeze':longest_owner_freeze(fs),'events':evs(cur)}
+            if rid.startswith('umt053h2-0098') or rid.startswith('umt053h2-333c'):
+              base['attackJitter']={pid:{'yFlips':flips(fs,pid),'taskChanges':task_changes(fs,pid)} for pid in ['H-ST','H-RW','A-LCB','A-RCB','A-LB','A-RB']}
+            if rid.startswith('umt053h2-cc50'):
+              base['defenderJitter']={pid:{'yFlips':flips(fs,pid),'taskChanges':task_changes(fs,pid)} for pid in ['A-LB','A-LCB','A-RCB','A-RB','A-LCM','A-CM','A-RCM']}
+            if rid.startswith('umt053h2-7913') and fs:
+              f0,fl=fs[0],fs[-1]; rb0,lw0=player(f0,'H-RB'),player(f0,'A-LW'); rb1,lw1=player(fl,'H-RB'),player(fl,'A-LW')
+              homeDef=[player(f0,x) for x in ['H-LB','H-LCB','H-RCB','H-RB']]; homeDef=[x for x in homeDef if x]
+              base['earlyEntry']={'H_RB_first':[round(rb0['x'],3),round(rb0['y'],3)] if rb0 else None,'A_LW_first':[round(lw0['x'],3),round(lw0['y'],3)] if lw0 else None,'distance_first':round(d(rb0,lw0),3) if rb0 and lw0 else None,'H_RB_last':[round(rb1['x'],3),round(rb1['y'],3)] if rb1 else None,'A_LW_last':[round(lw1['x'],3),round(lw1['y'],3)] if lw1 else None,'distance_last':round(d(rb1,lw1),3) if rb1 and lw1 else None,'A_LW_nearest_home_def_first':round(min((d(lw0,x) for x in homeDef),default=99),3) if lw0 else None,'H_RB_taskChanges':task_changes(fs,'H-RB')}
+            if rid.startswith('umt053h2-f618'):
+              base['decisionOptions']=option_rows(cur)
+            if rid.startswith('umt053h2-3cea') and fs:
+              e=base['events']; off=next((x for x in e if x['type']=='OFFSIDE'),None); pas=next((x for x in e if x['type']=='PASS'),None)
+              if off:
+                pre=min(fs,key=lambda f:abs(float(f['time'])-float(off['time']))); post=[f for f in fs if float(off['time'])<=float(f['time'])<=float(off['time'])+1.3]
+                b0=pre.get('ball') or {}; blast=(post[-1].get('ball') or {}) if post else b0
+                base['offsideMotion']={'passToCall':round(off['time']-pas['time'],3) if pas else None,'ballMoveAfterCall':round(math.hypot(float(blast.get('x',0))-float(b0.get('x',0)),float(blast.get('y',0))-float(b0.get('y',0))),3),'postCallFrames':len(post)}
+            if rid.startswith('umt053h2-8390') and fs:
+              f0=fs[0]; ball=f0.get('ball') or {}; backs=[player(f0,x) for x in ['H-LB','H-LCB','H-RCB','H-RB']]; backs=[x for x in backs if x]; mids=[player(f0,x) for x in ['A-LCM','A-CM','A-RCM']]; mids=[x for x in mids if x]; alb=player(f0,'A-LB'); gk=player(f0,'H-GK')
+              pair=[d(a,b) for i,a in enumerate(backs) for b in backs[i+1:]]
+              md=[math.hypot(float(m['x'])-float(ball.get('x',0)),float(m['y'])-float(ball.get('y',0))) for m in mids]
+              base['gkSceneShape']={'homeBack4MinPair':round(min(pair),3) if pair else None,'homeBack4MaxPair':round(max(pair),3) if pair else None,'awayMidfieldDistanceToBall':[round(x,3) for x in md],'awayMidfieldAvgX':round(sum(float(m['x']) for m in mids)/len(mids),3) if mids else None,'awayLB':[round(float(alb['x']),3),round(float(alb['y']),3)] if alb else None,'ball':[round(float(ball.get('x',0)),3),round(float(ball.get('y',0)),3)],'gk':[round(float(gk['x']),3),round(float(gk['y']),3)] if gk else None}
+            out[rid]=base
+          # Source facts that explain why numerical gates can pass while visual motion still fails.
+          tac=Path('runtime/tactical_movement.js').read_text(encoding='utf-8'); core=Path('runtime/continuous_match_core.js').read_text(encoding='utf-8')
+          source={'hasPerTickCrowdExit':('enforceActualDefenderCrowdExit' in tac),'hasPerTickWideRunnerResponsibility':('enforceFullbackWideRunnerResponsibility' in tac),'hasWideLaneHierarchy':('enforceWideLaneHierarchy' in tac),'hasOpponentSeparation':('duel?1.08:2.05' in tac),'offsideCallReview':("stage:deferredOffside?'CALL_REVIEW':'SETUP'" in core)}
+          Path('/tmp/findings.json').write_text(json.dumps({'schemaVersion':'FLR_HF2_VISUAL_ROOTCAUSE_AUDIT_1.0','status':'PASS','reports':out,'sourceFlags':source},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Persist findings
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR HF2 Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/findings.json .flr/hf2-visual-rootcause-audit.json
+          git add .flr/hf2-visual-rootcause-audit.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record HF2 visual root cause audit'
+          git push origin HEAD:main
