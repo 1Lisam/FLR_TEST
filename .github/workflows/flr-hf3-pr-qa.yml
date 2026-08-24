@@ -26,6 +26,7 @@ jobs:
           python .flr/v053_hf3_apply_v2.py
           python .flr/v053_hf3_tune_v3.py
           python .flr/v053_hf3_tune_v4.py
+          python .flr/v053_hf3_tune_v5.py
 
       - name: Syntax and source invariants
         shell: bash
@@ -37,7 +38,9 @@ jobs:
           node --check step71_hybrid_v06_ui.js
           node --check .flr/v053_hf3_flip_diagnostic.js
           grep -q 'stabilizeDefensiveResponsibilities' runtime/tactical_movement.js
-          grep -q 'laneTy' runtime/tactical_movement.js
+          grep -q 'liveThreat=owner||flightThreat' runtime/tactical_movement.js
+          grep -q 'stabilizeStrikerRunLane' runtime/tactical_movement.js
+          grep -q 'fastMotion' runtime/tactical_movement.js
           grep -q 'o.l.x<=52' runtime/tactical_movement.js
           grep -q 'recentShieldScan' runtime/continuous_match_core.js
           grep -q 'involvementGap' runtime/continuous_match_core.js
