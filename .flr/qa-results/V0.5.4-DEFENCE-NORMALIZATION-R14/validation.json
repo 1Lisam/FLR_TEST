@@ -1,0 +1,998 @@
+{
+  "schemaVersion": "FLR_V054_DEFENCE_NORMALIZATION_VALIDATION_R14_CONTEXTUAL_GATE_1.0",
+  "status": "PASS",
+  "legacyStatus": "FAIL",
+  "legacyExitStatus": 1,
+  "failedIds": [],
+  "checks": [
+    {
+      "id": "WIDE_CARRIER_FB_OWNS_PRESS",
+      "pass": true,
+      "value": {
+        "pressId": "A-LB",
+        "coverId": "A-LCB"
+      }
+    },
+    {
+      "id": "ONE_DIRECT_BALL_PRESSER",
+      "pass": true,
+      "value": [
+        {
+          "id": "A-LB",
+          "task": "PRESS_CONTAIN"
+        }
+      ]
+    },
+    {
+      "id": "CM_NEVER_STICKY_MARKS_CENTRAL_ST",
+      "pass": true,
+      "value": [
+        {
+          "id": "A-LCM",
+          "mark": null,
+          "task": "CUTBACK_TRACK",
+          "target": {
+            "x": 25.89390449111079,
+            "y": 21.99598892820177
+          }
+        },
+        {
+          "id": "A-CM",
+          "mark": null,
+          "task": "BOX_EDGE_SCREEN",
+          "target": {
+            "x": 25.431963637061827,
+            "y": 30.22
+          }
+        },
+        {
+          "id": "A-RCM",
+          "mark": null,
+          "task": "SECOND_BALL_TUCK",
+          "target": {
+            "x": 26.799999999999997,
+            "y": 37.48
+          }
+        }
+      ]
+    },
+    {
+      "id": "CENTRAL_ST_HAS_CB_REFERENCE",
+      "pass": true,
+      "value": [
+        {
+          "id": "A-LCB",
+          "mark": null,
+          "task": "SHOT_LANE_COVER"
+        },
+        {
+          "id": "A-RCB",
+          "mark": "H-ST",
+          "task": "MIDFIELD_LANE_SCREEN"
+        }
+      ]
+    },
+    {
+      "id": "CM_LAYER_STAYS_AHEAD_OF_BACK_FOUR",
+      "pass": true,
+      "value": {
+        "cbMean": 10.62585073341343,
+        "cms": [
+          {
+            "id": "A-LCM",
+            "x": 18.43563583949367,
+            "task": "SECOND_BALL_TUCK"
+          },
+          {
+            "id": "A-CM",
+            "x": 22.450000000000003,
+            "task": "BOX_EDGE_SCREEN"
+          },
+          {
+            "id": "A-RCM",
+            "x": 18.596312503631623,
+            "task": "CUTBACK_TRACK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EIGHTS_REACH_SECOND_BALL_LAYER",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 79.52032097815078,
+            "task": "SECOND_BALL_SUPPORT"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "PIVOT_REMAINS_REST_DEFENCE",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 79.52032097815078,
+            "task": "SECOND_BALL_SUPPORT"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 12.021454191841187,
+        "rb": 56.174021635809915,
+        "lcb": 27.316523509062826,
+        "rcb": 38.71527922237292
+      }
+    },
+    {
+      "id": "PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 13.136399937048552,
+        "rb": 54.45272261463106,
+        "lcb": 27.651694758981463,
+        "rcb": 40.25635786503553
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 13.721257811691615,
+        "rb": 54.03935484793037,
+        "lcb": 26.436092943931,
+        "rcb": 40.406567227607596
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 14.533880551205947,
+        "rb": 54.00324974874966,
+        "lcb": 26.525730238668622,
+        "rcb": 40.849763134960085
+      }
+    },
+    {
+      "id": "STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 7.95265291986987,
+        "rb": 54.85817153770476,
+        "lcb": 27.492020297655834,
+        "rcb": 40.32178393020295
+      }
+    },
+    {
+      "id": "CARRIER_SHIELD_FLOW:DEV-RECENT-1787576057595-34:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 13.131806690711528,
+        "rb": 54.86819330928847,
+        "lcb": 28.806326293223535,
+        "rcb": 38.59297434871551
+      }
+    },
+    {
+      "id": "OFFSIDE_INVOLVEMENT:DEV-RECENT-1787576131788-41:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 13.512503754813224,
+        "rb": 54.27054775832221,
+        "lcb": 27.453462316654623,
+        "rcb": 40.99055817909539
+      }
+    },
+    {
+      "id": "OFFSIDE_TEST_EXPOSES_FORWARD_TARGET",
+      "pass": true,
+      "value": [
+        {
+          "id": "THROUGH_PASS",
+          "targetId": "H-LW"
+        },
+        {
+          "id": "SAFE_PASS",
+          "targetId": "H-LW"
+        },
+        {
+          "id": "SHOT",
+          "targetId": null
+        },
+        {
+          "id": "AVAILABLE_PASS",
+          "targetId": "H-ST"
+        },
+        {
+          "id": "LOFTED_THROUGH_PASS",
+          "targetId": "H-LW"
+        },
+        {
+          "id": "CARRY",
+          "targetId": null
+        }
+      ]
+    },
+    {
+      "id": "OFFSIDE_TEST_CAN_TRIGGER_OFFSIDE",
+      "pass": true,
+      "value": {
+        "choice": {
+          "id": "AVAILABLE_PASS",
+          "targetId": "H-ST"
+        },
+        "applyOk": true,
+        "call": {
+          "t": 997.4000000000003,
+          "type": "OFFSIDE",
+          "text": "블루팀 ST이 오프사이드 위치에 있었습니다.",
+          "actorId": "H-ST",
+          "team": "HOME",
+          "releaseFrozen": true,
+          "involvementGap": 1.937,
+          "flightAge": 1
+        }
+      }
+    },
+    {
+      "id": "CORE_SMOKE:V054-SMOKE-01",
+      "pass": true,
+      "value": {
+        "score": {
+          "HOME": 4,
+          "AWAY": 6
+        },
+        "shots": 42,
+        "passes": 1016,
+        "completed": true
+      }
+    },
+    {
+      "id": "CORE_SMOKE:V054-SMOKE-02",
+      "pass": true,
+      "value": {
+        "score": {
+          "HOME": 7,
+          "AWAY": 10
+        },
+        "shots": 47,
+        "passes": 1010,
+        "completed": true
+      }
+    },
+    {
+      "id": "CORE_SMOKE:DEV-RECENT-1787573272419-1",
+      "pass": true,
+      "value": {
+        "score": {
+          "HOME": 6,
+          "AWAY": 4
+        },
+        "shots": 46,
+        "passes": 1036,
+        "completed": true
+      }
+    },
+    {
+      "id": "CORE_SMOKE:DEV-RECENT-1787575663982-11",
+      "pass": true,
+      "value": {
+        "score": {
+          "HOME": 5,
+          "AWAY": 2
+        },
+        "shots": 42,
+        "passes": 1063,
+        "completed": true
+      }
+    },
+    {
+      "id": "EXACTLY_ONE_EIGHT_ATTACKS_BOX",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "y": 30.8,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 79.52032097815078,
+            "y": 41.23312043273615,
+            "task": "SECOND_BALL_SUPPORT"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "OTHER_EIGHT_HOLDS_SECOND_BALL_EDGE",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "y": 30.8,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 79.52032097815078,
+            "y": 41.23312043273615,
+            "task": "SECOND_BALL_SUPPORT"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "MIDFIELD_TRIANGLE_HAS_THREE_LAYERS",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "y": 30.8,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 79.52032097815078,
+            "y": 41.23312043273615,
+            "task": "SECOND_BALL_SUPPORT"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "LEFT_WIDE_CARRIER_SAME_SIDE_FB_OWNS_PRESS",
+      "pass": true,
+      "value": {
+        "pressId": "A-RB",
+        "coverId": "A-RCB",
+        "until": 100.8
+      }
+    },
+    {
+      "id": "PROTAGONIST_CM_NOT_ASSIGNED_ST_BODY_MARK",
+      "pass": true,
+      "value": {
+        "markFrames": 0,
+        "sticky": 1,
+        "minGap": 2.25,
+        "rows": [
+          {
+            "t": 100.1,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 9.03,
+            "cm": {
+              "x": 27.97892703560033,
+              "y": 33.968981823396135
+            },
+            "st": {
+              "x": 18.947,
+              "y": 34
+            }
+          },
+          {
+            "t": 100.6,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 9.65,
+            "cm": {
+              "x": 27.513415682765515,
+              "y": 33.28007741300184
+            },
+            "st": {
+              "x": 17.886999999999997,
+              "y": 34
+            }
+          },
+          {
+            "t": 101.1,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 10.16,
+            "cm": {
+              "x": 26.233151981380225,
+              "y": 31.755367014952963
+            },
+            "st": {
+              "x": 16.321318924884665,
+              "y": 34
+            }
+          },
+          {
+            "t": 101.6,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 8.59,
+            "cm": {
+              "x": 24.531840181741163,
+              "y": 30.706522666096852
+            },
+            "st": {
+              "x": 16.433916379259813,
+              "y": 33.581651878510236
+            }
+          },
+          {
+            "t": 102.1,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 6.26,
+            "cm": {
+              "x": 22.60501438552952,
+              "y": 30.276543244869583
+            },
+            "st": {
+              "x": 16.829154357854947,
+              "y": 32.69872692430905
+            }
+          },
+          {
+            "t": 102.6,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 3.74,
+            "cm": {
+              "x": 20.225098275643923,
+              "y": 30.731357230960096
+            },
+            "st": {
+              "x": 16.983381560295413,
+              "y": 32.60070762833752
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "PROTAGONIST_CM_NOT_GLUE_DISTANCE",
+      "pass": true,
+      "value": {
+        "markFrames": 0,
+        "sticky": 1,
+        "minGap": 2.25,
+        "rows": [
+          {
+            "t": 100.1,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 9.03,
+            "cm": {
+              "x": 27.97892703560033,
+              "y": 33.968981823396135
+            },
+            "st": {
+              "x": 18.947,
+              "y": 34
+            }
+          },
+          {
+            "t": 100.6,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 9.65,
+            "cm": {
+              "x": 27.513415682765515,
+              "y": 33.28007741300184
+            },
+            "st": {
+              "x": 17.886999999999997,
+              "y": 34
+            }
+          },
+          {
+            "t": 101.1,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 10.16,
+            "cm": {
+              "x": 26.233151981380225,
+              "y": 31.755367014952963
+            },
+            "st": {
+              "x": 16.321318924884665,
+              "y": 34
+            }
+          },
+          {
+            "t": 101.6,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 8.59,
+            "cm": {
+              "x": 24.531840181741163,
+              "y": 30.706522666096852
+            },
+            "st": {
+              "x": 16.433916379259813,
+              "y": 33.581651878510236
+            }
+          },
+          {
+            "t": 102.1,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 6.26,
+            "cm": {
+              "x": 22.60501438552952,
+              "y": 30.276543244869583
+            },
+            "st": {
+              "x": 16.829154357854947,
+              "y": 32.69872692430905
+            }
+          },
+          {
+            "t": 102.6,
+            "mark": null,
+            "task": "BOX_EDGE_SCREEN",
+            "gap": 3.74,
+            "cm": {
+              "x": 20.225098275643923,
+              "y": 30.731357230960096
+            },
+            "st": {
+              "x": 16.983381560295413,
+              "y": 32.60070762833752
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "BACKFOUR:DEV-RECENT-1787573272419-1:PROBE_COMPLETES",
+      "pass": true,
+      "value": {
+        "status": 0,
+        "completed": true,
+        "shots": 46,
+        "goals": 10
+      }
+    },
+    {
+      "id": "BACKFOUR:DEV-RECENT-1787573272419-1:SEVERE_DEPTH_FRAGMENTATION",
+      "pass": true,
+      "value": {
+        "avgSpread": 4.989,
+        "over4Pct": 38.27,
+        "over6Pct": 22.09,
+        "maxSpread": 37.997,
+        "shots": 46,
+        "goals": 10
+      }
+    },
+    {
+      "id": "BACKFOUR:DEV-RECENT-1787575663982-11:PROBE_COMPLETES",
+      "pass": true,
+      "value": {
+        "status": 0,
+        "completed": true,
+        "shots": 42,
+        "goals": 7
+      }
+    },
+    {
+      "id": "BACKFOUR:DEV-RECENT-1787575663982-11:SEVERE_DEPTH_FRAGMENTATION",
+      "pass": true,
+      "value": {
+        "avgSpread": 5.147,
+        "over4Pct": 38.69,
+        "over6Pct": 23.78,
+        "maxSpread": 71.199,
+        "shots": 42,
+        "goals": 7
+      }
+    },
+    {
+      "id": "ECOLOGY_PROBE_COMPLETES",
+      "pass": true,
+      "value": [
+        {
+          "seed": "V054-SMOKE-02",
+          "score": {
+            "HOME": 7,
+            "AWAY": 10
+          },
+          "shots": 47,
+          "passes": 1010,
+          "offsides": 3,
+          "goals": 17,
+          "completed": true
+        },
+        {
+          "seed": "DEV-RECENT-1787573272419-1",
+          "score": {
+            "HOME": 6,
+            "AWAY": 4
+          },
+          "shots": 46,
+          "passes": 1036,
+          "offsides": 2,
+          "goals": 10,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "id": "R14_ONLY_SUPERSEDES_LEGACY_RAW_CM_COLLAPSE_GATE",
+      "pass": true,
+      "value": {
+        "legacyStatus": "FAIL",
+        "legacyExitStatus": 1,
+        "oldGateCount": 5,
+        "unexpectedLegacyFailures": []
+      }
+    },
+    {
+      "id": "DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 74,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    },
+    {
+      "id": "PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 91,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 90,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 69,
+        "intentCollapse": 2,
+        "ratio": 0.0097,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": [
+          {
+            "t": 758.7,
+            "id": "A-CM",
+            "nowX": 25.07,
+            "cbNow": 25.44,
+            "targetX": 34.79,
+            "cbTarget": 29.7,
+            "targetGap": 5.09,
+            "task": "POST_PASS_CONTINUE_RUN",
+            "mark": "H-CM"
+          },
+          {
+            "t": 758.8,
+            "id": "A-CM",
+            "nowX": 25.43,
+            "cbNow": 25.95,
+            "targetX": 34.79,
+            "cbTarget": 29.7,
+            "targetGap": 5.09,
+            "task": "POST_PASS_CONTINUE_RUN",
+            "mark": "H-CM"
+          }
+        ]
+      }
+    },
+    {
+      "id": "STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 91,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    }
+  ],
+  "watches": [
+    {
+      "id": "BOX_DENSITY_ALLOWED",
+      "value": 7
+    },
+    {
+      "id": "BACKFOUR:DEV-RECENT-1787573272419-1:DEPTH_SHAPE",
+      "value": {
+        "avgSpread": 4.989,
+        "over4Pct": 38.27,
+        "over6Pct": 22.09,
+        "maxSpread": 37.997,
+        "topDeep": [
+          {
+            "key": "LCB|HOLD_BLOCK",
+            "count": 2147
+          },
+          {
+            "key": "RCB|HOLD_BLOCK",
+            "count": 1875
+          },
+          {
+            "key": "RB|WIDE_RUN_TRACK",
+            "count": 1610
+          },
+          {
+            "key": "LB|WIDE_RUN_TRACK",
+            "count": 1505
+          },
+          {
+            "key": "RCB|SHOT_LANE_COVER",
+            "count": 787
+          },
+          {
+            "key": "LCB|SHOT_LANE_COVER",
+            "count": 692
+          },
+          {
+            "key": "LCB|MARK_LANE_SCREEN",
+            "count": 529
+          },
+          {
+            "key": "RCB|BOX_RECOVERY_LINE",
+            "count": 500
+          },
+          {
+            "key": "LCB|BOX_RECOVERY_LINE",
+            "count": 492
+          },
+          {
+            "key": "LB|WIDE_LINE_RECOVER",
+            "count": 485
+          }
+        ]
+      }
+    },
+    {
+      "id": "BACKFOUR:DEV-RECENT-1787575663982-11:DEPTH_SHAPE",
+      "value": {
+        "avgSpread": 5.147,
+        "over4Pct": 38.69,
+        "over6Pct": 23.78,
+        "maxSpread": 71.199,
+        "topDeep": [
+          {
+            "key": "RCB|HOLD_BLOCK",
+            "count": 2072
+          },
+          {
+            "key": "LCB|HOLD_BLOCK",
+            "count": 2035
+          },
+          {
+            "key": "RB|WIDE_RUN_TRACK",
+            "count": 1842
+          },
+          {
+            "key": "LB|WIDE_RUN_TRACK",
+            "count": 1721
+          },
+          {
+            "key": "RCB|SHOT_LANE_COVER",
+            "count": 718
+          },
+          {
+            "key": "LCB|SHOT_LANE_COVER",
+            "count": 619
+          },
+          {
+            "key": "LB|WIDE_LINE_RECOVER",
+            "count": 548
+          },
+          {
+            "key": "RB|WIDE_LINE_RECOVER",
+            "count": 526
+          },
+          {
+            "key": "RCB|BOX_RECOVERY_LINE",
+            "count": 519
+          },
+          {
+            "key": "LCB|BOX_RECOVERY_LINE",
+            "count": 487
+          }
+        ]
+      }
+    },
+    {
+      "id": "ECOLOGY:V054-SMOKE-02",
+      "value": {
+        "seed": "V054-SMOKE-02",
+        "score": {
+          "HOME": 7,
+          "AWAY": 10
+        },
+        "shots": 47,
+        "passes": 1010,
+        "offsides": 3,
+        "goals": 17,
+        "completed": true
+      }
+    },
+    {
+      "id": "ECOLOGY:DEV-RECENT-1787573272419-1",
+      "value": {
+        "seed": "DEV-RECENT-1787573272419-1",
+        "score": {
+          "HOME": 6,
+          "AWAY": 4
+        },
+        "shots": 46,
+        "passes": 1036,
+        "offsides": 2,
+        "goals": 10,
+        "completed": true
+      }
+    },
+    {
+      "id": "LEGACY_RAW_POSITION_GATE:DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:CM_BACKLINE_COLLAPSE_RATIO",
+      "value": {
+        "pass": true,
+        "value": {
+          "frames": 91,
+          "violations": 0,
+          "ratio": 0
+        }
+      }
+    },
+    {
+      "id": "LEGACY_RAW_POSITION_GATE:PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:CM_BACKLINE_COLLAPSE_RATIO",
+      "value": {
+        "pass": true,
+        "value": {
+          "frames": 91,
+          "violations": 0,
+          "ratio": 0
+        }
+      }
+    },
+    {
+      "id": "LEGACY_RAW_POSITION_GATE:MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:CM_BACKLINE_COLLAPSE_RATIO",
+      "value": {
+        "pass": true,
+        "value": {
+          "frames": 91,
+          "violations": 0,
+          "ratio": 0
+        }
+      }
+    },
+    {
+      "id": "LEGACY_RAW_POSITION_GATE:MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:CM_BACKLINE_COLLAPSE_RATIO",
+      "value": {
+        "pass": false,
+        "value": {
+          "frames": 91,
+          "violations": 15,
+          "ratio": 0.0549
+        }
+      }
+    },
+    {
+      "id": "LEGACY_RAW_POSITION_GATE:STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:CM_BACKLINE_COLLAPSE_RATIO",
+      "value": {
+        "pass": true,
+        "value": {
+          "frames": 91,
+          "violations": 0,
+          "ratio": 0
+        }
+      }
+    },
+    {
+      "id": "DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:CM_BACKLINE_CURRENT_POSITION_TRANSIENTS",
+      "value": {
+        "defendingFrames": 74,
+        "rawCurrentCollapse": 0,
+        "escapingTransient": 0,
+        "intentCollapse": 0,
+        "rawRatio": 0
+      }
+    },
+    {
+      "id": "PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:CM_BACKLINE_CURRENT_POSITION_TRANSIENTS",
+      "value": {
+        "defendingFrames": 91,
+        "rawCurrentCollapse": 0,
+        "escapingTransient": 0,
+        "intentCollapse": 0,
+        "rawRatio": 0
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:CM_BACKLINE_CURRENT_POSITION_TRANSIENTS",
+      "value": {
+        "defendingFrames": 90,
+        "rawCurrentCollapse": 0,
+        "escapingTransient": 0,
+        "intentCollapse": 0,
+        "rawRatio": 0
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:CM_BACKLINE_CURRENT_POSITION_TRANSIENTS",
+      "value": {
+        "defendingFrames": 69,
+        "rawCurrentCollapse": 9,
+        "escapingTransient": 7,
+        "intentCollapse": 2,
+        "rawRatio": 0.0435
+      }
+    },
+    {
+      "id": "STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:CM_BACKLINE_CURRENT_POSITION_TRANSIENTS",
+      "value": {
+        "defendingFrames": 91,
+        "rawCurrentCollapse": 0,
+        "escapingTransient": 0,
+        "intentCollapse": 0,
+        "rawRatio": 0
+      }
+    }
+  ]
+}

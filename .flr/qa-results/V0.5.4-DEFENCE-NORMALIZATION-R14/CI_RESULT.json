@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "FLR_V054_R14_INTEGRATED_QA_RESULT_1.0",
+  "status": "PASS",
+  "validationExitCode": 0,
+  "failedIds": [],
+  "legacyStatus": "FAIL",
+  "contextualGate": [
+    {
+      "id": "DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 74,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    },
+    {
+      "id": "PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 91,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 90,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 69,
+        "intentCollapse": 2,
+        "ratio": 0.0097,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": [
+          {
+            "t": 758.7,
+            "id": "A-CM",
+            "nowX": 25.07,
+            "cbNow": 25.44,
+            "targetX": 34.79,
+            "cbTarget": 29.7,
+            "targetGap": 5.09,
+            "task": "POST_PASS_CONTINUE_RUN",
+            "mark": "H-CM"
+          },
+          {
+            "t": 758.8,
+            "id": "A-CM",
+            "nowX": 25.43,
+            "cbNow": 25.95,
+            "targetX": 34.79,
+            "cbTarget": 29.7,
+            "targetGap": 5.09,
+            "task": "POST_PASS_CONTINUE_RUN",
+            "mark": "H-CM"
+          }
+        ]
+      }
+    },
+    {
+      "id": "STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL",
+      "pass": true,
+      "value": {
+        "defendingFrames": 91,
+        "intentCollapse": 0,
+        "ratio": 0,
+        "threshold": 0.035,
+        "missingTargets": 0,
+        "samples": []
+      }
+    }
+  ]
+}
