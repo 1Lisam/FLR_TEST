@@ -1,0 +1,167 @@
+name: FLR HF3 User Fail Deep Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/hf3-user-fail-audit-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch exact HF3 report bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hf3_reports
+          base='https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5.3-HF3'
+          for rid in \
+            umt053h3-a38dd18b-5674-47be-869f-49f2d658ddac \
+            umt053h3-be39da54-9cb8-482e-97b0-9152f4745e3c \
+            umt053h3-f553566d-ced2-4c7d-bfee-ff4933e57602 \
+            umt053h3-79471388-9836-46df-a8f7-e19e4001652d \
+            umt053h3-f01306d4-c2bb-472e-9188-098df821d4d8 \
+            umt053h3-bcbfe33c-63b0-4fed-8e63-66e572cfe547 \
+            umt053h3-4ff3da67-ec2f-4c6d-b629-634411b2d5bc \
+            umt053h3-fa9eddb1-0a89-4110-a7d6-14a446ef9909 \
+            umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c
+          do
+            curl --max-time 45 -fsS "$base/$rid.json" > "/tmp/hf3_reports/$rid.json"
+          done
+
+      - name: Build structural deep audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, math, re
+          from pathlib import Path
+
+          ROOT=Path('/tmp/hf3_reports')
+          ids=[
+            'umt053h3-a38dd18b-5674-47be-869f-49f2d658ddac',
+            'umt053h3-be39da54-9cb8-482e-97b0-9152f4745e3c',
+            'umt053h3-f553566d-ced2-4c7d-bfee-ff4933e57602',
+            'umt053h3-79471388-9836-46df-a8f7-e19e4001652d',
+            'umt053h3-f01306d4-c2bb-472e-9188-098df821d4d8',
+            'umt053h3-bcbfe33c-63b0-4fed-8e63-66e572cfe547',
+            'umt053h3-4ff3da67-ec2f-4c6d-b629-634411b2d5bc',
+            'umt053h3-fa9eddb1-0a89-4110-a7d6-14a446ef9909',
+            'umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c',
+          ]
+
+          def walk(o,path=''):
+            yield path,o
+            if isinstance(o,dict):
+              for k,v in o.items(): yield from walk(v,f'{path}.{k}' if path else k)
+            elif isinstance(o,list):
+              for i,v in enumerate(o): yield from walk(v,f'{path}[{i}]')
+
+          def collect_frames(o):
+            found=[]; seen=set()
+            for path,v in walk(o):
+              if isinstance(v,dict) and isinstance(v.get('players'),list) and isinstance(v.get('ball'),dict) and isinstance(v.get('time'),(int,float)):
+                key=(round(float(v['time']),4), tuple((p.get('id'),round(float(p.get('x',0)),3),round(float(p.get('y',0)),3)) for p in v['players'][:22]))
+                if key not in seen:
+                  seen.add(key); found.append(v)
+            return sorted(found,key=lambda f:float(f.get('time',0)))
+
+          def dist(a,b): return math.hypot(float(a.get('x',0))-float(b.get('x',0)),float(a.get('y',0))-float(b.get('y',0)))
+          def local_xy(team,p):
+            x=float(p.get('x',0)); y=float(p.get('y',0))
+            return (x,y) if team=='HOME' else (105-x,68-y)
+
+          def frame_metrics(frames):
+            if not frames:return {'count':0}
+            byid={}; maxCrowd3=0; maxCrowd5=0; roleSwapFrames=[]; cmBackline=[]; markChanges={}; tasks={}; prevMarks={}
+            for f in frames:
+              t=float(f.get('time',0)); ps=f.get('players') or []; ball=f.get('ball') or {}; bx=float(ball.get('x',0)); by=float(ball.get('y',0))
+              for p in ps:
+                byid.setdefault(p.get('id'),[]).append((t,p))
+                pid=p.get('id'); mark=p.get('markTargetId')
+                if pid in prevMarks and prevMarks[pid]!=mark and (prevMarks[pid] or mark): markChanges[pid]=markChanges.get(pid,0)+1
+                prevMarks[pid]=mark
+                task=str(p.get('tacticalTask') or p.get('action') or '')
+                if task: tasks.setdefault(pid,set()).add(task)
+              maxCrowd3=max(maxCrowd3,sum(1 for p in ps if math.hypot(float(p.get('x',0))-bx,float(p.get('y',0))-by)<=3.0))
+              maxCrowd5=max(maxCrowd5,sum(1 for p in ps if math.hypot(float(p.get('x',0))-bx,float(p.get('y',0))-by)<=5.0))
+              for team in ('HOME','AWAY'):
+                tp=[p for p in ps if p.get('team')==team]
+                lb=next((p for p in tp if p.get('slot')=='LB'),None); rb=next((p for p in tp if p.get('slot')=='RB'),None)
+                if lb and rb:
+                  _,ly=local_xy(team,lb); _,ry=local_xy(team,rb)
+                  if ly>ry: roleSwapFrames.append({'time':round(t,3),'team':team,'lbLocalY':round(ly,2),'rbLocalY':round(ry,2)})
+                cbs=[local_xy(team,p)[0] for p in tp if p.get('role')=='CB']
+                cms=[p for p in tp if p.get('role')=='CM']
+                if cbs and cms:
+                  cbMean=sum(cbs)/len(cbs)
+                  for p in cms:
+                    cx,_=local_xy(team,p)
+                    if cx<=cbMean+1.0:
+                      cmBackline.append({'time':round(t,3),'team':team,'id':p.get('id'),'slot':p.get('slot'),'cmLocalX':round(cx,2),'cbMeanLocalX':round(cbMean,2),'task':p.get('tacticalTask') or p.get('action'),'markTargetId':p.get('markTargetId')})
+
+            jitter=[]
+            for pid,rows in byid.items():
+              if len(rows)<4: continue
+              signs=[]; total=0.; p0=rows[0][1]
+              for (t1,a),(t2,b) in zip(rows,rows[1:]):
+                dy=float(b.get('y',0))-float(a.get('y',0)); dx=float(b.get('x',0))-float(a.get('x',0)); total+=math.hypot(dx,dy)
+                if abs(dy)>=0.08: signs.append(1 if dy>0 else -1)
+              flips=sum(1 for a,b in zip(signs,signs[1:]) if a!=b)
+              if flips: jitter.append({'id':pid,'slot':p0.get('slot'),'role':p0.get('role'),'lateralDirectionFlips':flips,'totalMove':round(total,3),'markChanges':markChanges.get(pid,0),'tasks':sorted(tasks.get(pid,set()))[:12]})
+            jitter=sorted(jitter,key=lambda x:(x['lateralDirectionFlips'],x['totalMove']),reverse=True)[:12]
+
+            first=frames[0]; last=frames[-1]
+            return {
+              'count':len(frames),'firstTime':first.get('time'),'lastTime':last.get('time'),
+              'maxPlayersWithin3mOfBall':maxCrowd3,'maxPlayersWithin5mOfBall':maxCrowd5,
+              'lbRbReversalFrameCount':len(roleSwapFrames),'lbRbReversalExamples':roleSwapFrames[:12],
+              'cmAtOrBehindBacklineFrameCount':len(cmBackline),'cmBacklineExamples':cmBackline[:20],
+              'markTargetChangeCounts':dict(sorted(markChanges.items(),key=lambda kv:kv[1],reverse=True)[:12]),
+              'topLateralJitter':jitter,
+            }
+
+          reports=[]
+          aggregate={'lbRbReversalReports':0,'cmBacklineReports':0,'crowd5AtLeast4Reports':0,'jitterReports':0}
+          for rid in ids:
+            d=json.loads((ROOT/f'{rid}.json').read_text(encoding='utf-8'))
+            ctx=d.get('bugReportContext') or {}; cur=d.get('currentSituation') or {}; prev=d.get('previousSituation') or {}
+            desc=str(ctx.get('description') or '')
+            seeds=sorted(set(re.findall(r'(?:DEV-RECENT|LIVE-V03)[A-Za-z0-9_.-]*',json.dumps(d,ensure_ascii=False))))
+            frames=collect_frames(cur)
+            fm=frame_metrics(frames)
+            aggregate['lbRbReversalReports']+=int(fm.get('lbRbReversalFrameCount',0)>0)
+            aggregate['cmBacklineReports']+=int(fm.get('cmAtOrBehindBacklineFrameCount',0)>0)
+            aggregate['crowd5AtLeast4Reports']+=int(fm.get('maxPlayersWithin5mOfBall',0)>=4)
+            aggregate['jitterReports']+=int(bool(fm.get('topLateralJitter')))
+            reports.append({'reportId':rid,'description':desc,'seeds':seeds,'category':ctx.get('category'),'priority':ctx.get('priority'),'frameMetrics':fm,'currentReportScope':cur.get('reportScope'),'previousSituationPresent':bool(prev),'currentBytes':len(json.dumps(cur,ensure_ascii=False).encode())})
+
+          out={'schemaVersion':'FLR_HF3_USER_FAIL_DEEP_AUDIT_1.0','status':'PASS','build':'USER-MATCH-TEST-V0.5.3-HF3','reportCount':len(reports),'aggregate':aggregate,'reports':reports}
+          Path('/tmp/hf3-user-fail-deep-audit.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'reportCount':len(reports),'aggregate':aggregate},ensure_ascii=False))
+          PY
+
+      - name: Persist audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR HF3 Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          cp /tmp/hf3-user-fail-deep-audit.json .flr/hf3-user-fail-deep-audit.json
+          git add .flr/hf3-user-fail-deep-audit.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record HF3 user fail deep audit'
+          git push origin HEAD:main
