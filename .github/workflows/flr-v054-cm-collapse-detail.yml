@@ -1,0 +1,43 @@
+name: V0.5.4 CM Collapse Detail
+
+on:
+  push:
+    branches:
+      - test/v054-defense-normalization
+    paths:
+      - '.flr/v054-cm-detail-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test/v054-defense-normalization
+          fetch-depth: 1
+      - name: Materialize and inspect transition context
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/flr-v054-detail
+          mkdir -p /tmp/flr-v054-detail
+          rsync -a --exclude='.git' ./ /tmp/flr-v054-detail/
+          python .flr/v054_defense_normalization_apply_bundle.py /tmp/flr-v054-detail
+          mkdir -p .flr/qa-results/V0.5.4-CM-COLLAPSE-DETAIL
+          node .flr/v054_cm_collapse_probe_detail.js /tmp/flr-v054-detail > .flr/qa-results/V0.5.4-CM-COLLAPSE-DETAIL/detail.json
+          cat .flr/qa-results/V0.5.4-CM-COLLAPSE-DETAIL/detail.json
+      - name: Persist detail result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "FLR V054 Probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add .flr/qa-results/V0.5.4-CM-COLLAPSE-DETAIL/detail.json
+          git diff --cached --quiet || {
+            git commit -m "Record V0.5.4 CM collapse detail"
+            git push origin HEAD:test/v054-defense-normalization
+          }
