@@ -1,0 +1,46 @@
+name: V0.5.4 CM Collapse Probe
+
+on:
+  push:
+    branches:
+      - test/v054-defense-normalization
+    paths:
+      - '.flr/v054-cm-probe-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact test branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/v054-defense-normalization
+          fetch-depth: 1
+
+      - name: Materialize R13 candidate and run CM collapse probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/flr-v054-probe
+          mkdir -p /tmp/flr-v054-probe
+          rsync -a --exclude='.git' ./ /tmp/flr-v054-probe/
+          python .flr/v054_defense_normalization_apply_bundle.py /tmp/flr-v054-probe
+          mkdir -p .flr/qa-results/V0.5.4-CM-COLLAPSE-PROBE
+          node .flr/v054_cm_collapse_probe.js /tmp/flr-v054-probe > .flr/qa-results/V0.5.4-CM-COLLAPSE-PROBE/probe.json
+          cat .flr/qa-results/V0.5.4-CM-COLLAPSE-PROBE/probe.json
+
+      - name: Persist probe result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "FLR V054 Probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add .flr/qa-results/V0.5.4-CM-COLLAPSE-PROBE/probe.json
+          git diff --cached --quiet || {
+            git commit -m "Record V0.5.4 CM collapse probe result"
+            git push origin HEAD:test/v054-defense-normalization
+          }
