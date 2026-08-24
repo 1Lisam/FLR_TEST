@@ -125,3 +125,6 @@ r1(t,
 "    m._defenceMotionStability={};\n    m._attackRunStability={};\n    m._lastTacticalPossession=poss;")
 
 print('HF3_TUNE_V5_OK')
+v6=ROOT/'.flr/v053_hf3_tune_v6.py'
+if v6.exists():
+    exec(compile(v6.read_text(encoding='utf-8'),str(v6),'exec'))
