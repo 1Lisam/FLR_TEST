@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "FLR_ADDITIONAL_TESTER_REPORT_INSPECT_1.0",
+  "reportId": "umt051-a13ae7a5-73a6-4d99-88fe-9c41d53d7534",
+  "build": "USER-MATCH-TEST-V0.5.1",
+  "bundleSchemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+  "scope": {
+    "currentSituation": true,
+    "previousSituation": true,
+    "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
+    "olderSituationsIncluded": false
+  },
+  "bugReportContext": {
+    "reportId": "umt051-a13ae7a5-73a6-4d99-88fe-9c41d53d7534",
+    "build": "USER-MATCH-TEST-V0.5.1",
+    "step": 78,
+    "description": "1. 모든 포지션에 선택함에 있어 어떤 것이 확률적으로 좋은 선택일지 각 선택에 % 가 표기되면 좋을 것 같음\n\n2. 상황종료 후 3초후에 재개되는것이 흐름을 끊는 느낌\n버튼을 눌러 바로 진행가능하게 하는게 있긴하나 아래쪽에 배치되어 버튼이 없다가 생기는 상태라서 잘보이게 버튼 고정을 해두던지 아에 스페이스바 같은거 눌러서 바로 넘어갈 수 있게 하면좋을 둣\n\n3. 키퍼 다이빙 캐치, 펀칭 같은 선택지가 추가 되면 좋을둣\n\n4. 반칙이 구현 된다면 카드, 프리킥도 구현\n\n5. 경기 종료후 화면 가운데 종료, 승패(스코어) 글씨가 뜨면 좋을 듯\n(경기가 종료되었다는 느낌이 들지 않음)",
+    "category": "기타",
+    "priority": 2,
+    "reportedAt": "2026-08-23T14:08:51.346Z"
+  },
+  "currentSituationPresent": true,
+  "previousSituationPresent": true,
+  "currentReportScope": {
+    "startSecond": 5191.900000000129,
+    "endSecond": 5219.400000000138,
+    "cumulativeMatchHistoryIncluded": false,
+    "keepsFullSituationFrames": true
+  },
+  "previousReportScope": {
+    "startSecond": 4851.700000000036,
+    "endSecond": 4890.600000000087,
+    "cumulativeMatchHistoryIncluded": false,
+    "keepsFullSituationFrames": true
+  },
+  "boundary": {
+    "id": "HW0014",
+    "sceneId": "HW0014",
+    "atSecond": 5191.900000000129,
+    "reason": "GK_GOALKEEPING",
+    "heroPlayerId": "H-GK",
+    "heroRole": "GK"
+  },
+  "selectedChoice": {
+    "id": "GK_STEP_OUT",
+    "family": "수비",
+    "label": "한두 걸음 전진해 각도 좁히기",
+    "targetId": null,
+    "targetName": null,
+    "hint": "의도: 골문을 버리고 달려드는 것이 아니라 한두 걸음만 전진해 슈팅 각도를 줄입니다.\n관련 능력: GK 위치선정, 반응, 가속\n위험: 보통\n성공하면: 슈터에게 보이는 골문 면적을 줄일 수 있음\n실패하면: 칩이나 옆 패스가 나오면 복귀 여유가 줄어들 수 있음",
+    "tooltip": "의도: 골문을 버리고 달려드는 것이 아니라 한두 걸음만 전진해 슈팅 각도를 줄입니다.\n관련 능력: GK 위치선정, 반응, 가속\n위험: 보통\n성공하면: 슈터에게 보이는 골문 면적을 줄일 수 있음\n실패하면: 칩이나 옆 패스가 나오면 복귀 여유가 줄어들 수 있음"
+  },
+  "actualResult": {
+    "sceneId": "STEP40-1",
+    "at": 5219.4,
+    "choiceId": "GK_STEP_OUT",
+    "label": "한두 걸음 전진해 각도 좁히기",
+    "targetId": null,
+    "targetName": null,
+    "family": "수비",
+    "selectedChoice": {
+      "id": "GK_STEP_OUT",
+      "label": "한두 걸음 전진해 각도 좁히기",
+      "targetId": null,
+      "targetName": null
+    },
+    "code": "POSSESSION_KEPT",
+    "headline": "한두 걸음 전진해 각도 좁히기 결과",
+    "detail": "레드팀 RCM이 슈팅을 시도합니다. → 레드팀 RCM이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-5",
+    "terminalEvent": {
+      "t": 5194.400000000138,
+      "type": "GOAL",
+      "text": "레드팀 RCM이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-5",
+      "actorId": "A-RCM",
+      "team": "AWAY"
+    },
+    "events": [
+      {
+        "t": 5193.900000000136,
+        "type": "SHOT",
+        "text": "레드팀 RCM이 슈팅을 시도합니다.",
+        "actorId": "A-RCM",
+        "team": "AWAY",
+        "turningShot": false,
+        "contactGapAtStrike": 0,
+        "contactAuthority": "CONTROLLED_CONTACT"
+      },
+      {
+        "t": 5194.400000000138,
+        "type": "GOAL",
+        "text": "레드팀 RCM이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-5",
+        "actorId": "A-RCM",
+        "team": "AWAY"
+      }
+    ],
+    "score": {
+      "HOME": 1,
+      "AWAY": 5
+    },
+    "possession": "HOME",
+    "performanceImpact": {
+      "at": 5219.4,
+      "appearanceStatus": "STARTER",
+      "choiceId": "GK_STEP_OUT",
+      "resultCode": "POSSESSION_KEPT",
+      "reckless": false,
+      "saferOption": null,
+      "chosenScore": null,
+      "ratingDelta": 0,
+      "rating": 6.5,
+      "substitutionPressureDelta": 0,
+      "substitutionPressure": 0,
+      "managerUsageTrustDelta": 0,
+      "managerUsageTrustTotal": 0,
+      "reason": "NO_PENALTY"
+    }
+  },
+  "decisionOptionCount": 2,
+  "episodeFrameCount": 25,
+  "firstFrameTime": 5192,
+  "lastFrameTime": 5219.4,
+  "currentSerializedBytes": 445752,
+  "previousSerializedBytes": 1817215
+}
