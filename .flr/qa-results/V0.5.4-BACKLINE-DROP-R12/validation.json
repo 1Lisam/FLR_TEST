@@ -1,0 +1,5 @@
+{
+  "schemaVersion": "FLR_V054_ECOLOGY_AB_VALIDATION_1.0",
+  "status": "PASS",
+  "purpose": "staged ecology probe; stage metrics are recorded in applyLog"
+}
