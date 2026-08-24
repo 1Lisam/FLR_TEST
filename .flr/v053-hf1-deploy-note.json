@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "FLR_V053_HF1_DEPLOY_NOTE_1.0",
+  "candidate": "V0.5.3 HF1",
+  "scope": [
+    "GK result consistency: GOAL/SAVE/PARRY mapping for GK_HOLD_POSITION and GK_STEP_OUT",
+    "Recent-fix tester UI: always-visible 5-item selector, selected-item guide, forced run, new seed, replay"
+  ],
+  "bugReportBuild": "USER-MATCH-TEST-V0.5.3-HF1",
+  "reportIdPrefix": "umt053h1-",
+  "qa": {
+    "gkHotfixRegression": "PASS",
+    "visibleFixRegression": "PASS",
+    "uiVmE2E": "PASS",
+    "browserUmdSmoke": "PASS",
+    "intentV2Regression": "PASS",
+    "extendedGate": "PASS",
+    "multiCycle": "PASS",
+    "longMultiCycle": "PASS",
+    "finalWindowContinuity": "PASS",
+    "roles90": {"ST":"PASS","CM":"PASS","CB":"PASS","GK":"PASS"}
+  }
+}
