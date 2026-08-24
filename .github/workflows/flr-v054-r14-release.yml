@@ -1,0 +1,119 @@
+name: FLR V0.5.4 R14 Release
+
+on:
+  push:
+    branches:
+      - test/v054-defense-normalization
+    paths:
+      - '.flr/v054-r14-release-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout QA branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/v054-defense-normalization
+          path: qa
+          fetch-depth: 1
+
+      - name: Checkout clean release branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/v054-r14-user-test
+          path: release
+          fetch-depth: 1
+
+      - name: Promote exact R13/R14 engine blobs and release labels
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='qa/.flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R13/applied'
+          cp "$SRC/live_hybrid_session_v02.js" release/live_hybrid_session_v02.js
+          cp "$SRC/live_v06_scene_authority_browser.js" release/live_v06_scene_authority_browser.js
+          cp "$SRC/runtime/continuous_match_core.js" release/runtime/continuous_match_core.js
+          cp "$SRC/runtime/hybrid_spatial_intent_v2.js" release/runtime/hybrid_spatial_intent_v2.js
+          cp "$SRC/runtime/protagonist_match_controller.js" release/runtime/protagonist_match_controller.js
+          cp "$SRC/runtime/tactical_movement.js" release/runtime/tactical_movement.js
+          python - <<'PY'
+          from pathlib import Path
+          repl={
+            'V0.5.3 HF3 TEST':'V0.5.4 R14 TEST',
+            'USER-MATCH-TEST-V0.5.3-HF3':'USER-MATCH-TEST-V0.5.4-R14',
+            '[USER-MATCH-TEST-V0.5.3]':'[USER-MATCH-TEST-V0.5.4]',
+            'V053_HF2_VISUAL_DEFENCE_FIX':'V054_R14_DEFENCE_NORMALIZATION',
+            '최근 HF3 수정 장면 검증':'최근 V0.5.4 수정 장면 검증',
+            '이번 HF3에서 실제로 수정한 현상만 모았습니다.':'이번 V0.5.4에서 실제로 수정한 현상만 모았습니다.',
+            'HF3 검사 항목을 선택한 뒤':'V0.5.4 검사 항목을 선택한 뒤',
+          }
+          for rel in ['index.html','step71_hybrid_v06_ui.js']:
+            p=Path('release')/rel
+            s=p.read_text(encoding='utf-8')
+            for a,b in repl.items(): s=s.replace(a,b)
+            p.write_text(s,encoding='utf-8')
+          ch=Path('release/CHANGELOG.md')
+          old=ch.read_text(encoding='utf-8')
+          note='## USER MATCH TEST V0.5.4 R14 — 2026-08-25\n- Promote the exact R13/R14-validated defence-normalization engine candidate for user visual testing.\n- R14 changes only the CM-collapse QA interpretation; engine code is byte-identical to the R13 applied candidate.\n- Update user-test/build-report labels from V0.5.3 HF3 to V0.5.4 R14.\n\n'
+          if note.splitlines()[0] not in old: ch.write_text(note+old,encoding='utf-8')
+          PY
+
+      - name: Verify exact engine blobs and syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release
+          declare -A EXPECT=(
+            [live_hybrid_session_v02.js]=73d743fad7c110ceb0709189b05d7baaa9280b8c
+            [live_v06_scene_authority_browser.js]=b0d245673832786b1a778cc8494db6dde22af0e1
+            [runtime/continuous_match_core.js]=de703b77ec9ffda8eecfd3a4cfafb2ffd4c6621f
+            [runtime/hybrid_spatial_intent_v2.js]=44c6bb73128840093c86c259e2cdc84ec7124210
+            [runtime/protagonist_match_controller.js]=735d08926517684478a68a2c7aca303105ebd3fa
+            [runtime/tactical_movement.js]=b04a90c3e346e3d08b94a563c31eeb1424f4f4de
+          )
+          for f in "${!EXPECT[@]}"; do
+            got=$(git hash-object "$f")
+            test "$got" = "${EXPECT[$f]}" || { echo "BLOB_MISMATCH $f $got ${EXPECT[$f]}"; exit 1; }
+            node --check "$f"
+          done
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'V0.5.4 R14 TEST' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.4-R14' step71_hybrid_v06_ui.js
+
+      - name: Run R14 integrated regression on release tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node qa/.flr/v054_defense_normalization_validation_r14.js release > /tmp/r14-release-validation.json
+          cat /tmp/r14-release-validation.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/r14-release-validation.json'))
+          assert x.get('status')=='PASS',x.get('failedIds')
+          PY
+
+      - name: Record validated release and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release/.flr/release/V0.5.4-R14
+          cp /tmp/r14-release-validation.json release/.flr/release/V0.5.4-R14/R14_VALIDATION.json
+          python - <<'PY'
+          import json,pathlib,subprocess
+          root=pathlib.Path('release')
+          files=['live_hybrid_session_v02.js','live_v06_scene_authority_browser.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','runtime/protagonist_match_controller.js','runtime/tactical_movement.js']
+          blobs={f:subprocess.check_output(['git','-C',str(root),'hash-object',f],text=True).strip() for f in files}
+          out={'schemaVersion':'FLR_V054_R14_RELEASE_RECORD_1.0','status':'PASS','build':'USER-MATCH-TEST-V0.5.4-R14','sourceQA':'V0.5.4-DEFENCE-NORMALIZATION-R14','engineBlobs':blobs,'engineEqualsR13Applied':True,'qaGateOnlyChangeFromR13':True}
+          (root/'.flr/release/V0.5.4-R14/RELEASE_RECORD.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          git -C release config user.name 'FLR V054 Release'
+          git -C release config user.email 'actions@users.noreply.github.com'
+          git -C release add live_hybrid_session_v02.js live_v06_scene_authority_browser.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js runtime/tactical_movement.js index.html step71_hybrid_v06_ui.js CHANGELOG.md .flr/release/V0.5.4-R14
+          git -C release diff --cached --quiet || {
+            git -C release commit -m 'Promote V0.5.4 R14 user-test candidate'
+            git -C release push origin HEAD:release/v054-r14-user-test
+          }
