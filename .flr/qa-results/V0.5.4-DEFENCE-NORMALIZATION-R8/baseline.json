@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "FLR_V054_BASELINE_STATS_1.0",
+  "rows": [
+    {
+      "seed": "V054-SMOKE-01",
+      "score": {
+        "HOME": 6,
+        "AWAY": 5
+      },
+      "shots": 37,
+      "passes": 1102,
+      "offsides": 1,
+      "goals": 11,
+      "completed": true
+    },
+    {
+      "seed": "V054-SMOKE-02",
+      "score": {
+        "HOME": 6,
+        "AWAY": 2
+      },
+      "shots": 34,
+      "passes": 1060,
+      "offsides": 2,
+      "goals": 8,
+      "completed": true
+    },
+    {
+      "seed": "DEV-RECENT-1787573272419-1",
+      "score": {
+        "HOME": 6,
+        "AWAY": 2
+      },
+      "shots": 38,
+      "passes": 1026,
+      "offsides": 1,
+      "goals": 8,
+      "completed": true
+    },
+    {
+      "seed": "DEV-RECENT-1787575663982-11",
+      "score": {
+        "HOME": 4,
+        "AWAY": 5
+      },
+      "shots": 44,
+      "passes": 1062,
+      "offsides": 1,
+      "goals": 9,
+      "completed": true
+    }
+  ]
+}
