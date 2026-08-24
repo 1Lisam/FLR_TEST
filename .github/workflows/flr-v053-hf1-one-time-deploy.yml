@@ -17,31 +17,50 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Apply validated HF1 patch
+
+      - name: Verify deployed V0.5.3 baseline
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          # This one-time workflow only applies tiny text transforms over the already deployed
-          # V0.5.3 baseline. It intentionally does not alter football physics or outcome odds.
-          p=Path('runtime/protagonist_match_controller.js'); s=p.read_text()
-          old="""  if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){\n    const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));\n    if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};\n  }"""
-          new="""  if(['TACKLE','DELAY','BLOCK_LANE','GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){\n    if(['GK_HOLD_POSITION','GK_STEP_OUT'].includes(choice)){\n      const gkOutcome=tr.newEvents.find(e=>['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY'].includes(e.type));\n      if(gkOutcome?.type==='GOAL')return{code:'GOAL_CONCEDED',headline:`${tr.label} → 실점`,detail:flow||gkOutcome.text||'상대 슈팅이 득점으로 이어졌습니다.',terminalEvent:deep(gkOutcome)};\n      if(['SAVE','CHIP_SAVE'].includes(gkOutcome?.type))return{code:'SAVED',headline:`${tr.label} → 선방`,detail:flow||gkOutcome.text||'골키퍼가 슈팅을 막았습니다.',terminalEvent:deep(gkOutcome)};\n      if(gkOutcome?.type==='CHIP_PARRY')return{code:'PARRIED',headline:`${tr.label} → 쳐냄`,detail:flow||gkOutcome.text||'골키퍼가 슈팅을 쳐냈습니다.',terminalEvent:deep(gkOutcome)};\n    }\n    const x=tr.newEvents.find(e=>['TACKLE','FOUL','LOOSE','INTERCEPT'].includes(e.type));\n    if(x)return{code:x.type,headline:`${tr.label} 결과`,detail:flow||x.text,terminalEvent:deep(x)};\n  }"""
-          assert old in s
-          s=s.replace(old,new)
-          old2="  const terminals=isShotChoice(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK']:tr.choiceId==='TAKE_ON'?['DRIBBLE_BEAT','TAKE_ON_TACKLED','TAKE_ON_LOOSE']:tr.choiceId==='TACKLE'?['TACKLE','FOUL','LOOSE']:[];"
-          new2="  const terminals=isShotChoice(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','BLOCK','CORNER','GOAL_KICK']:['GK_HOLD_POSITION','GK_STEP_OUT'].includes(tr.choiceId)?['GOAL','SAVE','CHIP_SAVE','CHIP_PARRY']:tr.choiceId==='TAKE_ON'?['DRIBBLE_BEAT','TAKE_ON_TACKLED','TAKE_ON_LOOSE']:tr.choiceId==='TACKLE'?['TACKLE','FOUL','LOOSE']:[];"
-          assert old2 in s
-          p.write_text(s.replace(old2,new2))
-          PY
+          test "$(sha256sum index.html | cut -d' ' -f1)" = d03d47333ed1370bdd753ad0e9616df505224acb06bf70b18dcdb1fe16c1d23f
+          test "$(sha256sum live_hybrid_session_v02.js | cut -d' ' -f1)" = 4ca3856fa994cc18401de1072a04063235f4195d493bf010e39feeb73bc8541e
+          test "$(sha256sum runtime/protagonist_match_controller.js | cut -d' ' -f1)" = 572fe690129d0a8866720f5e2f850aa002b6ad12bdeebc8303c94e083cd4180f
+          test "$(sha256sum step71_hybrid_v06_ui.js | cut -d' ' -f1)" = 1618b32c49bca7f9df527e08a11adb5b1f150c645f216d3bd14309f04f3eae4a
+
+      - name: Apply validated HF1 transform
+        shell: bash
+        env:
+          TRANSFORM_B64: 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
+        run: |
+          set -euo pipefail
+          printf '%s' "$TRANSFORM_B64" | base64 -d | gzip -d > /tmp/v053_hf1_transform.py
+          test "$(sha256sum /tmp/v053_hf1_transform.py | cut -d' ' -f1)" = 56656e6b21bd2952c01cc90a565836db19d10530484a8a07589a229d98f6ce77
+          python /tmp/v053_hf1_transform.py
+
+      - name: Verify exact validated HF1 outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum index.html | cut -d' ' -f1)" = ee287f600a8087b345e88285bb034e713b546520635d8ee5495d7a79fc085e9e
+          test "$(sha256sum live_hybrid_session_v02.js | cut -d' ' -f1)" = f21479597f6b1a4dd2f925ebe67c30241c236ace5c2682bcc532b6dcd654ded7
+          test "$(sha256sum runtime/protagonist_match_controller.js | cut -d' ' -f1)" = b6588ff3615cc0fa7a67180c1e3de9d20ec8294e1ca88c683a75d12041b3d09b
+          test "$(sha256sum step71_hybrid_v06_ui.js | cut -d' ' -f1)" = 5f4f33c32cda44664f43dfc1186574f220d0b4acc02ce9558244423f754d5d8f
+          node --check live_hybrid_session_v02.js
           node --check runtime/protagonist_match_controller.js
-      - name: Commit hotfix core only
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'V0.5.3 HF1' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.3-HF1' step71_hybrid_v06_ui.js
+          grep -q 'umt053h1-' step71_hybrid_v06_ui.js
+          grep -q 'heroRecentFixSelect' index.html
+          grep -q 'GK_RESULT_CONSISTENCY' live_hybrid_session_v02.js
+          grep -q "code:'GOAL_CONCEDED'" runtime/protagonist_match_controller.js
+
+      - name: Commit exact HF1 files
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'FLR HF1 Deploy Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add runtime/protagonist_match_controller.js
-          git commit -m 'Hotfix V0.5.3 GK result consistency'
+          git add index.html live_hybrid_session_v02.js runtime/protagonist_match_controller.js step71_hybrid_v06_ui.js
+          git commit -m 'Deploy Match Engine User Test V0.5.3 HF1'
           git push origin HEAD:main
