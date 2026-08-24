@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "FLR_HF2_USER_FAIL_AUDIT_REQUEST_1.0",
+  "requestedAt": "2026-08-24T15:06:00+09:00",
+  "build": "USER-MATCH-TEST-V0.5.3-HF2",
+  "latestReportId": "umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4",
+  "purpose": "Deep-audit all seven HF2 user visual FAIL reports and confirm GitHub issue token presence without exposing secret values"
+}
