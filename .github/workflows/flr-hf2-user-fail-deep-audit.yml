@@ -1,0 +1,224 @@
+name: FLR HF2 User Fail Deep Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/hf2-user-fail-audit-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Fetch exact HF2 report bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hf2_reports
+          base='https://flr-bug-reporter.sikarops.workers.dev/reports/USER-MATCH-TEST-V0.5.3-HF2'
+          for rid in \
+            umt053h2-0098b8c8-46ba-470e-be72-51f831b74798 \
+            umt053h2-333ca294-e134-4bce-966f-c1a342f6336e \
+            umt053h2-cc50be09-59f1-4d7d-ae2e-c4e963cdedff \
+            umt053h2-791328ab-de52-462d-9dc0-fbf00d05d78a \
+            umt053h2-f61835ad-3445-427a-9adc-b4fb3959f735 \
+            umt053h2-3ceaa876-6397-46e6-8488-45350d5a081f \
+            umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4
+          do
+            curl --max-time 40 -fsS "$base/$rid.json" > "/tmp/hf2_reports/$rid.json"
+          done
+
+      - name: Audit Worker GitHub issue secret presence
+        id: secrets
+        continue-on-error: true
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          cd bug-report-worker
+          npx --yes wrangler@latest secret list --name flr-bug-reporter --json > /tmp/flr_worker_secrets.json
+          cd ..
+
+      - name: Build compact seven-report deep audit
+        shell: bash
+        env:
+          SECRET_OUTCOME: ${{ steps.secrets.outcome }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, math, os, re
+          from pathlib import Path
+
+          ROOT=Path('/tmp/hf2_reports')
+          ids=[
+            'umt053h2-0098b8c8-46ba-470e-be72-51f831b74798',
+            'umt053h2-333ca294-e134-4bce-966f-c1a342f6336e',
+            'umt053h2-cc50be09-59f1-4d7d-ae2e-c4e963cdedff',
+            'umt053h2-791328ab-de52-462d-9dc0-fbf00d05d78a',
+            'umt053h2-f61835ad-3445-427a-9adc-b4fb3959f735',
+            'umt053h2-3ceaa876-6397-46e6-8488-45350d5a081f',
+            'umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4',
+          ]
+
+          def walk(o,path=''):
+            yield path,o
+            if isinstance(o,dict):
+              for k,v in o.items(): yield from walk(v,f'{path}.{k}' if path else k)
+            elif isinstance(o,list):
+              for i,v in enumerate(o): yield from walk(v,f'{path}[{i}]')
+
+          def find_first(o,names):
+            for path,v in walk(o):
+              if path.split('.')[-1].split('[')[0] in names and v is not None:
+                return v
+            return None
+
+          def collect_frames(o):
+            found=[]; seen=set()
+            for path,v in walk(o):
+              if isinstance(v,dict) and isinstance(v.get('players'),list) and isinstance(v.get('ball'),dict) and isinstance(v.get('time'),(int,float)):
+                key=(round(float(v['time']),4), tuple((p.get('id'),round(float(p.get('x',0)),3),round(float(p.get('y',0)),3)) for p in v['players'][:22]))
+                if key not in seen:
+                  seen.add(key); found.append(v)
+            return sorted(found,key=lambda f:float(f.get('time',0)))
+
+          def dist(a,b): return math.hypot(float(a.get('x',0))-float(b.get('x',0)),float(a.get('y',0))-float(b.get('y',0)))
+
+          def frame_metrics(frames):
+            if not frames:return {'count':0}
+            byid={}
+            minOpp=999.; minSame=999.; maxCrowd=0; longestOwnerFreeze=0.; freezeStart=None; prev=None
+            for f in frames:
+              ps=f.get('players') or []
+              for p in ps: byid.setdefault(p.get('id'),[]).append((float(f.get('time',0)),p))
+              for i,a in enumerate(ps):
+                for b in ps[i+1:]:
+                  d=dist(a,b)
+                  if a.get('team')==b.get('team'): minSame=min(minSame,d)
+                  else:minOpp=min(minOpp,d)
+              ball=f.get('ball') or {}; bx=float(ball.get('x',0)); by=float(ball.get('y',0))
+              crowd=sum(1 for p in ps if math.hypot(float(p.get('x',0))-bx,float(p.get('y',0))-by)<=3.0)
+              maxCrowd=max(maxCrowd,crowd)
+              oid=ball.get('ownerId')
+              owner=next((p for p in ps if p.get('id')==oid),None)
+              nearOpp=min((dist(owner,p) for p in ps if owner and p.get('team')!=owner.get('team')),default=99)
+              if prev and owner and oid==prev[1]:
+                dt=float(f.get('time',0))-prev[0]; move=dist(owner,prev[2])
+                if dt>0 and move<0.06 and nearOpp<=1.8:
+                  if freezeStart is None: freezeStart=prev[0]
+                  longestOwnerFreeze=max(longestOwnerFreeze,float(f.get('time',0))-freezeStart)
+                else: freezeStart=None
+              else: freezeStart=None
+              prev=(float(f.get('time',0)),oid,owner.copy() if owner else {})
+
+            jitter=[]
+            for pid,rows in byid.items():
+              if len(rows)<4: continue
+              signs=[]; totalMove=0.; p0=rows[0][1]
+              for (t1,a),(t2,b) in zip(rows,rows[1:]):
+                dy=float(b.get('y',0))-float(a.get('y',0)); dx=float(b.get('x',0))-float(a.get('x',0)); totalMove+=math.hypot(dx,dy)
+                if abs(dy)>=0.08: signs.append(1 if dy>0 else -1)
+              flips=sum(1 for a,b in zip(signs,signs[1:]) if a!=b)
+              if flips:
+                jitter.append({'id':pid,'slot':p0.get('slot'),'role':p0.get('role'),'lateralDirectionFlips':flips,'totalMove':round(totalMove,3)})
+            jitter=sorted(jitter,key=lambda x:(x['lateralDirectionFlips'],x['totalMove']),reverse=True)[:8]
+
+            slots={}
+            for pid,rows in byid.items():
+              p0=rows[0][1]; slot=p0.get('slot') or pid
+              xs=[float(p.get('x',0)) for _,p in rows]; ys=[float(p.get('y',0)) for _,p in rows]
+              slots[slot]={'id':pid,'team':p0.get('team'),'role':p0.get('role'),'first':[round(xs[0],3),round(ys[0],3)],'last':[round(xs[-1],3),round(ys[-1],3)],'xRange':round(max(xs)-min(xs),3),'yRange':round(max(ys)-min(ys),3)}
+            return {'count':len(frames),'firstTime':frames[0].get('time'),'lastTime':frames[-1].get('time'),'minOpponentDistance':round(minOpp,3) if minOpp<999 else None,'minSameTeamDistance':round(minSame,3) if minSame<999 else None,'maxPlayersWithin3mOfBall':maxCrowd,'longestControlledOwnerFreezeNearOpponentSeconds':round(longestOwnerFreeze,3),'topLateralJitter':jitter,'slots':slots}
+
+          def events(o):
+            out=[]; seen=set()
+            for path,v in walk(o):
+              if isinstance(v,dict):
+                typ=v.get('type') or v.get('kind') or v.get('eventType')
+                tm=v.get('time') if isinstance(v.get('time'),(int,float)) else v.get('at')
+                if isinstance(typ,str) and isinstance(tm,(int,float)) and typ.upper() in {'PASS','OFFSIDE','SHOT','GOAL','SAVE','CHIP_SAVE','CHIP_PARRY','INTERCEPT','TACKLE','FOUL'}:
+                  k=(round(float(tm),3),typ.upper(),v.get('playerId') or v.get('actorId'))
+                  if k not in seen: seen.add(k); out.append({'time':round(float(tm),3),'type':typ.upper(),'playerId':v.get('playerId') or v.get('actorId'),'targetId':v.get('targetId')})
+            return sorted(out,key=lambda x:x['time'])[:80]
+
+          reports=[]
+          for rid in ids:
+            d=json.loads((ROOT/f'{rid}.json').read_text(encoding='utf-8'))
+            ctx=d.get('bugReportContext') or {}
+            desc=str(ctx.get('description') or find_first(d,{'description'}) or '')
+            seeds=sorted(set(re.findall(r'(?:DEV-RECENT|LIVE-V03)[A-Za-z0-9_.-]*',json.dumps(d,ensure_ascii=False))))
+            cur=d.get('currentSituation') if isinstance(d,dict) else None
+            prev=d.get('previousSituation') if isinstance(d,dict) else None
+            frames=collect_frames(cur or {})
+            reports.append({
+              'reportId':rid,
+              'schemaVersion':d.get('schemaVersion'),
+              'description':desc,
+              'seeds':seeds,
+              'bugReportContext':ctx,
+              'currentReportScope':(cur or {}).get('reportScope') if isinstance(cur,dict) else None,
+              'previousReportScope':(prev or {}).get('reportScope') if isinstance(prev,dict) else None,
+              'futureOutcomePrecomputed':find_first(cur or {},{'futureOutcomePrecomputed'}),
+              'selectedChoice':find_first(cur or {},{'selectedChoice'}),
+              'actualResult':find_first(cur or {},{'actualResult'}),
+              'boundary':find_first(cur or {},{'boundary'}),
+              'frameMetrics':frame_metrics(frames),
+              'events':events(cur or {}),
+              'currentBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,
+              'previousPresent':prev is not None,
+            })
+
+          secret={'status':'UNKNOWN','githubIssueTokenPresent':None,'secretNames':[]}
+          sp=Path('/tmp/flr_worker_secrets.json')
+          if os.environ.get('SECRET_OUTCOME')=='success' and sp.exists():
+            try:
+              raw=json.loads(sp.read_text(encoding='utf-8'))
+              if isinstance(raw,dict): rows=raw.get('secrets') or raw.get('result') or []
+              else: rows=raw
+              names=[]
+              for r in rows or []:
+                if isinstance(r,str): names.append(r)
+                elif isinstance(r,dict): names.append(r.get('name') or r.get('key') or '')
+              names=sorted(x for x in names if x)
+              secret={'status':'PASS','githubIssueTokenPresent':'GITHUB_ISSUE_TOKEN' in names,'secretNames':names}
+            except Exception as e:
+              secret={'status':'PARSE_FAILED','githubIssueTokenPresent':None,'error':str(e),'secretNames':[]}
+          else:
+            secret={'status':'QUERY_FAILED','githubIssueTokenPresent':None,'secretNames':[]}
+
+          out={'schemaVersion':'FLR_HF2_USER_FAIL_DEEP_AUDIT_1.0','status':'PASS','build':'USER-MATCH-TEST-V0.5.3-HF2','reportCount':len(reports),'reports':reports,'workerSecretAudit':secret}
+          Path('/tmp/hf2-user-fail-deep-audit.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'reports':len(reports),'secretAudit':secret},ensure_ascii=False))
+          PY
+
+      - name: Persist compact audit only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR HF2 Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git reset --hard HEAD
+          git pull --rebase origin main || git reset --hard origin/main
+          mkdir -p .flr
+          cp /tmp/hf2-user-fail-deep-audit.json .flr/hf2-user-fail-deep-audit.json
+          git add .flr/hf2-user-fail-deep-audit.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record HF2 user fail deep audit'
+          git push origin HEAD:main
