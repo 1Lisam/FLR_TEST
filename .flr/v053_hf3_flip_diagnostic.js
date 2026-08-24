@@ -6,6 +6,7 @@ const E=require('../runtime/continuous_match_core.js');
 const P=require('../runtime/protagonist_match_controller.js');
 const runtimeDir=path.resolve(__dirname,'../runtime');
 const byId=(f,id)=>(f.players||[]).find(p=>p.id===id)||null;
+const n2=v=>Number.isFinite(Number(v))?+Number(v).toFixed(2):null;
 function run(key,seed,ids,seconds=9){
   const d=H.createDeveloperScenario({key,seed});
   const env=A.seedMatch(d.boundary,{runtimeDir,seed:d.seed,explicitHeroChoiceRequired:false});
@@ -16,13 +17,13 @@ function run(key,seed,ids,seconds=9){
   for(const id of ids){
     const flips=[];let lastSign=0,lastMove=null;
     for(let i=1;i<rows.length;i++){
-      const a=byId(rows[i-1],id),b=byId(rows[i],id);if(!a||!b)continue;
+      const fa=rows[i-1],fb=rows[i],a=byId(fa,id),b=byId(fb,id);if(!a||!b)continue;
       const dy=b.y-a.y;if(Math.abs(dy)<.06)continue;
       const sign=dy>0?1:-1;
       if(lastSign&&sign!==lastSign){
-        flips.push({t:+b.time.toFixed(2),dy:+dy.toFixed(3),fromSign:lastSign,toSign:sign,task:b.tacticalTask||b.action||null,mark:b.markTargetId||null,x:+b.x.toFixed(2),y:+b.y.toFixed(2),tx:+b.tx.toFixed(2),ty:+b.ty.toFixed(2),ballOwner:b.ball?.ownerId||null,ballX:+(b.ball?.x||0).toFixed(2),ballY:+(b.ball?.y||0).toFixed(2),prevMove:lastMove});
+        flips.push({t:n2(fb.time),dy:+dy.toFixed(3),fromSign:lastSign,toSign:sign,task:b.tacticalTask||b.action||null,mark:b.markTargetId||null,x:n2(b.x),y:n2(b.y),tx:n2(b.tx),ty:n2(b.ty),ballOwner:fb.ball?.ownerId||null,ballX:n2(fb.ball?.x),ballY:n2(fb.ball?.y),prevMove:lastMove});
       }
-      lastSign=sign;lastMove={t:+b.time.toFixed(2),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,tx:+b.tx.toFixed(2),ty:+b.ty.toFixed(2)};
+      lastSign=sign;lastMove={t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,tx:n2(b.tx),ty:n2(b.ty)};
     }
     result.players[id]={flipCount:flips.length,flips};
   }
