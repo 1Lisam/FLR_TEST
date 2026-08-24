@@ -1,0 +1,68 @@
+name: FLR V0.5.4 QA Tooling Export
+
+on:
+  push:
+    branches:
+      - data-export/v054-r14-local-source
+    paths:
+      - '.flr/v054-tooling-export-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact V0.5.4 control
+        uses: actions/checkout@v4
+        with:
+          ref: 8fc461f48f05e1ea508edacb990282c815ae51ef
+          path: control
+          fetch-depth: 1
+
+      - name: Package V0.5.4 QA tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p export/.flr
+          cp -f control/.flr/v054* export/.flr/
+          cp -f control/.flr/candidate_qa_runner.py export/.flr/ 2>/dev/null || true
+          (cd export && zip -qr ../V054_QA_TOOLING_EXACT.zip .)
+          sha256sum V054_QA_TOOLING_EXACT.zip > V054_QA_TOOLING_EXACT.zip.sha256
+
+      - name: Upload exact QA tooling
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: V054-QA-TOOLING-EXACT
+          path: |
+            V054_QA_TOOLING_EXACT.zip
+            V054_QA_TOOLING_EXACT.zip.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Record tooling locator
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch data-export/v054-r14-local-source "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" locator
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          Path('locator/.flr/v054-tooling-export-result.json').write_text(json.dumps({
+            'schemaVersion':'FLR_V054_QA_TOOLING_EXPORT_LOCATOR_1.0',
+            'status':'PASS',
+            'runId':os.environ.get('GITHUB_RUN_ID'),
+            'artifactId':int(os.environ['ARTIFACT_ID']),
+            'control':'8fc461f48f05e1ea508edacb990282c815ae51ef'
+          },indent=2),encoding='utf-8')
+          PY
+          git -C locator config user.name 'FLR Source Export'
+          git -C locator config user.email 'actions@users.noreply.github.com'
+          git -C locator add .flr/v054-tooling-export-result.json
+          git -C locator commit -m 'Record V0.5.4 QA tooling export locator'
+          git -C locator push origin HEAD:data-export/v054-r14-local-source
