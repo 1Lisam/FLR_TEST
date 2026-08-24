@@ -1,8 +1,98 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_1.3",
   "status": "PASS",
-  "count": 45,
+  "count": 50,
   "reports": [
+    {
+      "report_id": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T13:00:01.597Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "6번 항목은 몇번을 해도 오프사이드 상황이 나오지 않아서 검증이 안됨 강제 검증을 위해 상황을 다시 깔아주길 바람",
+      "size_bytes": 684165,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-fa9eddb1-0a89-4110-a7d6-14a446ef9909",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:57:37.088Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787576131788-41\n\n오프사이드 검사지만 별개로 RW에 선택지가 뜨지 않는 점이 있음 확인 바람",
+      "size_bytes": 683011,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-4ff3da67-ec2f-4c6d-b629-634411b2d5bc",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:56:49.149Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "이번 검증: 공격수 멈칫·SHIELD_SCAN 반복 방지 · seed=DEV-RECENT-1787576057595-34 · ST가 압박을 읽는 짧은 멈칫 뒤 다시 판단하고 움직이며, 같은 자리에서 SHIELD_SCAN을 반복하지 않는지 확인하세요.\n\n이번 검증은 적어도 짦은 멈칫은 공을 지킬때 나오는데 그게 공 지키느라 몸싸움 한다고 생각하면 크게 거슬리지는 않아서 이건 여러번 해봐도괜찮으니 통과로 봐도 될듯",
+      "size_bytes": 2669421,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-bcbfe33c-63b0-4fed-8e63-66e572cfe547",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:54:42.966Z",
+      "category": "패스/공격",
+      "priority": 3,
+      "description": "검증 완료: ST 침투 레인 연속성 · seed=DEV-RECENT-1787575948505-19\n\n여전히 침투패스 상황에서 공격수가 좌우로 시야를 흔들면서 어쩔줄을 몰라함.\n버그가 고쳐지지 않았음",
+      "size_bytes": 2572840,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-f01306d4-c2bb-472e-9188-098df821d4d8",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:54:03.228Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787575897894-18\n\n다른 상황으로 해봐도 LB와 RB가 서로 자리를 바꾸는 현상, CM이 갑자기 공을 잡으러 수비라인까지 달려들어버리는 현상, 중앙수비가 우왕좌왕 하는것은 그대로임",
+      "size_bytes": 2692108,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-79471388-9836-46df-a8f7-e19e4001652d",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:53:05.989Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787575803967-13\n\n상황 시작 하자 마자 LB와 RB가 반대 위치에 존재해서 서로 자리를 바꾸는 상황임.",
+      "size_bytes": 1993548,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-f553566d-ced2-4c7d-bfee-ff4933e57602",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:51:28.662Z",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787575663982-11 · JSON/버그리포트 사용 가능\n\n또한 전진패스를 하자마자 상대 LB가 우리 RW를 두고 가운데로 오는 현상이 수정 되지 않았음",
+      "size_bytes": 873860,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-be39da54-9cb8-482e-97b0-9152f4745e3c",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:50:49.190Z",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787575663982-11 · JSON/버그리포트 사용 가능\n\n상대 RCB가 더 깊숙한 곳에 있었는데 오프사이드 선언되는것 부터 일단 고쳐야 할 상황 오프사이드 라인의 판단을 확실하게 해야 할 듯",
+      "size_bytes": 1420996,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-a38dd18b-5674-47be-869f-49f2d658ddac",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
+      "created_at": "2026-08-24T12:10:34.863Z",
+      "category": "조작권/선택",
+      "priority": 3,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787573272419-1\n\n상대 CM이 공을 따라 내 LW 까지 죽자고 쫒아옴.",
+      "size_bytes": 1288194,
+      "chunk_count": 1
+    },
     {
       "report_id": "umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4",
       "build": "USER-MATCH-TEST-V0.5.3-HF2",
@@ -412,49 +502,9 @@
       "description": "이건 왜 ST가 수비진영에서 나오고 있는건지 도저히 이해가 안됨. 수비 가담을 했다고 하기엔 모든 포메이션이 정상 포메이션이거든",
       "size_bytes": 3074822,
       "chunk_count": 3
-    },
-    {
-      "report_id": "tt051-81ee7089-fc98-4f05-99d2-b7f1b1fa7a3e",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:28:44.880Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "여전히 선택지 이후 ST와 CB가 서로 비비면서 시간을 보내다 선택지 창이 뜸",
-      "size_bytes": 4978001,
-      "chunk_count": 4
-    },
-    {
-      "report_id": "tt051-259e1218-0586-4693-af88-7adfb22b6fc3",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:28:16.399Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "이 부분에서는 원터치 상황이 나오는데 원터치로 돌려주는 상황과 내가 볼을 간수한다 두가지 선택 뿐인게 최선인가? 날아오는걸 바로 다시 되돌려 주는 리턴도 가능은 하긴 한데 확률상 다른쪽으로 전달하는것도 가능해지는거라서.",
-      "size_bytes": 5816259,
-      "chunk_count": 4
-    },
-    {
-      "report_id": "tt051-e418816c-7d1e-434e-9c09-1c740879b08e",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:26:37.464Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "공간 전진을 했는데 서로 막힌 상태로 다음 선택까지 대치만 하고 있어 움직임이 전혀 없는건 의도하는 상황이 아니야 그래서도 안되고 완전히 막혔다면 상대가 내 공을 뺏던지 곧바로 다음 선택지가 뜨던지 해야 할거 같아.",
-      "size_bytes": 3452458,
-      "chunk_count": 3
-    },
-    {
-      "report_id": "tt051-59d9b67c-eaf0-4e39-94d9-533e602adefb",
-      "build": "TT-0.51",
-      "created_at": "2026-08-21T02:16:47.146Z",
-      "category": "조작권/선택",
-      "priority": 3,
-      "description": "이 상황에서 LW는 완전히 빈공간이고 RW도 공간침투가 가능한 상황인데 선택지 자체가 안뜨는 이유가 뭔지 모르겠어",
-      "size_bytes": 3504780,
-      "chunk_count": 3
     }
   ],
-  "latestAttachedReportId": "umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4",
+  "latestAttachedReportId": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -464,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4",
-      "build": "USER-MATCH-TEST-V0.5.3-HF2",
+      "reportId": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
+      "build": "USER-MATCH-TEST-V0.5.3-HF3",
       "step": 78,
-      "description": "검증 완료: GK 선택 결과 정합성 · seed=DEV-RECENT-1787551224799-36 · JSON/버그리포트 사용 가능\n\nGK는 움직임을 보이는데 우리 수비수들은 너무 촘촘하게 있고 \n\n상대 미드필드 진들은 공격 가담도 없이 너무 멀어져 있으며\n상대 LB는 또 포지션을 벗어나 어마어마하게 위로 올라와 있음 \n\n별도의 문제로 보임",
-      "category": "2D 움직임",
+      "description": "6번 항목은 몇번을 해도 오프사이드 상황이 나오지 않아서 검증이 안됨 강제 검증을 위해 상황을 다시 깔아주길 바람",
+      "category": "패스/공격",
       "priority": 3,
-      "reportedAt": "2026-08-24T06:01:28.480Z"
+      "reportedAt": "2026-08-24T12:58:20.243Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -493,18 +543,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 690,
-      "endSecond": 698.800000000002,
+      "startSecond": 1216,
+      "endSecond": 1216,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 814,
-      "endSecond": 815.9000000000004,
+      "startSecond": 1040,
+      "endSecond": 1043.3,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 1406778,
-    "previousSerializedBytes": 459181
+    "currentSerializedBytes": 182967,
+    "previousSerializedBytes": 578068
   }
 }
