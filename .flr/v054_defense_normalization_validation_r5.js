@@ -11,9 +11,9 @@ function forcePossession(m,id,x,y){const p=setLocal(m,id,x,y);E.choiceActionBrid
 {
  const m=E.createMatch('V054-WIDE-MIRROR',{dt:.05});m.time=100;forcePossession(m,'H-LW',80,13);setLocal(m,'A-RB',29,55);setLocal(m,'A-RCM',26,48);setLocal(m,'A-RCB',24,41);setLocal(m,'A-LCB',24,27);T.assign(m);const lock=m._defenceRoleLocks?.AWAY||{};check('LEFT_WIDE_CARRIER_SAME_SIDE_FB_OWNS_PRESS',lock.pressId==='A-RB',lock);
 }
-// Actual protagonist controller path: a user-designated CM must not be tethered body-to-body to central ST.
+// Actual protagonist controller path: a user-designated CM must not be tethered body-to-body to a central ST in the danger area.
 {
- const state=P.create('V054-HERO-CM-ST',{heroPlayerId:'H-CM',mode:'FULL_SKIP',replaySeconds:10}),m=state.m;m.time=100;forcePossession(m,'A-RW',23,55);setLocal(m,'A-ST',19,34);setLocal(m,'H-LCB',14.5,27);setLocal(m,'H-RCB',15,41);setLocal(m,'H-LB',17,10);setLocal(m,'H-RB',17,58);setLocal(m,'H-LCM',27,22);setLocal(m,'H-CM',28,34);setLocal(m,'H-RCM',27,46);
+ const state=P.create('V054-HERO-CM-ST',{heroPlayerId:'H-CM',mode:'FULL_SKIP',replaySeconds:10}),m=state.m;m.time=100;forcePossession(m,'A-RW',82,55);setLocal(m,'A-ST',86,34);setLocal(m,'H-LCB',14.5,27);setLocal(m,'H-RCB',15,41);setLocal(m,'H-LB',17,10);setLocal(m,'H-RB',17,58);setLocal(m,'H-LCM',27,22);setLocal(m,'H-CM',28,34);setLocal(m,'H-RCM',27,46);
  let sticky=0,markFrames=0,minGap=99,rows=[];for(let i=0;i<30;i++){P.step(state,.1);const cm=m.playersById['H-CM'],st=m.playersById['A-ST'];if(cm.markTargetId==='A-ST')markFrames++;const gap=Math.hypot(cm.x-st.x,cm.y-st.y);minGap=Math.min(minGap,gap);if(gap<2.4)sticky++;if(i%5===0)rows.push({t:+m.time.toFixed(2),mark:cm.markTargetId||null,task:cm.tacticalTask,gap:+gap.toFixed(2),cm:L('HOME',cm),st:L('HOME',st)});}
  check('PROTAGONIST_CM_NOT_ASSIGNED_ST_BODY_MARK',markFrames===0,{markFrames,sticky,minGap:+minGap.toFixed(2),rows});
  check('PROTAGONIST_CM_NOT_GLUE_DISTANCE',sticky<=1,{markFrames,sticky,minGap:+minGap.toFixed(2),rows});
