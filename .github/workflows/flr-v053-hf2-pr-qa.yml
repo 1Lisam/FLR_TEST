@@ -1,0 +1,97 @@
+name: FLR V0.5.3 HF2 PR QA
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  hf2-pr-qa:
+    if: github.head_ref == 'test/v053-hf2-visualfix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout HF2 branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/v053-hf2-visualfix
+          fetch-depth: 0
+
+      - name: Verify base game source still matches
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          base=$(git merge-base HEAD origin/main)
+          mapfile -t delta < <(git diff --name-only "$base" origin/main)
+          printf 'main-only delta: %s\n' "${delta[*]:-<none>}"
+          for f in "${delta[@]}"; do
+            case "$f" in
+              .github/workflows/flr-v053-hf2-exact-qa.yml|.github/workflows/flr-v053-hf2-pr-qa.yml) ;;
+              *) echo "Unexpected main-only source delta: $f"; exit 1;;
+            esac
+          done
+
+      - name: Apply HF2 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .flr/apply_v053_hf2_visualfix.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('live_hybrid_session_v02.js'); s=p.read_text(encoding='utf-8')
+          old=" else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';\n else if(role==='GK'"
+          new=" else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';\n else if(role==='CB'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.72&&['DANGEROUS_PASS','BOX_ENTRY','PROGRESS'].includes(e.kind)){const hp=s.spatial?.players?.[hid],bp=s.spatial?.ball,db=hp&&bp?Math.hypot(hp.x-bp.x,hp.y-bp.y):99,active=hp&&((hp.intentKind==='MARK'&&hp.intentTargetId)||hp.intentKind==='PRESS'||(hp.intentKind==='COVER'&&db<=11));if(active&&(s.zone==='BOX'||e.kind==='DANGEROUS_PASS'||s.danger>=.82))reason='DEFENSIVE_INVOLVEMENT';}\n else if(role==='GK'"
+          if old not in s: raise SystemExit('CB promotion marker missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+
+      - name: Syntax and scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in live_hybrid_session_v02.js live_v06_scene_authority_browser.js step71_hybrid_v06_ui.js runtime/tactical_movement.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js; do node --check "$f"; done
+          git diff --check
+          grep -q 'V0.5.3 HF2 TEST' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.3-HF2' step71_hybrid_v06_ui.js
+          grep -q 'umt053h2-' step71_hybrid_v06_ui.js
+          grep -q "reason='DEFENSIVE_INVOLVEMENT'" live_hybrid_session_v02.js
+
+      - name: User visual and core regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .flr/v053_hf2_user_visual_regression.js
+          node .flr/v053_visible_fix_regression.js
+          node .flr/v053_ui_event_e2e_vm.js
+          (cd .flr && node v052_intent_v2_wip_regression.js)
+          (cd .flr && node v053_intent_v2_extended_gate.js)
+          (cd .flr && node intent_v2_wip_long_multicycle_bench.js)
+          (cd .flr && node v053_final_window_continuity_regression.js)
+          (cd .flr && node v053_gk_result_hotfix_regression.js)
+
+      - name: Integrated 4x90 and CB decision survival
+        shell: bash
+        run: |
+          set -euo pipefail
+          for r in ST CM CB GK; do (cd .flr && node v053_integrated_90_role_bench.js "$r"); done
+          python - <<'PY'
+          import json
+          statuses={r:json.load(open(f'.flr/v053_integrated_90_{r}_status.json')) for r in ['ST','CM','CB','GK']}
+          if any(x.get('status')!='PASS' for x in statuses.values()): raise SystemExit('role 90 failure')
+          cb=statuses['CB'].get('summary',{}); windows=(cb.get('boundaryTypes') or {}).get('PROTAGONIST_2D_WINDOW',0); choices=cb.get('choices',0)
+          print({'roleStatus':{k:v.get('status') for k,v in statuses.items()},'cbWindows':windows,'cbChoices':choices,'stChoices':statuses['ST'].get('summary',{}).get('choices')})
+          if windows<1 or choices<1: raise SystemExit('CB protagonist decision survival failure')
+          PY
+
+      - name: Protected invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),P=fs.readFileSync('runtime/protagonist_match_controller.js','utf8'),H=fs.readFileSync('live_hybrid_session_v02.js','utf8'),C=fs.readFileSync('runtime/continuous_match_core.js','utf8'),UI=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          const x={noFuture:P.includes('futureOutcomePrecomputed:false'),exactTarget:P.includes('CHOICE_TARGET_RESOLUTION_MISMATCH'),gkGoal:P.includes("code:'GOAL_CONCEDED'"),finalWindow:H.includes("type:'FINAL_2D_WINDOW'"),cbDecision:H.includes("reason='DEFENSIVE_INVOLVEMENT'"),offsideReview:C.includes("stage:deferredOffside?'CALL_REVIEW':'SETUP'"),devReport:UI.includes("rememberCompletedSituation(latestIntegratedDebug,'DEV_VISUAL')"),devSeed:UI.includes('developerScenarioActive?.seed||`${seed()}-${r.boundary.sceneId}`')}; console.log(x); if(Object.values(x).some(v=>!v))process.exit(1);
+          NODE
