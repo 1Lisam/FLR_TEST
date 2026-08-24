@@ -257,7 +257,7 @@ function candidateIntent(state,players,p,assignments,now){
     const threatEntry=Object.entries(assignments.markerByThreat).find(([,marker])=>marker===p.id);
     if(threatEntry){const threat=players[threatEntry[0]],pp=predicted(threat,.35),goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.2,y:pp.y+(p.slot==='LCB'?-0.7:p.slot==='RCB'?0.7:0)},max=p.role==='CB'?12:14;return{kind:'MARK',target:capAround(base,raw,max),targetId:threat.id,score:.94};}
     const markerEntry=Object.entries(assignments.coverByMarker).find(([,cover])=>cover===p.id);
-    if(markerEntry){const marker=players[markerEntry[0]],goalX=p.team==='HOME'?0:105,raw={x:marker.x+(goalX-marker.x)*.10,y:marker.y+(34-marker.y)*.28};return{kind:'COVER',target:capAround(base,raw,9),targetId:marker.id,score:.87};}
+    if(markerEntry){const marker=players[markerEntry[0]],threat=players[marker?.intentTargetId],goalX=p.team==='HOME'?0:105;if(threat){const dx=goalX-threat.x,dy=34-threat.y,dg=Math.max(.01,Math.hypot(dx,dy)),side=p.slot==='LCB'?-1:p.slot==='RCB'?1:0,raw={x:threat.x+dx/dg*4.8,y:threat.y+dy/dg*4.8+side*1.25};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}const raw={x:marker.x+(goalX-marker.x)*.16,y:marker.y+(34-marker.y)*.32};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}
     if(['CB','FB','CM'].includes(p.role)){
       const goalX=p.team==='HOME'?0:105,blend=p.role==='CM'?.08:.12;return{kind:'COVER',target:{x:base.x+(goalX-base.x)*blend,y:base.y+(34-base.y)*.08},targetId:null,score:.61};
     }
@@ -425,6 +425,21 @@ function resolveBodySeparation(players,minDist=.68){
   }
 }
 
+function resolveOffBallThreatSeparation(state,players){
+  const ownerId=state.ball?.ownerId||null,attackTeam=state.possession;
+  const attackers=Object.values(players).filter(a=>a.team===attackTeam&&a.id!==ownerId&&['ST','WF'].includes(a.role));
+  for(const a of attackers){
+    const near=Object.values(players).filter(d=>d.team!==attackTeam&&d.role!=='GK').map(d=>({d,dist:Math.hypot(d.x-a.x,d.y-a.y),priority:(d.intentKind==='MARK'&&d.intentTargetId===a.id?5:0)+(d.role==='CB'?1.2:d.role==='FB'?.8:0)})).filter(x=>x.dist<5.7).sort((u,v)=>v.priority-u.priority||u.dist-v.dist);
+    if(!near.length)continue;
+    const place=(d,need,sideBias=0)=>{let dx=d.x-a.x,dy=d.y-a.y,dd=Math.hypot(dx,dy);if(dd<.01){const goalX=d.team==='HOME'?0:105;dx=goalX-a.x;dy=(d.slot?.startsWith('L')?-1:1)*2;dd=Math.hypot(dx,dy)||1;}const nx=dx/dd,ny=dy/dd;d.x=clamp(a.x+nx*need,3,102);d.y=clamp(a.y+ny*need+sideBias,3,65);d.intentTargetX=d.x;d.intentTargetY=d.y;d.vx*=.35;d.vy*=.35;};
+    if(near[0].dist<1.30)place(near[0].d,1.35,0);
+    for(let i=1;i<near.length;i++){
+      const z=near[i];if(z.dist>=5.35)continue;const side=z.d.slot==='LCB'||z.d.slot==='LB'?-1:1;place(z.d,5.45,side*.55);
+      if(z.d.intentKind==='MARK'&&z.d.intentTargetId===a.id){z.d.intentKind='COVER';z.d.intentTargetId=null;z.d.intentScore=Math.min(z.d.intentScore||.6,.72);}
+    }
+  }
+}
+
 function advanceV2(state,players,seconds,opts={}){
   // Hybrid time is compressed event time. `seconds` controls how much continuous spatial
   // motion we sample, while clockSeconds advances tactical responsibility/TTL across the
@@ -440,6 +455,8 @@ function advanceV2(state,players,seconds,opts={}){
     for(const p of Object.values(players))steerOne(state,players,p,dt);
     resolveBodySeparation(players,.68);
   }
+  resolveOffBallThreatSeparation(state,players);
+  resolveBodySeparation(players,.68);
   if(state.ball)state.ball.progress=endProgress;
   if(opts.mutateTime!==false)state.second=start+clockSeconds;return{players,switches};
 }

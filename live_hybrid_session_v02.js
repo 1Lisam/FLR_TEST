@@ -108,6 +108,7 @@ function maybeHeroWindow(session,e){const s=session.state,ht=session.opts.heroTe
  }
  else if(role==='CM'&&e.kind.startsWith('TURNOVER')&&s.danger>=.66&&s.ball.lane==='CENTER')reason='DEFENSIVE_TRANSITION';
  else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';
+ else if(role==='CB'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.72&&['DANGEROUS_PASS','BOX_ENTRY','PROGRESS'].includes(e.kind)){const hp=s.spatial?.players?.[hid],bp=s.spatial?.ball,db=hp&&bp?Math.hypot(hp.x-bp.x,hp.y-bp.y):99,active=hp&&((hp.intentKind==='MARK'&&hp.intentTargetId)||hp.intentKind==='PRESS'||(hp.intentKind==='COVER'&&db<=11));if(active&&(s.zone==='BOX'||e.kind==='DANGEROUS_PASS'||s.danger>=.82))reason='DEFENSIVE_INVOLVEMENT';}
  else if(role==='GK'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.60&&['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(e.kind))reason='GK_GOALKEEPING';
  return reason?makeWindow(session,e,reason):null;}
 function doAction(session,policy={},prePromotion=null){const s=session.state,team=s.possession,opp=other(team),tempo=s.teams[team].intent.tempo/100,direct=s.teams[team].intent.directness/100,press=s.teams[opp].intent.press/100;s.counters.actions++;

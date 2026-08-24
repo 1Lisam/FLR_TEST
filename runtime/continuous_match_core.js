@@ -567,9 +567,9 @@ function resolveSpacing(m){
     let dx=b.x-a.x,dy=b.y-a.y;
     // Exact broad-phase: every legal spacing radius is <= 1.18m. If either axis alone is
     // already >= 1.18m, Euclidean distance cannot be inside any collision radius.
-    if(Math.abs(dx)>=1.18||Math.abs(dy)>=1.18)continue;
+    if(Math.abs(dx)>=1.28||Math.abs(dy)>=1.28)continue;
     let d=Math.hypot(dx,dy);const same=a.team===b.team,duel=!same&&ownerId&&((a.id===ownerId&&['ENGAGE','CLOSE_DOWN','PRESS_CONTAIN'].includes(b.tacticalTask||b.action))||(b.id===ownerId&&['ENGAGE','CLOSE_DOWN','PRESS_CONTAIN'].includes(a.tacticalTask||a.action)));
-    const bothBox=insideBox(a)&&insideBox(b),min=a.role==='GK'||b.role==='GK'?0.82:same?(bothBox?1.18:0.88):(duel?1.02:1.05);if(d>=min)continue;
+    const bothBox=insideBox(a)&&insideBox(b),min=a.role==='GK'||b.role==='GK'?0.82:same?(bothBox?1.18:0.88):(duel?1.02:1.24);if(d>=min)continue;
     if(d<0.001){const ang=((hash32(a.id+'|'+b.id)%6283)/1000),eps=0.01;dx=Math.cos(ang)*eps;dy=Math.sin(ang)*eps;d=eps;}
     const n={x:dx/d,y:dy/d};
     if(duel){
@@ -1836,7 +1836,7 @@ function handleOut(m,cross){
   if(last===defendingGoalTeam){const team=other(defendingGoalTeam);m.stats.corners++;event(m,'CORNER',`${teamDisplayName(team)}의 코너킥입니다.`);startDeadRestart(m,'CORNER',team,cross.side==='GOAL_LEFT'?1.2:103.8,cross.y<34?1.2:66.8,cross);}
   else{m.stats.goalKicks++;event(m,'GOAL_KICK',`${teamDisplayName(defendingGoalTeam)}의 골킥입니다.`);startDeadRestart(m,'GOAL_KICK',defendingGoalTeam,defendingGoalTeam===HOME?6:99,34,cross);}
 }
-function startDeadRestart(m,kind,team,x,y,cross=null){consumeCompressedDeadClock(m,kind);for(const p of m.players){p.hasBall=false;p.runUntil=0;p.runType=null;p.pressCommitUntil=0;p.markTargetId=null;p.faceTargetAngle=null;}
+function startDeadRestart(m,kind,team,x,y,cross=null){const deferredOffside=kind==='OFFSIDE';if(!deferredOffside)consumeCompressedDeadClock(m,kind);for(const p of m.players){p.hasBall=false;p.runUntil=0;p.runType=null;p.pressCommitUntil=0;p.markTargetId=null;p.faceTargetAngle=null;}
   // A dead-ball is a new defensive phase. Transition hand-offs and press/mark locks from
   // open play must not survive through the restart setup and reappear after the kick/throw.
   m._transitionWideVacancies={HOME:{},AWAY:{}};m._defenceRoleLocks={};m._markLocks={};
@@ -1848,7 +1848,13 @@ function startDeadRestart(m,kind,team,x,y,cross=null){consumeCompressedDeadClock
     const fromX=Number.isFinite(m.ball?.x)?m.ball.x:x,fromY=Number.isFinite(m.ball?.y)?m.ball.y:y;bx=fromX;by=fromY;
     ballReturn={phase:'OUT_HOLD',startedAt:m.time,holdUntil:m.time+0.28,returnUntil:m.time+1.18,from:{x:fromX,y:fromY},to:{x,y}};
   }
-  m.ball={mode:'DEAD',x:bx,y:by,z:0,vx:0,vy:0,vz:0,ownerId:null,kind,lastTouchTeam:m.lastTouchTeam,lastTouchPlayer:m.lastTouchPlayer};m.ballOwner=null;m.possession=team;m.phase=kind;m.restart={kind,team,x,y,until:m.time+(kind==='THROW_IN'?1.35:0.9),stage:'SETUP',setupStartedAt:m.time,ballReturn};m.nextShape=m.time;if(RESTARTS&&typeof RESTARTS.begin==='function'){const setup=RESTARTS.begin(m);if(kind==='THROW_IN'&&setup?.kickerId&&setup.targets?.[setup.kickerId]){const thrower=playerById(m,setup.kickerId),t=setup.targets[setup.kickerId];if(thrower&&t){thrower.x=t.x;thrower.y=t.y;thrower.vx=thrower.vy=0;thrower.tx=t.x;thrower.ty=t.y;m.ball.x=t.x;m.ball.y=t.y;}}}}
+  m.ball={mode:'DEAD',x:bx,y:by,z:0,vx:0,vy:0,vz:0,ownerId:null,kind,lastTouchTeam:m.lastTouchTeam,lastTouchPlayer:m.lastTouchPlayer};m.ballOwner=null;m.possession=team;m.phase=kind;
+  m.restart={kind,team,x,y,until:m.time+(kind==='THROW_IN'?1.35:0.9),stage:deferredOffside?'CALL_REVIEW':'SETUP',setupStartedAt:m.time,ballReturn,deferredDeadClock:deferredOffside,callReviewUntil:deferredOffside?m.time+1.60:null};m.nextShape=m.time;
+  if(deferredOffside){
+    // Hold the actual positions briefly so the pass/run and referee call are readable before
+    // the dead-clock jump. This is presentation continuity, not delayed result computation.
+    for(const p of m.players){p.tx=p.x;p.ty=p.y;p.vx*=.25;p.vy*=.25;p.action='OFFSIDE_CALL_REVIEW';p.tacticalTask='OFFSIDE_CALL_REVIEW';p.sprint=false;if(Number.isFinite(m.ball.x)&&Number.isFinite(m.ball.y))p.faceTargetAngle=Math.atan2(m.ball.y-p.y,m.ball.x-p.x);}
+  }else if(RESTARTS&&typeof RESTARTS.begin==='function'){const setup=RESTARTS.begin(m);if(kind==='THROW_IN'&&setup?.kickerId&&setup.targets?.[setup.kickerId]){const thrower=playerById(m,setup.kickerId),t=setup.targets[setup.kickerId];if(thrower&&t){thrower.x=t.x;thrower.y=t.y;thrower.vx=thrower.vy=0;thrower.tx=t.x;thrower.ty=t.y;m.ball.x=t.x;m.ball.y=t.y;}}}}
 function updateDeadBallReturn(m,r){
   const br=r?.ballReturn;if(!br)return true;
   if(br.phase==='OUT_HOLD'){if(m.time<br.holdUntil)return false;br.phase='RETURNING';}
@@ -1872,6 +1878,13 @@ function updateDeadBallReturn(m,r){
 }
 function performRestart(m){
   const r=m.restart;if(!r)return false;
+  if(r.kind==='OFFSIDE'&&r.stage==='CALL_REVIEW'){
+    if(m.time<(r.callReviewUntil||m.time))return false;
+    if(r.deferredDeadClock){consumeCompressedDeadClock(m,'OFFSIDE');r.deferredDeadClock=false;}
+    r.stage='SETUP';r.setupStartedAt=m.time;r.until=m.time+.90;
+    r.ballReturn={phase:'OUT_HOLD',startedAt:m.time,holdUntil:m.time+.18,returnUntil:m.time+.92,from:{x:m.ball.x,y:m.ball.y},to:{x:r.x,y:r.y}};
+    if(RESTARTS&&typeof RESTARTS.begin==='function')RESTARTS.begin(m);
+  }
   if(!updateDeadBallReturn(m,r))return false;
   const approachStage=['RUN_UP','APPROACH'].includes(r.stage),ready=approachStage?true:(r.kind==='KICKOFF'?m.time>=r.until:(RESTARTS&&typeof RESTARTS.isReady==='function'?RESTARTS.isReady(m):m.time>=r.until));if(!ready)return false;
   if(r.kind==='KICKOFF'){if(m.ball.mode==='DEAD'||!m.ball.ownerId)placeKickoff(m,r.team);const owner=playerById(m,m.ball.ownerId);if(owner)owner.nextThink=m.time+(owner.role==='GK'?0.70:1.10);m.kickoffBuildUntil=m.time+5.5;m.phase='OPEN_PLAY';m.restart=null;return true;}
@@ -1975,9 +1988,9 @@ function updateLooseChasers(m){
 function maybeOffside(m){
   // Offside position is frozen when the pass is RELEASED. Do not re-evaluate after the runner
   // has moved during the first 0.1s of ball flight.
-  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.age>0.12)return;
+  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.offsideCalled||m.ball.age<0.30||m.ball.age>1.20)return;
   const t=playerById(m,m.ball.intendedReceiverId),source=playerById(m,m.ball.lastTouchPlayer);if(!t||!source||source.team!==t.team)return;
-  if(m.ball.offsideAtRelease===true){m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}
+  if(m.ball.offsideAtRelease===true){m.ball.offsideCalled=true;m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}
 }
 function updatePossessionClock(m,dt){
   if(m.ball.mode==='DEAD'||!m.possession)return;

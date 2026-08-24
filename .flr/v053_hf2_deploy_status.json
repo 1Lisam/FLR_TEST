@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "FLR_V053_HF2_DEPLOY_1.0",
+  "status": "PASS",
+  "checkedAtUtc": "2026-08-24T05:37:19.998750+00:00",
+  "build": "USER-MATCH-TEST-V0.5.3-HF2",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 12257,
+      "sha256": "6606f71dfe653b4d07b06de20e21536e3536ce77dc560c584612757d87b0d25d"
+    },
+    {
+      "path": "live_hybrid_session_v02.js",
+      "bytes": 38829,
+      "sha256": "f170649b725575e529ccd39fb206014bbb1fe831fea96c7809ffdde9d6d3936a"
+    },
+    {
+      "path": "runtime/continuous_match_core.js",
+      "bytes": 238976,
+      "sha256": "279f3568964fac593510c8fa857cbecb02bafb05fd845cfa36e8e97f9f6d58a3"
+    },
+    {
+      "path": "runtime/hybrid_spatial_intent_v2.js",
+      "bytes": 33709,
+      "sha256": "01b79b7b09019759633ff6b4c9a8c74dd9d1bcce2ce233c08c04c8a447ea0f60"
+    },
+    {
+      "path": "runtime/tactical_movement.js",
+      "bytes": 81009,
+      "sha256": "422e394cf1cf62b5ce90a3cc2b4dd877002f49e7796224985edd899b35e7fbca"
+    },
+    {
+      "path": "step71_hybrid_v06_ui.js",
+      "bytes": 62690,
+      "sha256": "ba896728c18a3d5e3ffae297d590fb2919dd0496b22873d50366591b27343cb3"
+    }
+  ],
+  "visualStatus": "PASS",
+  "roles": {
+    "ST": {
+      "status": "PASS",
+      "summary": {
+        "cycles": 38,
+        "choices": 15,
+        "second": 5400,
+        "score": {
+          "HOME": 0,
+          "AWAY": 1
+        },
+        "resumeCount": 38,
+        "boundaryTypes": {
+          "PROTAGONIST_2D_WINDOW": 19,
+          "NON_HERO_SHOT_2D_WINDOW": 12,
+          "SET_PIECE_2D_WINDOW": 6,
+          "FINAL_2D_WINDOW": 1
+        }
+      }
+    },
+    "CM": {
+      "status": "PASS",
+      "summary": {
+        "cycles": 45,
+        "choices": 13,
+        "second": 5400,
+        "score": {
+          "HOME": 1,
+          "AWAY": 0
+        },
+        "resumeCount": 45,
+        "boundaryTypes": {
+          "NON_HERO_SHOT_2D_WINDOW": 23,
+          "PROTAGONIST_2D_WINDOW": 16,
+          "SET_PIECE_2D_WINDOW": 5,
+          "FINAL_2D_WINDOW": 1
+        }
+      }
+    },
+    "CB": {
+      "status": "PASS",
+      "summary": {
+        "cycles": 29,
+        "choices": 3,
+        "second": 5400,
+        "score": {
+          "HOME": 0,
+          "AWAY": 1
+        },
+        "resumeCount": 29,
+        "boundaryTypes": {
+          "NON_HERO_SHOT_2D_WINDOW": 18,
+          "PROTAGONIST_2D_WINDOW": 6,
+          "SET_PIECE_2D_WINDOW": 4,
+          "FINAL_2D_WINDOW": 1
+        }
+      }
+    },
+    "GK": {
+      "status": "PASS",
+      "summary": {
+        "cycles": 42,
+        "choices": 0,
+        "second": 5400,
+        "score": {
+          "HOME": 0,
+          "AWAY": 0
+        },
+        "resumeCount": 42,
+        "boundaryTypes": {
+          "PROTAGONIST_2D_WINDOW": 14,
+          "NON_HERO_SHOT_2D_WINDOW": 21,
+          "SET_PIECE_2D_WINDOW": 6,
+          "FINAL_2D_WINDOW": 1
+        }
+      }
+    }
+  },
+  "watch": [
+    "ST choice pace increased versus V24 reference; no quota adjustment applied.",
+    "Historical 10-minute every-session >=2 handoff gate remains WATCH, not a scene quota."
+  ],
+  "futureOutcomePrecomputed": false
+}
