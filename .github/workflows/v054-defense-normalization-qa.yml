@@ -1,0 +1,68 @@
+name: FLR V0.5.4 Defence Normalization QA
+
+on:
+  push:
+    branches: [test/v054-defense-normalization]
+    paths:
+      - '.flr/v054-qa-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/v054-defense-normalization
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Apply defence normalization
+        run: |
+          python .flr/v054_defense_normalization.py
+          python .flr/v054_defense_normalization_cm_guard.py
+
+      - name: Syntax check
+        run: |
+          node --check runtime/tactical_movement.js
+          node --check runtime/hybrid_spatial_intent_v2.js
+          node --check live_hybrid_session_v02.js
+          node --check live_v06_scene_authority_browser.js
+          node --check .flr/v054_defense_normalization_regression.js
+
+      - name: Targeted defence regression
+        run: node .flr/v054_defense_normalization_regression.js
+
+      - name: Core runtime multi-seed smoke
+        run: |
+          node - <<'NODE'
+          const E=require('./runtime/continuous_match_core.js');
+          const seeds=['V054-SMOKE-01','V054-SMOKE-02','V054-SMOKE-03','DEV-RECENT-1787573272419-1','DEV-RECENT-1787575663982-11'];
+          const out=[];
+          for(const seed of seeds){
+            const r=E.runToEnd(seed,{dt:.05});
+            const s=r.snapshot;
+            const finite=s.players.every(p=>[p.x,p.y,p.tx,p.ty].every(Number.isFinite));
+            if(!s.completed||s.players.length!==22||!finite)throw new Error(`smoke failed ${seed}`);
+            out.push({seed,score:s.score,passes:s.stats.passes,shots:s.stats.shots,completed:s.completed,players:s.players.length});
+          }
+          require('fs').writeFileSync('.flr/v054_core_smoke_status.json',JSON.stringify({status:'PASS',out},null,2)+'\n');
+          console.log(JSON.stringify(out,null,2));
+          NODE
+
+      - name: Commit materialized candidate and QA evidence
+        run: |
+          git config user.name 'FLR V054 QA Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add runtime/tactical_movement.js runtime/hybrid_spatial_intent_v2.js live_hybrid_session_v02.js live_v06_scene_authority_browser.js .flr/v054_defense_normalization_regression_status.json .flr/v054_core_smoke_status.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Materialize V0.5.4 defence normalization candidate'
+          git push origin HEAD:test/v054-defense-normalization
