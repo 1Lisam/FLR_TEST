@@ -1,0 +1,137 @@
+name: FLR User Match Test V0.5.3 one-time deploy
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-v053-one-time-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.5.3'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Guard deployed V0.5.2 game baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --quiet b42a08803e7b53f0b374ce9bb1a3ab4689a78124 -- \
+            index.html \
+            live_hybrid_session_v02.js \
+            live_v06_scene_authority_browser.js \
+            runtime/hybrid_spatial_intent_v2.js \
+            runtime/protagonist_match_controller.js \
+            step71_hybrid_v06_ui.js || {
+              echo 'GAME_BASELINE_CHANGED_AFTER_V052_DEPLOY'
+              git diff --stat b42a08803e7b53f0b374ce9bb1a3ab4689a78124 -- \
+                index.html live_hybrid_session_v02.js live_v06_scene_authority_browser.js \
+                runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js step71_hybrid_v06_ui.js
+              exit 1
+            }
+
+      - name: Checkout staged validated V0.5.3 payload
+        uses: actions/checkout@v4
+        with:
+          ref: automation/tt-deploy
+          path: _incoming
+          fetch-depth: 1
+
+      - name: Assemble and verify exact V0.5.3 files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+
+          specs = [
+            ('index.html', ['.flr/v053_payload/index.html.part00'], 'd03d47333ed1370bdd753ad0e9616df505224acb06bf70b18dcdb1fe16c1d23f'),
+            ('live_hybrid_session_v02.js', [
+              '.flr/v053_payload/small/live_hybrid_session_v02.js.p00',
+              '.flr/v053_payload/small/live_hybrid_session_v02.js.p01',
+              '.flr/v053_payload/small/live_hybrid_session_v02.js.p02'],
+              '4ca3856fa994cc18401de1072a04063235f4195d493bf010e39feeb73bc8541e'),
+            ('live_v06_scene_authority_browser.js', [
+              '.flr/v053_payload/small/live_v06_scene_authority_browser.js.p00',
+              '.flr/v053_payload/small/live_v06_scene_authority_browser.js.p01'],
+              'ff3e7f660513af20cbc7cd93fa53c1e15c6cb5970be3abd125fd5c192b1a7798'),
+            ('runtime/hybrid_spatial_intent_v2.js', [
+              '.flr/v053_payload/small/runtime__hybrid_spatial_intent_v2.js.p00',
+              '.flr/v053_payload/small/runtime__hybrid_spatial_intent_v2.js.p01'],
+              'ebaf882d3b2bd2edc11d575430b4a930cbaa4164a2d38d2e636b5b7269d512e8'),
+            ('runtime/protagonist_match_controller.js', [
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p00x0',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p00x1',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p00x2',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p01',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p02',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p03',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p04',
+              '.flr/v053_payload/small/runtime__protagonist_match_controller.js.p05'],
+              '572fe690129d0a8866720f5e2f850aa002b6ad12bdeebc8303c94e083cd4180f'),
+            ('step71_hybrid_v06_ui.js', [
+              '.flr/v053_payload/small/step71_hybrid_v06_ui.js.p00',
+              '.flr/v053_payload/small/step71_hybrid_v06_ui.js.p01',
+              '.flr/v053_payload/small/step71_hybrid_v06_ui.js.p02',
+              '.flr/v053_payload/small/step71_hybrid_v06_ui.js.p03'],
+              '1618b32c49bca7f9df527e08a11adb5b1f150c645f216d3bd14309f04f3eae4a'),
+          ]
+
+          root = Path('_incoming')
+          for dest, parts, expected in specs:
+              missing = [str(root / p) for p in parts if not (root / p).is_file()]
+              if missing:
+                  raise SystemExit('MISSING_PARTS ' + ','.join(missing))
+              data = b''.join((root / p).read_bytes() for p in parts)
+              actual = hashlib.sha256(data).hexdigest()
+              print(dest, len(data), actual)
+              if actual != expected:
+                  raise SystemExit(f'SHA256_MISMATCH {dest} expected={expected} actual={actual}')
+              out = Path(dest)
+              out.parent.mkdir(parents=True, exist_ok=True)
+              out.write_bytes(data)
+          PY
+          rm -rf _incoming
+
+      - name: V0.5.3 syntax and report identity checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check live_hybrid_session_v02.js
+          node --check live_v06_scene_authority_browser.js
+          node --check runtime/hybrid_spatial_intent_v2.js
+          node --check runtime/protagonist_match_controller.js
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'Match Engine User Test V0.5.3' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.3' step71_hybrid_v06_ui.js
+          grep -q 'umt053-' step71_hybrid_v06_ui.js
+          grep -q 'issueCreated!==false' step71_hybrid_v06_ui.js
+          ! grep -q 'USER-MATCH-TEST-V0.5.2' step71_hybrid_v06_ui.js
+
+      - name: Commit exact V0.5.3 user-test build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR Test Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            index.html \
+            live_hybrid_session_v02.js \
+            live_v06_scene_authority_browser.js \
+            runtime/hybrid_spatial_intent_v2.js \
+            runtime/protagonist_match_controller.js \
+            step71_hybrid_v06_ui.js
+          git diff --cached --quiet && { echo 'NO_V053_CHANGES'; exit 1; }
+          git commit -m 'Deploy Match Engine User Test V0.5.3 visible fixes'
+          git push origin main
