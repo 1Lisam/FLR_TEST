@@ -1,6 +1,6 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "V0.5.4-DEFENCE-NORMALIZATION-R7",
+  "version": "V0.5.4-DEFENCE-NORMALIZATION-R8",
   "candidateBranch": "test/v054-defense-normalization",
   "baselineRef": "8965e9eb026d317be95db14bf8e80a135e6aef56",
   "applyScripts": [
@@ -24,6 +24,6 @@
     "live_hybrid_session_v02.js",
     "live_v06_scene_authority_browser.js"
   ],
-  "resultDir": ".flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R7",
-  "runNonce": "2026-08-24T23:05+09:00-r7-exact-failed-check-diagnostic"
+  "resultDir": ".flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R8",
+  "runNonce": "2026-08-24T23:08+09:00-r8-wrapper-status-fix"
 }
