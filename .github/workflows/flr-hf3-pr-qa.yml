@@ -25,6 +25,7 @@ jobs:
           set -euo pipefail
           python .flr/v053_hf3_apply_v2.py
           python .flr/v053_hf3_tune_v3.py
+          python .flr/v053_hf3_tune_v4.py
 
       - name: Syntax and source invariants
         shell: bash
@@ -33,24 +34,16 @@ jobs:
           node --check runtime/tactical_movement.js
           node --check runtime/continuous_match_core.js
           node --check live_v06_scene_authority_browser.js
+          node --check step71_hybrid_v06_ui.js
           grep -q 'stabilizeDefensiveResponsibilities' runtime/tactical_movement.js
+          grep -q 'laneTy' runtime/tactical_movement.js
           grep -q 'o.l.x<=52' runtime/tactical_movement.js
           grep -q 'recentShieldScan' runtime/continuous_match_core.js
           grep -q 'involvementGap' runtime/continuous_match_core.js
           grep -q 'runDeveloperVisualWindow' live_v06_scene_authority_browser.js
+          grep -q 'A.runDeveloperVisualWindow' step71_hybrid_v06_ui.js
           grep -q 'futureOutcomePrecomputed:false' live_hybrid_session_v02.js
           grep -q 'GITHUB_REPO = "FLR_TEST"' bug-report-worker/wrangler.toml
-
-      - name: Diagnose current visual dev function
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          s=Path('step71_hybrid_v06_ui.js').read_text(encoding='utf-8')
-          a=s.find('function runDeveloperVisualScenario')
-          b=s.find('function runRecentFixScenario',a)
-          print(s[a:b])
-          PY
 
       - name: Core runtime smoke
         shell: bash
