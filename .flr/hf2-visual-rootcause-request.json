@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "FLR_HF2_VISUAL_ROOTCAUSE_REQUEST_1.0",
+  "requestedAt": "2026-08-24T15:12:00+09:00",
+  "build": "USER-MATCH-TEST-V0.5.3-HF2",
+  "purpose": "Analyze seven exact HF2 failure bundles to explain visual FAIL despite numerical QA PASS"
+}
