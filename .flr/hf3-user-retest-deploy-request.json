@@ -1,0 +1,6 @@
+{
+  "candidateCommit": "302ce1aed74d55b9fc1282e54b4e0176bfd98c84",
+  "hf3QaRunId": 32720151086,
+  "expectedStatus": "PASS",
+  "purpose": "Deploy V0.5.3 HF3 to the FLR user test page while preserving the lower forced-scenario tester and visible seeds."
+}
