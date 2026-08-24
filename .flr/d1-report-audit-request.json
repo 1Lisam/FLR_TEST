@@ -1,8 +1,8 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.1",
-  "build": "USER-MATCH-TEST-V0.5.3-HF2",
+  "build": "USER-MATCH-TEST-V0.5.3-HF3",
   "limit": 50,
-  "requestedAt": "2026-08-24T15:01:00+09:00",
-  "purpose": "Inspect exact HF2 user report umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4 after user visual FAIL; confirm D1/R2 storage and attached debug/seed. Inspection only; no engine changes.",
-  "runNonce": "hf2-user-fail-umt053h2-8390c662-20260824-1501"
+  "requestedAt": "2026-08-24T22:02:00+09:00",
+  "purpose": "Inspect all recent HF3 user bug reports after full defensive visual FAIL. Recover report IDs, descriptions, categories, priorities, seeds and attached bundles. Inspection only; no engine changes.",
+  "runNonce": "hf3-user-defence-fail-batch-20260824-2202"
 }
