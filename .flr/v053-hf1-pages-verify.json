@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "FLR_V053_HF1_PAGES_VERIFY_1.0",
+  "status": "PASS",
+  "url": "https://1lisam.github.io/FLR_TEST/",
+  "checks": {
+    "pageVersionHF1": true,
+    "fiveItemSelector": true,
+    "reportBuildHF1": true,
+    "reportPrefixHF1": true,
+    "gkGoalConceded": true,
+    "gkScenario": true
+  },
+  "sha256": {
+    "index": "ee287f600a8087b345e88285bb034e713b546520635d8ee5495d7a79fc085e9e",
+    "ui": "5f4f33c32cda44664f43dfc1186574f220d0b4acc02ce9558244423f754d5d8f",
+    "controller": "b6588ff3615cc0fa7a67180c1e3de9d20ec8294e1ca88c683a75d12041b3d09b",
+    "live": "f21479597f6b1a4dd2f925ebe67c30241c236ace5c2682bcc532b6dcd654ded7"
+  }
+}
