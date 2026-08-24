@@ -92,8 +92,7 @@ function meaningfulFlips(rows,id){
   };
 }
 function run(key,seed,ids,seconds=9){
-  const d=H.createDeveloperScenario({key,seed});const env=A.seedMatch(d.boundary,{runtimeDir,seed:d.seed,explicitHeroChoiceRequired:false});env.state.mode='FULL_SKIP';
-  const rows=[E.snapshot(env.state.m)];for(let i=0;i<Math.round(seconds/.1)&&!env.state.m.completed;i++){P.step(env.state,.1);rows.push(E.snapshot(env.state.m));}
+  const d=H.createDeveloperScenario({key,seed});const v=A.runDeveloperVisualWindow(d.boundary,{runtimeDir,seed:d.seed,durationSeconds:seconds});const rows=v.frames;
   const result={key,seed,players:{}};
   for(const id of ids){
     const raw=[];let lastSign=0,lastMove=null;
