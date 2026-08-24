@@ -7,31 +7,40 @@ const P=require('../runtime/protagonist_match_controller.js');
 const runtimeDir=path.resolve(__dirname,'../runtime');
 const byId=(f,id)=>(f.players||[]).find(p=>p.id===id)||null;
 const n2=v=>Number.isFinite(Number(v))?+Number(v).toFixed(2):null;
+function phaseRuns(rows,id){
+  const phases=[];let cur=null;
+  for(let i=1;i<rows.length;i++){
+    const a=byId(rows[i-1],id),b=byId(rows[i],id);if(!a||!b)continue;
+    const dy=b.y-a.y;if(Math.abs(dy)<.025)continue;const sign=dy>0?1:-1;
+    if(!cur||cur.sign!==sign){if(cur)phases.push(cur);cur={sign,start:rows[i-1].time,end:rows[i].time,travel:Math.abs(dy),samples:1,startY:a.y,endY:b.y,tasks:new Set([b.tacticalTask||b.action||'']),owners:new Set([rows[i].ball?.ownerId||'FLIGHT'])};}
+    else{cur.end=rows[i].time;cur.travel+=Math.abs(dy);cur.samples++;cur.endY=b.y;cur.tasks.add(b.tacticalTask||b.action||'');cur.owners.add(rows[i].ball?.ownerId||'FLIGHT');}
+  }
+  if(cur)phases.push(cur);
+  return phases.map(p=>({...p,start:n2(p.start),end:n2(p.end),travel:+p.travel.toFixed(3),startY:+p.startY.toFixed(3),endY:+p.endY.toFixed(3),tasks:[...p.tasks],owners:[...p.owners]}));
+}
+function meaningfulFlips(rows,id){
+  const ph=phaseRuns(rows,id),flips=[];
+  for(let i=1;i<ph.length;i++){const a=ph[i-1],b=ph[i];if(a.travel>=.34&&b.travel>=.34&&a.samples>=2&&b.samples>=2)flips.push({at:b.start,from:a,to:b});}
+  return{count:flips.length,phases:ph,flips};
+}
 function run(key,seed,ids,seconds=9){
-  const d=H.createDeveloperScenario({key,seed});
-  const env=A.seedMatch(d.boundary,{runtimeDir,seed:d.seed,explicitHeroChoiceRequired:false});
-  env.state.mode='FULL_SKIP';
-  const rows=[E.snapshot(env.state.m)];
-  for(let i=0;i<Math.round(seconds/.1)&&!env.state.m.completed;i++){P.step(env.state,.1);rows.push(E.snapshot(env.state.m));}
+  const d=H.createDeveloperScenario({key,seed});const env=A.seedMatch(d.boundary,{runtimeDir,seed:d.seed,explicitHeroChoiceRequired:false});env.state.mode='FULL_SKIP';
+  const rows=[E.snapshot(env.state.m)];for(let i=0;i<Math.round(seconds/.1)&&!env.state.m.completed;i++){P.step(env.state,.1);rows.push(E.snapshot(env.state.m));}
   const result={key,seed,players:{}};
   for(const id of ids){
-    const flips=[];let lastSign=0,lastMove=null;
+    const raw=[];let lastSign=0,lastMove=null;
     for(let i=1;i<rows.length;i++){
-      const fa=rows[i-1],fb=rows[i],a=byId(fa,id),b=byId(fb,id);if(!a||!b)continue;
-      const dy=b.y-a.y;if(Math.abs(dy)<.06)continue;
-      const sign=dy>0?1:-1;
-      if(lastSign&&sign!==lastSign){
-        flips.push({t:n2(fb.time),dy:+dy.toFixed(3),fromSign:lastSign,toSign:sign,task:b.tacticalTask||b.action||null,mark:b.markTargetId||null,x:n2(b.x),y:n2(b.y),tx:n2(b.tx),ty:n2(b.ty),ballOwner:fb.ball?.ownerId||null,ballX:n2(fb.ball?.x),ballY:n2(fb.ball?.y),prevMove:lastMove});
-      }
+      const fa=rows[i-1],fb=rows[i],a=byId(fa,id),b=byId(fb,id);if(!a||!b)continue;const dy=b.y-a.y;if(Math.abs(dy)<.06)continue;const sign=dy>0?1:-1;
+      if(lastSign&&sign!==lastSign)raw.push({t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,mark:b.markTargetId||null,x:n2(b.x),y:n2(b.y),tx:n2(b.tx),ty:n2(b.ty),ballOwner:fb.ball?.ownerId||null,ballX:n2(fb.ball?.x),ballY:n2(fb.ball?.y),prevMove:lastMove});
       lastSign=sign;lastMove={t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,tx:n2(b.tx),ty:n2(b.ty)};
     }
-    result.players[id]={flipCount:flips.length,flips};
+    const meaningful=meaningfulFlips(rows,id);result.players[id]={rawFlipCount:raw.length,meaningfulFlipCount:meaningful.count,rawFlips:raw,meaningfulFlips:meaningful.flips,phases:meaningful.phases};
   }
   return result;
 }
 const out=[
- run('BALL_DEPTH_SYNC','DEV-RECENT-1787550734911-1',['H-ST','A-LB','A-RB']),
- run('BALL_DEPTH_SYNC','DEV-RECENT-1787550810767-13',['H-RW','A-LB','A-RB']),
- run('CM_SUPPORT_SPREAD','DEV-RECENT-1787550909999-20',['A-LB','A-LCB','A-RB','A-LCM','A-RCM'])
+ run('BALL_DEPTH_SYNC','DEV-RECENT-1787550734911-1',['H-ST','H-RW','A-LB','A-LCB','A-RCB','A-RB']),
+ run('BALL_DEPTH_SYNC','DEV-RECENT-1787550810767-13',['H-ST','H-RW','A-LB','A-LCB','A-RCB','A-RB']),
+ run('CM_SUPPORT_SPREAD','DEV-RECENT-1787550909999-20',['A-LB','A-LCB','A-RCB','A-RB','A-LCM','A-CM','A-RCM'])
 ];
 console.log(JSON.stringify(out,null,2));
