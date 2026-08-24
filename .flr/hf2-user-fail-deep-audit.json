@@ -1,0 +1,5869 @@
+{
+  "schemaVersion": "FLR_HF2_USER_FAIL_DEEP_AUDIT_1.0",
+  "status": "PASS",
+  "build": "USER-MATCH-TEST-V0.5.3-HF2",
+  "reportCount": 7,
+  "reports": [
+    {
+      "reportId": "umt053h2-0098b8c8-46ba-470e-be72-51f831b74798",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "검증 완료: 공 위치-공격수 거리 동기화 · seed=DEV-RECENT-1787550734911-1\n\n공격수가 공을 잡은채로 멈춰있고 수비수는 거기에 접근해서 아무것도 안하고 비비기만 하는 상황\n\n원래 검증과는 별개로 이런 문제가 발생함",
+      "seeds": [
+        "DEV-RECENT-1787550734911-1"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-0098b8c8-46ba-470e-be72-51f831b74798",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "검증 완료: 공 위치-공격수 거리 동기화 · seed=DEV-RECENT-1787550734911-1\n\n공격수가 공을 잡은채로 멈춰있고 수비수는 거기에 접근해서 아무것도 안하고 비비기만 하는 상황\n\n원래 검증과는 별개로 이런 문제가 발생함",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T05:53:06.592Z"
+      },
+      "currentReportScope": {
+        "startSecond": 1133,
+        "endSecond": 1141.9999999999918,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": null,
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": null,
+      "actualResult": null,
+      "boundary": {
+        "id": "DEV-BALL_DEPTH_SYNC-28fa1315",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-BALL_DEPTH_SYNC-28fa1315",
+        "atSecond": 1133,
+        "sourceEventId": "E00001",
+        "reason": "ATTACKING_INVOLVEMENT",
+        "heroPlayerId": "H-ST",
+        "heroRole": "ST",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 1133,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "HOME",
+          "zone": "MIDFIELD",
+          "phase": "PROGRESSION",
+          "danger": 0.4203733947873115,
+          "ball": {
+            "team": "HOME",
+            "lane": "LEFT",
+            "progress": 0.6190284621642268,
+            "ownerId": "H-LB"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 46.24168405774981,
+              "lineHeight": 47.21210250072181,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 46.24432164011523,
+              "lineHeight": 47.27671406790614,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 1133,
+            "source": "HYBRID_INTENT_V2_WIP",
+            "lastBallProgress": 0.6190284621642268,
+            "lastPossession": "HOME",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 7.592156165189232,
+                "y": 34,
+                "vx": 2.6285264062594687,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 10.432459865827113,
+                "intentTargetY": 34,
+                "intentSince": 1131,
+                "intentMinUntil": 1131,
+                "intentScore": 0.6,
+                "intentMaxUntil": 1136,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 58.172988527243824,
+                "y": 18,
+                "vx": 6.545454545454546,
+                "vy": 0,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 67.03662489088019,
+                "intentTargetY": 18,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.95,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 23.906963939959212,
+                "y": 25.21590705742873,
+                "vx": 2.9818521710043093,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 26.432459865827113,
+                "intentTargetY": 25.21590705742873,
+                "intentSince": 1131,
+                "intentMinUntil": 1131,
+                "intentScore": 0.43,
+                "intentMaxUntil": 1136,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 23.906963939959212,
+                "y": 40.86409294257127,
+                "vx": 2.9818521710043093,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 26.432459865827113,
+                "intentTargetY": 40.86409294257127,
+                "intentSince": 1131,
+                "intentMinUntil": 1131,
+                "intentScore": 0.43,
+                "intentMaxUntil": 1136,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 28.44387819360737,
+                "y": 50.49279459613867,
+                "vx": 5.293843650821714,
+                "vy": -3.398546861107584,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 32.64183164996698,
+                "intentTargetY": 48.83721542681975,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 52.882043232020806,
+                "y": 19.20516333732265,
+                "vx": 6.25433147221079,
+                "vy": -1.6759944960391173,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 61.42811495198728,
+                "intentTargetY": 16.96674570336014,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.78,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 47.77204920620202,
+                "y": 31.951481927402966,
+                "vx": 2.372078200537815,
+                "vy": -0.91579298529715,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 48.005382777898376,
+                "intentTargetY": 31.666761319983593,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.9,
+                "intentScore": 0.84,
+                "intentMaxUntil": 1136.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 51.60230403504742,
+                "y": 45.488938407899234,
+                "vx": 6.469550767986329,
+                "vy": 0.2699834934639417,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 60.80118496071687,
+                "intentTargetY": 45.85491919615984,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.73,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 66.84759521011947,
+                "y": 10.661526614091427,
+                "vx": -0.14349949291983766,
+                "vy": -0.04175050479933682,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 66.73395246289927,
+                "intentTargetY": 10.62846278949745,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 75.75625161531224,
+                "y": 32.09847776354625,
+                "vx": 5.715992254445987,
+                "vy": -2.5306538187234535,
+                "intentKind": "RUN",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 77.03662489088019,
+                "intentTargetY": 30.54,
+                "intentSince": 1132.5,
+                "intentMinUntil": 1135.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 1138,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 68.72695202530522,
+                "y": 49.19417145695061,
+                "vx": 1.7324976941923265,
+                "vy": -6.767714157352603,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 69.20644546776848,
+                "intentTargetY": 47.3211100556025,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 100.38559778221892,
+                "y": 34,
+                "vx": 1.0271649940927041,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 101,
+                "intentTargetY": 34,
+                "intentSince": 1131,
+                "intentMinUntil": 1131,
+                "intentScore": 0.6,
+                "intentMaxUntil": 1136,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 74.86526020883903,
+                "y": 51.47067558925286,
+                "vx": -4.846676041431017,
+                "vy": -2.7733910996490785,
+                "intentKind": "MARK",
+                "intentTargetId": "H-RW",
+                "intentTargetX": 71.27725486641279,
+                "intentTargetY": 50.725028657735706,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1134.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 1137,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 79.6346722261273,
+                "y": 35.013060058049334,
+                "vx": -2.00610473716081,
+                "vy": -5.246771968414456,
+                "intentKind": "MARK",
+                "intentTargetId": "H-ST",
+                "intentTargetX": 77.79621109162204,
+                "intentTargetY": 32.889643548164564,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1134.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 1137,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 80.43439636804615,
+                "y": 29.852505361595863,
+                "vx": -0.44268928958160825,
+                "vy": 1.7273263216770396,
+                "intentKind": "COVER",
+                "intentTargetId": "A-LCB",
+                "intentTargetX": 80.43439636804615,
+                "intentTargetY": 29.852505361595863,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.9,
+                "intentScore": 0.87,
+                "intentMaxUntil": 1136.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 73.50339416169354,
+                "y": 11.101846878228036,
+                "vx": -5.650413375866113,
+                "vy": -0.6466943531009298,
+                "intentKind": "MARK",
+                "intentTargetId": "H-LW",
+                "intentTargetX": 70.30337068998158,
+                "intentTargetY": 10.816228201186401,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1134.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 1137,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 64.85383017325684,
+                "y": 42.76107710457728,
+                "vx": 5.625208453422297,
+                "vy": -0.4054612356354837,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 67.34748617710993,
+                "intentTargetY": 42.716632783954445,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 1136.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 65.26229716591871,
+                "y": 32.22574063662303,
+                "vx": 5.583660680551737,
+                "vy": 0.08114821706242202,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 67.71548617710994,
+                "intentTargetY": 32.233599999999996,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 1136.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 58.036305694034034,
+                "y": 18.704975481161092,
+                "vx": -0.6723063469103192,
+                "vy": -1.2330597340874467,
+                "intentKind": "PRESS",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 57.58662489088019,
+                "intentTargetY": 18,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1132.7,
+                "intentScore": 1,
+                "intentMaxUntil": 1134.3,
+                "sourceTask": "HYBRID_PRESS",
+                "lastPossession": "HOME"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 42.19275180005752,
+                "y": 53.24140158251673,
+                "vx": 3.387397158786011,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 44.47335454033688,
+                "intentTargetY": 53.24140158251673,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 37.556977748025744,
+                "y": 32.08,
+                "vx": 3.328905572360167,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 39.87335454033689,
+                "intentTargetY": 32.08,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 43.592751800057506,
+                "y": 10.918598417483267,
+                "vx": 3.3873971587860074,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 45.87335454033688,
+                "intentTargetY": 10.918598417483267,
+                "intentSince": 1131.5,
+                "intentMinUntil": 1133.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 1136,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              }
+            },
+            "ball": {
+              "x": 58.172988527243824,
+              "y": 18,
+              "ownerId": "H-LB"
+            },
+            "abstractProgressBefore": 0.8114868255448529,
+            "spatialProgress": 0.5540284621642269,
+            "progressGapBefore": 0.257458363380626,
+            "progressReconciled": 0.6190284621642268
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 1133,
+            "minute": 18.88,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "MIDFIELD",
+            "phase": "PROGRESSION",
+            "detail": {
+              "scenario": "BALL_DEPTH_SYNC",
+              "label": "공 위치-공격수 거리 동기화",
+              "ownerId": "H-LB",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "HOME",
+              "danger": 0.42,
+              "ball": {
+                "team": "HOME",
+                "lane": "LEFT",
+                "progress": 0.6190284621642268,
+                "ownerId": "H-LB"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 46.24168405774981,
+                  "lineHeight": 47.21210250072181,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 46.24432164011523,
+                  "lineHeight": 47.27671406790614,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "BALL_DEPTH_SYNC",
+          "label": "공 위치-공격수 거리 동기화",
+          "instruction": "LB가 아직 중원에 있을 때 ST/RW가 골키퍼 옆까지 먼저 달아나지 않는지 확인하세요.",
+          "seed": "DEV-RECENT-1787550734911-1",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 1133,
+        "lastTime": 1141.9999999999918,
+        "minOpponentDistance": 0.718,
+        "minSameTeamDistance": 0.88,
+        "maxPlayersWithin3mOfBall": 3,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 3.3,
+        "topLateralJitter": [
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 4,
+            "totalMove": 34.411
+          },
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 24.937
+          },
+          {
+            "id": "A-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 22.392
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 4,
+            "totalMove": 20.167
+          },
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 4,
+            "totalMove": 6.818
+          },
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 33.651
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 39.693
+          },
+          {
+            "id": "A-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 29.848
+          }
+        ],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              100.386,
+              34.0
+            ],
+            "last": [
+              98.636,
+              33.824
+            ],
+            "xRange": 2.24,
+            "yRange": 3.462
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              74.865,
+              51.471
+            ],
+            "last": [
+              83.447,
+              61.062
+            ],
+            "xRange": 10.266,
+            "yRange": 15.857
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              79.635,
+              35.013
+            ],
+            "last": [
+              78.257,
+              33.089
+            ],
+            "xRange": 2.159,
+            "yRange": 10.08
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              80.434,
+              29.853
+            ],
+            "last": [
+              79.325,
+              31.902
+            ],
+            "xRange": 2.256,
+            "yRange": 6.274
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              73.503,
+              11.102
+            ],
+            "last": [
+              83.994,
+              21.4
+            ],
+            "xRange": 12.659,
+            "yRange": 11.034
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              64.854,
+              42.761
+            ],
+            "last": [
+              71.68,
+              40.806
+            ],
+            "xRange": 10.165,
+            "yRange": 4.744
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              65.262,
+              32.226
+            ],
+            "last": [
+              71.913,
+              34.15
+            ],
+            "xRange": 8.552,
+            "yRange": 9.397
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              58.036,
+              18.705
+            ],
+            "last": [
+              69.87,
+              26.868
+            ],
+            "xRange": 12.939,
+            "yRange": 10.233
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.193,
+              53.241
+            ],
+            "last": [
+              52.554,
+              54.806
+            ],
+            "xRange": 10.434,
+            "yRange": 5.606
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              37.557,
+              32.08
+            ],
+            "last": [
+              50.554,
+              33.848
+            ],
+            "xRange": 13.056,
+            "yRange": 3.882
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              43.593,
+              10.919
+            ],
+            "last": [
+              52.554,
+              12.707
+            ],
+            "xRange": 9.034,
+            "yRange": 5.966
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 1408099,
+      "previousPresent": false
+    },
+    {
+      "reportId": "umt053h2-333ca294-e134-4bce-966f-c1a342f6336e",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "검증 완료: 공 위치-공격수 거리 동기화 · seed=DEV-RECENT-1787550810767-13\n\n여러개를 시험해 봤으나 우리가 검증하려는 목적인 LB가 중원에 있는데 ST와 RW가 골키퍼 앞에 나가는건 고쳐졌으나 여전히 공격수 앞에서 CB 등 수비수들이 시선 고정이 안된 채 좌우로 덜덜 떨고 있는 현상과 공격수가 프리징 되는 현상이 발생함",
+      "seeds": [
+        "DEV-RECENT-1787550810767-13",
+        "DEV-RECENT-1787550824847-14"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-333ca294-e134-4bce-966f-c1a342f6336e",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "검증 완료: 공 위치-공격수 거리 동기화 · seed=DEV-RECENT-1787550810767-13\n\n여러개를 시험해 봤으나 우리가 검증하려는 목적인 LB가 중원에 있는데 ST와 RW가 골키퍼 앞에 나가는건 고쳐졌으나 여전히 공격수 앞에서 CB 등 수비수들이 시선 고정이 안된 채 좌우로 덜덜 떨고 있는 현상과 공격수가 프리징 되는 현상이 발생함",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T05:54:34.599Z"
+      },
+      "currentReportScope": {
+        "startSecond": 949,
+        "endSecond": 958.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": {
+        "startSecond": 1307,
+        "endSecond": 1315.9999999999918,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": null,
+      "actualResult": null,
+      "boundary": {
+        "id": "DEV-BALL_DEPTH_SYNC-7c480baf",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-BALL_DEPTH_SYNC-7c480baf",
+        "atSecond": 949,
+        "sourceEventId": "E00001",
+        "reason": "ATTACKING_INVOLVEMENT",
+        "heroPlayerId": "H-ST",
+        "heroRole": "ST",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 949,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "HOME",
+          "zone": "MIDFIELD",
+          "phase": "PROGRESSION",
+          "danger": 0.5314704925566911,
+          "ball": {
+            "team": "HOME",
+            "lane": "LEFT",
+            "progress": 0.6016924873287681,
+            "ownerId": "H-LB"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 53.91314486972988,
+              "lineHeight": 53.97428616322577,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 54.5407974650152,
+              "lineHeight": 53.78889172524214,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 949,
+            "source": "HYBRID_INTENT_V2_WIP",
+            "lastBallProgress": 0.6016924873287681,
+            "lastPossession": "HOME",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 7.82473003218983,
+                "y": 34,
+                "vx": 2.5229898263896113,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 10.451231178781017,
+                "intentTargetY": 34,
+                "intentSince": 947,
+                "intentMinUntil": 947,
+                "intentScore": 0.6,
+                "intentMaxUntil": 952,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 56.35271116952065,
+                "y": 17.832425021725932,
+                "vx": 4.472483729026422,
+                "vy": -1.9829771492320711,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 65.3915275848587,
+                "intentTargetY": 18,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.95,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 24.134533917397015,
+                "y": 23.917895888041702,
+                "vx": 2.8563000328832713,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 26.451231178781015,
+                "intentTargetY": 23.917895888041702,
+                "intentSince": 947,
+                "intentMinUntil": 947,
+                "intentScore": 0.43,
+                "intentMaxUntil": 952,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 24.134533917397015,
+                "y": 42.1621041119583,
+                "vx": 2.8563000328832713,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 26.451231178781015,
+                "intentTargetY": 42.1621041119583,
+                "intentSince": 947,
+                "intentMinUntil": 947,
+                "intentScore": 0.43,
+                "intentMaxUntil": 952,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 28.306583170768835,
+                "y": 53.788037215563364,
+                "vx": 5.028766358767665,
+                "vy": -3.6909013124078274,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 32.11917730609833,
+                "intentTargetY": 52.137053663994635,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 53.22002820807688,
+                "y": 17.502302370671707,
+                "vx": 6.321083725703897,
+                "vy": -1.4043452413283464,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 60.70427213733783,
+                "intentTargetY": 15.836033751360773,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.78,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 47.839921618663766,
+                "y": 32.06253454587582,
+                "vx": 2.1275770005114873,
+                "vy": -0.7657100960260155,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 47.97883898952899,
+                "intentTargetY": 31.85135109252065,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.9,
+                "intentScore": 0.84,
+                "intentMaxUntil": 952.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 51.86738345675655,
+                "y": 47.19194162748931,
+                "vx": 6.475102262858081,
+                "vy": -0.03666444720885601,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 60.20894993054913,
+                "intentTargetY": 47.14716142701626,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.73,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 66.15844496445717,
+                "y": 8.301411083046158,
+                "vx": 0.05189676641959402,
+                "vy": -0.47430043082168283,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 66.17461937885196,
+                "intentTargetY": 8.153588159866183,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 75.5669674864835,
+                "y": 32.13303540279623,
+                "vx": 4.366601318294735,
+                "vy": -2.3284428904689194,
+                "intentKind": "RUN",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 75.3915275848587,
+                "intentTargetY": 30.54,
+                "intentSince": 948.5,
+                "intentMinUntil": 951.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 954,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 68.92929269200766,
+                "y": 52.92975200894957,
+                "vx": 1.6730801024943132,
+                "vy": -6.782647429039061,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 69.43528097065662,
+                "intentTargetY": 50.878481366147824,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 99.7745081221188,
+                "y": 34,
+                "vx": 1.4419405961239968,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 101,
+                "intentTargetY": 34,
+                "intentSince": 947,
+                "intentMinUntil": 947,
+                "intentScore": 0.6,
+                "intentMaxUntil": 952,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 74.1388363235498,
+                "y": 55.145574334772625,
+                "vx": -4.748270509122855,
+                "vy": -2.8059987101345034,
+                "intentKind": "MARK",
+                "intentTargetId": "H-RW",
+                "intentTargetX": 70.77263745828121,
+                "intentTargetY": 54.37562821086095,
+                "intentSince": 947.5,
+                "intentMinUntil": 950.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 953,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 79.49241141705974,
+                "y": 35.80738332835405,
+                "vx": -1.3286455517082554,
+                "vy": -5.690494765929693,
+                "intentKind": "MARK",
+                "intentTargetId": "H-ST",
+                "intentTargetX": 77.77938063683911,
+                "intentTargetY": 32.83998023572765,
+                "intentSince": 947.5,
+                "intentMinUntil": 950.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 953,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 80.00096654299432,
+                "y": 28.547071755928123,
+                "vx": -0.7987815188371343,
+                "vy": 5.487398686377897,
+                "intentKind": "COVER",
+                "intentTargetId": "A-LCB",
+                "intentTargetX": 80.56075288172418,
+                "intentTargetY": 31.231393743833028,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.9,
+                "intentScore": 0.87,
+                "intentMaxUntil": 952.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 72.63912404280515,
+                "y": 8.262976511405377,
+                "vx": -5.860811375127979,
+                "vy": 0.11744408214195201,
+                "intentKind": "MARK",
+                "intentTargetId": "H-LW",
+                "intentTargetX": 69.25157141207322,
+                "intentTargetY": 8.855733339895925,
+                "intentSince": 947.5,
+                "intentMinUntil": 950.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 953,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 64.01821655999288,
+                "y": 44.65282445574177,
+                "vx": 5.522477981527227,
+                "vy": -0.4983911418812449,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 66.3877627918873,
+                "intentTargetY": 44.597344295749366,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 952.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 64.43908110608263,
+                "y": 32.2258256719644,
+                "vx": 5.473943686972497,
+                "vy": 0.0817346236704859,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 66.75576279188729,
+                "intentTargetY": 32.233599999999996,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 952.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 56.84409158852636,
+                "y": 18.302473193531526,
+                "vx": 0.8786032976944071,
+                "vy": 1.7740047477950749,
+                "intentKind": "PRESS",
+                "intentTargetId": "H-LB",
+                "intentTargetX": 55.9415275848587,
+                "intentTargetY": 18,
+                "intentSince": 947.5,
+                "intentMinUntil": 948.7,
+                "intentScore": 1,
+                "intentMaxUntil": 950.3,
+                "sourceTask": "HYBRID_PRESS",
+                "lastPossession": "HOME"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 41.33589080139379,
+                "y": 57.037868919990956,
+                "vx": 3.367513006678613,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 43.430176947703586,
+                "intentTargetY": 57.037868919990956,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 36.70070411692173,
+                "y": 32.08,
+                "vx": 3.3092248656081438,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 38.83017694770358,
+                "intentTargetY": 32.08,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 42.73589080139379,
+                "y": 7.122131080009041,
+                "vx": 3.367513006678613,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 44.830176947703585,
+                "intentTargetY": 7.122131080009041,
+                "intentSince": 947.5,
+                "intentMinUntil": 949.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 952,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              }
+            },
+            "ball": {
+              "x": 56.35271116952065,
+              "y": 17.832425021725932,
+              "ownerId": "H-LB"
+            },
+            "abstractProgressBefore": 0.7798067855532281,
+            "spatialProgress": 0.5366924873287682,
+            "progressGapBefore": 0.24311429822445996,
+            "progressReconciled": 0.6016924873287681
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 949,
+            "minute": 15.82,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "MIDFIELD",
+            "phase": "PROGRESSION",
+            "detail": {
+              "scenario": "BALL_DEPTH_SYNC",
+              "label": "공 위치-공격수 거리 동기화",
+              "ownerId": "H-LB",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "HOME",
+              "danger": 0.531,
+              "ball": {
+                "team": "HOME",
+                "lane": "LEFT",
+                "progress": 0.6016924873287681,
+                "ownerId": "H-LB"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 53.91314486972988,
+                  "lineHeight": 53.97428616322577,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 54.5407974650152,
+                  "lineHeight": 53.78889172524214,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "BALL_DEPTH_SYNC",
+          "label": "공 위치-공격수 거리 동기화",
+          "instruction": "LB가 아직 중원에 있을 때 ST/RW가 골키퍼 옆까지 먼저 달아나지 않는지 확인하세요.",
+          "seed": "DEV-RECENT-1787550824847-14",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 949,
+        "lastTime": 958.000000000002,
+        "minOpponentDistance": 0.68,
+        "minSameTeamDistance": 1.11,
+        "maxPlayersWithin3mOfBall": 3,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 0.2,
+        "topLateralJitter": [
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 5,
+            "totalMove": 25.621
+          },
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 5,
+            "totalMove": 21.445
+          },
+          {
+            "id": "A-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 5,
+            "totalMove": 20.704
+          },
+          {
+            "id": "A-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 4,
+            "totalMove": 37.542
+          },
+          {
+            "id": "H-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 23.567
+          },
+          {
+            "id": "A-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 16.459
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 14.298
+          },
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 13.664
+          }
+        ],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              99.775,
+              34.0
+            ],
+            "last": [
+              98.281,
+              33.47
+            ],
+            "xRange": 1.812,
+            "yRange": 4.659
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              74.139,
+              55.146
+            ],
+            "last": [
+              80.656,
+              48.653
+            ],
+            "xRange": 9.216,
+            "yRange": 6.878
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              79.492,
+              35.807
+            ],
+            "last": [
+              78.412,
+              39.116
+            ],
+            "xRange": 2.364,
+            "yRange": 5.962
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              80.001,
+              28.547
+            ],
+            "last": [
+              78.825,
+              25.733
+            ],
+            "xRange": 2.443,
+            "yRange": 6.468
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              72.639,
+              8.263
+            ],
+            "last": [
+              76.721,
+              13.836
+            ],
+            "xRange": 7.663,
+            "yRange": 5.715
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              64.018,
+              44.653
+            ],
+            "last": [
+              62.909,
+              40.26
+            ],
+            "xRange": 6.82,
+            "yRange": 6.241
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              64.439,
+              32.226
+            ],
+            "last": [
+              70.063,
+              28.565
+            ],
+            "xRange": 7.627,
+            "yRange": 4.9
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              56.844,
+              18.302
+            ],
+            "last": [
+              71.094,
+              26.97
+            ],
+            "xRange": 15.644,
+            "yRange": 15.505
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              41.336,
+              57.038
+            ],
+            "last": [
+              49.118,
+              53.61
+            ],
+            "xRange": 9.643,
+            "yRange": 8.441
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              36.701,
+              32.08
+            ],
+            "last": [
+              47.293,
+              33.316
+            ],
+            "xRange": 12.291,
+            "yRange": 3.349
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.736,
+              7.122
+            ],
+            "last": [
+              49.102,
+              11.027
+            ],
+            "xRange": 8.243,
+            "yRange": 4.665
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 1404616,
+      "previousPresent": true
+    },
+    {
+      "reportId": "umt053h2-cc50be09-59f1-4d7d-ae2e-c4e963cdedff",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "검증 완료: 3CM 지원 역할 분산 · seed=DEV-RECENT-1787550909999-20\n역시 공 소유자를 같은 방향으로 쫒아간다는 느낌은 사라졌으나\n공이 RW에게 전달 될때 ,ST 에게 전달 될때 수비수들이 일직선으로 달리는게 아니라 좌우좌우좌우좌우 하면서 지그재그로 떨면서 달려나가는 모습임",
+      "seeds": [
+        "DEV-RECENT-1787550903703-19",
+        "DEV-RECENT-1787550909999-20"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-cc50be09-59f1-4d7d-ae2e-c4e963cdedff",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "검증 완료: 3CM 지원 역할 분산 · seed=DEV-RECENT-1787550909999-20\n역시 공 소유자를 같은 방향으로 쫒아간다는 느낌은 사라졌으나\n공이 RW에게 전달 될때 ,ST 에게 전달 될때 수비수들이 일직선으로 달리는게 아니라 좌우좌우좌우좌우 하면서 지그재그로 떨면서 달려나가는 모습임",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T05:55:57.401Z"
+      },
+      "currentReportScope": {
+        "startSecond": 666,
+        "endSecond": 675.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": {
+        "startSecond": 865,
+        "endSecond": 874.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": null,
+      "actualResult": null,
+      "boundary": {
+        "id": "DEV-CM_SUPPORT_SPREAD-3dc2a016",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-CM_SUPPORT_SPREAD-3dc2a016",
+        "atSecond": 666,
+        "sourceEventId": "E00001",
+        "reason": "ATTACKING_INVOLVEMENT",
+        "heroPlayerId": "H-ST",
+        "heroRole": "ST",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 666,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "danger": 0.5218588196113706,
+          "ball": {
+            "team": "HOME",
+            "lane": "RIGHT",
+            "progress": 0.6370575597975403,
+            "ownerId": "H-RB"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 49.84507661079988,
+              "lineHeight": 49.65730603411794,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 50.47341417055577,
+              "lineHeight": 49.59746257029474,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 666,
+            "source": "HYBRID_INTENT_V2_WIP",
+            "lastBallProgress": 0.6370575597975403,
+            "lastPossession": "HOME",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 7.742663605751871,
+                "y": 34,
+                "vx": 0.7563008329941786,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 8.230776108512654,
+                "intentTargetY": 34,
+                "intentSince": 664,
+                "intentMinUntil": 664,
+                "intentScore": 0.6,
+                "intentMaxUntil": 669,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 30.026944537196666,
+                "y": 15.975987024612548,
+                "vx": 5.07299176785352,
+                "vy": 4.045693576468268,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-RB",
+                "intentTargetX": 31.399702985104653,
+                "intentTargetY": 16.748283465659647,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 23.84813269628841,
+                "y": 26.526213037452663,
+                "vx": 0.8997371978723848,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 24.230776108512654,
+                "intentTargetY": 26.526213037452663,
+                "intentSince": 664,
+                "intentMinUntil": 664,
+                "intentScore": 0.43,
+                "intentMaxUntil": 669,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 23.84813269628841,
+                "y": 43.39378696254734,
+                "vx": 0.8997371978723848,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 24.230776108512654,
+                "intentTargetY": 43.39378696254734,
+                "intentSince": 664,
+                "intentMinUntil": 664,
+                "intentScore": 0.43,
+                "intentMaxUntil": 669,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 64.25706142476092,
+                "y": 50.13906930148175,
+                "vx": 2.7493044713614454,
+                "vy": 0.18593037903317006,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 64,
+                "intentTargetY": 50,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.95,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 53.11781912814353,
+                "y": 21.720083098362693,
+                "vx": 6.474121691124117,
+                "vy": -0.11834039597253251,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 63.47324133018991,
+                "intentTargetY": 21.538096535063982,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.73,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 50.602353221216944,
+                "y": 36.43020929519125,
+                "vx": 6.005209552028835,
+                "vy": 0.8513655594547634,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 53.959003694971955,
+                "intentTargetY": 36.570468144840255,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.9,
+                "intentScore": 0.84,
+                "intentMaxUntil": 669.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 54.45816237541246,
+                "y": 49.482792188307855,
+                "vx": 6.328712232404836,
+                "vy": 1.3666818688156217,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-RB",
+                "intentTargetX": 64.69396162578767,
+                "intentTargetY": 51.59315293012971,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.78,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 74.67248304636585,
+                "y": 11.931071092898286,
+                "vx": 5.159179755635067,
+                "vy": 1.1320017540465168,
+                "intentKind": "RUN",
+                "intentTargetId": "H-RB",
+                "intentTargetX": 74.98655385565013,
+                "intentTargetY": 11.999982959482558,
+                "intentSince": 664.5,
+                "intentMinUntil": 667.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 670,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 77.26645237844187,
+                "y": 37.07107587596936,
+                "vx": 6.095980313837826,
+                "vy": 2.1166598311936804,
+                "intentKind": "RUN",
+                "intentTargetId": "H-RB",
+                "intentTargetX": 78.38655385565012,
+                "intentTargetY": 37.46,
+                "intentSince": 664.5,
+                "intentMinUntil": 667.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 670,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 73.6555742504044,
+                "y": 57.8833965845369,
+                "vx": 5.166358390835184,
+                "vy": -1.2265713057803211,
+                "intentKind": "RUN",
+                "intentTargetId": "H-RB",
+                "intentTargetX": 73.98655385565013,
+                "intentTargetY": 57.80481704051744,
+                "intentSince": 664.5,
+                "intentMinUntil": 667.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 670,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 100.80228211739885,
+                "y": 34,
+                "vx": 0.7563008329941786,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 101,
+                "intentTargetY": 34,
+                "intentSince": 664,
+                "intentMinUntil": 664,
+                "intentScore": 0.6,
+                "intentMaxUntil": 669,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 76.21276636732702,
+                "y": 58.09305721609691,
+                "vx": -2.197327757948135,
+                "vy": -0.5014757166136518,
+                "intentKind": "MARK",
+                "intentTargetId": "H-RW",
+                "intentTargetX": 74.81429947159195,
+                "intentTargetY": 58.13061090234144,
+                "intentSince": 664.5,
+                "intentMinUntil": 667.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 670,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 84.62251796429551,
+                "y": 38.65373314546771,
+                "vx": -1.2624120063460016,
+                "vy": -4.6526940442206985,
+                "intentKind": "COVER",
+                "intentTargetId": "A-RCB",
+                "intentTargetX": 79.77950866022336,
+                "intentTargetY": 35.57052141978091,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.9,
+                "intentScore": 0.87,
+                "intentMaxUntil": 669.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 81.2235334814588,
+                "y": 32.67885584612967,
+                "vx": -1.5371603938547174,
+                "vy": 5.611972207974575,
+                "intentKind": "MARK",
+                "intentTargetId": "H-ST",
+                "intentTargetX": 78.17604933332048,
+                "intentTargetY": 37.32301926307999,
+                "intentSince": 664.5,
+                "intentMinUntil": 667.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 670,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 77.28157962874248,
+                "y": 12.185215455927143,
+                "vx": -2.078827368527278,
+                "vy": -1.0199678262424445,
+                "intentKind": "MARK",
+                "intentTargetId": "H-LW",
+                "intentTargetX": 75.8339828990815,
+                "intentTargetY": 11.703208517065482,
+                "intentSince": 664.5,
+                "intentMinUntil": 667.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 670,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 63.96366366414998,
+                "y": 48.89414276289874,
+                "vx": 2.763431267880768,
+                "vy": -0.18432205591033898,
+                "intentKind": "PRESS",
+                "intentTargetId": "H-RB",
+                "intentTargetX": 65.03150226894759,
+                "intentTargetY": 48.759478095683264,
+                "intentSince": 664.5,
+                "intentMinUntil": 665.7,
+                "intentScore": 1,
+                "intentMaxUntil": 667.3,
+                "sourceTask": "HYBRID_PRESS",
+                "lastPossession": "HOME"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 64.8422170654195,
+                "y": 35.768645328282396,
+                "vx": 2.5148437720013996,
+                "vy": -0.0726602408228949,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 65.33916305054687,
+                "intentTargetY": 35.766400000000004,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 669.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 64.4577670784492,
+                "y": 24.308804537638853,
+                "vx": 2.564090972227044,
+                "vy": 0.40563031503883273,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 64.97116305054686,
+                "intentTargetY": 24.32468268850505,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 669.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 43.048855423876205,
+                "y": 59.01663432444632,
+                "vx": 1.0949713863686164,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 43.29039462015964,
+                "intentTargetY": 59.01663432444632,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 37.04014176185082,
+                "y": 35.92,
+                "vx": 1.0831662162897202,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 37.290394620159645,
+                "intentTargetY": 35.92,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 41.648855423876206,
+                "y": 12.823365675553674,
+                "vx": 1.0949713863686164,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 41.89039462015964,
+                "intentTargetY": 12.823365675553674,
+                "intentSince": 664.5,
+                "intentMinUntil": 666.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 669,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              }
+            },
+            "ball": {
+              "x": 64.25706142476092,
+              "y": 50.13906930148175,
+              "ownerId": "H-RB"
+            },
+            "abstractProgressBefore": 0.6370575597975403,
+            "spatialProgress": 0.6119720135691517,
+            "progressGapBefore": 0.025085546228388655,
+            "progressReconciled": 0.6370575597975403
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 666,
+            "minute": 11.1,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "FINAL_THIRD",
+            "phase": "FINAL_THIRD",
+            "detail": {
+              "scenario": "CM_SUPPORT_SPREAD",
+              "label": "3CM 지원 역할 분산",
+              "ownerId": "H-RB",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "HOME",
+              "danger": 0.522,
+              "ball": {
+                "team": "HOME",
+                "lane": "RIGHT",
+                "progress": 0.6370575597975403,
+                "ownerId": "H-RB"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 49.84507661079988,
+                  "lineHeight": 49.65730603411794,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 50.47341417055577,
+                  "lineHeight": 49.59746257029474,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "CM_SUPPORT_SPREAD",
+          "label": "3CM 지원 역할 분산",
+          "instruction": "LCM·CM·RCM이 공 소유자 한 명을 같이 쫓지 않고 볼사이드/피벗/반대쪽 세컨드라인으로 나뉘는지 확인하세요.",
+          "seed": "DEV-RECENT-1787550909999-20",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 666,
+        "lastTime": 675.000000000002,
+        "minOpponentDistance": 0.967,
+        "minSameTeamDistance": 2.15,
+        "maxPlayersWithin3mOfBall": 2,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 0.2,
+        "topLateralJitter": [
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 4,
+            "totalMove": 40.578
+          },
+          {
+            "id": "A-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 30.077
+          },
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 3,
+            "totalMove": 26.776
+          },
+          {
+            "id": "H-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 24.771
+          },
+          {
+            "id": "A-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 24.279
+          },
+          {
+            "id": "A-RCB",
+            "slot": "RCB",
+            "role": "CB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 24.074
+          },
+          {
+            "id": "A-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 2,
+            "totalMove": 25.4
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 2,
+            "totalMove": 20.908
+          }
+        ],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              100.802,
+              34.0
+            ],
+            "last": [
+              98.347,
+              37.397
+            ],
+            "xRange": 2.473,
+            "yRange": 5.168
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              76.213,
+              58.093
+            ],
+            "last": [
+              85.498,
+              59.633
+            ],
+            "xRange": 11.426,
+            "yRange": 5.95
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              84.623,
+              38.654
+            ],
+            "last": [
+              86.809,
+              45.948
+            ],
+            "xRange": 11.577,
+            "yRange": 9.216
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              81.224,
+              32.679
+            ],
+            "last": [
+              84.738,
+              30.269
+            ],
+            "xRange": 8.321,
+            "yRange": 6.736
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              77.282,
+              12.185
+            ],
+            "last": [
+              86.671,
+              18.301
+            ],
+            "xRange": 10.656,
+            "yRange": 7.438
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              63.964,
+              48.894
+            ],
+            "last": [
+              82.631,
+              56.893
+            ],
+            "xRange": 22.077,
+            "yRange": 9.769
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              64.842,
+              35.769
+            ],
+            "last": [
+              77.122,
+              41.392
+            ],
+            "xRange": 16.337,
+            "yRange": 6.802
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              64.458,
+              24.309
+            ],
+            "last": [
+              76.784,
+              27.979
+            ],
+            "xRange": 16.896,
+            "yRange": 6.939
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              43.049,
+              59.017
+            ],
+            "last": [
+              51.601,
+              60.084
+            ],
+            "xRange": 10.732,
+            "yRange": 3.386
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              37.04,
+              35.92
+            ],
+            "last": [
+              49.474,
+              37.075
+            ],
+            "xRange": 14.741,
+            "yRange": 2.499
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              41.649,
+              12.823
+            ],
+            "last": [
+              51.601,
+              17.985
+            ],
+            "xRange": 12.132,
+            "yRange": 7.198
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 1445173,
+      "previousPresent": true
+    },
+    {
+      "reportId": "umt053h2-791328ab-de52-462d-9dc0-fbf00d05d78a",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "검증 완료: 공격 장면 조기 진입 · seed=DEV-RECENT-1787550979631-32\n\n여러번 테스트 해봤으나 시작한 직후 공이 어디에 있건 여전히 포메이션은 처음 시작하는 모습 처럼 말 그대로 '이제 선택지구나 포메이션을 배치해놔야지' 느낌이 강함\n\n또한 공이 있는 방향으로 블루팀(아군) RB가 너무나 전진해 나가서 상대 LW가 완전 노마크가 되어버림 이건 그럴 이유도 없고 그래서도 안된다고 봄",
+      "seeds": [
+        "DEV-RECENT-1787550977104-31",
+        "DEV-RECENT-1787550979631-32"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-791328ab-de52-462d-9dc0-fbf00d05d78a",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "검증 완료: 공격 장면 조기 진입 · seed=DEV-RECENT-1787550979631-32\n\n여러번 테스트 해봤으나 시작한 직후 공이 어디에 있건 여전히 포메이션은 처음 시작하는 모습 처럼 말 그대로 '이제 선택지구나 포메이션을 배치해놔야지' 느낌이 강함\n\n또한 공이 있는 방향으로 블루팀(아군) RB가 너무나 전진해 나가서 상대 LW가 완전 노마크가 되어버림 이건 그럴 이유도 없고 그래서도 안된다고 봄",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T05:58:00.312Z"
+      },
+      "currentReportScope": {
+        "startSecond": 1189,
+        "endSecond": 1197.9999999999918,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": {
+        "startSecond": 902,
+        "endSecond": 924.000000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": null,
+      "actualResult": null,
+      "boundary": {
+        "id": "DEV-EARLY_ATTACK_ENTRY-a50359c7",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-EARLY_ATTACK_ENTRY-a50359c7",
+        "atSecond": 1189,
+        "sourceEventId": "E00001",
+        "reason": "ATTACKING_INVOLVEMENT",
+        "heroPlayerId": "H-ST",
+        "heroRole": "ST",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 1189,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "danger": 0.42416982032358647,
+          "ball": {
+            "team": "HOME",
+            "lane": "RIGHT",
+            "progress": 0.6759671669164147,
+            "ownerId": "H-RCM"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 52.18281020410359,
+              "lineHeight": 51.08998239971697,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 51.5544726443477,
+              "lineHeight": 50.89981985837221,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 1189,
+            "source": "HYBRID_INTENT_V2_WIP",
+            "lastBallProgress": 0.6759671669164147,
+            "lastPossession": "HOME",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 8.815385974425297,
+                "y": 34,
+                "vx": 0.7563008329941786,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 9.219849500386045,
+                "intentTargetY": 34,
+                "intentSince": 1187,
+                "intentMinUntil": 1187,
+                "intentScore": 0.6,
+                "intentMaxUntil": 1192,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 31.099434459709798,
+                "y": 14.88158730499859,
+                "vx": 4.589692607573425,
+                "vy": 4.412238779665223,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-RCM",
+                "intentTargetX": 32.17932863509824,
+                "intentTargetY": 15.829729845751757,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 24.920855064961835,
+                "y": 26.13066851346567,
+                "vx": 0.8997371978723848,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 25.219849500386044,
+                "intentTargetY": 26.13066851346567,
+                "intentSince": 1187,
+                "intentMinUntil": 1187,
+                "intentScore": 0.43,
+                "intentMaxUntil": 1192,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 24.920855064961835,
+                "y": 43.78933148653433,
+                "vx": 0.8997371978723848,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 25.219849500386044,
+                "intentTargetY": 43.78933148653433,
+                "intentSince": 1187,
+                "intentMinUntil": 1187,
+                "intentScore": 0.43,
+                "intentMaxUntil": 1192,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 35.12848573900165,
+                "y": 58.98679272395793,
+                "vx": 5.047267728251286,
+                "vy": -0.3875636464724776,
+                "intentKind": "SUPPORT",
+                "intentTargetId": "H-RCM",
+                "intentTargetX": 35.612444283629785,
+                "intentTargetY": 58.9646300933629,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.68,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 63.28666517859225,
+                "y": 21.13755194807622,
+                "vx": -2.5562319989744693,
+                "vy": -0.03962012620634234,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 63.391391829083275,
+                "intentTargetY": 21.144309986739156,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.73,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 54.49710009700239,
+                "y": 36.626144616383165,
+                "vx": -2.0252457147890373,
+                "vy": 0.5876849974531388,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 53.731643969675766,
+                "intentTargetY": 36.578626816391655,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.9,
+                "intentScore": 0.84,
+                "intentMaxUntil": 1192.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 64.15155252622354,
+                "y": 50.11384772354131,
+                "vx": 0.6007355065673592,
+                "vy": 0.0657276351775167,
+                "intentKind": "SUPPORT",
+                "intentTargetId": null,
+                "intentTargetX": 64.59024201785213,
+                "intentTargetY": 50,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.95,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_SUPPORT",
+                "lastPossession": "HOME"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 82.3764651062256,
+                "y": 10.872212647619476,
+                "vx": 4.71072778986634,
+                "vy": 1.3096492096878354,
+                "intentKind": "RUN",
+                "intentTargetId": "H-RCM",
+                "intentTargetX": 82.80000000000001,
+                "intentTargetY": 10.925859829900116,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1190.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 1193,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 86.0700875794732,
+                "y": 37.07635433002738,
+                "vx": 6.064827250964682,
+                "vy": 2.114520300638067,
+                "intentKind": "RUN",
+                "intentTargetId": "H-RCM",
+                "intentTargetX": 87.17045285535278,
+                "intentTargetY": 37.46,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1190.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 1193,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 81.40149945915626,
+                "y": 58.93947219856495,
+                "vx": 4.943148950038836,
+                "vy": -1.3799203379368545,
+                "intentKind": "RUN",
+                "intentTargetId": "H-RCM",
+                "intentTargetX": 81.80000000000001,
+                "intentTargetY": 58.87894017009988,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1190.5,
+                "intentScore": 0.86,
+                "intentMaxUntil": 1193,
+                "sourceTask": "HYBRID_RUN",
+                "lastPossession": "HOME"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 101,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 101,
+                "intentTargetY": 34,
+                "intentSince": 1187,
+                "intentMinUntil": 1187,
+                "intentScore": 0.6,
+                "intentMaxUntil": 1192,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 81.91609032672255,
+                "y": 60.18754921502562,
+                "vx": 0.9411498338410245,
+                "vy": 0.010806341208995198,
+                "intentKind": "MARK",
+                "intentTargetId": "H-RW",
+                "intentTargetX": 81.91609032672255,
+                "intentTargetY": 60.18754921502562,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1190.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 1193,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 88.21872566006667,
+                "y": 41.5349324115415,
+                "vx": 0.6146018427630972,
+                "vy": -2.1073800766583277,
+                "intentKind": "COVER",
+                "intentTargetId": "A-RCB",
+                "intentTargetX": 88.21872566006667,
+                "intentTargetY": 41.5349324115415,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.9,
+                "intentScore": 0.87,
+                "intentMaxUntil": 1192.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 86.00697166202306,
+                "y": 33.253938424071336,
+                "vx": 2.6702909062305116,
+                "vy": 5.279048049538458,
+                "intentKind": "MARK",
+                "intentTargetId": "H-ST",
+                "intentTargetX": 86.98736909256635,
+                "intentTargetY": 37.329130663411505,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1190.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 1193,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 83.48631067747016,
+                "y": 10.103614698110867,
+                "vx": 1.0228591406686005,
+                "vy": -0.44540796675799116,
+                "intentKind": "MARK",
+                "intentTargetId": "H-LW",
+                "intentTargetX": 83.48631067747016,
+                "intentTargetY": 10.103614698110867,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1190.1,
+                "intentScore": 0.94,
+                "intentMaxUntil": 1193,
+                "sourceTask": "HYBRID_MARK",
+                "lastPossession": "HOME"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 65.19181878109285,
+                "y": 49.317365693658225,
+                "vx": 1.0543969679530343,
+                "vy": 1.0143416568160217,
+                "intentKind": "PRESS",
+                "intentTargetId": "H-RCM",
+                "intentTargetX": 65.06971206905648,
+                "intentTargetY": 50.10782125459648,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1188.7,
+                "intentScore": 1,
+                "intentMaxUntil": 1190.3,
+                "sourceTask": "HYBRID_PRESS",
+                "lastPossession": "HOME"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 65.59876380258399,
+                "y": 35.76817167753936,
+                "vx": 2.3909663777480996,
+                "vy": -0.07164936305031813,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 66.0478120941598,
+                "intentTargetY": 35.766400000000004,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 1192.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 65.21317320810324,
+                "y": 24.065624752081533,
+                "vx": 2.442647892279136,
+                "vy": 0.4110268972009089,
+                "intentKind": "COVER",
+                "intentTargetId": null,
+                "intentTargetX": 65.6798120941598,
+                "intentTargetY": 24.079619705198116,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.9,
+                "intentScore": 0.61,
+                "intentMaxUntil": 1192.5,
+                "sourceTask": "HYBRID_COVER",
+                "lastPossession": "HOME"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 43.867426278383334,
+                "y": 59.51132668205351,
+                "vx": 1.0450671672549636,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 44.06066531973891,
+                "intentTargetY": 59.51132668205351,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 37.85917169196668,
+                "y": 35.92,
+                "vx": 1.033910103917799,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 38.060665319738916,
+                "intentTargetY": 35.92,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 42.467426278383336,
+                "y": 12.328673317946496,
+                "vx": 1.0450671672549636,
+                "vy": 0,
+                "intentKind": "RECOVER",
+                "intentTargetId": null,
+                "intentTargetX": 42.66066531973891,
+                "intentTargetY": 12.328673317946496,
+                "intentSince": 1187.5,
+                "intentMinUntil": 1189.5,
+                "intentScore": 0.56,
+                "intentMaxUntil": 1192,
+                "sourceTask": "HYBRID_RECOVER",
+                "lastPossession": "HOME"
+              }
+            },
+            "ball": {
+              "x": 64.15155252622354,
+              "y": 50.11384772354131,
+              "ownerId": "H-RCM"
+            },
+            "abstractProgressBefore": 0.6847091979789547,
+            "spatialProgress": 0.6109671669164146,
+            "progressGapBefore": 0.07374203106254007,
+            "progressReconciled": 0.6759671669164147
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 1189,
+            "minute": 19.82,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "FINAL_THIRD",
+            "phase": "FINAL_THIRD",
+            "detail": {
+              "scenario": "EARLY_ATTACK_ENTRY",
+              "label": "공격 장면 조기 진입",
+              "ownerId": "H-RCM",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "HOME",
+              "danger": 0.424,
+              "ball": {
+                "team": "HOME",
+                "lane": "RIGHT",
+                "progress": 0.6759671669164147,
+                "ownerId": "H-RCM"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 52.18281020410359,
+                  "lineHeight": 51.08998239971697,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 51.5544726443477,
+                  "lineHeight": 50.89981985837221,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "EARLY_ATTACK_ENTRY",
+          "label": "공격 장면 조기 진입",
+          "instruction": "선택 장면이 이미 골라인 앞에서 시작하지 않고, 전진 과정과 주변 선수 움직임이 먼저 보이는지 확인하세요.",
+          "seed": "DEV-RECENT-1787550979631-32",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 91,
+        "firstTime": 1189,
+        "lastTime": 1197.9999999999918,
+        "minOpponentDistance": 1.02,
+        "minSameTeamDistance": 1.687,
+        "maxPlayersWithin3mOfBall": 2,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 0.7,
+        "topLateralJitter": [
+          {
+            "id": "A-RB",
+            "slot": "RB",
+            "role": "FB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 32.372
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 28.253
+          },
+          {
+            "id": "A-RCB",
+            "slot": "RCB",
+            "role": "CB",
+            "lateralDirectionFlips": 3,
+            "totalMove": 25.935
+          },
+          {
+            "id": "H-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 2,
+            "totalMove": 40.809
+          },
+          {
+            "id": "H-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 38.788
+          },
+          {
+            "id": "H-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 2,
+            "totalMove": 36.172
+          },
+          {
+            "id": "A-LB",
+            "slot": "LB",
+            "role": "FB",
+            "lateralDirectionFlips": 2,
+            "totalMove": 35.2
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 2,
+            "totalMove": 34.275
+          }
+        ],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              101.0,
+              34.0
+            ],
+            "last": [
+              97.774,
+              35.126
+            ],
+            "xRange": 3.226,
+            "yRange": 5.57
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              81.916,
+              60.188
+            ],
+            "last": [
+              65.986,
+              45.813
+            ],
+            "xRange": 17.562,
+            "yRange": 18.277
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              88.219,
+              41.535
+            ],
+            "last": [
+              68.754,
+              43.18
+            ],
+            "xRange": 19.484,
+            "yRange": 4.575
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              86.007,
+              33.254
+            ],
+            "last": [
+              68.754,
+              26.38
+            ],
+            "xRange": 18.199,
+            "yRange": 9.752
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              83.486,
+              10.104
+            ],
+            "last": [
+              69.149,
+              6.994
+            ],
+            "xRange": 16.475,
+            "yRange": 11.803
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              65.192,
+              49.317
+            ],
+            "last": [
+              58.51,
+              45.92
+            ],
+            "xRange": 10.513,
+            "yRange": 4.077
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              65.599,
+              35.768
+            ],
+            "last": [
+              65.426,
+              36.658
+            ],
+            "xRange": 11.715,
+            "yRange": 20.866
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              65.213,
+              24.066
+            ],
+            "last": [
+              59.792,
+              25.119
+            ],
+            "xRange": 6.757,
+            "yRange": 6.447
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              43.867,
+              59.511
+            ],
+            "last": [
+              34.219,
+              64.332
+            ],
+            "xRange": 18.393,
+            "yRange": 5.401
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              37.859,
+              35.92
+            ],
+            "last": [
+              31.389,
+              30.099
+            ],
+            "xRange": 19.216,
+            "yRange": 8.732
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.467,
+              12.329
+            ],
+            "last": [
+              36.452,
+              4.886
+            ],
+            "xRange": 16.161,
+            "yRange": 15.871
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 1469470,
+      "previousPresent": true
+    },
+    {
+      "reportId": "umt053h2-f61835ad-3445-427a-9adc-b4fb3959f735",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "이번 검증: 오프사이드 판정/연출 · seed=DEV-RECENT-1787551093991-33 · ST/RW가 수비라인보다 앞선 상황입니다. 전방 침투 패스를 골라 오프사이드 라인 표시와 짧은 종료 연출, 다시보기를 확인하세요.\n\n오프사이드 라인에서 오프사이드 안에 들어가 있는 ST와 RW에 대한 선택지는 등장하지 않음",
+      "seeds": [
+        "DEV-RECENT-1787550979631-32",
+        "DEV-RECENT-1787551093991-33"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-f61835ad-3445-427a-9adc-b4fb3959f735",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "이번 검증: 오프사이드 판정/연출 · seed=DEV-RECENT-1787551093991-33 · ST/RW가 수비라인보다 앞선 상황입니다. 전방 침투 패스를 골라 오프사이드 라인 표시와 짧은 종료 연출, 다시보기를 확인하세요.\n\n오프사이드 라인에서 오프사이드 안에 들어가 있는 ST와 RW에 대한 선택지는 등장하지 않음",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T05:58:55.770Z"
+      },
+      "currentReportScope": {
+        "startSecond": 1156,
+        "endSecond": 1156,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": {
+        "startSecond": 1189,
+        "endSecond": 1197.9999999999918,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": null,
+      "actualResult": null,
+      "boundary": {
+        "id": "DEV-OFFSIDE_REVIEW-eb70d2d3",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-OFFSIDE_REVIEW-eb70d2d3",
+        "atSecond": 1156,
+        "sourceEventId": "E00001",
+        "reason": "MIDFIELD_INVOLVEMENT",
+        "heroPlayerId": "H-CM",
+        "heroRole": "CM",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 1156,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "danger": 0.5031384285539389,
+          "ball": {
+            "team": "HOME",
+            "lane": "CENTER",
+            "progress": 0.6664485714513632,
+            "ownerId": "H-CM"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 50.02304131165147,
+              "lineHeight": 49.36216728575528,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 49.40066388109699,
+              "lineHeight": 50.17679686844349,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 1156,
+            "source": "DEVELOPER_RECENT_FIX_SEED",
+            "lastBallProgress": 0.6514715954568238,
+            "lastPossession": "HOME",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 8.67546210108325,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 8.67546210108325,
+                "intentTargetY": 34,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 27.175462101083248,
+                "y": 10.489170583523807,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 27.175462101083248,
+                "intentTargetY": 10.489170583523807,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 24.675462101083248,
+                "y": 25.53610141006857,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 24.675462101083248,
+                "intentTargetY": 25.53610141006857,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 24.675462101083248,
+                "y": 42.463898589931425,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 24.675462101083248,
+                "intentTargetY": 42.463898589931425,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 27.175462101083248,
+                "y": 57.51082941647619,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 27.175462101083248,
+                "intentTargetY": 57.51082941647619,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 67.7,
+                "y": 20.83393552677333,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 67.7,
+                "intentTargetY": 20.83393552677333,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 69.97710000239313,
+                "y": 33.977458712644875,
+                "vx": 1.2,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 68.4045175229665,
+                "intentTargetY": 34,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 67.7,
+                "y": 47.16606447322667,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 67.7,
+                "intentTargetY": 47.16606447322667,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 76.4,
+                "y": 9.548737406864761,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 76.4,
+                "intentTargetY": 9.548737406864761,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 83.37053386964836,
+                "y": 36.50636941865086,
+                "vx": 2,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 80,
+                "intentTargetY": 34,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 83.88915319885128,
+                "y": 52.9629149235785,
+                "vx": 2.4,
+                "vy": -0.2,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 76.4,
+                "intentTargetY": 58.45126259313524,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 99.2682022694964,
+                "y": 34.37533341161907,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 101,
+                "intentTargetY": 34,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 82.08997407113202,
+                "y": 13.120721699669957,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 83.01234496874734,
+                "intentTargetY": 55.73629210768267,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 82.99308865182101,
+                "y": 27.71222504740581,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 85.71234496874735,
+                "intentTargetY": 41.82506515876577,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 82.5160760528408,
+                "y": 41.03077847743407,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 85.71234496874735,
+                "intentTargetY": 26.174934841234233,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 81.63014333541506,
+                "y": 56.17810636293143,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 83.01234496874734,
+                "intentTargetY": 12.263707892317328,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 61.91234496874735,
+                "y": 46.172323580302304,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 61.91234496874735,
+                "intentTargetY": 46.172323580302304,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 62.31234496874735,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 62.31234496874735,
+                "intentTargetY": 34,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 61.91234496874735,
+                "y": 21.827676419697703,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 61.91234496874735,
+                "intentTargetY": 21.827676419697703,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 42.31234496874735,
+                "y": 56.60574379198998,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 42.31234496874735,
+                "intentTargetY": 56.60574379198998,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 37.712344968747345,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 37.712344968747345,
+                "intentTargetY": 34,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 42.31234496874735,
+                "y": 11.394256208010013,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 42.31234496874735,
+                "intentTargetY": 11.394256208010013,
+                "intentSince": 1154,
+                "intentMinUntil": 1154,
+                "intentScore": 0.2,
+                "intentMaxUntil": 1159,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              }
+            },
+            "ball": {
+              "x": 69.97710000239313,
+              "y": 33.977458712644875,
+              "ownerId": "H-CM"
+            }
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 1156,
+            "minute": 19.27,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "FINAL_THIRD",
+            "phase": "FINAL_THIRD",
+            "detail": {
+              "scenario": "OFFSIDE_REVIEW",
+              "label": "오프사이드 판정/연출",
+              "ownerId": "H-CM",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "HOME",
+              "danger": 0.503,
+              "ball": {
+                "team": "HOME",
+                "lane": "CENTER",
+                "progress": 0.6664485714513632,
+                "ownerId": "H-CM"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 50.02304131165147,
+                  "lineHeight": 49.36216728575528,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 49.40066388109699,
+                  "lineHeight": 50.17679686844349,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "OFFSIDE_REVIEW",
+          "label": "오프사이드 판정/연출",
+          "instruction": "ST/RW가 수비라인보다 앞선 상황입니다. 전방 침투 패스를 골라 오프사이드 라인 표시와 짧은 종료 연출, 다시보기를 확인하세요.",
+          "seed": "DEV-RECENT-1787551093991-33",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 5,
+        "firstTime": 1156,
+        "lastTime": 1156.4,
+        "minOpponentDistance": 3.811,
+        "minSameTeamDistance": 11.802,
+        "maxPlayersWithin3mOfBall": 1,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 0.0,
+        "topLateralJitter": [],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              99.268,
+              34.375
+            ],
+            "last": [
+              98.852,
+              34.197
+            ],
+            "xRange": 0.416,
+            "yRange": 0.178
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              82.09,
+              13.121
+            ],
+            "last": [
+              82.139,
+              13.552
+            ],
+            "xRange": 0.049,
+            "yRange": 0.431
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              82.993,
+              27.712
+            ],
+            "last": [
+              82.945,
+              28.141
+            ],
+            "xRange": 0.048,
+            "yRange": 0.429
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              82.516,
+              41.031
+            ],
+            "last": [
+              82.188,
+              40.693
+            ],
+            "xRange": 0.328,
+            "yRange": 0.338
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              81.63,
+              56.178
+            ],
+            "last": [
+              81.603,
+              55.734
+            ],
+            "xRange": 0.027,
+            "yRange": 0.444
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              61.912,
+              46.172
+            ],
+            "last": [
+              62.109,
+              45.821
+            ],
+            "xRange": 0.197,
+            "yRange": 0.351
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              62.312,
+              34.0
+            ],
+            "last": [
+              62.663,
+              33.983
+            ],
+            "xRange": 0.351,
+            "yRange": 0.017
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              61.912,
+              21.828
+            ],
+            "last": [
+              62.064,
+              22.196
+            ],
+            "xRange": 0.152,
+            "yRange": 0.368
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.312,
+              56.606
+            ],
+            "last": [
+              42.685,
+              56.542
+            ],
+            "xRange": 0.373,
+            "yRange": 0.064
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              37.712,
+              34.0
+            ],
+            "last": [
+              38.076,
+              34.0
+            ],
+            "xRange": 0.364,
+            "yRange": 0.0
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.312,
+              11.394
+            ],
+            "last": [
+              42.685,
+              11.458
+            ],
+            "xRange": 0.373,
+            "yRange": 0.064
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 91418,
+      "previousPresent": true
+    },
+    {
+      "reportId": "umt053h2-3ceaa876-6397-46e6-8488-45350d5a081f",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "검증 완료: 오프사이드 판정/연출 · seed=DEV-RECENT-1787551150447-35 · JSON/버그리포트 사용 가능\n\n여전히 오프사이드 선택 직후 공은 멈추고 패스 한 인물은 뒤돌아서 돌아가고 패스를 받는 인원은 천천히 돌아옴 \n\n오프사이드로 인식 되기 보다는 에러로 인식 되는 중",
+      "seeds": [
+        "DEV-RECENT-1787550979631-32",
+        "DEV-RECENT-1787551150447-35"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-3ceaa876-6397-46e6-8488-45350d5a081f",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "검증 완료: 오프사이드 판정/연출 · seed=DEV-RECENT-1787551150447-35 · JSON/버그리포트 사용 가능\n\n여전히 오프사이드 선택 직후 공은 멈추고 패스 한 인물은 뒤돌아서 돌아가고 패스를 받는 인원은 천천히 돌아옴 \n\n오프사이드로 인식 되기 보다는 에러로 인식 되는 중",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T06:00:20.327Z"
+      },
+      "currentReportScope": {
+        "startSecond": 814,
+        "endSecond": 815.9000000000004,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": {
+        "startSecond": 1189,
+        "endSecond": 1197.9999999999918,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": {
+        "id": "AVAILABLE_PASS",
+        "targetId": "H-ST",
+        "targetName": "같은 팀 ST",
+        "family": "패스",
+        "label": "전진 패스 → 같은 팀 ST",
+        "meta": {
+          "targetId": "H-ST",
+          "targetSlot": "ST",
+          "forward": 12.033307140431475,
+          "d": 12.24286497442878,
+          "receiverPressure": 4.54814541336212,
+          "contested": false,
+          "laneBlockers": 0,
+          "offsideRisk": true,
+          "offsideMargin": 1.3267767177653411
+        },
+        "hint": "의도: 패스 길 자체는 열려 있는 동료 (같은 팀 ST)에게 연결합니다.\n관련 능력: 패스, 시야, 판단\n위험: 보통\n성공하면: 압박받는 동료라도 현재 존재하는 패스 선택을 사용할 수 있음\n실패하면: 연결 후 바로 압박을 받을 수 있음",
+        "tooltip": "의도: 패스 길 자체는 열려 있는 동료 (같은 팀 ST)에게 연결합니다.\n관련 능력: 패스, 시야, 판단\n위험: 보통\n성공하면: 압박받는 동료라도 현재 존재하는 패스 선택을 사용할 수 있음\n실패하면: 연결 후 바로 압박을 받을 수 있음"
+      },
+      "actualResult": {
+        "sceneId": "STEP40-1",
+        "at": 815.9,
+        "choiceId": "AVAILABLE_PASS",
+        "label": "전진 패스 → 같은 팀 ST",
+        "targetId": "H-ST",
+        "targetName": "같은 팀 ST",
+        "family": "패스",
+        "selectedChoice": {
+          "id": "AVAILABLE_PASS",
+          "label": "전진 패스 → 같은 팀 ST",
+          "targetId": "H-ST",
+          "targetName": "같은 팀 ST"
+        },
+        "code": "OFFSIDE",
+        "headline": "전진 패스 → 같은 팀 ST → 오프사이드",
+        "detail": "블루팀 CM이 블루팀 ST 쪽으로 강한 지상 패스했습니다. → 블루팀 ST이 오프사이드 위치에 있었습니다.",
+        "terminalEvent": {
+          "t": 814.7000000000002,
+          "type": "OFFSIDE",
+          "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+        },
+        "events": [
+          {
+            "t": 814.4000000000001,
+            "type": "PASS",
+            "text": "블루팀 CM이 블루팀 ST 쪽으로 강한 지상 패스했습니다.",
+            "actorId": "H-CM",
+            "team": "HOME",
+            "targetId": "H-ST",
+            "passKind": "PASS"
+          },
+          {
+            "t": 814.7000000000002,
+            "type": "OFFSIDE",
+            "text": "블루팀 ST이 오프사이드 위치에 있었습니다."
+          }
+        ],
+        "score": {
+          "HOME": 0,
+          "AWAY": 0
+        },
+        "possession": "AWAY",
+        "performanceImpact": {
+          "at": 815.9,
+          "appearanceStatus": "STARTER",
+          "choiceId": "AVAILABLE_PASS",
+          "resultCode": "OFFSIDE",
+          "reckless": false,
+          "saferOption": {
+            "id": "PROGRESSIVE_PASS",
+            "targetId": "H-LW",
+            "targetName": "블루팀 LW",
+            "score": 4.727
+          },
+          "chosenScore": 3.364,
+          "ratingDelta": 0,
+          "rating": 6.5,
+          "substitutionPressureDelta": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "managerUsageTrustTotal": 0,
+          "reason": "NO_PENALTY"
+        }
+      },
+      "boundary": {
+        "id": "DEV-OFFSIDE_REVIEW-544abc3b",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-OFFSIDE_REVIEW-544abc3b",
+        "atSecond": 814,
+        "sourceEventId": "E00001",
+        "reason": "MIDFIELD_INVOLVEMENT",
+        "heroPlayerId": "H-CM",
+        "heroRole": "CM",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 814,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "HOME",
+          "zone": "FINAL_THIRD",
+          "phase": "FINAL_THIRD",
+          "danger": 0.41165183715522286,
+          "ball": {
+            "team": "HOME",
+            "lane": "CENTER",
+            "progress": 0.6683694904013759,
+            "ownerId": "H-CM"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 50.2381881326437,
+              "lineHeight": 51.03432077355683,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 50.859880598727614,
+              "lineHeight": 49.84413421154022,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 814,
+            "source": "DEVELOPER_RECENT_FIX_SEED",
+            "lastBallProgress": 0.6744759236928076,
+            "lastPossession": "HOME",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 9.223312288355082,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 9.223312288355082,
+                "intentTargetY": 34,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 27.723312288355082,
+                "y": 10.38805157765746,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 27.723312288355082,
+                "intentTargetY": 10.38805157765746,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 25.223312288355082,
+                "y": 25.499698567956685,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 25.223312288355082,
+                "intentTargetY": 25.499698567956685,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 25.223312288355082,
+                "y": 42.500301432043315,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 25.223312288355082,
+                "intentTargetY": 42.500301432043315,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 27.723312288355082,
+                "y": 57.611948422342536,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 27.723312288355082,
+                "intentTargetY": 57.611948422342536,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 67.7,
+                "y": 20.777308883488175,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 67.7,
+                "intentTargetY": 20.777308883488175,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 70.17879649214447,
+                "y": 34.31361952889711,
+                "vx": 1.2,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 70.8199719877448,
+                "intentTargetY": 34,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 67.7,
+                "y": 47.222691116511825,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 67.7,
+                "intentTargetY": 47.222691116511825,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 76.4,
+                "y": 9.44357364076376,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 76.4,
+                "intentTargetY": 9.44357364076376,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 83.38036531885155,
+                "y": 36.55131318643689,
+                "vx": 2,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 80,
+                "intentTargetY": 34,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 83.89898464805447,
+                "y": 53.007858691364525,
+                "vx": 2.4,
+                "vy": -0.2,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 76.4,
+                "intentTargetY": 58.55642635923624,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 98.94654470984824,
+                "y": 33.9158226121217,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 101,
+                "intentTargetY": 34,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 81.49122315761633,
+                "y": 12.265363251790404,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 83.45303588954732,
+                "intentTargetY": 56.37834746344015,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 82.10694093704224,
+                "y": 26.44629974057898,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 86.15303588954731,
+                "intentTargetY": 42.05620508683845,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 82.77741522071884,
+                "y": 41.40412014583126,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 86.15303588954731,
+                "intentTargetY": 25.943794913161547,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 81.30932019385509,
+                "y": 55.71978758927435,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 83.45303588954732,
+                "intentTargetY": 11.62165253655985,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 62.35303588954732,
+                "y": 46.53187457952649,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 62.35303588954732,
+                "intentTargetY": 46.53187457952649,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 62.75303588954732,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 62.75303588954732,
+                "intentTargetY": 34,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 62.35303588954732,
+                "y": 21.468125420473513,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 62.35303588954732,
+                "intentTargetY": 21.468125420473513,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 42.75303588954732,
+                "y": 57.27348136197776,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 42.75303588954732,
+                "intentTargetY": 57.27348136197776,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 38.15303588954731,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 38.15303588954731,
+                "intentTargetY": 34,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 42.75303588954732,
+                "y": 10.726518638022242,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 42.75303588954732,
+                "intentTargetY": 10.726518638022242,
+                "intentSince": 812,
+                "intentMinUntil": 812,
+                "intentScore": 0.2,
+                "intentMaxUntil": 817,
+                "sourceTask": null,
+                "lastPossession": "HOME"
+              }
+            },
+            "ball": {
+              "x": 70.17879649214447,
+              "y": 34.31361952889711,
+              "ownerId": "H-CM"
+            }
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 814,
+            "minute": 13.57,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "FINAL_THIRD",
+            "phase": "FINAL_THIRD",
+            "detail": {
+              "scenario": "OFFSIDE_REVIEW",
+              "label": "오프사이드 판정/연출",
+              "ownerId": "H-CM",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "HOME",
+              "danger": 0.412,
+              "ball": {
+                "team": "HOME",
+                "lane": "CENTER",
+                "progress": 0.6683694904013759,
+                "ownerId": "H-CM"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 50.2381881326437,
+                  "lineHeight": 51.03432077355683,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 50.859880598727614,
+                  "lineHeight": 49.84413421154022,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "OFFSIDE_REVIEW",
+          "label": "오프사이드 판정/연출",
+          "instruction": "ST/RW가 수비라인보다 앞선 상황입니다. 전방 침투 패스를 골라 오프사이드 라인 표시와 짧은 종료 연출, 다시보기를 확인하세요.",
+          "seed": "DEV-RECENT-1787551150447-35",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 20,
+        "firstTime": 814,
+        "lastTime": 815.9,
+        "minOpponentDistance": 1.24,
+        "minSameTeamDistance": 6.232,
+        "maxPlayersWithin3mOfBall": 1,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 0.0,
+        "topLateralJitter": [
+          {
+            "id": "H-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 1,
+            "totalMove": 1.887
+          }
+        ],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              98.947,
+              33.916
+            ],
+            "last": [
+              98.0,
+              34.0
+            ],
+            "xRange": 0.947,
+            "yRange": 0.153
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              81.491,
+              12.265
+            ],
+            "last": [
+              82.006,
+              18.543
+            ],
+            "xRange": 0.515,
+            "yRange": 6.278
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              82.107,
+              26.446
+            ],
+            "last": [
+              83.164,
+              30.895
+            ],
+            "xRange": 1.943,
+            "yRange": 4.449
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              82.777,
+              41.404
+            ],
+            "last": [
+              84.351,
+              37.013
+            ],
+            "xRange": 1.668,
+            "yRange": 4.391
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              81.309,
+              55.72
+            ],
+            "last": [
+              80.432,
+              50.145
+            ],
+            "xRange": 0.877,
+            "yRange": 5.575
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              62.353,
+              46.532
+            ],
+            "last": [
+              67.004,
+              44.89
+            ],
+            "xRange": 4.651,
+            "yRange": 1.642
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              62.753,
+              34.0
+            ],
+            "last": [
+              68.546,
+              33.988
+            ],
+            "xRange": 5.793,
+            "yRange": 0.044
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              62.353,
+              21.468
+            ],
+            "last": [
+              66.845,
+              23.013
+            ],
+            "xRange": 4.492,
+            "yRange": 1.545
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.753,
+              57.273
+            ],
+            "last": [
+              47.952,
+              54.133
+            ],
+            "xRange": 5.199,
+            "yRange": 3.14
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              38.153,
+              34.0
+            ],
+            "last": [
+              44.187,
+              34.004
+            ],
+            "xRange": 6.034,
+            "yRange": 0.006
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              42.753,
+              10.727
+            ],
+            "last": [
+              47.959,
+              13.889
+            ],
+            "xRange": 5.206,
+            "yRange": 3.162
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 459181,
+      "previousPresent": true
+    },
+    {
+      "reportId": "umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4",
+      "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
+      "description": "검증 완료: GK 선택 결과 정합성 · seed=DEV-RECENT-1787551224799-36 · JSON/버그리포트 사용 가능\n\nGK는 움직임을 보이는데 우리 수비수들은 너무 촘촘하게 있고 \n\n상대 미드필드 진들은 공격 가담도 없이 너무 멀어져 있으며\n상대 LB는 또 포지션을 벗어나 어마어마하게 위로 올라와 있음 \n\n별도의 문제로 보임",
+      "seeds": [
+        "DEV-RECENT-1787551150447-35",
+        "DEV-RECENT-1787551224799-36"
+      ],
+      "bugReportContext": {
+        "reportId": "umt053h2-8390c662-4f4d-4969-bed8-f300eba8ddf4",
+        "build": "USER-MATCH-TEST-V0.5.3-HF2",
+        "step": 78,
+        "description": "검증 완료: GK 선택 결과 정합성 · seed=DEV-RECENT-1787551224799-36 · JSON/버그리포트 사용 가능\n\nGK는 움직임을 보이는데 우리 수비수들은 너무 촘촘하게 있고 \n\n상대 미드필드 진들은 공격 가담도 없이 너무 멀어져 있으며\n상대 LB는 또 포지션을 벗어나 어마어마하게 위로 올라와 있음 \n\n별도의 문제로 보임",
+        "category": "2D 움직임",
+        "priority": 3,
+        "reportedAt": "2026-08-24T06:01:28.480Z"
+      },
+      "currentReportScope": {
+        "startSecond": 690,
+        "endSecond": 698.800000000002,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "previousReportScope": {
+        "startSecond": 814,
+        "endSecond": 815.9000000000004,
+        "cumulativeMatchHistoryIncluded": false,
+        "keepsFullSituationFrames": true
+      },
+      "futureOutcomePrecomputed": false,
+      "selectedChoice": {
+        "id": "GK_STEP_OUT",
+        "family": "수비",
+        "label": "한두 걸음 전진해 각도 좁히기",
+        "targetId": null,
+        "targetName": null,
+        "hint": "의도: 골문을 버리고 달려드는 것이 아니라 한두 걸음만 전진해 슈팅 각도를 줄입니다.\n관련 능력: GK 위치선정, 반응, 가속\n위험: 보통\n성공하면: 슈터에게 보이는 골문 면적을 줄일 수 있음\n실패하면: 칩이나 옆 패스가 나오면 복귀 여유가 줄어들 수 있음",
+        "tooltip": "의도: 골문을 버리고 달려드는 것이 아니라 한두 걸음만 전진해 슈팅 각도를 줄입니다.\n관련 능력: GK 위치선정, 반응, 가속\n위험: 보통\n성공하면: 슈터에게 보이는 골문 면적을 줄일 수 있음\n실패하면: 칩이나 옆 패스가 나오면 복귀 여유가 줄어들 수 있음"
+      },
+      "actualResult": {
+        "sceneId": "STEP40-1",
+        "at": 698.8,
+        "choiceId": "GK_STEP_OUT",
+        "label": "한두 걸음 전진해 각도 좁히기",
+        "targetId": null,
+        "targetName": null,
+        "family": "수비",
+        "selectedChoice": {
+          "id": "GK_STEP_OUT",
+          "label": "한두 걸음 전진해 각도 좁히기",
+          "targetId": null,
+          "targetName": null
+        },
+        "code": "POSSESSION_LOST",
+        "headline": "한두 걸음 전진해 각도 좁히기 결과",
+        "detail": "레드팀 RW이 레드팀 RCM 쪽으로 짧은 패스했습니다.",
+        "terminalEvent": {
+          "t": 698.3000000000019,
+          "type": "PASS",
+          "text": "레드팀 RW이 레드팀 RCM 쪽으로 짧은 패스했습니다.",
+          "actorId": "A-RW",
+          "team": "AWAY",
+          "targetId": "A-RCM",
+          "passKind": "PASS"
+        },
+        "events": [
+          {
+            "t": 698.3000000000019,
+            "type": "PASS",
+            "text": "레드팀 RW이 레드팀 RCM 쪽으로 짧은 패스했습니다.",
+            "actorId": "A-RW",
+            "team": "AWAY",
+            "targetId": "A-RCM",
+            "passKind": "PASS"
+          }
+        ],
+        "score": {
+          "HOME": 0,
+          "AWAY": 0
+        },
+        "possession": "AWAY",
+        "performanceImpact": {
+          "at": 698.8,
+          "appearanceStatus": "STARTER",
+          "choiceId": "GK_STEP_OUT",
+          "resultCode": "POSSESSION_LOST",
+          "reckless": false,
+          "saferOption": null,
+          "chosenScore": null,
+          "ratingDelta": 0,
+          "rating": 6.5,
+          "substitutionPressureDelta": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "managerUsageTrustTotal": 0,
+          "reason": "NO_PENALTY"
+        }
+      },
+      "boundary": {
+        "id": "DEV-GK_RESULT_CONSISTENCY-e6a35436",
+        "type": "PROTAGONIST_2D_WINDOW",
+        "sceneId": "DEV-GK_RESULT_CONSISTENCY-e6a35436",
+        "atSecond": 690,
+        "sourceEventId": "E00001",
+        "reason": "GK_GOALKEEPING",
+        "heroPlayerId": "H-GK",
+        "heroRole": "GK",
+        "heroTeam": "HOME",
+        "protagonistPerformance": {
+          "rating": 6.5,
+          "recklessFailures": 0,
+          "substitutionPressure": 0,
+          "managerUsageTrustDelta": 0,
+          "lastImpact": null,
+          "history": []
+        },
+        "stateSnapshot": {
+          "second": 690,
+          "score": {
+            "HOME": 0,
+            "AWAY": 0
+          },
+          "possession": "AWAY",
+          "zone": "FINAL_THIRD",
+          "phase": "CHANCE",
+          "danger": 0.8859551671799273,
+          "ball": {
+            "team": "AWAY",
+            "lane": "CENTER",
+            "progress": 0.8114715794722239,
+            "ownerId": "A-RCM"
+          },
+          "structure": {
+            "HOME": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 46.80725414073095,
+              "lineHeight": 47.22704805806279,
+              "transitionDebt": 0
+            },
+            "AWAY": {
+              "midfieldOccupancy": 3,
+              "backLineOccupancy": 4,
+              "width": 47.43559170048684,
+              "lineHeight": 47.16720459423959,
+              "transitionDebt": 0
+            }
+          },
+          "spatial": {
+            "atSecond": 690,
+            "source": "DEVELOPER_RECENT_FIX_SEED",
+            "lastBallProgress": 0.8290434867218136,
+            "lastPossession": "AWAY",
+            "players": {
+              "H-GK": {
+                "id": "H-GK",
+                "team": "HOME",
+                "slot": "GK",
+                "role": "GK",
+                "x": 6.057441562297754,
+                "y": 33.158995845541355,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 4,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-LB": {
+                "id": "H-LB",
+                "team": "HOME",
+                "slot": "LB",
+                "role": "FB",
+                "x": 18.15375614799559,
+                "y": 12.221258996799587,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 18.555381083652378,
+                "intentTargetY": 13.404808178078383,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-LCB": {
+                "id": "H-LCB",
+                "team": "HOME",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 16.104385194927453,
+                "y": 26.41595301758498,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 15.85538108365238,
+                "intentTargetY": 26.585730944108217,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-RCB": {
+                "id": "H-RCB",
+                "team": "HOME",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 16.703590232133866,
+                "y": 40.814760573394594,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 15.85538108365238,
+                "intentTargetY": 41.41426905589178,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-RB": {
+                "id": "H-RB",
+                "team": "HOME",
+                "slot": "RB",
+                "role": "FB",
+                "x": 18.909991627559066,
+                "y": 56.6056122161448,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 18.555381083652378,
+                "intentTargetY": 54.59519182192162,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-LCM": {
+                "id": "H-LCM",
+                "team": "HOME",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 39.65538108365237,
+                "y": 22.466692579723894,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 39.65538108365237,
+                "intentTargetY": 22.466692579723894,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-CM": {
+                "id": "H-CM",
+                "team": "HOME",
+                "slot": "CM",
+                "role": "CM",
+                "x": 39.255381083652374,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 39.255381083652374,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-RCM": {
+                "id": "H-RCM",
+                "team": "HOME",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 39.65538108365237,
+                "y": 45.5333074202761,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 39.65538108365237,
+                "intentTargetY": 45.5333074202761,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-LW": {
+                "id": "H-LW",
+                "team": "HOME",
+                "slot": "LW",
+                "role": "WF",
+                "x": 59.255381083652374,
+                "y": 12.58100050520152,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 59.255381083652374,
+                "intentTargetY": 12.58100050520152,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-ST": {
+                "id": "H-ST",
+                "team": "HOME",
+                "slot": "ST",
+                "role": "ST",
+                "x": 63.855381083652375,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 63.855381083652375,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "H-RW": {
+                "id": "H-RW",
+                "team": "HOME",
+                "slot": "RW",
+                "role": "WF",
+                "x": 59.255381083652374,
+                "y": 55.418999494798484,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 59.255381083652374,
+                "intentTargetY": 55.418999494798484,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-GK": {
+                "id": "A-GK",
+                "team": "AWAY",
+                "slot": "GK",
+                "role": "GK",
+                "x": 93.3038408714682,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 93.3038408714682,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-LB": {
+                "id": "A-LB",
+                "team": "AWAY",
+                "slot": "LB",
+                "role": "FB",
+                "x": 74.8038408714682,
+                "y": 56.29472809922881,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 74.8038408714682,
+                "intentTargetY": 56.29472809922881,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-LCB": {
+                "id": "A-LCB",
+                "team": "AWAY",
+                "slot": "LCB",
+                "role": "CB",
+                "x": 77.3038408714682,
+                "y": 42.026102115722374,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 77.3038408714682,
+                "intentTargetY": 42.026102115722374,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-RCB": {
+                "id": "A-RCB",
+                "team": "AWAY",
+                "slot": "RCB",
+                "role": "CB",
+                "x": 77.3038408714682,
+                "y": 25.973897884277626,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 77.3038408714682,
+                "intentTargetY": 25.973897884277626,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-RB": {
+                "id": "A-RB",
+                "team": "AWAY",
+                "slot": "RB",
+                "role": "FB",
+                "x": 74.8038408714682,
+                "y": 11.705271900771187,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 74.8038408714682,
+                "intentTargetY": 11.705271900771187,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-LCM": {
+                "id": "A-LCM",
+                "team": "AWAY",
+                "slot": "LCM",
+                "role": "CM",
+                "x": 37.3,
+                "y": 46.48504773556814,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 37.3,
+                "intentTargetY": 46.48504773556814,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-CM": {
+                "id": "A-CM",
+                "team": "AWAY",
+                "slot": "CM",
+                "role": "CM",
+                "x": 48.1,
+                "y": 34,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 48.1,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-RCM": {
+                "id": "A-RCM",
+                "team": "AWAY",
+                "slot": "RCM",
+                "role": "CM",
+                "x": 19.79548415541649,
+                "y": 35.76725305477157,
+                "vx": -1.4,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 17.950433894209567,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-LW": {
+                "id": "A-LW",
+                "team": "AWAY",
+                "slot": "LW",
+                "role": "WF",
+                "x": 24.32544626109302,
+                "y": 12.978794166445732,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 28.599999999999994,
+                "intentTargetY": 57.18651722319797,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-ST": {
+                "id": "A-ST",
+                "team": "AWAY",
+                "slot": "ST",
+                "role": "ST",
+                "x": 20.365158288553356,
+                "y": 37.03836220763624,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 25,
+                "intentTargetY": 34,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              },
+              "A-RW": {
+                "id": "A-RW",
+                "team": "AWAY",
+                "slot": "RW",
+                "role": "WF",
+                "x": 24.232040566578508,
+                "y": 54.338685624673964,
+                "vx": 0,
+                "vy": 0,
+                "intentKind": "SHAPE",
+                "intentTargetId": null,
+                "intentTargetX": 28.599999999999994,
+                "intentTargetY": 10.813482776802026,
+                "intentSince": 688,
+                "intentMinUntil": 688,
+                "intentScore": 0.2,
+                "intentMaxUntil": 693,
+                "sourceTask": null,
+                "lastPossession": "AWAY"
+              }
+            },
+            "ball": {
+              "x": 19.79548415541649,
+              "y": 35.76725305477157,
+              "ownerId": "A-RCM"
+            }
+          }
+        },
+        "preContext": [
+          {
+            "id": "E00001",
+            "t": 690,
+            "minute": 11.5,
+            "kind": "DEVELOPER_RECENT_FIX",
+            "team": "HOME",
+            "zone": "FINAL_THIRD",
+            "phase": "CHANCE",
+            "detail": {
+              "scenario": "GK_RESULT_CONSISTENCY",
+              "label": "GK 선택 결과 정합성",
+              "ownerId": "A-RCM",
+              "forcedContextOnly": true,
+              "futureOutcomePrecomputed": false
+            },
+            "context": {
+              "possession": "AWAY",
+              "danger": 0.886,
+              "ball": {
+                "team": "AWAY",
+                "lane": "CENTER",
+                "progress": 0.8114715794722239,
+                "ownerId": "A-RCM"
+              },
+              "structure": {
+                "HOME": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 46.80725414073095,
+                  "lineHeight": 47.22704805806279,
+                  "transitionDebt": 0
+                },
+                "AWAY": {
+                  "midfieldOccupancy": 3,
+                  "backLineOccupancy": 4,
+                  "width": 47.43559170048684,
+                  "lineHeight": 47.16720459423959,
+                  "transitionDebt": 0
+                }
+              }
+            }
+          }
+        ],
+        "futureOutcomePrecomputed": false,
+        "choicePrecomputed": false,
+        "developerScenario": {
+          "key": "GK_RESULT_CONSISTENCY",
+          "label": "GK 선택 결과 정합성",
+          "instruction": "GK가 위협적인 슈팅 직전 상황에서 위치 유지/전진을 선택한 뒤 실제 선방·실점 결과와 결과 문구가 일치하는지 확인하세요.",
+          "seed": "DEV-RECENT-1787551224799-36",
+          "forcedContextOnly": true,
+          "futureOutcomePrecomputed": false
+        }
+      },
+      "frameMetrics": {
+        "count": 89,
+        "firstTime": 690,
+        "lastTime": 698.8,
+        "minOpponentDistance": 1.239,
+        "minSameTeamDistance": 1.014,
+        "maxPlayersWithin3mOfBall": 4,
+        "longestControlledOwnerFreezeNearOpponentSeconds": 0.3,
+        "topLateralJitter": [
+          {
+            "id": "H-LCM",
+            "slot": "LCM",
+            "role": "CM",
+            "lateralDirectionFlips": 4,
+            "totalMove": 33.798
+          },
+          {
+            "id": "H-RCM",
+            "slot": "RCM",
+            "role": "CM",
+            "lateralDirectionFlips": 4,
+            "totalMove": 31.607
+          },
+          {
+            "id": "H-LCB",
+            "slot": "LCB",
+            "role": "CB",
+            "lateralDirectionFlips": 4,
+            "totalMove": 24.864
+          },
+          {
+            "id": "H-GK",
+            "slot": "GK",
+            "role": "GK",
+            "lateralDirectionFlips": 4,
+            "totalMove": 6.609
+          },
+          {
+            "id": "H-CM",
+            "slot": "CM",
+            "role": "CM",
+            "lateralDirectionFlips": 3,
+            "totalMove": 34.813
+          },
+          {
+            "id": "A-ST",
+            "slot": "ST",
+            "role": "ST",
+            "lateralDirectionFlips": 3,
+            "totalMove": 19.959
+          },
+          {
+            "id": "H-RW",
+            "slot": "RW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 15.575
+          },
+          {
+            "id": "H-LW",
+            "slot": "LW",
+            "role": "WF",
+            "lateralDirectionFlips": 3,
+            "totalMove": 15.567
+          }
+        ],
+        "slots": {
+          "GK": {
+            "id": "A-GK",
+            "team": "AWAY",
+            "role": "GK",
+            "first": [
+              93.304,
+              34.0
+            ],
+            "last": [
+              96.288,
+              33.353
+            ],
+            "xRange": 3.029,
+            "yRange": 1.191
+          },
+          "LB": {
+            "id": "A-LB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              74.804,
+              56.295
+            ],
+            "last": [
+              37.0,
+              41.2
+            ],
+            "xRange": 37.804,
+            "yRange": 15.095
+          },
+          "LCB": {
+            "id": "A-LCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              77.304,
+              42.026
+            ],
+            "last": [
+              51.0,
+              41.926
+            ],
+            "xRange": 26.304,
+            "yRange": 0.897
+          },
+          "RCB": {
+            "id": "A-RCB",
+            "team": "AWAY",
+            "role": "CB",
+            "first": [
+              77.304,
+              25.974
+            ],
+            "last": [
+              51.0,
+              25.126
+            ],
+            "xRange": 26.304,
+            "yRange": 1.061
+          },
+          "RB": {
+            "id": "A-RB",
+            "team": "AWAY",
+            "role": "FB",
+            "first": [
+              74.804,
+              11.705
+            ],
+            "last": [
+              49.85,
+              7.0
+            ],
+            "xRange": 25.634,
+            "yRange": 4.705
+          },
+          "LCM": {
+            "id": "A-LCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              37.3,
+              46.485
+            ],
+            "last": [
+              29.0,
+              43.734
+            ],
+            "xRange": 14.901,
+            "yRange": 4.331
+          },
+          "CM": {
+            "id": "A-CM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              48.1,
+              34.0
+            ],
+            "last": [
+              45.0,
+              33.362
+            ],
+            "xRange": 7.648,
+            "yRange": 1.058
+          },
+          "RCM": {
+            "id": "A-RCM",
+            "team": "AWAY",
+            "role": "CM",
+            "first": [
+              19.795,
+              35.767
+            ],
+            "last": [
+              15.546,
+              31.218
+            ],
+            "xRange": 7.091,
+            "yRange": 6.519
+          },
+          "LW": {
+            "id": "A-LW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              24.325,
+              12.979
+            ],
+            "last": [
+              16.669,
+              60.378
+            ],
+            "xRange": 8.036,
+            "yRange": 47.399
+          },
+          "ST": {
+            "id": "A-ST",
+            "team": "AWAY",
+            "role": "ST",
+            "first": [
+              20.365,
+              37.038
+            ],
+            "last": [
+              11.949,
+              38.698
+            ],
+            "xRange": 9.73,
+            "yRange": 5.436
+          },
+          "RW": {
+            "id": "A-RW",
+            "team": "AWAY",
+            "role": "WF",
+            "first": [
+              24.232,
+              54.339
+            ],
+            "last": [
+              12.916,
+              24.004
+            ],
+            "xRange": 11.679,
+            "yRange": 31.79
+          }
+        }
+      },
+      "events": [],
+      "currentBytes": 1406778,
+      "previousPresent": true
+    }
+  ],
+  "workerSecretAudit": {
+    "status": "QUERY_FAILED",
+    "githubIssueTokenPresent": null,
+    "secretNames": []
+  }
+}
