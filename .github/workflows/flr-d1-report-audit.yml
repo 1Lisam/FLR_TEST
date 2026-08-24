@@ -58,6 +58,155 @@ jobs:
           fi
           RID="$rid" python -c "import json,pathlib,os; q=json.load(open('/tmp/flr_d1_query.json',encoding='utf-8')); assert q.get('success') is True; rows=((q.get('result') or [{}])[0].get('results') or []); d=json.load(open('/tmp/flr_latest_report.json',encoding='utf-8')); cur=d.get('currentSituation'); prev=d.get('previousSituation'); slim={'schemaVersion':'FLR_D1_REPORT_AUDIT_1.3','status':'PASS','count':len(rows),'reports':rows,'latestAttachedReportId':os.environ.get('RID') or None,'latestBundle':{'schemaVersion':d.get('schemaVersion'),'scope':d.get('scope'),'bugReportContext':d.get('bugReportContext'),'currentSituationPresent':cur is not None,'previousSituationPresent':prev is not None,'currentSituationKeys':list(cur.keys()) if isinstance(cur,dict) else [],'previousSituationKeys':list(prev.keys()) if isinstance(prev,dict) else [],'currentReportScope':cur.get('reportScope') if isinstance(cur,dict) else None,'previousReportScope':prev.get('reportScope') if isinstance(prev,dict) else None,'currentSerializedBytes':len(json.dumps(cur,ensure_ascii=False).encode()) if cur is not None else 0,'previousSerializedBytes':len(json.dumps(prev,ensure_ascii=False).encode()) if prev is not None else 0}}; pathlib.Path('/tmp/flr_d1_report_status.json').write_text(json.dumps(slim,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')"
 
+      - name: Export requested D1 report batch for local-first triage
+        id: export
+        continue-on-error: true
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          FLR_WORKER_ORIGIN: https://flr-bug-reporter.sikarops.workers.dev
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/flr_report_export/raw
+          if [ ! -s /tmp/flr_d1_list.json ]; then
+            npx --yes wrangler@latest d1 list --json > /tmp/flr_d1_list.json
+          fi
+          dbid="$(python -c "import json; j=json.load(open('/tmp/flr_d1_list.json',encoding='utf-8')); print(next(((r.get('uuid') or r.get('id') or '') for r in j if r.get('name')=='flr-bug-reports'),''))")"
+          test -n "$dbid"
+
+          python - <<'PY' > /tmp/flr_export_query_body.json
+          import json
+          req=json.load(open('.flr/d1-report-audit-request.json',encoding='utf-8'))
+          current=str(req.get('build') or '').strip()
+          if not current:
+              raise SystemExit('request build is required')
+          since=str(req.get('sinceCreatedAt') or '1970-01-01T00:00:00Z').strip()
+          limit=max(1,min(2000,int(req.get('exportLimit') or req.get('limit') or 500)))
+          sql=("SELECT report_id, build, created_at, category, priority, description, "
+               "size_bytes, chunk_count, summary_json, debug_schema_version "
+               "FROM bug_reports WHERE build = ? OR created_at >= ? "
+               "ORDER BY created_at DESC LIMIT ?")
+          print(json.dumps({'sql':sql,'params':[current,since,limit]},ensure_ascii=False))
+          PY
+
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H 'Content-Type: application/json' \
+            --data-binary @/tmp/flr_export_query_body.json \
+            > /tmp/flr_export_query.json
+
+          python - <<'PY' > /tmp/flr_export_ids.tsv
+          import json
+          q=json.load(open('/tmp/flr_export_query.json',encoding='utf-8'))
+          if q.get('success') is not True:
+              raise SystemExit('D1 export query failed')
+          rows=((q.get('result') or [{}])[0].get('results') or [])
+          for r in rows:
+              if int(r.get('chunk_count') or 0)>0:
+                  print(f"{r['report_id']}\t{r['build']}")
+          PY
+
+          failed=0
+          while IFS=$'\t' read -r rid build; do
+            [ -n "$rid" ] || continue
+            safe_build="$(printf '%s' "$build" | sed -E 's/[^A-Za-z0-9._-]+/_/g' | cut -c1-80)"
+            out="/tmp/flr_report_export/raw/${rid}.json"
+            if ! curl -fsS "${FLR_WORKER_ORIGIN}/reports/${safe_build}/${rid}.json" > "$out"; then
+              echo "::warning::raw report download failed: ${rid}"
+              rm -f "$out"
+              failed=$((failed+1))
+            fi
+          done < /tmp/flr_export_ids.tsv
+
+          export GITHUB_RUN_ID GITHUB_SHA FAILED_DOWNLOADS="$failed" FLR_WORKER_ORIGIN
+          python - <<'PY'
+          import datetime, hashlib, json, os, pathlib
+          req=json.load(open('.flr/d1-report-audit-request.json',encoding='utf-8'))
+          q=json.load(open('/tmp/flr_export_query.json',encoding='utf-8'))
+          rows=((q.get('result') or [{}])[0].get('results') or [])
+          raw_dir=pathlib.Path('/tmp/flr_report_export/raw')
+          current=str(req.get('build') or '')
+          collected_at=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          index=[]
+          failures=0
+          for r in rows:
+              rid=r['report_id']
+              p=raw_dir/f'{rid}.json'
+              has_debug=int(r.get('chunk_count') or 0)>0
+              ok=(not has_debug) or p.is_file()
+              if has_debug and not ok:
+                  failures+=1
+              item={
+                  'reportId':rid,
+                  'build':r.get('build'),
+                  'submittedAt':r.get('created_at'),
+                  'category':r.get('category'),
+                  'priority':r.get('priority'),
+                  'description':r.get('description'),
+                  'summary':json.loads(r['summary_json']) if r.get('summary_json') else None,
+                  'debugSchemaVersion':r.get('debug_schema_version'),
+                  'sizeBytes':r.get('size_bytes'),
+                  'chunkCount':r.get('chunk_count'),
+                  'sourceLocator':f"{os.environ.get('FLR_WORKER_ORIGIN')}/report-meta/{rid}",
+                  'rawPath':f"raw/{rid}.json" if has_debug and ok else None,
+                  'retrievalStatus':'OK' if ok else 'FAILED',
+                  'sha256':hashlib.sha256(p.read_bytes()).hexdigest() if p.is_file() else None,
+              }
+              index.append(item)
+          since=req.get('sinceCreatedAt')
+          payload={
+              'schemaVersion':'FLR_REPORT_EXPORT_INDEX_1.0',
+              'status':'PASS' if failures==0 else 'PARTIAL',
+              'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
+              'sourceCommit':os.environ.get('GITHUB_SHA'),
+              'requestedAt':req.get('requestedAt'),
+              'collectedAt':collected_at,
+              'currentBuild':current,
+              'sinceCreatedAt':since,
+              'safetyOverlapMinutes':req.get('overlapMinutes',30),
+              'count':len(index),
+              'currentBuildCount':sum(1 for x in index if x.get('build')==current),
+              'lateOlderBuildCount':sum(
+                  1 for x in index
+                  if x.get('build')!=current and x.get('submittedAt') and (not since or x['submittedAt']>=since)
+              ),
+              'failedDownloads':failures,
+              'reports':index,
+          }
+          pathlib.Path('/tmp/flr_report_export/index.json').write_text(
+              json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'
+          )
+          cursor={
+              'schemaVersion':'FLR_REPORT_COLLECTION_CURSOR_1.0',
+              'lastCollectedAt':collected_at,
+              'safetyOverlapMinutes':req.get('overlapMinutes',30),
+              'latestSubmittedAt':max((x.get('submittedAt') or '' for x in index), default=None),
+          }
+          pathlib.Path('/tmp/flr_report_export/cursor.json').write_text(
+              json.dumps(cursor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'
+          )
+          status={k:payload[k] for k in (
+              'schemaVersion','status','workflowRunId','sourceCommit','requestedAt','collectedAt',
+              'currentBuild','sinceCreatedAt','safetyOverlapMinutes','count','currentBuildCount',
+              'lateOlderBuildCount','failedDownloads'
+          )}
+          pathlib.Path('/tmp/flr_d1_report_export_status.json').write_text(
+              json.dumps(status,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'
+          )
+          PY
+          test "$failed" -eq 0
+
+      - name: Upload report export artifact
+        id: upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flr-v27-report-export-${{ github.run_id }}
+          path: /tmp/flr_report_export
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Deep-audit all V0.4 attached reports
         id: deep
         continue-on-error: true
@@ -87,6 +236,11 @@ jobs:
         env:
           OUTCOME: ${{ steps.audit.outcome }}
           DEEP_OUTCOME: ${{ steps.deep.outcome }}
+          EXPORT_OUTCOME: ${{ steps.export.outcome }}
+          RUN_ID: ${{ github.run_id }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
         run: |
           set +e
           if [ "${OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_d1_report_status.json ]; then
@@ -98,6 +252,19 @@ jobs:
           if [ "${DEEP_OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_v04_feedback_compact_status.json ]; then
             printf '{"schemaVersion":"FLR_V04_FEEDBACK_COMPACT_SUMMARY_1.0","status":"FAILED","count":0,"reports":[]}\n' > /tmp/flr_v04_feedback_compact_status.json
           fi
+          if [ "${EXPORT_OUTCOME}" != 'success' ] || [ ! -s /tmp/flr_d1_report_export_status.json ]; then
+            printf '{"schemaVersion":"FLR_REPORT_EXPORT_INDEX_1.0","status":"FAILED","count":0,"currentBuildCount":0,"lateOlderBuildCount":0,"failedDownloads":-1}\n' > /tmp/flr_d1_report_export_status.json
+          fi
+          python - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path('/tmp/flr_d1_report_export_status.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          d['workflowRunId']=os.environ.get('RUN_ID') or d.get('workflowRunId')
+          d['artifactId']=os.environ.get('ARTIFACT_ID') or None
+          d['artifactUrl']=os.environ.get('ARTIFACT_URL') or None
+          d['artifactDigest']=os.environ.get('ARTIFACT_DIGEST') or None
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
           git config user.name 'FLR D1 Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
           git reset --hard HEAD
@@ -106,12 +273,13 @@ jobs:
           cp /tmp/flr_d1_report_status.json .flr/d1-report-audit-status.json
           cp /tmp/flr_v04_feedback_deep_status.json .flr/v04-feedback-deep-audit-status.json
           cp /tmp/flr_v04_feedback_compact_status.json .flr/v04-feedback-compact-status.json
-          git add .flr/d1-report-audit-status.json .flr/v04-feedback-deep-audit-status.json .flr/v04-feedback-compact-status.json
+          cp /tmp/flr_d1_report_export_status.json .flr/d1-report-export-status.json
+          git add .flr/d1-report-audit-status.json .flr/v04-feedback-deep-audit-status.json .flr/v04-feedback-compact-status.json .flr/d1-report-export-status.json
           if git diff --cached --quiet; then
             echo 'AUDIT_STATUS_UNCHANGED'
             exit 0
           fi
-          git commit -m 'Record latest FLR V0.4 feedback deep audit' || exit 0
+          git commit -m 'Record latest FLR D1 report audit and export' || exit 0
           for attempt in 1 2 3; do
             git push origin HEAD:main && exit 0
             sleep 2
