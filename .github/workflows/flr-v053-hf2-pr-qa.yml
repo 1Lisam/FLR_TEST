@@ -39,6 +39,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # The original helper was authored against an older maybeOffside() function shape.
+          # Patch only those two transformer anchors to the exact current HF1 source form.
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.flr/apply_v053_hf2_visualfix.py'); s=p.read_text(encoding='utf-8')
+          old1='''replace_once(core,\n"function maybeOffside(m,receiver){if(m.ball.kind==='SHOT'||!m.ball.offsideAtRelease||m.ball.age>.55)return false;",\n"function maybeOffside(m,receiver){if(m.ball.kind==='SHOT'||!m.ball.offsideAtRelease||m.ball.offsideCalled||m.ball.age<.30||m.ball.age>1.20)return false;",\n'Offside call after visible flight')'''
+          new1='''replace_once(core,\n"  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.age>0.12)return;",\n"  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.offsideCalled||m.ball.age<0.30||m.ball.age>1.20)return;",\n'Offside declaration timing')'''
+          old2='''replace_once(core,\n"  addEvent(m,'OFFSIDE',`${receiver.name} 오프사이드`,receiver.team,receiver.id,null);m.stats.offsides[receiver.team]++;startDeadRestart(m,'OFFSIDE',other(receiver.team),m.ball.x,m.ball.y);return true;}",\n"  m.ball.offsideCalled=true;addEvent(m,'OFFSIDE',`${receiver.name} 오프사이드`,receiver.team,receiver.id,null);m.stats.offsides[receiver.team]++;startDeadRestart(m,'OFFSIDE',other(receiver.team),m.ball.x,m.ball.y);return true;}",\n'Offside one-shot flag')'''
+          new2='''replace_once(core,\n"  if(m.ball.offsideAtRelease===true){m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}",\n"  if(m.ball.offsideAtRelease===true){m.ball.offsideCalled=true;m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}",\n'Offside one-shot flag')'''
+          if old1 not in s or old2 not in s: raise SystemExit('expected legacy transformer offside anchors missing')
+          p.write_text(s.replace(old1,new1,1).replace(old2,new2,1),encoding='utf-8')
+          PY
           python .flr/apply_v053_hf2_visualfix.py
           python - <<'PY'
           from pathlib import Path
