@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Apply HF3 transformer in QA workspace
-        run: python .flr/v053_hf3_apply.py
+        run: python .flr/v053_hf3_apply_v2.py
 
       - name: Syntax and source invariants
         shell: bash
