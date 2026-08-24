@@ -13,4 +13,4 @@ const eights=['H-LCM','H-RCM'].map(id=>({id,x:LT('HOME',m.playersById[id]).x,y:L
 check('EXACTLY_ONE_EIGHT_ATTACKS_BOX',box.length===1,{eights,pivot});
 check('OTHER_EIGHT_HOLDS_SECOND_BALL_EDGE',edge.length===1,{eights,pivot});
 check('MIDFIELD_TRIANGLE_HAS_THREE_LAYERS',box.length===1&&edge.length===1&&pivot.x<=65&&pivot.x<edge[0]?.x,{eights,pivot});
-const status=(base.returncode===0&&checks.every(x=>x.pass))?'PASS':'FAIL';const out={schemaVersion:'FLR_V054_DEFENCE_NORMALIZATION_VALIDATION_R4',status,baseStatus:baseObj.status,checks,watches};console.log(JSON.stringify(out,null,2));if(status!=='PASS')process.exitCode=1;
+const failedIds=checks.filter(x=>!x.pass).map(x=>x.id),status=(base.status===0&&failedIds.length===0)?'PASS':'FAIL';const out={schemaVersion:'FLR_V054_DEFENCE_NORMALIZATION_VALIDATION_R4',status,baseStatus:baseObj.status,baseExitStatus:base.status,failedIds,checks,watches};console.log(JSON.stringify(out,null,2));if(status!=='PASS')process.exitCode=1;
