@@ -25,8 +25,8 @@ const DEV_RECENT_GUIDES={
  CARRIER_SHIELD_FLOW:{label:'공격수 멈칫 반복 방지',watch:'ST가 공을 지킨 뒤 같은 자리에서 SHIELD_SCAN/멈춤을 반복하는지 봅니다.',normal:'정상: 짧게 스캔한 뒤 패스·드리블·보호 등 다음 실제 판단으로 이어집니다.'},
  OFFSIDE_INVOLVEMENT:{label:'오프사이드 실제 관여 시점',watch:'오프사이드 위치는 패스가 출발한 순간 기준인지, 판정 연출은 실제 공 관여 시점에 나타나는지 봅니다.',normal:'정상: 위치 판정 기준은 release 순간에 고정되고, 휘슬은 실제 관여가 확인될 때 표시됩니다.'}
 };
-function selectedRecentFixKey(){const sel=$('heroRecentFixSelect');return sel?.value||'BALL_DEPTH_SYNC';}
-function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GUIDES[key]||DEV_RECENT_GUIDES.BALL_DEPTH_SYNC,box=$('heroRecentFixGuide');if(box)box.innerHTML=`<strong>${g.label}</strong><br><span>무엇을 볼지: ${g.watch}</span><br><span class="muted">${g.normal}</span>`;}
+function selectedRecentFixKey(){const sel=$('heroRecentFixSelect');return sel?.value||'DEFENSIVE_ROLE_STABILITY';}
+function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GUIDES[key]||DEV_RECENT_GUIDES.DEFENSIVE_ROLE_STABILITY,box=$('heroRecentFixGuide');if(box)box.innerHTML=`<strong>${g.label}</strong><br><span>무엇을 볼지: ${g.watch}</span><br><span class="muted">${g.normal}</span>`;}
 function clearAutoAdvance(){clearTimeout(autoAdvanceTimer);clearInterval(autoAdvanceInterval);autoAdvanceTimer=autoAdvanceInterval=null;const x=$('heroAutoNext');if(x)x.textContent='';const n=$('heroSceneNotice');if(n?.classList.contains('end-countdown')){n.hidden=true;n.classList.remove('end-countdown');}}
 function periodMinute(t){const sec=Math.max(0,Number(t)||0),m=Math.floor(sec/60)+1;return sec<2700?`전반 ${Math.min(45,m)}분`:`후반 ${Math.max(1,Math.min(45,m-45))}분`;}
 function pushLiveFeed(text,kind=''){const box=$('heroLiveFeed');if(!box||!text)return;const row=document.createElement('div');row.className=`live-feed-row ${kind}`.trim();row.textContent=text;box.appendChild(row);while(box.children.length>3)box.removeChild(box.firstChild);}
