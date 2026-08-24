@@ -23,7 +23,7 @@ function attackDir(team){return team==='HOME'?1:-1;}
 function world(team,x,y){return team==='HOME'?{x,y}:{x:105-x,y:68-y};}
 function local(team,x,y){return team==='HOME'?{x,y}:{x:105-x,y:68-y};}
 function localProgressOf(team,x){return clamp((team==='HOME'?x:105-x)/105,.02,.98);}
-function attackLineLocal(players,team){const xs=Object.values(players).filter(q=>q.team!==team&&q.role!=='GK').map(q=>local(team,q.x,q.y).x).sort((a,b)=>a-b);return xs.length>=2?xs[xs.length-2]:92;}
+function attackLineLocal(players,team){const xs=Object.values(players).filter(q=>q.team!==team).map(q=>local(team,q.x,q.y).x).sort((a,b)=>a-b);return xs.length>=2?xs[xs.length-2]:92;}
 function dist(a,b){return Math.hypot((a?.x||0)-(b?.x||0),(a?.y||0)-(b?.y||0));}
 
 function abstractBallWorld(state){
@@ -157,24 +157,22 @@ function maxIntentDuration(kind){
 }
 function intentPriority(kind){return({PRESS:1.0,MARK:.92,COVER:.82,RUN:.88,RECOVER:.80,SUPPORT:.68,SHAPE:.35})[kind]||.3;}
 
-function pressLeash(role){return({ST:10.5,WF:12.5,CM:13.5,FB:14.5})[role]||12;}
+function pressLeash(role){return({ST:10.5,WF:11.5,CM:10.8,FB:14.5})[role]||12;}
 function defensiveAssignments(state,players,team){
   const opp=other(team),owner=players[state.ball.ownerId],teamPs=Object.values(players).filter(p=>p.team===team&&p.role!=='GK');
   const out={press:null,markerByThreat:{},coverByMarker:{}};
   if(owner&&owner.team===opp){
-    const ownerLocalX=team==='HOME'?owner.x:105-owner.x;
-    const press=nearest(players,owner,p=>{
-      if(p.team!==team||p.role==='GK'||!['CM','FB','WF','ST'].includes(p.role))return false;
-      // The striker may lead a press high up the pitch, but must not be dragged into his
-      // own defensive third simply because he became the nearest player after a transition.
-      if(p.role==='ST'&&ownerLocalX<45)return false;
-      if(p.role==='WF'&&ownerLocalX<30)return false;
-      // A player who is already far outside his structural lane should recover rather than
-      // earn a fresh licence to chase the ball even farther away.
-      const base=shapeBase(state,p.id),anchorDist=dist(p,base);
-      return anchorDist<=pressLeash(p.role)+4;
-    });
-    if(press&&press.d<=16)out.press=press.p.id;
+    const ol=local(team,owner.x,owner.y),wide=Math.abs(ol.y-34)>14.5,side=ol.y<34?-1:1;
+    const ranked=teamPs.filter(p=>['CM','FB','WF','ST'].includes(p.role)).map(p=>{
+      const base=shapeBase(state,p.id),anchorDist=dist(p,base),pside=['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0;
+      if(anchorDist>pressLeash(p.role)+4)return null;
+      if(p.role==='ST'&&ol.x<45)return null;if(p.role==='WF'&&ol.x<30)return null;
+      let score=dist(p,owner);
+      if(wide){if(p.role==='FB')score+=pside===side?-4.2:7.0;else if(p.role==='CM')score+=(ol.x<38?3.5:1.4)+(pside&&pside!==side?4.0:0);else score+=5.0;}
+      else{if(p.role==='CM')score-=1.8;else if(p.role==='FB')score+=2.5;else score+=2.8;}
+      return{p,d:dist(p,owner),score};
+    }).filter(Boolean).sort((a,b)=>a.score-b.score||a.d-b.d);
+    const press=ranked[0];if(press&&press.d<=17)out.press=press.p.id;
   }
   const prefix=opp==='HOME'?'H':'A';
   const threats=[`${prefix}-ST`,`${prefix}-LW`,`${prefix}-RW`].map(id=>players[id]).filter(Boolean);
@@ -291,10 +289,10 @@ function candidateIntent(state,players,p,assignments,now){
     }
     if(p.slot===nearSlot){
       const lat=p.slot==='LCM'?-6:6,relation=world(p.team,clamp(ol.x-5,5,100),clamp(ol.y+lat,5,63));
-      return{kind:'SUPPORT',target:capAround(base,blend(base,relation,.44),10),targetId:owner?.id||null,score:.78};
+      return{kind:'SUPPORT',target:capAround(base,blend(base,relation,.60),13),targetId:owner?.id||null,score:.78};
     }
     const farY=p.slot==='LCM'?21:47,targetLocal={x:clamp(ol.x-8,30,82),y:farY},w=world(p.team,targetLocal.x,targetLocal.y);
-    return{kind:'SUPPORT',target:capAround(base,blend(base,w,.36),10),targetId:null,score:.73};
+    return{kind:'SUPPORT',target:capAround(base,blend(base,w,.50),13),targetId:null,score:.73};
   }
   if(p.role==='WF'||p.role==='FB'){
     const rel=owner?predicted(owner,.30):abstractBallWorld(state),behind=p.role==='FB'?-9:-2;

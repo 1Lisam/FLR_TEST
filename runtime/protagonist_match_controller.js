@@ -66,7 +66,7 @@ function trackPassRelease(s){
   const sig=`${b.lastTouchPlayer}|${b.intendedReceiverId}|${Number(b.originX||b.x).toFixed(2)}|${Number(b.targetX||b.x).toFixed(2)}|${Math.floor(s.m.time*10)}`;
   if(sig===s.lastPassReleaseSig)return;s.lastPassReleaseSig=sig;
   const f=leanFrame(s.m),src=f.players.find(p=>p.id===b.lastTouchPlayer),target=f.players.find(p=>p.id===b.intendedReceiverId);if(!src||!target)return;
-  const engineLine=engineOffsideLine(f,src.team,false),referenceLine=engineOffsideLine(f,src.team,true),ballX=b.originX??b.x;
+  const engineLine=engineOffsideLine(f,src.team,true),referenceLine=engineOffsideLine(f,src.team,true),ballX=b.originX??b.x;
   const engineOffside=src.team==='HOME'?(target.x>52.5&&target.x>ballX+.25&&engineLine!=null&&target.x>engineLine+.25):(target.x<52.5&&target.x<ballX-.25&&engineLine!=null&&target.x<engineLine-.25);
   s.passReleases.push({at:Number(s.m.time.toFixed(2)),sourceId:src.id,sourceName:src.name,targetId:target.id,targetName:target.name,attackingTeam:src.team,ballX:Number(ballX.toFixed(3)),targetX:Number(target.x.toFixed(3)),engineOffsideLine:engineLine==null?null:Number(engineLine.toFixed(3)),referenceSecondLastOpponentLine:referenceLine==null?null:Number(referenceLine.toFixed(3)),engineWouldFlag:!!engineOffside});
   while(s.passReleases.length&&s.passReleases[0].at<s.m.time-30)s.passReleases.shift();

@@ -228,7 +228,9 @@ function baseLocalX(role,possessing,progress){
   return clamp(b+shift,4,99);
 }
 function offsideLine(m,attTeam){
-  const defenders=outfield(m,other(attTeam)).map(p=>p.x).sort((a,b)=>a-b);
+  // Law 11 uses the second-last OPPONENT, not the second-last outfield defender.
+  // The goalkeeper is an opponent too and is normally the last opponent.
+  const defenders=teamPlayers(m,other(attTeam)).map(p=>p.x).sort((a,b)=>a-b);
   if(attTeam===HOME)return defenders[defenders.length-2]??101;
   return defenders[1]??4;
 }
