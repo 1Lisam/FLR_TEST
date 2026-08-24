@@ -1,0 +1,48 @@
+name: FLR HF3 Traceable PR QA
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    if: github.event.pull_request.title == '[FLR_QA] V0.5.3 HF3 ROLE STABILITY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Apply HF3 transformer in QA workspace
+        run: python .flr/v053_hf3_apply.py
+
+      - name: Syntax and source invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check runtime/tactical_movement.js
+          node --check runtime/continuous_match_core.js
+          grep -q 'stabilizeDefensiveResponsibilities' runtime/tactical_movement.js
+          grep -q 'o.l.x<=52' runtime/tactical_movement.js
+          grep -q 'recentShieldScan' runtime/continuous_match_core.js
+          grep -q 'involvementGap' runtime/continuous_match_core.js
+          grep -q 'futureOutcomePrecomputed:false' live_hybrid_session_v02.js
+          grep -q 'GITHUB_REPO = "FLR_TEST"' bug-report-worker/wrangler.toml
+
+      - name: Core runtime smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const E=require('./runtime/continuous_match_core.js');
+          const m=E.createMatch('HF3-PR-SMOKE',{dt:.05});
+          for(let i=0;i<2400&&!m.completed;i++)E.step(m,.05);
+          if(!Number.isFinite(m.time)||m.players.length!==22)throw new Error('runtime smoke failed');
+          console.log(JSON.stringify({time:m.time,score:m.score,offsides:m.stats.offsides,passes:m.stats.passes}));
+          NODE
