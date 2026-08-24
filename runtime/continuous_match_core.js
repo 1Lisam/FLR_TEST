@@ -1307,7 +1307,8 @@ function executeCarry(m,owner,opts={}){
   m.frontPassChain[owner.team]=0;
   if((m.attackRecycleUntil?.[owner.team]||0)>m.time){m.stats.recycleReattacks=(m.stats.recycleReattacks||0)+1;m.attackRecycleUntil[owner.team]=0;}
   const l=worldToLocal(owner.team,owner.x,owner.y),pressure=ballCarrierPressureDistance(m,owner),space=forwardSpace(m,owner,13),laneBias=(34-l.y)*0.055,inBox=inOppPenaltyArea(owner.team,owner.x,owner.y);
-  if(!opts.userCommitted&&!inBox&&l.x>=70&&l.x<88&&['ST','WF','CM'].includes(owner.role)&&pressure<3.0){owner.action=owner.tacticalTask='SHIELD_SCAN';owner.sprint=false;owner.lockTargetUntil=0;owner.nextThink=m.time+0.68;owner.lastDecision='HOLD';return;}
+  const recentShieldScan=m.time-Number(owner.lastShieldScanAt||-99)<1.20;
+  if(!opts.userCommitted&&!recentShieldScan&&!inBox&&l.x>=70&&l.x<88&&['ST','WF','CM'].includes(owner.role)&&pressure<3.0){owner.lastShieldScanAt=m.time;owner.action=owner.tacticalTask='SHIELD_SCAN';owner.sprint=false;owner.lockTargetUntil=0;owner.nextThink=m.time+0.48;owner.lastDecision='HOLD';return;}
   const base=owner.role==='WF'?4.8:owner.role==='ST'?4.3:owner.role==='CM'?3.8:owner.role==='FB'?3.5:2.8,stride=clamp(Math.min(base+space*0.19,space-0.45),1.2,7.2);
   let tx,ty;
   if(inBox){
@@ -1459,7 +1460,7 @@ function ownerThink(m,owner){
   }
   const pressure=ballCarrierPressureDistance(m,owner),held=Math.max(0,m.time-(owner.controlledSince||m.time));
   if(owner.role==='GK'&&held>0.75)owner.nextThink=Math.min(owner.nextThink,m.time);
-  else if(pressure<1.20&&held>0.28)owner.nextThink=Math.min(owner.nextThink,m.time);
+  else if(pressure<1.65&&held>0.22)owner.nextThink=Math.min(owner.nextThink,m.time);
   if(m.time<owner.nextThink)return;
   const action=chooseOwnerAction(m,owner);
   if(TELEMETRY&&m.telemetry&&typeof TELEMETRY.onDecision==='function'&&(!m.telemetry.focusPlayerId||owner.id===m.telemetry.focusPlayerId)){
@@ -1986,11 +1987,15 @@ function updateLooseChasers(m){
   }
 }
 function maybeOffside(m){
-  // Offside position is frozen when the pass is RELEASED. Do not re-evaluate after the runner
-  // has moved during the first 0.1s of ball flight.
-  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.offsideCalled||m.ball.age<0.30||m.ball.age>1.20)return;
+  // Law 11 reference is still frozen at RELEASE. HF3 changes only when the referee call becomes
+  // visible: let the real pass/run develop until the intended receiver is involved with the ball.
+  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.offsideCalled||m.ball.age<0.24||m.ball.age>1.90)return;
   const t=playerById(m,m.ball.intendedReceiverId),source=playerById(m,m.ball.lastTouchPlayer);if(!t||!source||source.team!==t.team)return;
-  if(m.ball.offsideAtRelease===true){m.ball.offsideCalled=true;m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}
+  if(m.ball.offsideAtRelease===true){
+    const involvementGap=dist(t,m.ball),involved=involvementGap<=2.55||m.ball.age>=1.65;
+    if(!involved)return;
+    m.ball.offsideCalled=true;m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`,{actorId:t.id,team:t.team,releaseFrozen:true,involvementGap:Number(involvementGap.toFixed(3)),flightAge:Number(m.ball.age.toFixed(3))});startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);
+  }
 }
 function updatePossessionClock(m,dt){
   if(m.ball.mode==='DEAD'||!m.possession)return;
