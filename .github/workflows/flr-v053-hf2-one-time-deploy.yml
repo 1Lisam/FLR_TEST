@@ -1,0 +1,124 @@
+name: FLR V0.5.3 HF2 one-time deploy
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-hf2:
+    if: github.event.issue.title == '[FLR_DEPLOY] V0.5.3 HF2 TEST'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Freeze HF1 production baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object index.html)" = 'f08e4cec13d68114c15ce321351c84f52cb675c4'
+          test "$(git hash-object live_hybrid_session_v02.js)" = '7a4edd403ba0ab77fe5d958a9be11e0a7141bbd1'
+          test "$(git hash-object runtime/continuous_match_core.js)" = '6d0c235f58f8c16cd0ab9b54c82597ef11b7fd62'
+          test "$(git hash-object runtime/hybrid_spatial_intent_v2.js)" = '0557d31daa3c47212446b5e6456e1152d6c1a978'
+          test "$(git hash-object runtime/tactical_movement.js)" = 'a2d3c0b738cf37f94f998721654fa6356b9c6317'
+          test "$(git hash-object step71_hybrid_v06_ui.js)" = '61fb9aa336b08c3ca6f09b20f8fc55baf144d78b'
+
+      - name: Fetch validated HF2 helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin test/v053-hf2-visualfix
+          git show origin/test/v053-hf2-visualfix:.flr/apply_v053_hf2_visualfix.py > .flr/_hf2_apply_temp.py
+          git show origin/test/v053-hf2-visualfix:.flr/v053_hf2_user_visual_regression.js > .flr/v053_hf2_user_visual_regression.js
+          git show origin/test/v053-hf2-visualfix:.flr/v053_integrated_90_role_bench.js > .flr/v053_integrated_90_role_bench.js
+
+      - name: Apply exact HF2 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.flr/_hf2_apply_temp.py'); s=p.read_text(encoding='utf-8')
+          old1='''replace_once(core,\n"function maybeOffside(m,receiver){if(m.ball.kind==='SHOT'||!m.ball.offsideAtRelease||m.ball.age>.55)return false;",\n"function maybeOffside(m,receiver){if(m.ball.kind==='SHOT'||!m.ball.offsideAtRelease||m.ball.offsideCalled||m.ball.age<.30||m.ball.age>1.20)return false;",\n'Offside call after visible flight')'''
+          new1='''replace_once(core,\n"  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.age>0.12)return;",\n"  if(m.ball.mode!=='FLIGHT'||!m.ball.intendedReceiverId||m.ball.offsideCalled||m.ball.age<0.30||m.ball.age>1.20)return;",\n'Offside declaration timing')'''
+          old2='''replace_once(core,\n"  addEvent(m,'OFFSIDE',`${receiver.name} 오프사이드`,receiver.team,receiver.id,null);m.stats.offsides[receiver.team]++;startDeadRestart(m,'OFFSIDE',other(receiver.team),m.ball.x,m.ball.y);return true;}",\n"  m.ball.offsideCalled=true;addEvent(m,'OFFSIDE',`${receiver.name} 오프사이드`,receiver.team,receiver.id,null);m.stats.offsides[receiver.team]++;startDeadRestart(m,'OFFSIDE',other(receiver.team),m.ball.x,m.ball.y);return true;}",\n'Offside one-shot flag')'''
+          new2='''replace_once(core,\n"  if(m.ball.offsideAtRelease===true){m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}",\n"  if(m.ball.offsideAtRelease===true){m.ball.offsideCalled=true;m.stats.offsides++;event(m,'OFFSIDE',`${subjectName(t.name)} 오프사이드 위치에 있었습니다.`);startDeadRestart(m,'OFFSIDE',other(t.team),t.x,t.y);}",\n'Offside one-shot flag')'''
+          if old1 not in s or old2 not in s: raise SystemExit('legacy offside transformer anchors missing')
+          p.write_text(s.replace(old1,new1,1).replace(old2,new2,1),encoding='utf-8')
+          PY
+          python .flr/_hf2_apply_temp.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('live_hybrid_session_v02.js'); s=p.read_text(encoding='utf-8')
+          old=" else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';\n else if(role==='GK'"
+          new=" else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';\n else if(role==='CB'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.72&&['DANGEROUS_PASS','BOX_ENTRY','PROGRESS'].includes(e.kind)){const hp=s.spatial?.players?.[hid],bp=s.spatial?.ball,db=hp&&bp?Math.hypot(hp.x-bp.x,hp.y-bp.y):99,active=hp&&((hp.intentKind==='MARK'&&hp.intentTargetId)||hp.intentKind==='PRESS'||(hp.intentKind==='COVER'&&db<=11));if(active&&(s.zone==='BOX'||e.kind==='DANGEROUS_PASS'||s.danger>=.82))reason='DEFENSIVE_INVOLVEMENT';}\n else if(role==='GK'"
+          if old not in s: raise SystemExit('CB promotion marker missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+
+      - name: Syntax and HF2 identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in live_hybrid_session_v02.js step71_hybrid_v06_ui.js runtime/tactical_movement.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js; do node --check "$f"; done
+          git diff --check
+          grep -q 'V0.5.3 HF2 TEST' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.3-HF2' step71_hybrid_v06_ui.js
+          grep -q 'umt053h2-' step71_hybrid_v06_ui.js
+          grep -q "reason='DEFENSIVE_INVOLVEMENT'" live_hybrid_session_v02.js
+
+      - name: Exact user five-issue regression
+        run: node .flr/v053_hf2_user_visual_regression.js
+
+      - name: Integrated 4x90 deployment gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          for r in ST CM CB GK; do (cd .flr && node v053_integrated_90_role_bench.js "$r"); done
+          python - <<'PY'
+          import json
+          statuses={r:json.load(open(f'.flr/v053_integrated_90_{r}_status.json')) for r in ['ST','CM','CB','GK']}
+          if any(x.get('status')!='PASS' for x in statuses.values()): raise SystemExit('role 90 failure')
+          cb=statuses['CB'].get('summary',{}); windows=(cb.get('boundaryTypes') or {}).get('PROTAGONIST_2D_WINDOW',0); choices=cb.get('choices',0)
+          if windows<1 or choices<1: raise SystemExit('CB decision survival failure')
+          print({'roles':{k:v.get('status') for k,v in statuses.items()},'cbWindows':windows,'cbChoices':choices,'stChoices':statuses['ST'].get('summary',{}).get('choices')})
+          PY
+
+      - name: Protected invariants and final manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),P=fs.readFileSync('runtime/protagonist_match_controller.js','utf8'),H=fs.readFileSync('live_hybrid_session_v02.js','utf8'),C=fs.readFileSync('runtime/continuous_match_core.js','utf8'),UI=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          const x={noFuture:P.includes('futureOutcomePrecomputed:false'),exactTarget:P.includes('CHOICE_TARGET_RESOLUTION_MISMATCH'),gkGoal:P.includes("code:'GOAL_CONCEDED'"),finalWindow:H.includes("type:'FINAL_2D_WINDOW'"),cbDecision:H.includes("reason='DEFENSIVE_INVOLVEMENT'"),offsideReview:C.includes("stage:deferredOffside?'CALL_REVIEW':'SETUP'"),devReport:UI.includes("rememberCompletedSituation(latestIntegratedDebug,'DEV_VISUAL')"),devSeed:UI.includes('developerScenarioActive?.seed||`${seed()}-${r.boundary.sceneId}`')}; console.log(x); if(Object.values(x).some(v=>!v))process.exit(1);
+          NODE
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,datetime
+          paths=['index.html','live_hybrid_session_v02.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','runtime/tactical_movement.js','step71_hybrid_v06_ui.js']
+          files=[]
+          for f in paths:
+            b=Path(f).read_bytes(); files.append({'path':f,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          roles={r:json.load(open(f'.flr/v053_integrated_90_{r}_status.json')) for r in ['ST','CM','CB','GK']}
+          visual=json.load(open('.flr/v053_hf2_user_visual_regression_status.json'))
+          out={'schemaVersion':'FLR_V053_HF2_DEPLOY_1.0','status':'PASS','checkedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'build':'USER-MATCH-TEST-V0.5.3-HF2','files':files,'visualStatus':visual.get('status'),'roles':{r:{'status':roles[r].get('status'),'summary':roles[r].get('summary')} for r in roles},'watch':['ST choice pace increased versus V24 reference; no quota adjustment applied.','Historical 10-minute every-session >=2 handoff gate remains WATCH, not a scene quota.'],'futureOutcomePrecomputed':False}
+          Path('.flr/v053_hf2_deploy_status.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Commit only validated HF2 production files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .flr/_hf2_apply_temp.py .flr/v053_hf2_user_visual_regression.js .flr/v053_integrated_90_role_bench.js
+          git config user.name 'FLR HF2 Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html live_hybrid_session_v02.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/tactical_movement.js step71_hybrid_v06_ui.js .flr/v053_hf2_deploy_status.json
+          git commit -m 'Deploy Match Engine User Test V0.5.3 HF2'
+          git push origin main
