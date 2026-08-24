@@ -1,6 +1,0 @@
-{
-  "schemaVersion": "FLR_V052_COMPACT_FINDINGS_REQUEST_1.0",
-  "requestedAt": "2026-08-24T08:28:00+09:00",
-  "source": ".flr/current-report-inspect-status.json",
-  "purpose": "Extract only the five V0.5.2 user-report metrics needed for diagnosis"
-}
