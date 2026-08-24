@@ -1,0 +1,46 @@
+name: FLR HF3 Candidate Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/hf3-candidate-build-request.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout HF3 branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/v053-hf3-role-stability
+          fetch-depth: 0
+
+      - name: Apply HF3 structural transformer
+        run: python .flr/v053_hf3_apply.py
+
+      - name: Syntax and protected-source smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check runtime/tactical_movement.js
+          node --check runtime/continuous_match_core.js
+          grep -q "stabilizeDefensiveResponsibilities" runtime/tactical_movement.js
+          grep -q "involvementGap" runtime/continuous_match_core.js
+          grep -q 'GITHUB_REPO = "FLR_TEST"' bug-report-worker/wrangler.toml
+          grep -q 'futureOutcomePrecomputed:false' live_hybrid_session_v02.js
+
+      - name: Commit candidate to HF3 branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR HF3 Candidate Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add runtime/tactical_movement.js runtime/continuous_match_core.js bug-report-worker/wrangler.toml .flr/v053_hf3_apply.py
+          git diff --cached --quiet && exit 0
+          git commit -m 'Build V0.5.3 HF3 role stability candidate'
+          git push origin HEAD:test/v053-hf3-role-stability
