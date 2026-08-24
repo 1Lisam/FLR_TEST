@@ -1,0 +1,71 @@
+name: V0.5.4 R14 Integrated QA
+
+on:
+  push:
+    branches:
+      - test/v054-defense-normalization
+    paths:
+      - '.flr/v054-r14-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test/v054-defense-normalization
+          fetch-depth: 1
+      - name: Materialize exact R13 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/flr-v054-r14
+          mkdir -p /tmp/flr-v054-r14
+          rsync -a --exclude='.git' ./ /tmp/flr-v054-r14/
+          python .flr/v054_defense_normalization_apply_bundle.py /tmp/flr-v054-r14
+      - name: Syntax checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check /tmp/flr-v054-r14/live_hybrid_session_v02.js
+          node --check /tmp/flr-v054-r14/live_v06_scene_authority_browser.js
+          node --check /tmp/flr-v054-r14/runtime/continuous_match_core.js
+          node --check /tmp/flr-v054-r14/runtime/hybrid_spatial_intent_v2.js
+          node --check /tmp/flr-v054-r14/runtime/protagonist_match_controller.js
+          node --check /tmp/flr-v054-r14/runtime/tactical_movement.js
+          node --check .flr/v054_defense_normalization_validation_r14.js
+      - name: Run full R14 integrated validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R14
+          set +e
+          node .flr/v054_defense_normalization_validation_r14.js /tmp/flr-v054-r14 > .flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R14/validation.json
+          code=$?
+          set -e
+          python - "$code" <<'PY'
+          import json,sys,pathlib
+          p=pathlib.Path('.flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R14/validation.json')
+          o=json.loads(p.read_text(encoding='utf-8'))
+          out={'schemaVersion':'FLR_V054_R14_INTEGRATED_QA_RESULT_1.0','status':o.get('status'),'validationExitCode':int(sys.argv[1]),'failedIds':o.get('failedIds',[]),'legacyStatus':o.get('legacyStatus'),'contextualGate':[
+              c for c in o.get('checks',[]) if str(c.get('id','')).endswith('CM_BACKLINE_COLLAPSE_RATIO_CONTEXTUAL')
+          ]}
+          pathlib.Path('.flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R14/CI_RESULT.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if int(sys.argv[1])!=0 or o.get('status')!='PASS': raise SystemExit(1)
+          PY
+      - name: Persist R14 result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "FLR V054 R14 QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add .flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R14
+          git diff --cached --quiet || {
+            git commit -m "Record V0.5.4 R14 integrated QA"
+            git push origin HEAD:test/v054-defense-normalization
+          }
