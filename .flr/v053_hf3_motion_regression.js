@@ -10,6 +10,7 @@ const player=(f,id)=>(f.players||[]).find(p=>p.id===id)||null;
 const n3=v=>Number.isFinite(Number(v))?+Number(v).toFixed(3):null;
 function visual(key,seed,seconds=9){const d=H.createDeveloperScenario({key,seed});const v=A.runDeveloperVisualWindow(d.boundary,{runtimeDir,seed:d.seed,durationSeconds:seconds});return{d,env:v,rows:v.frames};}
 function taskKey(p){return `${p?.tacticalTask||p?.action||''}|${p?.markTargetId||''}`;}
+function threatContext(f){const b=f?.ball||{};if(b.ownerId)return `OWNER:${b.ownerId}`;if(b.mode==='FLIGHT')return `FLIGHT:${b.intendedReceiverId||'NONE'}`;return `${b.mode||'NONE'}:${b.intendedReceiverId||'NONE'}`;}
 function taskChanges(rows,id){const a=rows.map(f=>player(f,id)).filter(Boolean).map(taskKey);let n=0;for(let i=1;i<a.length;i++)if(a[i]!==a[i-1])n++;return n;}
 function lateralFlips(rows,id,thr=.06){const s=[];for(let i=1;i<rows.length;i++){const a=player(rows[i-1],id),b=player(rows[i],id);if(!a||!b)continue;const dy=b.y-a.y;if(Math.abs(dy)>=thr)s.push(dy>0?1:-1);}let n=0;for(let i=1;i<s.length;i++)if(s[i]!==s[i-1])n++;return n;}
 function shared(a,b){const s=new Set(a||[]);return(b||[]).filter(x=>s.has(x));}
@@ -17,7 +18,7 @@ function meaningfulLateral(rows,id){
   const phases=[];let cur=null;
   for(let i=1;i<rows.length;i++){
     const a=player(rows[i-1],id),b=player(rows[i],id);if(!a||!b)continue;
-    const dy=b.y-a.y;if(Math.abs(dy)<.025)continue;const sign=dy>0?1:-1,task=b.tacticalTask||b.action||'',owner=rows[i].ball?.ownerId||'FLIGHT',mark=b.markTargetId||'NONE';
+    const dy=b.y-a.y;if(Math.abs(dy)<.025)continue;const sign=dy>0?1:-1,task=b.tacticalTask||b.action||'',owner=threatContext(rows[i]),mark=b.markTargetId||'NONE';
     if(!cur||cur.sign!==sign){if(cur)phases.push(cur);cur={sign,start:rows[i-1].time,end:rows[i].time,travel:Math.abs(dy),samples:1,tasks:new Set([task]),owners:new Set([owner]),marks:new Set([mark])};}
     else{cur.end=rows[i].time;cur.travel+=Math.abs(dy);cur.samples++;cur.tasks.add(task);cur.owners.add(owner);cur.marks.add(mark);}
   }
@@ -33,7 +34,7 @@ function meaningfulLateral(rows,id){
 }
 function taskOscillation(rows,id){
   const runs=[];let cur=null;
-  for(const f of rows){const p=player(f,id);if(!p)continue;const key=taskKey(p),owner=f.ball?.ownerId||'FLIGHT';if(!cur||cur.key!==key){if(cur)runs.push(cur);cur={key,start:f.time,samples:1,owners:new Set([owner])};}else{cur.samples++;cur.owners.add(owner);}}
+  for(const f of rows){const p=player(f,id);if(!p)continue;const key=taskKey(p),owner=threatContext(f);if(!cur||cur.key!==key){if(cur)runs.push(cur);cur={key,start:f.time,samples:1,owners:new Set([owner])};}else{cur.samples++;cur.owners.add(owner);}}
   if(cur)runs.push(cur);
   let ping=0,stableSameOwnerRapid=0;
   for(let i=2;i<runs.length;i++){const a=runs[i-2],b=runs[i-1],c=runs[i];if(a.key!==c.key||a.key===b.key)continue;ping++;const owners=shared(shared([...a.owners],[...b.owners]),[...c.owners]);if(a.samples>=2&&b.samples>=2&&c.samples>=2&&owners.length&&c.start-b.start<=1.25)stableSameOwnerRapid++;}
@@ -62,5 +63,5 @@ for(const c of cases){
 checks.push({id:'EARLY_ENTRY_WIDE_RUNNER_FIRST_GAP',pass:earlyMetrics.first<=10.5,value:earlyMetrics.first});checks.push({id:'EARLY_ENTRY_WIDE_RUNNER_MAX_GAP',pass:earlyMetrics.max<=13.5,value:earlyMetrics.max});checks.push({id:'EARLY_ENTRY_RB_TASK_CHANGES',pass:earlyMetrics.rbTaskChanges<=8,value:earlyMetrics.rbTaskChanges});
 checks.push({id:'OFFSIDE_PRODUCTION_RISKY_TARGET_FOUND',pass:offside.found,value:offside});if(offside.found){checks.push({id:'OFFSIDE_MEANINGFUL_FLIGHT_BEFORE_CALL',pass:offside.callAge>=.45&&offside.maxBallMove>=3.0,value:offside});checks.push({id:'OFFSIDE_NO_FUTURE_PRECOMPUTE',pass:offside.futureOutcomePrecomputed===false,value:offside.futureOutcomePrecomputed});}
 const status=checks.every(x=>x.pass)?'PASS':'FAIL',legacyStatus=legacyForensicChecks.every(x=>x.pass)?'PASS':'FAIL';
-const out={schemaVersion:'FLR_V053_HF3_MOTION_REGRESSION_1.2',status,legacyStatus,measurementPolicy:'Raw task/lateral totals are preserved as forensic evidence. Hard motion gating uses repeated meaningful lateral reversals only when they recur rapidly in the same tactical and ball-owner context; mark identity is emitted diagnostically before deciding whether it belongs in the hard context definition; task ping-pong remains WATCH until it is correlated with visible motion.',checks,legacyForensicChecks,watches,cases:cases.map(c=>({seed:c.seed,key:c.key,metrics:c.metrics})),earlyMetrics,offside};
+const out={schemaVersion:'FLR_V053_HF3_MOTION_REGRESSION_1.3',status,legacyStatus,measurementPolicy:'Raw task/lateral totals are preserved as forensic evidence. Hard motion gating uses repeated meaningful lateral reversals only when they recur rapidly in the same tactical and semantic ball-threat context. Controlled possession is keyed by owner; pass flight is keyed by intended receiver so distinct live defensive threats are not collapsed into one FLIGHT bucket. Mark identity remains emitted diagnostically; task ping-pong remains WATCH until it is correlated with visible motion.',checks,legacyForensicChecks,watches,cases:cases.map(c=>({seed:c.seed,key:c.key,metrics:c.metrics})),earlyMetrics,offside};
 fs.writeFileSync(path.resolve(__dirname,'v053_hf3_motion_regression_status.json'),JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(status!=='PASS')process.exitCode=1;
