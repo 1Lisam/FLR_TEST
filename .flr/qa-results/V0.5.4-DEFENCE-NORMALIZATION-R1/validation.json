@@ -1,0 +1,301 @@
+{
+  "schemaVersion": "FLR_V054_DEFENCE_NORMALIZATION_REGRESSION_1.0",
+  "status": "FAIL",
+  "checks": [
+    {
+      "id": "WIDE_CARRIER_FB_OWNS_PRESS",
+      "pass": true,
+      "value": {
+        "pressId": "A-LB",
+        "coverId": "A-LCB"
+      }
+    },
+    {
+      "id": "ONE_DIRECT_BALL_PRESSER",
+      "pass": true,
+      "value": [
+        {
+          "id": "A-LB",
+          "task": "PRESS_CONTAIN"
+        }
+      ]
+    },
+    {
+      "id": "CM_NEVER_BODY_MARKS_CENTRAL_ST",
+      "pass": true,
+      "value": [
+        {
+          "id": "A-LCM",
+          "mark": null,
+          "task": "CUTBACK_TRACK",
+          "target": {
+            "x": 25.859372801433636,
+            "y": 22.007024324515925
+          }
+        },
+        {
+          "id": "A-CM",
+          "mark": null,
+          "task": "BOX_EDGE_SCREEN",
+          "target": {
+            "x": 24.031963637061835,
+            "y": 30.22
+          }
+        },
+        {
+          "id": "A-RCM",
+          "mark": null,
+          "task": "SECOND_BALL_TUCK",
+          "target": {
+            "x": 26.799999999999997,
+            "y": 37.48
+          }
+        }
+      ]
+    },
+    {
+      "id": "CENTRAL_ST_REMAINS_CB_RESPONSIBILITY",
+      "pass": true,
+      "value": {
+        "st": {
+          "x": 19,
+          "y": 34
+        },
+        "cbMarks": [
+          "A-RCB"
+        ]
+      }
+    },
+    {
+      "id": "CM_LAYER_STAYS_AHEAD_OF_BACK_FOUR",
+      "pass": true,
+      "value": {
+        "cbMean": 10.62585073341343,
+        "cms": [
+          {
+            "id": "A-LCM",
+            "x": 18.056242167192053,
+            "task": "SECOND_BALL_TUCK"
+          },
+          {
+            "id": "A-CM",
+            "x": 22.450000000000003,
+            "task": "BOX_EDGE_SCREEN"
+          },
+          {
+            "id": "A-RCM",
+            "x": 18.065276891486832,
+            "task": "CUTBACK_TRACK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EIGHTS_REACH_SECOND_BALL_LAYER",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 89.1,
+            "task": "LATE_BOX_ARRIVAL"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "PIVOT_REMAINS_REST_DEFENCE",
+      "pass": true,
+      "value": {
+        "eights": [
+          {
+            "id": "H-LCM",
+            "x": 89.1,
+            "task": "LATE_BOX_ARRIVAL"
+          },
+          {
+            "id": "H-RCM",
+            "x": 89.1,
+            "task": "LATE_BOX_ARRIVAL"
+          }
+        ],
+        "pivot": {
+          "x": 60,
+          "task": "PIVOT_SCREEN"
+        }
+      }
+    },
+    {
+      "id": "DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:START_BACK_FOUR_SIDE_ORDER",
+      "pass": true,
+      "value": {
+        "lb": 12.021454191841187,
+        "rb": 56.174021635809915,
+        "lcb": 27.316523509062826,
+        "rcb": 38.71527922237292
+      }
+    },
+    {
+      "id": "PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:START_BACK_FOUR_SIDE_ORDER",
+      "pass": false,
+      "value": {
+        "lb": 55.13639993704855,
+        "rb": 12.452722614631057,
+        "lcb": 41.65169475898146,
+        "rcb": 25.256357865035532
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:START_BACK_FOUR_SIDE_ORDER",
+      "pass": false,
+      "value": {
+        "lb": 53.721257811691615,
+        "rb": 14.039354847930369,
+        "lcb": 40.436092943931,
+        "rcb": 26.406567227607596
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:START_BACK_FOUR_SIDE_ORDER",
+      "pass": false,
+      "value": {
+        "lb": 54.53388055120595,
+        "rb": 14.00324974874966,
+        "lcb": 40.52573023866862,
+        "rcb": 26.849763134960085
+      }
+    },
+    {
+      "id": "STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:START_BACK_FOUR_SIDE_ORDER",
+      "pass": false,
+      "value": {
+        "lb": 7.95265291986987,
+        "rb": 12.858171537704763,
+        "lcb": 41.492020297655834,
+        "rcb": 26.321783930202947
+      }
+    },
+    {
+      "id": "CARRIER_SHIELD_FLOW:DEV-RECENT-1787576057595-34:START_BACK_FOUR_SIDE_ORDER",
+      "pass": false,
+      "value": {
+        "lb": 13.131806690711528,
+        "rb": 54.86819330928847,
+        "lcb": 37.806326293223535,
+        "rcb": 28.592974348715508
+      }
+    },
+    {
+      "id": "OFFSIDE_INVOLVEMENT:DEV-RECENT-1787576131788-41:START_BACK_FOUR_SIDE_ORDER",
+      "pass": false,
+      "value": {
+        "lb": 55.512503754813224,
+        "rb": 11.27054775832221,
+        "lcb": 41.45346231665462,
+        "rcb": 25.990558179095387
+      }
+    },
+    {
+      "id": "DEFENSIVE_ROLE_STABILITY:DEV-RECENT-1787573272419-1:CM_BACKLINE_COLLAPSE_RATIO",
+      "pass": true,
+      "value": {
+        "frames": 91,
+        "violations": 7,
+        "ratio": 0.0256
+      }
+    },
+    {
+      "id": "PASS_FLIGHT_WIDE_TRACK:DEV-RECENT-1787575663982-11:CM_BACKLINE_COLLAPSE_RATIO",
+      "pass": true,
+      "value": {
+        "frames": 91,
+        "violations": 0,
+        "ratio": 0
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575803967-13:CM_BACKLINE_COLLAPSE_RATIO",
+      "pass": true,
+      "value": {
+        "frames": 91,
+        "violations": 0,
+        "ratio": 0
+      }
+    },
+    {
+      "id": "MARK_TARGET_STABILITY:DEV-RECENT-1787575897894-18:CM_BACKLINE_COLLAPSE_RATIO",
+      "pass": true,
+      "value": {
+        "frames": 91,
+        "violations": 0,
+        "ratio": 0
+      }
+    },
+    {
+      "id": "STRIKER_RUN_LANE:DEV-RECENT-1787575948505-19:CM_BACKLINE_COLLAPSE_RATIO",
+      "pass": true,
+      "value": {
+        "frames": 91,
+        "violations": 5,
+        "ratio": 0.0183
+      }
+    },
+    {
+      "id": "OFFSIDE_TEST_EXPOSES_FORWARD_TARGET",
+      "pass": true,
+      "value": [
+        {
+          "id": "THROUGH_PASS",
+          "targetId": "H-LW"
+        },
+        {
+          "id": "PROGRESSIVE_PASS",
+          "targetId": "H-ST"
+        },
+        {
+          "id": "SAFE_PASS",
+          "targetId": "H-LW"
+        },
+        {
+          "id": "SHOT",
+          "targetId": null
+        },
+        {
+          "id": "LOFTED_THROUGH_PASS",
+          "targetId": "H-LW"
+        },
+        {
+          "id": "CARRY",
+          "targetId": null
+        }
+      ]
+    },
+    {
+      "id": "OFFSIDE_TEST_CAN_TRIGGER_OFFSIDE",
+      "pass": false,
+      "value": {
+        "choice": {
+          "id": "PROGRESSIVE_PASS",
+          "targetId": "H-ST"
+        },
+        "applyOk": true,
+        "call": null
+      }
+    }
+  ],
+  "watches": [
+    {
+      "id": "BOX_DENSITY_ALLOWED",
+      "value": 7
+    }
+  ]
+}
