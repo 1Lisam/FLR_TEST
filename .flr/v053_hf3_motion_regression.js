@@ -27,9 +27,9 @@ function meaningfulLateral(rows,id){
     const a=phases[i-1],b=phases[i];
     if(a.travel<.34||b.travel<.34||a.samples<2||b.samples<2)continue;
     const sharedTasks=shared([...a.tasks],[...b.tasks]),sharedOwners=shared([...a.owners],[...b.owners]),prev=flips.length?flips.at(-1).at:null;
-    flips.push({at:b.start,rapidRepeat:prev!=null&&b.start-prev<=1.25,sameContext:sharedTasks.length>0&&sharedOwners.length>0});
+    flips.push({at:b.start,prevAt:prev,gap:prev==null?null:n3(b.start-prev),rapidRepeat:prev!=null&&b.start-prev<=1.25,sameContext:sharedTasks.length>0&&sharedOwners.length>0,sharedTasks,sharedOwners,from:{start:n3(a.start),end:n3(a.end),travel:n3(a.travel),samples:a.samples},to:{start:n3(b.start),end:n3(b.end),travel:n3(b.travel),samples:b.samples}});
   }
-  return{meaningfulFlips:flips.length,sameContextRapidRepeats:flips.filter(x=>x.rapidRepeat&&x.sameContext).length};
+  const sameContextRapidDetails=flips.filter(x=>x.rapidRepeat&&x.sameContext);return{meaningfulFlips:flips.length,sameContextRapidRepeats:sameContextRapidDetails.length,sameContextRapidDetails};
 }
 function taskOscillation(rows,id){
   const runs=[];let cur=null;
