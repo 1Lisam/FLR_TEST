@@ -19,6 +19,58 @@ function phaseRuns(rows,id){
   return phases.map(p=>({...p,start:n2(p.start),end:n2(p.end),travel:+p.travel.toFixed(3),startY:+p.startY.toFixed(3),endY:+p.endY.toFixed(3),tasks:[...p.tasks],owners:[...p.owners]}));
 }
 function shared(a,b){const s=new Set(a||[]);return(b||[]).filter(x=>s.has(x));}
+function taskRuns(rows,id){
+  const runs=[];let cur=null;
+  for(const frame of rows){
+    const p=byId(frame,id);if(!p)continue;
+    const task=p.tacticalTask||p.action||'';
+    const mark=p.markTargetId||'';
+    const key=`${task}|${mark}`;
+    const owner=frame.ball?.ownerId||'FLIGHT';
+    if(!cur||cur.key!==key){
+      if(cur)runs.push(cur);
+      cur={key,task,mark,start:frame.time,end:frame.time,samples:1,owners:new Set([owner])};
+    }else{
+      cur.end=frame.time;cur.samples++;cur.owners.add(owner);
+    }
+  }
+  if(cur)runs.push(cur);
+  return runs.map(r=>({...r,start:n2(r.start),end:n2(r.end),owners:[...r.owners]}));
+}
+function taskStability(rows,id){
+  const runs=taskRuns(rows,id);
+  const stableTransitions=[];
+  for(let i=1;i<runs.length;i++){
+    const a=runs[i-1],b=runs[i];
+    if(a.samples>=2&&b.samples>=2){
+      stableTransitions.push({at:b.start,from:a.key,to:b.key,sharedOwners:shared(a.owners,b.owners)});
+    }
+  }
+  const pingPongs=[];
+  for(let i=2;i<runs.length;i++){
+    const a=runs[i-2],b=runs[i-1],c=runs[i];
+    if(a.key!==c.key||a.key===b.key)continue;
+    const span=c.start-b.start;
+    const ownerABC=shared(shared(a.owners,b.owners),c.owners);
+    const stable=a.samples>=2&&b.samples>=2&&c.samples>=2;
+    pingPongs.push({
+      at:c.start,from:a.key,via:b.key,backTo:c.key,span:n2(span),
+      stable,sharedOwners:ownerABC,sameOwner:ownerABC.length>0,
+      rapid:span<=1.25,
+      sameOwnerRapid:ownerABC.length>0&&span<=1.25,
+      stableSameOwnerRapid:stable&&ownerABC.length>0&&span<=1.25
+    });
+  }
+  return{
+    rawTaskChangeCount:Math.max(0,runs.length-1),
+    stableTaskChangeCount:stableTransitions.length,
+    taskPingPongCount:pingPongs.length,
+    sameOwnerRapidTaskPingPongCount:pingPongs.filter(x=>x.sameOwnerRapid).length,
+    stableSameOwnerRapidTaskPingPongCount:pingPongs.filter(x=>x.stableSameOwnerRapid).length,
+    taskRuns:runs,
+    taskPingPongs:pingPongs
+  };
+}
 function meaningfulFlips(rows,id){
   const ph=phaseRuns(rows,id),flips=[];
   for(let i=1;i<ph.length;i++){
@@ -50,7 +102,7 @@ function run(key,seed,ids,seconds=9){
       if(lastSign&&sign!==lastSign)raw.push({t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,mark:b.markTargetId||null,x:n2(b.x),y:n2(b.y),tx:n2(b.tx),ty:n2(b.ty),ballOwner:fb.ball?.ownerId||null,ballX:n2(fb.ball?.x),ballY:n2(fb.ball?.y),prevMove:lastMove});
       lastSign=sign;lastMove={t:n2(fb.time),dy:+dy.toFixed(3),task:b.tacticalTask||b.action||null,tx:n2(b.tx),ty:n2(b.ty)};
     }
-    const meaningful=meaningfulFlips(rows,id);result.players[id]={rawFlipCount:raw.length,meaningfulFlipCount:meaningful.count,sameTaskMeaningfulFlipCount:meaningful.sameTaskCount,sameOwnerMeaningfulFlipCount:meaningful.sameOwnerCount,sameTaskAndOwnerMeaningfulFlipCount:meaningful.sameTaskAndOwnerCount,rapidMeaningfulRepeatCount:meaningful.rapidRepeatCount,sameContextRapidRepeatCount:meaningful.sameContextRapidRepeatCount,rawFlips:raw,meaningfulFlips:meaningful.flips,phases:meaningful.phases};
+    const meaningful=meaningfulFlips(rows,id),tasks=taskStability(rows,id);result.players[id]={rawFlipCount:raw.length,meaningfulFlipCount:meaningful.count,sameTaskMeaningfulFlipCount:meaningful.sameTaskCount,sameOwnerMeaningfulFlipCount:meaningful.sameOwnerCount,sameTaskAndOwnerMeaningfulFlipCount:meaningful.sameTaskAndOwnerCount,rapidMeaningfulRepeatCount:meaningful.rapidRepeatCount,sameContextRapidRepeatCount:meaningful.sameContextRapidRepeatCount,rawTaskChangeCount:tasks.rawTaskChangeCount,stableTaskChangeCount:tasks.stableTaskChangeCount,taskPingPongCount:tasks.taskPingPongCount,sameOwnerRapidTaskPingPongCount:tasks.sameOwnerRapidTaskPingPongCount,stableSameOwnerRapidTaskPingPongCount:tasks.stableSameOwnerRapidTaskPingPongCount,rawFlips:raw,meaningfulFlips:meaningful.flips,taskPingPongs:tasks.taskPingPongs,phases:meaningful.phases,taskRuns:tasks.taskRuns};
   }
   return result;
 }
