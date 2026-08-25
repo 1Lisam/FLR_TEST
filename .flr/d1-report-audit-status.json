@@ -4,6 +4,16 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-317658f8-29f0-4b1c-b366-40a605311b82",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T05:05:05.200Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "선택 시점에서 중심점이 어디인진 모르겠으나 LW와 RW는 명백히 RB와 LB 의 뒤에 있는 상황  LW에게 패스 한 시점에서 오프사이드 선언이 되지 않았는데 이게 정상인지 확인 바람",
+      "size_bytes": 1708898,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-49335f23-7ae0-4adf-8a44-38d57d341305",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "created_at": "2026-08-25T04:55:32.877Z",
@@ -492,19 +502,9 @@
       "description": "1. 모든 포지션에 선택함에 있어 어떤 것이 확률적으로 좋은 선택일지 각 선택에 % 가 표기되면 좋을 것 같음\n\n2. 상황종료 후 3초후에 재개되는것이 흐름을 끊는 느낌\n버튼을 눌러 바로 진행가능하게 하는게 있긴하나 아래쪽에 배치되어 버튼이 없다가 생기는 상태라서 잘보이게 버튼 고정을 해두던지 아에 스페이스바 같은거 눌러서 바로 넘어갈 수 있게 하면좋을 둣\n\n3. 키퍼 다이빙 캐치, 펀칭 같은 선택지가 추가 되면 좋을둣\n\n4. 반칙이 구현 된다면 카드, 프리킥도 구현\n\n5. 경기 종료후 화면 가운데 종료, 승패(스코어) 글씨가 뜨면 좋을 듯\n(경기가 종료되었다는 느낌이 들지 않음)",
       "size_bytes": 2028560,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt051-ff447b78-2f56-4994-9ca8-f6cf5fa03780",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:23:17.275Z",
-      "category": "기타",
-      "priority": 3,
-      "description": "7:0 이라는 수치가 나온것과 우리팀 득점 장면은 대부분 뜬금없이 포메이션이 다 구성된 곳에서 득점자 하나만 돌출 되어 ST와 함께 패널티 라인 안에 들어와 있고 수비수들은 모두 자기 포메이션을 유지 중인 상황인데 이게 맞나?\n\n이러면 '득점자만 앞에두고 나머지는 그냥 던져놓자' 라고 해서 갑자기 득점자만 툭 튀어나온 느낌이라 우리가 지향하는 '뒤에서 시뮬레이션 계산을 하던 포메이션을 그대로 드러나자'가 절대 아닌게 드러나는데?",
-      "size_bytes": 4046581,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-49335f23-7ae0-4adf-8a44-38d57d341305",
+  "latestAttachedReportId": "umt053h3-317658f8-29f0-4b1c-b366-40a605311b82",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -514,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-49335f23-7ae0-4adf-8a44-38d57d341305",
+      "reportId": "umt053h3-317658f8-29f0-4b1c-b366-40a605311b82",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "step": 78,
-      "description": "선택지가 LW, RW 모두 오프사이드 라인 안에만 있는 상태에서 선택지가 떴음\n이부분은 명백한 오프사이드이나 오프사이드 표시가 뜨지 않음.",
-      "category": "수비/전술",
+      "description": "선택 시점에서 중심점이 어디인진 모르겠으나 LW와 RW는 명백히 RB와 LB 의 뒤에 있는 상황  LW에게 패스 한 시점에서 오프사이드 선언이 되지 않았는데 이게 정상인지 확인 바람",
+      "category": "2D 움직임",
       "priority": 3,
-      "reportedAt": "2026-08-25T04:56:19.685Z"
+      "reportedAt": "2026-08-25T05:05:51.917Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": false,
@@ -535,13 +535,13 @@
     ],
     "previousSituationKeys": [],
     "currentReportScope": {
-      "startSecond": 5331.700000000279,
-      "endSecond": 5364.800000000311,
+      "startSecond": 375.4000000000008,
+      "endSecond": 387.20000000000346,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": null,
-    "currentSerializedBytes": 1777687,
+    "currentSerializedBytes": 1904805,
     "previousSerializedBytes": 0
   }
 }

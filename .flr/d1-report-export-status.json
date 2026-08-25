@@ -4,15 +4,15 @@
   "workflowRunId": "32806917101",
   "sourceCommit": "aab49352c488f436f470e8d458e3099720fddb12",
   "requestedAt": "2026-08-25T12:52:00+09:00",
-  "collectedAt": "2026-08-25T04:57:15.806218Z",
+  "collectedAt": "2026-08-25T05:06:06.251811Z",
   "currentBuild": "USER-MATCH-TEST-V0.5.4-R15",
   "sinceCreatedAt": "2026-08-25T02:40:00Z",
   "safetyOverlapMinutes": 30,
-  "count": 15,
-  "currentBuildCount": 15,
+  "count": 16,
+  "currentBuildCount": 16,
   "lateOlderBuildCount": 0,
   "failedDownloads": 0,
-  "artifactId": "9549751811",
-  "artifactUrl": "https://github.com/1Lisam/FLR_TEST/actions/runs/32806917101/artifacts/9549751811",
-  "artifactDigest": "67c7a6b15583d40294399fa402e788a6660124c1d14ecf859cc90d756c5ba86d"
+  "artifactId": "9549934341",
+  "artifactUrl": "https://github.com/1Lisam/FLR_TEST/actions/runs/32806917101/artifacts/9549934341",
+  "artifactDigest": "49fdceec80e773f35d1c45228b037f0b07f50af5ac653f6d3675265e2e776b32"
 }
