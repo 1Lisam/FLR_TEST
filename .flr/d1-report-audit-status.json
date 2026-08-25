@@ -4,6 +4,26 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-1c596025-ce41-46d3-99de-22cf0286cbd6",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T04:41:40.958Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "공간 침투시 ST 앞에서 수비가 버벅 거리고\n패스 이후 LW 앞에서 수비가 버벅 거리는 현상 발견 됨",
+      "size_bytes": 1647656,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-d5ad1f0e-d76c-4ec0-b848-6f502c3affe7",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T04:41:05.083Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "LIVE V0.6 EPISODE\nscene=HW0002\nphase=CHOICE\nresult=POSSESSION_KEPT\nfuturePrecomputed=false\n\n\n공간으로 전진 하였으나 ST는 전진하지 않고 수비수는 공격수에 막혀 움찔거리는 상황 추가 발생하였음",
+      "size_bytes": 2574163,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-b6493533-1f3d-4bc1-bd67-052b427f14a5",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "created_at": "2026-08-25T03:51:19.264Z",
@@ -482,29 +502,9 @@
       "description": "아까부터 선택 직전에 장면이 한번 되돌아갔다가 돌아오는 버퍼링 같은 현상이 발생 중임",
       "size_bytes": 5437298,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt051-4666b14a-cb73-44db-a2a6-1b62961f8d9c",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:06:52.061Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "여전히 현재 화면에서 포메이션이 너무 반듯하게 배치 되어 있으며 다른 21명의 선수 중 내 ST (조작캐릭터)만 포메이션과 전혀 다른 위치에 배치 되어 있음.\n\n다만 이건 ST가 배치 되어 있으면 거기에 마크하는 수비수가 있어야 하거나 \n혹은 ST가 여기 위치에 있는데 다른 선수들은 정 위치에 있는것들이 매우 어색함\n이부분도 몇번이나 언급되었던 이슈인데 고쳐지지 않는 중",
-      "size_bytes": 1613687,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt051-aa3cf94e-e023-4f23-a446-88038e5babfb",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:05:11.442Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "해당 상황에서 LW가 비어 있는 상태임에도 패스가 불가능. 분명히 선택지로 존재 해도 될 법한 상황인데 존재하지 않음",
-      "size_bytes": 1697781,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-b6493533-1f3d-4bc1-bd67-052b427f14a5",
+  "latestAttachedReportId": "umt053h3-1c596025-ce41-46d3-99de-22cf0286cbd6",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -514,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-b6493533-1f3d-4bc1-bd67-052b427f14a5",
+      "reportId": "umt053h3-1c596025-ce41-46d3-99de-22cf0286cbd6",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "step": 78,
-      "description": "이 부분은 로빙 패스 이후 정확하게 연결이 되었고 패널티 라인 안에서 연결이 될만도 했었는데 '어째서 슛까지 연결 되지 않았나?' 를 알고 싶음 명백한 슈팅 찬스였는데 백패스를 하는 상황이라 말이 안되네",
-      "category": "패스/공격",
-      "priority": 1,
-      "reportedAt": "2026-08-25T03:52:06.149Z"
+      "description": "공간 침투시 ST 앞에서 수비가 버벅 거리고\n패스 이후 LW 앞에서 수비가 버벅 거리는 현상 발견 됨",
+      "category": "2D 움직임",
+      "priority": 3,
+      "reportedAt": "2026-08-25T04:42:27.775Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": false,
@@ -535,13 +535,13 @@
     ],
     "previousSituationKeys": [],
     "currentReportScope": {
-      "startSecond": 731.3000000000014,
-      "endSecond": 739.3000000000033,
+      "startSecond": 682.2000000000035,
+      "endSecond": 693.500000000006,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": null,
-    "currentSerializedBytes": 1333667,
+    "currentSerializedBytes": 1836972,
     "previousSerializedBytes": 0
   }
 }
