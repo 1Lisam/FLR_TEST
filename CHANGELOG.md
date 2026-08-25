@@ -1,3 +1,20 @@
+# USER-MATCH-TEST V0.5.4 R17 — 2026-08-25 — Defensive Responsibility / Offside UX
+
+- Removes every player-facing predictive `오프사이드 위험` warning from selectable players and pass choices. Risky choices remain available and Law 11 enforcement remains live; hidden risk metadata is retained only for QA.
+- Extends an actual offside call into a readable post-call beat: the result remains visibly active for about 3.4 seconds, the engine call-review window lasts 3.6 seconds, and the release-frozen offside line is shown during result playback/review.
+- Removes the redundant small top-right `○` marker from selectable players; the existing target ring/focus remains the sole selectable-player marker.
+- Reorders wide defensive responsibility in both Hybrid pre-choice simulation and high-resolution play: winger/wide midfielder/near CM delays the carrier first in outer/mid flank zones, the same-side full-back protects goal-side depth, and the full-back takes over only when the threat reaches the deep flank.
+- Prevents centre-backs from becoming a second wide ball presser when the full-back or front presser already owns the carrier; central protection remains the CB priority.
+- Preserves Hybrid marking intent (`markTargetId`, tactical task and intent target) across the high-resolution scene boundary so defenders do not wake up and begin marking only after the choice scene appears.
+- Makes marking more proactive against a goalward burst by projecting the attacker's velocity and turning/running toward the likely penetration lane before the attacker has already gone past.
+- Makes the central CM support line phase-relative: the pivot stays useful in buildup but advances materially with final-third progression instead of remaining permanently DM-deep.
+- Non-protagonist GOAL alerts now always include the updated current score.
+- Retires already-PASS pass-flight wide tracking, ST run-lane continuity and offside-involvement items from the user-visible recent-fix checklist while preserving them as internal regression coverage.
+- R17 focused feedback regression: 22/22 PASS. Retained V0.5.4 defence regression: 21/21 PASS. Changed JavaScript syntax: PASS.
+- The retained monolithic R14 validator exceeded the local command window, so the R17-relevant contextual portion was sharded and rerun separately: 5/5 contextual collapse gates PASS. The full monolithic R14 wrapper is not claimed as PASS or FAIL in this session.
+- Bare same-seed ecology comparisons are retained as a noncanonical WATCH only and are not used to tune shot/goal probabilities. No shot/goal probability code was changed in R17.
+- R17 is the user visual re-test build for the V0.5.4 defensive-responsibility/offside-UX feedback batch.
+
 # USER-MATCH-TEST V0.5.4 R16 — 2026-08-25 — User Feedback Hotfix
 
 - Fixes same-side full-back goal-side recovery and closes excessive stand-off distance against live wide carriers without adding ball-swarm behaviour.

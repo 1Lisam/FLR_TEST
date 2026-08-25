@@ -1924,9 +1924,9 @@ function startDeadRestart(m,kind,team,x,y,cross=null){const deferredOffside=kind
     m._pendingOffsideCoast={startedAt:m.time,from:{x:fromX,y:fromY,z:v0.z},vx:v0.x,vy:v0.y,vz:v0.vz,duration:0.72};
   }
   m.ball={mode:'DEAD',x:bx,y:by,z:0,vx:0,vy:0,vz:0,ownerId:null,kind,lastTouchTeam:m.lastTouchTeam,lastTouchPlayer:m.lastTouchPlayer};m.ballOwner=null;m.possession=team;m.phase=kind;
-  m.restart={kind,team,x,y,until:m.time+(kind==='THROW_IN'?1.35:0.9),stage:deferredOffside?'CALL_REVIEW':'SETUP',setupStartedAt:m.time,ballReturn,deferredDeadClock:deferredOffside,callReviewUntil:deferredOffside?m.time+1.60:null,offsideCoast:deferredOffside?(m._pendingOffsideCoast||null):null};m._pendingOffsideCoast=null;m.nextShape=m.time;
+  m.restart={kind,team,x,y,until:m.time+(kind==='THROW_IN'?1.35:0.9),stage:deferredOffside?'CALL_REVIEW':'SETUP',setupStartedAt:m.time,ballReturn,deferredDeadClock:deferredOffside,callReviewUntil:deferredOffside?m.time+3.60:null,offsideCoast:deferredOffside?(m._pendingOffsideCoast||null):null};m._pendingOffsideCoast=null;m.nextShape=m.time;
   if(deferredOffside){
-    // Hold the actual positions briefly so the pass/run and referee call are readable before
+    // Hold the actual positions for a 3-4 second review beat so the pass/run and referee call are readable before
     // the dead-clock jump. This is presentation continuity, not delayed result computation.
     for(const p of m.players){p.tx=p.x;p.ty=p.y;p.vx*=.25;p.vy*=.25;p.action='OFFSIDE_CALL_REVIEW';p.tacticalTask='OFFSIDE_CALL_REVIEW';p.sprint=false;if(Number.isFinite(m.ball.x)&&Number.isFinite(m.ball.y))p.faceTargetAngle=Math.atan2(m.ball.y-p.y,m.ball.x-p.x);}
   }else if(RESTARTS&&typeof RESTARTS.begin==='function'){

@@ -261,13 +261,13 @@ function attackTask(m,p,ctx){
     if(p.slot==='CM'){
       let x;
       if(phase==='BUILD_UP')x=clamp(progress+5,28,44);
-      else if(phase==='PROGRESSION')x=clamp(progress-8,40,56);
-      else if(phase==='FINAL_THIRD')x=clamp(progress-16,47,60);
-      else x=clamp(progress-22,49,60);
+      else if(phase==='PROGRESSION')x=clamp(progress-6,42,60);
+      else if(phase==='FINAL_THIRD')x=clamp(progress-12,52,67);
+      else x=clamp(progress-15,55,70);
       // During deep build-up the pivot may drop close to the centre-backs instead of being trapped in a static midfield band.
       if(progress<22)x=clamp(progress+11,24,36);
       const surgeSide=ctx.fullbackSurge&&ctx.fullbackSurgeSlot==='LB'?-1:ctx.fullbackSurge&&ctx.fullbackSurgeSlot==='RB'?1:0;
-      if(surgeSide&&(phase==='FINAL_THIRD'||phase==='CHANCE'))x=clamp(x-1.2,24,60);
+      if(surgeSide&&(phase==='FINAL_THIRD'||phase==='CHANCE'))x=clamp(x-1.2,24,68);
       const y=clamp(lerp(34,by,phase==='BUILD_UP'?0.18:0.08)+surgeSide*2.2,18,50);
       const task=progress<22?'DROP_BETWEEN_LINES':phase==='BUILD_UP'?'DROP_TO_BUILD':surgeSide?'PIVOT_WIDE_COVER':'PIVOT_SCREEN';
       // R15: after a possession wave the pivot reconnects in steps instead of instantly receiving
@@ -564,44 +564,50 @@ function preferredDefenceRoles(m,team,owner,ball,field,candidates){
   if(centralThreat){
     const ownerL=worldToLocal(team,owner.x,owner.y);
     const cbs=field.filter(p=>p.role==='CB').map(p=>{const l=worldToLocal(team,p.x,p.y);return{p,d:dist(p,owner),l,behind:l.x>ownerL.x+0.65,goalSide:l.x<=ownerL.x+0.65};}).sort((a,b)=>a.d-b.d);
-    // STEP40 V0.5.1: when one centre-back is already beaten/behind a central ST, the
-    // remaining goal-side CB is the LAST COVER and must not be spent as a second presser.
-    // The beaten CB chases from behind while the goal-side partner protects the shot lane.
     const behindCb=cbs.filter(c=>c.behind).sort((a,b)=>a.d-b.d)[0];
     const goalSideCb=cbs.filter(c=>c.goalSide&&c.p.id!==behindCb?.p.id).sort((a,b)=>a.d-b.d)[0];
-    if(behindCb&&goalSideCb&&goalSideCb.d<=10.5){
-      return{press:behindCb.p,cover:goalSideCb.p,mode:'CENTRAL_ST_LAST_COVER'};
-    }
+    if(behindCb&&goalSideCb&&goalSideCb.d<=10.5)return{press:behindCb.p,cover:goalSideCb.p,mode:'CENTRAL_ST_LAST_COVER'};
     const cbPress=cbs[0]?.p,cbD=cbs[0]?.d??99;
     if(cbPress&&(cbD<=13.5||ball.x<23.5)){
       const otherCb=cbs.find(c=>c.p.id!==cbPress.id)?.p||null;
-      const cover=otherCb||candidates.find(c=>c.p.id!==cbPress.id)?.p||null;
-      return{press:cbPress,cover,mode:'CENTRAL_ST_CB'};
+      return{press:cbPress,cover:otherCb||candidates.find(c=>c.p.id!==cbPress.id)?.p||null,mode:'CENTRAL_ST_CB'};
     }
   }
-  const wideThreat=(owner.role==='WF'||Math.abs(ball.y-34)>14.5)&&ball.x<50;
+  const wideThreat=(owner.role==='WF'||owner.role==='FB'||Math.abs(ball.y-34)>14.5)&&ball.x<50;
   if(wideThreat){
     const side=ball.y<34?-1:1;
-    const fbs=field.filter(p=>p.role==='FB'&&sideSign(p.slot)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d);
-    const fb=fbs[0]?.p,fbD=fbs[0]?.d??99;
+    const sideFb=field.filter(p=>p.role==='FB'&&sideSign(p.slot)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0]||null;
+    // R17: the flank is defended from the front backwards. A nearby winger/8/pivot delays
+    // the carrier first; the same-side full-back protects goal-side depth. This prevents the
+    // old pattern where the FB abandoned a live winger while midfield watched from inside.
+    const front=field.filter(p=>['WF','CM','ST'].includes(p.role)).map(p=>{
+      const d=dist(p,owner),pside=sideSign(p.slot);if(d>17.5)return null;
+      if(p.role==='WF'&&pside!==side)return null;
+      if(p.role==='CM'&&pside&&pside!==side)return null;
+      if(p.role==='ST'&&(d>9.5||ball.x<40))return null;
+      let score=d;
+      if(p.role==='WF')score-=4.8;
+      else if(p.role==='CM')score-=p.slot==='CM'?1.8:3.3;
+      else score+=0.8;
+      return{p,d,score};
+    }).filter(Boolean).sort((a,b)=>a.score-b.score||a.d-b.d);
+    const frontPress=front[0]||null;
+    if(frontPress&&frontPress.d<=16.5&&(ball.x>=27.5||!sideFb?.p)){
+      const cover=sideFb?.p||candidates.find(c=>c.p.id!==frontPress.p.id&&c.p.role!=='CB')?.p||null;
+      return{press:frontPress.p,cover,mode:'WIDE_FRONT_PRESS'};
+    }
+    const fb=sideFb?.p,fbD=sideFb?.d??99;
     if(fb&&fbD<=15.5){
       const cbs=field.filter(p=>p.role==='CB').map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d);
       return{press:fb,cover:cbs[0]?.p||candidates.find(c=>c.p.id!==fb.id)?.p||null,mode:'WIDE_FB'};
     }
-    // STEP40 V0.3: when the full-back cannot arrive in time and a CB has to confront
-    // the wide carrier, do not spend BOTH centre-backs on that same ball. Reserve the
-    // spare CB for a central striker and use the nearest non-CB as secondary lane cover.
     const centralRunner=outfield(m,other(team)).map(a=>({a,l:worldToLocal(team,a.x,a.y)})).find(o=>o.a.id!==owner.id&&o.a.role==='ST'&&o.l.x<=34&&Math.abs(o.l.y-34)<13);
     if(centralRunner&&nearest?.role==='CB'){
       const nonCbCover=candidates.find(c=>c.p.id!==nearest.id&&c.p.role!=='CB'&&c.d<=14.5)?.p||null;
       if(nonCbCover)return{press:nearest,cover:nonCbCover,mode:'WIDE_CB_ST_GUARD'};
     }
   }
-  // Generic phases are still role-aware. Distance is evidence, not authority: a wide
-  // carrier belongs to the same-side full-back first, while a central carrier is normally
-  // screened by midfield until he reaches the centre-back line. This prevents nearest-player
-  // fallback from turning CM/FB/CB into one roaming ball pack.
-  const genericWide=owner.role==='WF'||Math.abs(ball.y-34)>14.5,side=ball.y<34?-1:1;
+  const genericWide=owner.role==='WF'||owner.role==='FB'||Math.abs(ball.y-34)>14.5,side=ball.y<34?-1:1;
   const ranked=candidates.filter(c=>{
     if(c.p.role==='ST'&&ball.x<45)return false;
     if(c.p.role==='WF'&&ball.x<34)return false;
@@ -609,10 +615,11 @@ function preferredDefenceRoles(m,team,owner,ball,field,candidates){
   }).map(c=>{
     const p=c.p,pside=sideSign(p.slot);let score=c.d;
     if(genericWide){
-      if(p.role==='FB')score+=pside===side?-4.6:7.5;
-      else if(p.role==='CM')score+=(ball.x<38?3.8:1.5)+(pside&&pside!==side?4.0:0);
-      else if(p.role==='CB')score+=ball.x<28?2.0:4.5;
-      else score+=5.5;
+      if(p.role==='WF')score+=pside===side?-4.2:6.0;
+      else if(p.role==='CM')score+=(pside===side?-2.8:p.slot==='CM'?-1.4:3.5);
+      else if(p.role==='FB')score+=pside===side?1.4:7.5;
+      else if(p.role==='CB')score+=5.0;
+      else score+=1.8;
     }else{
       if(p.role==='CM')score+=ball.x<25?1.2:-2.0;
       else if(p.role==='CB')score+=ball.x<28?-2.2:1.8;
@@ -625,9 +632,8 @@ function preferredDefenceRoles(m,team,owner,ball,field,candidates){
   let genericCover=null;
   if(genericPress){
     const cbCover=field.filter(p=>p.role==='CB'&&p.id!==genericPress.id).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0]?.p||null;
-    // R15: the secondary screen is structural work.  A striker/winger may press from the
-    // front, but must not become the generic second defender and sprint through midfield.
-    genericCover=(ball.x<42?cbCover:null)||ranked.find(c=>c.p.id!==genericPress.id&&!['ST','WF'].includes(c.p.role))?.p||null;
+    const wideFbCover=genericWide&&genericPress.role!=='FB'?field.filter(p=>p.role==='FB'&&sideSign(p.slot)===side&&p.id!==genericPress.id).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0]?.p||null:null;
+    genericCover=wideFbCover||(ball.x<42&&!genericWide?cbCover:null)||ranked.find(c=>c.p.id!==genericPress.id&&!['ST','WF'].includes(c.p.role))?.p||null;
   }
   return{press:genericPress,cover:genericCover,mode:genericWide?'GENERIC_WIDE_ROLE_AWARE':'GENERIC_ROLE_AWARE'};
 }
@@ -682,16 +688,18 @@ function assignDefence(m,team,ctx){
   const structuralOverride=centralMode&&candPress&&press&&press.role!=='CB';
   const centralCoverOverride=centralMode&&candCover&&(!cover||cover.id!==candCover.id||cover.role!=='CB');
   const wideOverride=pref.mode==='WIDE_FB'&&candPress&&press&&press.role!=='FB'&&candD<=13.5;
+  const wideFrontOverride=pref.mode==='WIDE_FRONT_PRESS'&&candPress&&(!press||press.id!==candPress.id)&&(['FB','CB'].includes(press?.role)||candD+1.0<pressD);
+  const wideFrontCoverOverride=pref.mode==='WIDE_FRONT_PRESS'&&candCover?.role==='FB'&&(!cover||cover.id!==candCover.id);
   const wideGuardCoverOverride=pref.mode==='WIDE_CB_ST_GUARD'&&candCover&&(!cover||cover.id!==candCover.id||cover.role==='CB');
   // STEP40 V0.3: a central striker at the back line is a centre-back partnership problem,
   // not just a first-presser problem.  A stale role lock must never leave a midfielder as
   // the second defender while the spare CB follows a winger away from the centre.
   // Expiry merely allows ordinary switches; structural overrides restore line ownership now.
-  if(!press||currentLost||lastCoverOverride||structuralOverride||wideOverride||(expired&&meaningfullyCloser)){
+  if(!press||currentLost||lastCoverOverride||structuralOverride||wideOverride||wideFrontOverride||(expired&&meaningfullyCloser)){
     press=candPress||press;
     cover=candCover&&candCover.id!==press?.id?candCover:(candidates.find(c=>c.p.id!==press?.id)?.p||null);
     lock.pressId=press?.id||null;lock.coverId=cover?.id||null;lock.until=m.time+0.80;
-  }else if(centralCoverOverride||wideGuardCoverOverride){
+  }else if(centralCoverOverride||wideFrontCoverOverride||wideGuardCoverOverride){
     cover=candCover;lock.coverId=cover?.id||null;lock.until=Math.max(lock.until||0,m.time+0.80);
   }else if(!cover||cover.id===press.id){
     cover=candCover&&candCover.id!==press.id?candCover:(candidates.find(c=>c.p.id!==press.id)?.p||null);lock.coverId=cover?.id||null;
@@ -722,11 +730,11 @@ function assignDefence(m,team,ctx){
       continue;
     }
     const dangerBase=dangerBlockAnchor(pr,ball,p.slot,p.role);
-    const base=dangerBase||defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role);let lx=base.x,ly=base.y,task=dangerBase?.task||'HOLD_BLOCK',sprint=!!dangerBase&&Math.abs(worldToLocal(team,p.x,p.y).x-lx)>2.5;
+    const base=dangerBase||defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role);let lx=base.x,ly=base.y,task=dangerBase?.task||'HOLD_BLOCK',sprint=!!dangerBase&&Math.abs(worldToLocal(team,p.x,p.y).x-lx)>2.5,markerTurnRun=false;
     const beatenTarget=(p.beatenRecoveryUntil||0)>m.time?playerById(m,p.beatenRecoveryTargetId):null;
     const ownerLocal=owner&&owner.team!==team?worldToLocal(team,owner.x,owner.y):null;
     const ownerSide=ownerLocal?(ownerLocal.y<34?-1:1):0,fbSide=sideSign(p.slot);
-    const sameSideWideCarrier=!!(p.role==='FB'&&ownerLocal&&owner?.role==='WF'&&fbSide&&fbSide===ownerSide&&ownerLocal.x<58&&Math.abs(ownerLocal.y-34)>=11.5);
+    const sameSideWideCarrier=!!(p.role==='FB'&&ownerLocal&&(owner?.role==='WF'||owner?.role==='FB'||Math.abs(ownerLocal.y-34)>=14.5)&&fbSide&&fbSide===ownerSide&&ownerLocal.x<58&&Math.abs(ownerLocal.y-34)>=11.5);
     if(beatenTarget&&beatenTarget.team!==p.team){
       const al=worldToLocal(team,beatenTarget.x,beatenTarget.y),dl=worldToLocal(team,p.x,p.y);
       lx=clamp(al.x+1.35,3,96);ly=clamp(lerp(dl.y,al.y,0.86),4,64);task='RECOVERY_CHASE';sprint=true;
@@ -795,13 +803,21 @@ function assignDefence(m,team,ctx){
         // responsible for him, but stand on the dangerous corridor instead of
         // blindly following his exact path.  The target blends the pass lane from
         // ball->runner and the shot lane from runner->goal.
-        const toBallX=ball.x-al.x,toBallY=ball.y-al.y,db=Math.max(0.001,Math.hypot(toBallX,toBallY));
-        const toGoalX=-al.x,toGoalY=34-al.y,dg=Math.max(0.001,Math.hypot(toGoalX,toGoalY));
+        // R17 proactive marker: read the attacker's velocity before he has already run past.
+        // In defending-team local coordinates negative X is a run toward our goal. A quick
+        // goalward burst therefore shifts the screen to the predicted lane and starts the
+        // defender's turn-and-run early instead of producing a late snake-tail chase.
+        const avx=team==='HOME'?(Number(a.vx)||0):-(Number(a.vx)||0),avy=team==='HOME'?(Number(a.vy)||0):-(Number(a.vy)||0),towardGoal=Math.max(0,-avx);
+        const lead=towardGoal>2.0?clamp(.44+towardGoal*.055,.46,.74):.28,futureAl={x:clamp(al.x+avx*lead,2,101),y:clamp(al.y+avy*lead,2,66)};
+        const toBallX=ball.x-futureAl.x,toBallY=ball.y-futureAl.y,db=Math.max(0.001,Math.hypot(toBallX,toBallY));
+        const toGoalX=-futureAl.x,toGoalY=34-futureAl.y,dg=Math.max(0.001,Math.hypot(toGoalX,toGoalY));
         const passGap=p.role==='CM'?1.65:1.45,shotGap=p.role==='CB'?1.60:1.35;
-        const passX=al.x+toBallX/db*passGap,passY=al.y+toBallY/db*passGap;
-        const shotX=al.x+toGoalX/dg*shotGap,shotY=al.y+toGoalY/dg*shotGap;
+        const passX=futureAl.x+toBallX/db*passGap,passY=futureAl.y+toBallY/db*passGap;
+        const shotX=futureAl.x+toGoalX/dg*shotGap,shotY=futureAl.y+toGoalY/dg*shotGap;
         const shotWeight=p.role==='CB'?0.64:p.role==='FB'?0.54:0.46;
-        const screenX=lerp(passX,shotX,shotWeight),screenY=lerp(passY,shotY,shotWeight);
+        let screenX=lerp(passX,shotX,shotWeight),screenY=lerp(passY,shotY,shotWeight);
+        markerTurnRun=towardGoal>2.15;
+        if(markerTurnRun&&p.role!=='CM')screenX=Math.min(screenX,futureAl.x-1.05);
         // TT-0.48 zonal priority: marking is a reference inside the player's zone, not
         // an instruction to copy the attacker body-for-body. CBs may shoulder a central
         // striker more tightly; midfielders stay primarily in the cutback/second-ball layer.
@@ -815,7 +831,7 @@ function assignDefence(m,team,ctx){
           // midfield/edge zone empty.
           lx=clamp(lx,ball.x+1.8,ball.x+5.2);
         }
-        task='MARK_LANE_SCREEN';p.markTargetId=a.id;sprint=dist(p,a)>4.4||Math.abs(worldToLocal(team,p.x,p.y).x-lx)>2.6;
+        task='MARK_LANE_SCREEN';p.markTargetId=a.id;sprint=markerTurnRun||dist(p,a)>4.4||Math.abs(worldToLocal(team,p.x,p.y).x-lx)>2.6;
       }
     }else if(p.role==='CM'){
       // Midfield defends as a unit: ball-side 8 recovers toward the duel, pivot screens the centre, far-side 8 tucks in.
@@ -844,6 +860,7 @@ function assignDefence(m,team,ctx){
       }
     }
     applyTarget(p,lx,ly,task,sprint,m);
+    if(markerTurnRun){p.action='MARK_TURN_AND_RUN';p.tacticalTask='MARK_LANE_SCREEN';}
   }
 }
 
@@ -1008,7 +1025,6 @@ function enforceFullbackWideRunnerResponsibility(m,team,owner){
     if(!wf)continue;
     const wl=wf.l,tx=clamp(wl.x-2.5,6,42),ty=clamp(lerp(wl.y,34,.10),5,63),w=localToWorld(team,tx,ty);
     fb.tx=w.x;fb.ty=w.y;fb.markTargetId=wf.a.id;fb.action=fb.tacticalTask='WIDE_RUN_TRACK';fb.sprint=dist(fb,wf.a)>4.2||dist(fb,w)>2.8;
-    if(lock.coverId===fb.id)lock.coverId=null;
   }
 }
 

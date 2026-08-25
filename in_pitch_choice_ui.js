@@ -84,8 +84,8 @@ function createController(cfg){
     const title=make('div','in-pitch-choice-title');title.textContent=player?(player.id===heroId()?`내 선수 · ${player.slot||player.role}`:(hero&&player.team===hero.team?`같은 팀 ${player.slot||player.role}`:`상대 ${player.slot||player.role}`)):'선택';menu.appendChild(title);
     const grid=make('div','in-pitch-choice-grid');
     for(const o of options){
-      const b=make('button','in-pitch-choice-option');b.type='button';b.setAttribute('role','menuitem');const offsideRisk=!!o.meta?.offsideRisk,baseTip=o.tooltip||o.hint||'',riskTip=offsideRisk?`⚠ 오프사이드 위험\n${baseTip}`:baseTip,tip=o.recommended?`추천 행동\n${riskTip}`:riskTip;
-      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.dataset.recommended=o.recommended?'true':'false';b.dataset.offsideRisk=offsideRisk?'true':'false';b.classList.toggle('recommended',!!o.recommended);b.classList.toggle('offside-risk',offsideRisk);b.setAttribute('aria-label',`${shortLabel(o)}${offsideRisk?' · 오프사이드 위험':''}${o.recommended?' · 추천 행동':''}`);b.textContent=`${offsideRisk?'⚠ ':''}${shortLabel(o)}`;
+      const b=make('button','in-pitch-choice-option');b.type='button';b.setAttribute('role','menuitem');const offsideRisk=!!o.meta?.offsideRisk,baseTip=o.tooltip||o.hint||'',tip=o.recommended?`추천 행동\n${baseTip}`:baseTip;
+      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.dataset.recommended=o.recommended?'true':'false';b.dataset.offsideRisk=offsideRisk?'true':'false';b.classList.toggle('recommended',!!o.recommended);b.setAttribute('aria-label',`${shortLabel(o)}${o.recommended?' · 추천 행동':''}`);b.textContent=shortLabel(o);
       b.addEventListener('mouseenter',()=>showTooltipFor(b,tip));b.addEventListener('mouseleave',hideTooltip);b.addEventListener('focus',()=>showTooltipFor(b,tip));b.addEventListener('blur',hideTooltip);
       b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();if(locked||generation!==menuGeneration||performance.now()<menuArmAt){resetPointerCommit();return;}pointerCommit={pointerId:ev.pointerId,generation,choiceId:o.id,targetId:o.targetId||null,button:b};});
       b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();const c=pointerCommit;resetPointerCommit();if(!c||c.pointerId!==ev.pointerId||c.generation!==generation||c.button!==b)return;commitChoice(o,anchorId,generation,ev.pointerType||'pointer');});
@@ -135,8 +135,8 @@ function createController(cfg){
   function renderTargets(){
     targets.innerHTML='';if(!pending||!snapshot)return;const players=new Map((snapshot.players||[]).map(p=>[p.id,p]));
     for(const g of getGroups()){
-      const p=players.get(g.anchorId);if(!p)continue;const pt=project(p),b=make('button','in-pitch-target'),hasOffsideRisk=(g.options||[]).some(o=>o.meta?.offsideRisk);b.type='button';b.dataset.playerId=p.id;b.dataset.offsideRisk=hasOffsideRisk?'true':'false';b.classList.toggle('offside-risk',hasOffsideRisk);b.setAttribute('aria-label',`${p.slot||p.role} 선택지 보기${hasOffsideRisk?' · 오프사이드 위험':''}`);b.title=hasOffsideRisk?'오프사이드 위험 위치':'선택지 보기';b.style.left=`${pt.x}px`;b.style.top=`${pt.y}px`;
-      const ring=make('span','in-pitch-target-ring'),dot=make('span','in-pitch-target-dot');b.append(ring,dot);
+      const p=players.get(g.anchorId);if(!p)continue;const pt=project(p),b=make('button','in-pitch-target'),hasOffsideRisk=(g.options||[]).some(o=>o.meta?.offsideRisk);b.type='button';b.dataset.playerId=p.id;b.dataset.offsideRisk=hasOffsideRisk?'true':'false';b.setAttribute('aria-label',`${p.slot||p.role} 선택지 보기`);b.title='선택지 보기';b.style.left=`${pt.x}px`;b.style.top=`${pt.y}px`;
+      const ring=make('span','in-pitch-target-ring');b.append(ring);
       b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();if(locked)return;selectTarget(p.id)});b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();});targets.appendChild(b);
     }
   }

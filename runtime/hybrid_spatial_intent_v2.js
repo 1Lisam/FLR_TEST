@@ -160,77 +160,47 @@ function intentPriority(kind){return({PRESS:1.0,MARK:.92,COVER:.82,RUN:.88,RECOV
 function pressLeash(role){return({ST:10.5,WF:11.5,CM:10.8,FB:14.5})[role]||12;}
 function defensiveAssignments(state,players,team){
   const opp=other(team),owner=players[state.ball.ownerId],teamPs=Object.values(players).filter(p=>p.team===team&&p.role!=='GK');
-  const out={press:null,markerByThreat:{},coverByMarker:{}};
+  const out={press:null,markerByThreat:{},coverByMarker:{},wideCoverByDefender:{}};
   if(owner&&owner.team===opp){
-    const ol=local(team,owner.x,owner.y),wide=Math.abs(ol.y-34)>14.5,side=ol.y<34?-1:1;
-    const ranked=teamPs.filter(p=>['CM','FB','WF','ST'].includes(p.role)).map(p=>{
-      const base=shapeBase(state,p.id),anchorDist=dist(p,base),pside=['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0;
-      if(anchorDist>pressLeash(p.role)+4)return null;
-      if(p.role==='ST'&&ol.x<45)return null;if(p.role==='WF'&&ol.x<30)return null;
-      let score=dist(p,owner);
-      if(wide){if(p.role==='FB')score+=pside===side?-4.2:7.0;else if(p.role==='CM')score+=(ol.x<38?3.5:1.4)+(pside&&pside!==side?4.0:0);else score+=5.0;}
-      else{if(p.role==='CM')score-=1.8;else if(p.role==='FB')score+=2.5;else score+=2.8;}
-      return{p,d:dist(p,owner),score};
-    }).filter(Boolean).sort((a,b)=>a.score-b.score||a.d-b.d);
-    const press=ranked[0];if(press&&press.d<=17)out.press=press.p.id;
+    const ol=local(team,owner.x,owner.y),wide=Math.abs(ol.y-34)>14.5||owner.role==='WF'||owner.role==='FB',side=ol.y<34?-1:1;
+    if(wide){
+      const front=teamPs.filter(p=>['WF','CM','ST'].includes(p.role)).map(p=>{
+        const base=shapeBase(state,p.id),anchorDist=dist(p,base),d=dist(p,owner),pside=['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0;
+        if(anchorDist>pressLeash(p.role)+4||d>17.5)return null;
+        if(p.role==='WF'&&pside!==side)return null;
+        if(p.role==='CM'&&pside&&pside!==side)return null;
+        if(p.role==='ST'&&(d>9.5||ol.x<40))return null;
+        let score=d;if(p.role==='WF')score-=4.8;else if(p.role==='CM')score-=p.slot==='CM'?1.8:3.3;else score+=.8;
+        return{p,d,score};
+      }).filter(Boolean).sort((a,b)=>a.score-b.score||a.d-b.d);
+      if(front[0]&&front[0].d<=16.5&&ol.x>=27.5)out.press=front[0].p.id;
+      if(!out.press){
+        const fb=teamPs.filter(p=>p.role==='FB'&&(['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0];
+        if(fb&&fb.d<=15.5)out.press=fb.p.id;
+      }
+      if(out.press){
+        const cover=teamPs.filter(p=>p.role==='FB'&&p.id!==out.press&&(['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0]?.p;
+        if(cover)out.wideCoverByDefender[cover.id]=owner.id;
+      }
+    }else{
+      const ranked=teamPs.filter(p=>['CM','FB','WF','ST'].includes(p.role)).map(p=>{
+        const base=shapeBase(state,p.id),anchorDist=dist(p,base);if(anchorDist>pressLeash(p.role)+4)return null;
+        if(p.role==='ST'&&ol.x<45)return null;if(p.role==='WF'&&ol.x<30)return null;
+        let score=dist(p,owner);if(p.role==='CM')score-=1.8;else if(p.role==='FB')score+=2.5;else score+=2.8;
+        return{p,d:dist(p,owner),score};
+      }).filter(Boolean).sort((a,b)=>a.score-b.score||a.d-b.d);
+      if(ranked[0]&&ranked[0].d<=17)out.press=ranked[0].p.id;
+    }
   }
   const prefix=opp==='HOME'?'H':'A';
   const threats=[`${prefix}-ST`,`${prefix}-LW`,`${prefix}-RW`].map(id=>players[id]).filter(Boolean);
-  const cb=teamPs.filter(p=>p.role==='CB');
-  const fb=teamPs.filter(p=>p.role==='FB');
-  const st=threats.find(p=>p.role==='ST');
+  const cb=teamPs.filter(p=>p.role==='CB'),fb=teamPs.filter(p=>p.role==='FB'),st=threats.find(p=>p.role==='ST');
   let stMarker=null,freeCbs=[...cb];
-  if(st&&cb.length){
-    cb.sort((a,b)=>dist(a,st)-dist(b,st));stMarker=cb[0];out.markerByThreat[st.id]=stMarker.id;
-    freeCbs=cb.filter(x=>x.id!==stMarker.id&&x.id!==out.press);
-    if(freeCbs[0])out.coverByMarker[stMarker.id]=freeCbs[0].id;
-  }
-
-  const wingInfo=threats.filter(p=>p.role==='WF').map(w=>{
-    const desired=w.slot==='LW'?'RB':'LB',candidate=fb.find(p=>p.slot===desired)||nearest(players,w,p=>p.team===team&&p.role==='FB')?.p;
-    const threatAdvance=w.team==='HOME'?w.x:105-w.x,ly=local(w.team,w.x,w.y).y;
-    const inside=w.slot==='LW'?ly>=22:ly<=46;
-    const centrality=Math.abs(ly-34);
-    return{w,candidate,threatAdvance,inside,centrality};
-  });
-
-  // A winger cutting into the penalty-area channels is not simply abandoned when he leaves
-  // a full-back's normal lane. If one centre-back is genuinely free after the striker is
-  // accounted for, that CB may accept one inside runner. With three central runners against
-  // a back four, the remaining winger stays the full-back's responsibility: the hand-off is
-  // therefore capacity-aware rather than an automatic 'cross the line -> drop the man' rule.
-  const handoff=wingInfo.filter(x=>x.inside&&x.threatAdvance>=80&&x.w.id!==state.ball.ownerId)
-    .sort((a,b)=>(b.threatAdvance-a.threatAdvance)||(a.centrality-b.centrality));
-  if(freeCbs.length&&handoff.length){
-    const h=handoff[0],preferredSlot=h.w.slot==='LW'?'RCB':'LCB';
-    const preferred=freeCbs.find(p=>p.slot===preferredSlot)||freeCbs.sort((a,b)=>dist(a,h.w)-dist(b,h.w))[0];
-    if(preferred&&dist(preferred,h.w)<=20){
-      out.markerByThreat[h.w.id]=preferred.id;
-      // The full-back that released the inside runner becomes the spare/tuck defender instead
-      // of following him all the way across the box. Remove the old CB-cover relationship so
-      // one defender is never asked to cover and man-mark simultaneously.
-      if(stMarker&&out.coverByMarker[stMarker.id]===preferred.id)delete out.coverByMarker[stMarker.id];
-    }
-  }
-
-  for(const info of wingInfo){
-    const {w,candidate,threatAdvance}=info;
-    if(out.markerByThreat[w.id])continue;
-    // Do not turn every full-back into a man-marker across half the pitch. Normal wide
-    // threats keep the 18m relevance gate. Once a winger is already very deep, however,
-    // the same-side full-back must keep recovery responsibility when no safe CB hand-off is
-    // available; otherwise a box runner can become nobody's assignment.
-    const trackLimit=threatAdvance>=90?30:threatAdvance>=80?24:18;
-    if(candidate&&dist(candidate,w)<=trackLimit){
-      if(candidate.id!==out.press)out.markerByThreat[w.id]=candidate.id;
-      else if(threatAdvance>=80){
-        const backupSlot=w.slot==='LW'?'RCB':'LCB';
-        const used=new Set(Object.values(out.markerByThreat));
-        const backup=cb.find(p=>p.slot===backupSlot&&!used.has(p.id))||nearest(players,w,p=>p.team===team&&p.role==='CB'&&p.id!==out.press&&!used.has(p.id))?.p;
-        if(backup&&dist(backup,w)<=18)out.markerByThreat[w.id]=backup.id;
-      }
-    }
-  }
+  if(st&&cb.length){cb.sort((a,b)=>dist(a,st)-dist(b,st));stMarker=cb[0];out.markerByThreat[st.id]=stMarker.id;freeCbs=cb.filter(x=>x.id!==stMarker.id&&x.id!==out.press);if(freeCbs[0])out.coverByMarker[stMarker.id]=freeCbs[0].id;}
+  const wingInfo=threats.filter(p=>p.role==='WF').map(w=>{const desired=w.slot==='LW'?'RB':'LB',candidate=fb.find(p=>p.slot===desired)||nearest(players,w,p=>p.team===team&&p.role==='FB')?.p,threatAdvance=w.team==='HOME'?w.x:105-w.x,ly=local(w.team,w.x,w.y).y,inside=w.slot==='LW'?ly>=22:ly<=46,centrality=Math.abs(ly-34);return{w,candidate,threatAdvance,inside,centrality};});
+  const handoff=wingInfo.filter(x=>x.inside&&x.threatAdvance>=80&&x.w.id!==state.ball.ownerId).sort((a,b)=>(b.threatAdvance-a.threatAdvance)||(a.centrality-b.centrality));
+  if(freeCbs.length&&handoff.length){const h=handoff[0],preferredSlot=h.w.slot==='LW'?'RCB':'LCB',preferred=freeCbs.find(p=>p.slot===preferredSlot)||freeCbs.sort((a,b)=>dist(a,h.w)-dist(b,h.w))[0];if(preferred&&dist(preferred,h.w)<=20){out.markerByThreat[h.w.id]=preferred.id;if(stMarker&&out.coverByMarker[stMarker.id]===preferred.id)delete out.coverByMarker[stMarker.id];}}
+  for(const info of wingInfo){const {w,candidate,threatAdvance}=info;if(w.id===state.ball.ownerId)continue;if(out.markerByThreat[w.id])continue;const trackLimit=threatAdvance>=90?30:threatAdvance>=80?24:18;if(candidate&&dist(candidate,w)<=trackLimit){if(candidate.id!==out.press)out.markerByThreat[w.id]=candidate.id;else if(threatAdvance>=80){const backupSlot=w.slot==='LW'?'RCB':'LCB',used=new Set(Object.values(out.markerByThreat)),backup=cb.find(p=>p.slot===backupSlot&&!used.has(p.id))||nearest(players,w,p=>p.team===team&&p.role==='CB'&&p.id!==out.press&&!used.has(p.id))?.p;if(backup&&dist(backup,w)<=18)out.markerByThreat[w.id]=backup.id;}}}
   return out;
 }
 
@@ -254,6 +224,8 @@ function candidateIntent(state,players,p,assignments,now){
     }
     const threatEntry=Object.entries(assignments.markerByThreat).find(([,marker])=>marker===p.id);
     if(threatEntry){const threat=players[threatEntry[0]],pp=predicted(threat,.35),goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.2,y:pp.y+(p.slot==='LCB'?-0.7:p.slot==='RCB'?0.7:0)},max=p.role==='CB'?12:14;return{kind:'MARK',target:capAround(base,raw,max),targetId:threat.id,score:.94};}
+    const wideCoverTarget=assignments.wideCoverByDefender?.[p.id];
+    if(wideCoverTarget){const threat=players[wideCoverTarget];if(threat){const pp=predicted(threat,.38),goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.35,y:pp.y};return{kind:'MARK',target:capAround(base,raw,14),targetId:threat.id,score:.93};}}
     const markerEntry=Object.entries(assignments.coverByMarker).find(([,cover])=>cover===p.id);
     if(markerEntry){const marker=players[markerEntry[0]],threat=players[marker?.intentTargetId],goalX=p.team==='HOME'?0:105;if(threat){const dx=goalX-threat.x,dy=34-threat.y,dg=Math.max(.01,Math.hypot(dx,dy)),side=p.slot==='LCB'?-1:p.slot==='RCB'?1:0,raw={x:threat.x+dx/dg*4.8,y:threat.y+dy/dg*4.8+side*1.25};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}const raw={x:marker.x+(goalX-marker.x)*.16,y:marker.y+(34-marker.y)*.32};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}
     if(['CB','FB','CM'].includes(p.role)){
@@ -284,8 +256,9 @@ function candidateIntent(state,players,p,assignments,now){
   if(p.role==='CM'){
     const rel=owner?predicted(owner,.30):abstractBallWorld(state),ol=local(p.team,rel.x,rel.y),nearSlot=ol.y<30?'LCM':ol.y>38?'RCM':(state.ball.lane==='LEFT'?'LCM':state.ball.lane==='RIGHT'?'RCM':'LCM');
     if(p.slot==='CM'){
-      const q=local(p.team,base.x,base.y),targetLocal={x:clamp(Math.min(q.x,ol.x-10),28,76),y:clamp(34+(ol.y-34)*.16,18,50)},w=world(p.team,targetLocal.x,targetLocal.y);
-      return{kind:'COVER',target:capAround(base,w,9),targetId:null,score:.84};
+      let supportX;if(phase==='BUILD_UP')supportX=clamp(ol.x-10,28,44);else if(phase==='PROGRESSION')supportX=clamp(ol.x-8,40,58);else if(phase==='FINAL_THIRD')supportX=clamp(ol.x-13,48,64);else supportX=clamp(ol.x-16,50,66);
+      const targetLocal={x:supportX,y:clamp(34+(ol.y-34)*.16,18,50)},w=world(p.team,targetLocal.x,targetLocal.y);
+      return{kind:'COVER',target:capAround(base,w,12),targetId:null,score:.84};
     }
     if(p.slot===nearSlot){
       const lat=p.slot==='LCM'?-6:6,relation=world(p.team,clamp(ol.x-5,5,100),clamp(ol.y+lat,5,63));

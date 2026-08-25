@@ -604,11 +604,11 @@ function updateResultTracker(s){
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
     const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY',visibleRestartAge=s.m.restart&&Number.isFinite(Number(s.m.restart.setupStartedAt))?Math.max(0,now-Number(s.m.restart.setupStartedAt)):age;
     // Dead-clock compression may jump the match clock, but user-facing readability is measured
-    // from when the controller first observes the terminal event. OFFSIDE gets a short dedicated
+    // from when the controller first observes the terminal event. OFFSIDE gets a dedicated 3-4 second
     // review beat so the line/call can be understood without watching a long restart walk-back.
     if(tt==='OFFSIDE'){
       const visibleOffsideAge=Number.isFinite(Number(tr.offsideVisibleSince))?Math.max(0,now-Number(tr.offsideVisibleSince)):0;
-      ready=(now>=tr.minimumUntil)&&visibleOffsideAge>=1.20;
+      ready=(now>=tr.minimumUntil)&&visibleOffsideAge>=3.40;
     }else if(tt==='GOAL_KICK'||tt==='CORNER')ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.35&&((ballReady&&ratio>=0.52)||!s.m.restart||visibleRestartAge>=6.40);
     else ready=(now>=tr.minimumUntil)&&visibleRestartAge>=1.10&&(ratio>=0.55||visibleRestartAge>=4.60||!s.m.restart);
   }else if(['BLOCK','SAVE','CHIP_SAVE','CHIP_PARRY'].includes(tt)){
