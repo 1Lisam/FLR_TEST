@@ -1,0 +1,83 @@
+name: FLR R15 one-shot atomic deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/flr-r15-one-shot-deploy.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-r15-one-shot-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Decode and preflight frozen R15 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s .flr/r15-deploy.patch.gz.b64
+          base64 -d .flr/r15-deploy.patch.gz.b64 | gzip -dc > /tmp/r15.patch
+          git apply --check /tmp/r15.patch
+          git apply /tmp/r15.patch
+
+      - name: Verify exact frozen R15 production hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, pathlib
+          expected={
+            'live_hybrid_session_v02.js':'56e1bdf3cdfe1d193f5b4a58864f2638d9b40294323fceaf5b9bece18f2f78bb',
+            'live_v06_scene_authority_browser.js':'0b312d456b7d92a742d59ac4d9245ea511eb2bb404fe966743133edc050ae862',
+            'step71_hybrid_v06_ui.js':'588ba0290c10aac65e6aad8a3c47c218631c75ec725dd249ad24777ed2025ec7',
+            'index.html':'50303dd018297cff4ad1e86cb883473d65ed32b630a26bf343f39dc4ae85f597',
+            'runtime/continuous_match_core.js':'b0bcc35d40ce4417959ad8dbdd0b75118358f07d423ecc19111063ada2c0683d',
+            'runtime/protagonist_match_controller.js':'ccfa63abef2c168f8ebccc6eda168592fc0a9161184ea0f75a59f161637cf7d6',
+            'runtime/tactical_movement.js':'f3ac5ec59101e0a57648be6299ac73dfd8178159cc1b74a5c18bf5e2586dd57a',
+          }
+          for path,want in expected.items():
+              data=pathlib.Path(path).read_bytes()
+              got=hashlib.sha256(data).hexdigest()
+              if got!=want:
+                  raise SystemExit(f'HASH_MISMATCH {path} expected={want} got={got}')
+              print(f'OK {path} {got}')
+          PY
+          grep -q 'V0.5.4 R15 TEST' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.4-R15' step71_hybrid_v06_ui.js
+
+      - name: JavaScript syntax gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check live_hybrid_session_v02.js
+          node --check live_v06_scene_authority_browser.js
+          node --check step71_hybrid_v06_ui.js
+          node --check runtime/continuous_match_core.js
+          node --check runtime/protagonist_match_controller.js
+          node --check runtime/tactical_movement.js
+
+      - name: Commit exact R15 and remove one-shot payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR R15 Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git rm .flr/r15-deploy.patch.gz.b64
+          git rm .github/workflows/flr-r15-one-shot-deploy.yml
+          git add index.html live_hybrid_session_v02.js live_v06_scene_authority_browser.js step71_hybrid_v06_ui.js runtime/continuous_match_core.js runtime/protagonist_match_controller.js runtime/tactical_movement.js
+          git diff --cached --quiet && { echo 'NO_STAGED_CHANGES'; exit 1; }
+          git commit -m 'Deploy Match Engine User Test V0.5.4 R15'
+          git push origin HEAD:main
