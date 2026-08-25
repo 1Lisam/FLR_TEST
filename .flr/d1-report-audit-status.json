@@ -4,6 +4,106 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-b6493533-1f3d-4bc1-bd67-052b427f14a5",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:51:19.264Z",
+      "category": "패스/공격",
+      "priority": 1,
+      "description": "이 부분은 로빙 패스 이후 정확하게 연결이 되었고 패널티 라인 안에서 연결이 될만도 했었는데 '어째서 슛까지 연결 되지 않았나?' 를 알고 싶음 명백한 슈팅 찬스였는데 백패스를 하는 상황이라 말이 안되네",
+      "size_bytes": 1197675,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-a7ba2bd5-4ec9-4307-8718-ec145545bb2c",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:48:54.265Z",
+      "category": "수비/전술",
+      "priority": 1,
+      "description": "검증 완료: ST 침투 레인 연속성 · seed=DEV-RECENT-1787629749269-15\n4번의 경우 ST가 침투 중 좌 우로 왔다갔다 하긴 하는데 공간을 찾아 뚫고 나가려는 시도로 볼 수 있어서 이건 매우 구현이 잘되었다고 생각함.\nPASS 요소임",
+      "size_bytes": 2791190,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-efc55d0f-b135-4a92-92cc-2b410735a116",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:47:51.722Z",
+      "category": "수비/전술",
+      "priority": 1,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787629691485-12\n여전히 RB나 LB가 LW, RW 등이 공을 잡았는데 무시하고 앞으로 달려 나가다가 돌아오는 현상이 자꾸 관측됨",
+      "size_bytes": 2631855,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-615179d3-537f-4dad-8808-7d57b9501db4",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:47:18.696Z",
+      "category": "수비/전술",
+      "priority": 1,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787629651653-11\n\n쓸대 없이 공격수가 제자리에서 한바퀴 도는 현상이 있음",
+      "size_bytes": 2593156,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-e76656ec-11df-4a56-9484-54cf1af55626",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:45:52.375Z",
+      "category": "수비/전술",
+      "priority": 2,
+      "description": "이번 검증: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787629485846-8\n\n정확히는 시작 하자마자 RB와 RB가 바로 앞쪽의 LW, 와 RW를 두고 전진 하는 이상한 행동을 함.",
+      "size_bytes": 1270767,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-f34c3045-23c3-46d2-b73b-6dd13caab864",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:44:54.803Z",
+      "category": "수비/전술",
+      "priority": 2,
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787629485846-8\n\n상황 시작 부터 RB가 다른 수비 할 것도 없는데 자기 포지션에서만 LW를 멀찍이서 지켜보는 상황.\n조금 더 가까워 지거나 조금 더 거리를 좁히거나 해야 하지 않나 싶음",
+      "size_bytes": 3287283,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-e822c7f3-09a8-480f-93cc-0ff6ef53cc15",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:43:49.079Z",
+      "category": "2D 움직임",
+      "priority": 4,
+      "description": "다른 리포트에서 이야기 한거지만 LB는 정상이지만 RB는 너무 공격수를 두고 달려나감.\n또한 공격수들도 수비 적인 상황이면 ST 하나만 남기고 나머지는 볼 운반을 위해 내려 오는 것이 정상이라 생각하는데 모두 상대 공격수들은 공격진영에 남아서 구경하는건 고쳐야함",
+      "size_bytes": 2454249,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-7c9a20d1-c496-4699-8020-27ec88680236",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:43:00.115Z",
+      "category": "2D 움직임",
+      "priority": 4,
+      "description": "RCM 이 반대 방향에서 스타트 하는 현상 있음",
+      "size_bytes": 2453950,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-c7b34ce8-3571-4040-81f4-03d70710d243",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T03:42:25.783Z",
+      "category": "2D 움직임",
+      "priority": 2,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787629304942-7\n\nRB가 LW를 재쳐두고 달려 나와 LW가 노마크가 됨.\n\n너무 이렇게 대 놓고 노마크는 없어야함\n\n이전에도 RB나 LB들이 너무 자기 포지션을 유기한 채로 달려나오는 부분에 대해서 이야기 했으나 고쳐지지 않음 \n\n\n2. 또한 스로인 라인을 나가는건 좋으나 나가자마자 RB가 순간이동해서 스로인을 던지러 가버림",
+      "size_bytes": 2454380,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-9082c319-c64f-4409-bfab-d4a2ed537fac",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T02:59:23.778Z",
+      "category": "2D 움직임",
+      "priority": 2,
+      "description": "1. 오프사이드 인건 맞지만 공이 중간에 멈춰버리면 상당히 어색함",
+      "size_bytes": 579008,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-af5a6d30-a4c4-4503-8874-2535af1df504",
       "build": "USER-MATCH-TEST-V0.5.4-R14",
       "created_at": "2026-08-24T16:31:09.090Z",
@@ -402,128 +502,28 @@
       "description": "해당 상황에서 LW가 비어 있는 상태임에도 패스가 불가능. 분명히 선택지로 존재 해도 될 법한 상황인데 존재하지 않음",
       "size_bytes": 1697781,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt051-c61b317e-68bb-485c-b15d-8c51592bdab5",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:03:41.841Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "최종적으로 우리팀 RW가 공격을 성공 시켰으나 '골세레머니' 나오지 않음, 또한 표현도 '득점'이 아닌 '공격지속' 이 되어 밋밋하게 끝나버림 이 부분은 몇번이나 언급했듯 수정이 필요함",
-      "size_bytes": 2066896,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt05-a2800ef6-1eca-4b8a-b27b-c1d8b84c2be0",
-      "build": "USER-MATCH-TEST-V0.5",
-      "created_at": "2026-08-23T10:04:14.530Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "공간 침투패스를 받은 후 그대로 달려나가는것이 정상이지만 공간 침투 패스를 달려가서 잡은 후 멈춰버림",
-      "size_bytes": 6097518,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt05-95769221-3144-4b0b-b702-e06fa6e7dd80",
-      "build": "USER-MATCH-TEST-V0.5",
-      "created_at": "2026-08-23T09:05:22.822Z",
-      "category": "패스/공격",
-      "priority": 4,
-      "description": "이 부분에 대해서는 분명히 공이 날아오는것 을 보여주고 선택지가 나오기로 했는데 출발도 전에 선택지가 나오는 현상 유지중임",
-      "size_bytes": 3668949,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt05-bca7cf28-9efa-407c-9692-10e3c63e3610",
-      "build": "USER-MATCH-TEST-V0.5",
-      "created_at": "2026-08-23T09:00:17.222Z",
-      "category": "패스/공격",
-      "priority": 4,
-      "description": "LW 가 무방비 임에도 패스 옵션이 활성화가 안됨",
-      "size_bytes": 1670275,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt05-94f72953-e6dd-4a49-82d9-2639d15870a6",
-      "build": "USER-MATCH-TEST-V0.5",
-      "created_at": "2026-08-23T08:58:33.791Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "여전히 우리 팀의 포메이션에서 ST만 특출나고 \n나머지 우리팀과 상대팀의 포메이션은 너무 정갈함",
-      "size_bytes": 518364,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-18e7a4ba-3938-47dc-a1eb-d992b87df14d",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:43:29.428Z",
-      "category": "패스/공격",
-      "priority": 4,
-      "description": "선택지에서는 공중패스도 있어야 할 것 같다.\n쓰루패스가 매번 땅으로만 가니 수비를 넘겨서 패스한다는 선택지가 성립이 안되네",
-      "size_bytes": 634387,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-e4ab4e9d-34a5-4925-a0f7-555412e311b4",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:42:51.019Z",
-      "category": "2D 움직임",
-      "priority": 4,
-      "description": "이 장면에서는 선택 직후에 플레이가 끊기는데 플레이가 종료 되기 전 몇초 정도는 더 재생하고 왜 끊기는지 이유를 명확하게 적어줬으면 함.\n예를 들어 공을 뺐겼으면 '상대 RCB에게 공을 탈취 당한 후 공격권 종료' 그리고 바로 끊지 말고 살짝 재생 시켜주고 끝내줘 선택이 끝나자 마자 바로 다음 장면 공을 뺏긴 이후 상황이 바로 종료되어 버려서 무슨 상황인지 인지가 안됨",
-      "size_bytes": 288274,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-9d22011c-b234-45f0-b9e7-7e9d46990757",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:41:28.104Z",
-      "category": "2D 움직임",
-      "priority": 4,
-      "description": "2D 상 플레이어에게 닿지도 않았는데 슈팅이 나감",
-      "size_bytes": 1736371,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-fa3386a4-d200-408c-818c-a44b8078688a",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:40:59.588Z",
-      "category": "패스/공격",
-      "priority": 4,
-      "description": "공간침투 패스 선택 후 ST가 매우 빠르게 달려나가는데 이거 정상적인 속도인지?",
-      "size_bytes": 1098707,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt04-c4f44ee9-67f2-4814-a0a8-c125e278bf70",
-      "build": "USER-MATCH-TEST-V0.4",
-      "created_at": "2026-08-23T05:40:26.005Z",
-      "category": "패스/공격",
-      "priority": 4,
-      "description": "이 이전 상대방의 골 장면은 항상 동일한거 같음.\n어떤 테스트를 몇 번 하던 상대방 슈팅은 항상 저 위치에 저 포지션에 위치한 상태로 골이 들어갔다고 판단하는거 같은데 확인바람",
-      "size_bytes": 539444,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-af5a6d30-a4c4-4503-8874-2535af1df504",
+  "latestAttachedReportId": "umt053h3-b6493533-1f3d-4bc1-bd67-052b427f14a5",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
       "currentSituation": true,
-      "previousSituation": true,
+      "previousSituation": false,
       "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-af5a6d30-a4c4-4503-8874-2535af1df504",
-      "build": "USER-MATCH-TEST-V0.5.4-R14",
+      "reportId": "umt053h3-b6493533-1f3d-4bc1-bd67-052b427f14a5",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
       "step": 78,
-      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787588844292-94\n\n오프 사이드 라인 자체가 이상함\n해당 시드, JSON에서는 RW가 공격진이 튀어 넘어간건데 저 상황에서 RW에게 동을 주면 오프사이드가 되어야 하지만\n\n라인도 빨간선(상대 오프사이드 라인) 가장 뒤에 있는 RCB가 아닌 RB를 기점으로 맞춰져 있고 파란팀의 오프사이드란도 가장 우선적으로 뛰어가는 RW나 ST와도 전혀 맞지 않은 위치임",
-      "category": "2D 움직임",
-      "priority": 3,
-      "reportedAt": "2026-08-24T16:29:27.171Z"
+      "description": "이 부분은 로빙 패스 이후 정확하게 연결이 되었고 패널티 라인 안에서 연결이 될만도 했었는데 '어째서 슛까지 연결 되지 않았나?' 를 알고 싶음 명백한 슈팅 찬스였는데 백패스를 하는 상황이라 말이 안되네",
+      "category": "패스/공격",
+      "priority": 1,
+      "reportedAt": "2026-08-25T03:52:06.149Z"
     },
     "currentSituationPresent": true,
-    "previousSituationPresent": true,
+    "previousSituationPresent": false,
     "currentSituationKeys": [
       "schemaVersion",
       "canonicalContract",
@@ -533,28 +533,15 @@
       "futureOutcomePrecomputed",
       "reportScope"
     ],
-    "previousSituationKeys": [
-      "schemaVersion",
-      "canonicalContract",
-      "hybridBefore",
-      "highResolution",
-      "hybridAfter",
-      "futureOutcomePrecomputed",
-      "reportScope"
-    ],
+    "previousSituationKeys": [],
     "currentReportScope": {
-      "startSecond": 1446,
-      "endSecond": 1446,
+      "startSecond": 731.3000000000014,
+      "endSecond": 739.3000000000033,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "previousReportScope": {
-      "startSecond": 1191,
-      "endSecond": 1199.9999999999918,
-      "cumulativeMatchHistoryIncluded": false,
-      "keepsFullSituationFrames": true
-    },
-    "currentSerializedBytes": 91659,
-    "previousSerializedBytes": 1469468
+    "previousReportScope": null,
+    "currentSerializedBytes": 1333667,
+    "previousSerializedBytes": 0
   }
 }
