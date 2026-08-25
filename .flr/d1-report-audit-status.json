@@ -4,6 +4,56 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-142e4891-a7fa-470a-96b6-b015bc25aa42",
+      "build": "USER-MATCH-TEST-V0.5.4-R19",
+      "created_at": "2026-08-25T12:06:27.024Z",
+      "category": "수비/전술",
+      "priority": 5,
+      "description": "이번 검증: 노마크 ST 슈팅 선택지 노출 · seed=DEV-RECENT-1787659287292-19 · 박스 안에서 ST가 공을 안정적으로 소유한 상태입니다. 주인공 ST를 선택했을 때 슈팅이 바로 보이고 자동 실행되지는 않는지 확인하세요.\n\nST가 슈팅 선택지는 뜨지만 노마크 찬스에서 빠르게 슈팅을 할 수 있는 상황인데도 멈춰서 슈팅을 해버림 왜 1:1인데 멈춰서 수비가 오길 기다리는지 알 수 없음 \n\n슈팅 선택지가 뜨니까 에러 부분에서는 PASS지만 다이렉트 슈팅이라는 부분에서는 탈락임",
+      "size_bytes": 1602590,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-e3a552db-8373-40a8-b7c9-1e3826fe9bcc",
+      "build": "USER-MATCH-TEST-V0.5.4-R19",
+      "created_at": "2026-08-25T12:03:06.119Z",
+      "category": "수비/전술",
+      "priority": 5,
+      "description": "검증 완료: 공 운반 중 멈칫 반복 방지 · seed=DEV-RECENT-1787659225861-18\nRW가 툭툭 치면서 살짝 속도가 줄어드는 모습은 있지만 멈추진 않음\n드리블 한다고 생각하면 괜찮을 수 있지만 평소에 드리블 할때는 그런거 없으니 이 부분은 툭툭 속도가 조금씩 줄어드는건 고쳐야 하지 않을까? 싶음 일단 불합격",
+      "size_bytes": 2855143,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-190b7840-0fe3-4f26-9c23-3e44312f4b84",
+      "build": "USER-MATCH-TEST-V0.5.4-R19",
+      "created_at": "2026-08-25T12:01:37.440Z",
+      "category": "수비/전술",
+      "priority": 5,
+      "description": "이번 검증: 같은 마크 대상 유지 · seed=DEV-RECENT-1787659136401-12\n\n위성처럼 빙글빙글 도는건 아니지만\n상대에게 따라 붙은 후 -> 상대가 이동하면 같이 끌려나감.\n\n2번 항목과 마찬가지로 상대가 뒤로 빠졌으면 찰싹 달라 붙는게 아니라 조금 뒤에서 지역을 지키며 살짝 마킹을 해야하는데 너무 붙는 바람에 툭툭 범퍼카 치는 움직임임",
+      "size_bytes": 2000622,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-53358bf6-ddc2-43b2-bdb3-8c69ca35a0b3",
+      "build": "USER-MATCH-TEST-V0.5.4-R19",
+      "created_at": "2026-08-25T12:00:09.246Z",
+      "category": "수비/전술",
+      "priority": 5,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787658676933-6\n\n선택 시작이 트리거의 반응이 되는건 아니지만 시작하자마자 LW와 RW는 먼저 돌파해버리고 RB와 LB는 0.2~3초뒤부터 움직이기 시작하는데 갑자기 LW와 RW가 정지해서 RB와 LB가 따라가면 LW와 RW는 다시 뒤로 움직이는것 처럼\n\n서로 술래잡기를 하는데 수비는 포지션에서 지키는게 아니라 여전히 공격수에게 줄이 연결된것 처럼 끌려다니는 움직임을 보여서 이 항목은 재점검 필요",
+      "size_bytes": 2525234,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-9a1148f8-42fe-4c2a-b405-6fe8e3cd728f",
+      "build": "USER-MATCH-TEST-V0.5.4-R19",
+      "created_at": "2026-08-25T11:41:18.432Z",
+      "category": "슈팅/GK",
+      "priority": 5,
+      "description": "검증 완료: 선택 장면 포메이션 연속성 · seed=DEV-RECENT-1787656660068-1\n\n지금 이 이슈에 대한 부분이 전달이 안된거 같은데 \n상황이 시작 -> 포메이션 위치 -> 움직인다 가 아니라\n상황이 시작 -> 그 상황에 알맞는 위치들로 배치가 된 상태로 상황이 시작되어야 함\n\n계산을 하면서 그 축구 경기를 하다가 상황이 벌어져야 하는건데 계산을 하면서 상황이 벌어지면 그때야 체스나 장기 말 배치하는것 처럼 포메이션을 가지런히 놓는거면 절대로 위화감은 안 사라짐",
+      "size_bytes": 1362009,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-a7ac2872-169c-4840-bb66-9926916a2f7d",
       "build": "USER-MATCH-TEST-V0.5.4-R17",
       "created_at": "2026-08-25T08:46:46.154Z",
@@ -452,59 +502,9 @@
       "description": "6번 항목은 몇번을 해도 오프사이드 상황이 나오지 않아서 검증이 안됨 강제 검증을 위해 상황을 다시 깔아주길 바람",
       "size_bytes": 684165,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-fa9eddb1-0a89-4110-a7d6-14a446ef9909",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
-      "created_at": "2026-08-24T12:57:37.088Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "이번 검증: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787576131788-41\n\n오프사이드 검사지만 별개로 RW에 선택지가 뜨지 않는 점이 있음 확인 바람",
-      "size_bytes": 683011,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-4ff3da67-ec2f-4c6d-b629-634411b2d5bc",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
-      "created_at": "2026-08-24T12:56:49.149Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "이번 검증: 공격수 멈칫·SHIELD_SCAN 반복 방지 · seed=DEV-RECENT-1787576057595-34 · ST가 압박을 읽는 짧은 멈칫 뒤 다시 판단하고 움직이며, 같은 자리에서 SHIELD_SCAN을 반복하지 않는지 확인하세요.\n\n이번 검증은 적어도 짦은 멈칫은 공을 지킬때 나오는데 그게 공 지키느라 몸싸움 한다고 생각하면 크게 거슬리지는 않아서 이건 여러번 해봐도괜찮으니 통과로 봐도 될듯",
-      "size_bytes": 2669421,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-bcbfe33c-63b0-4fed-8e63-66e572cfe547",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
-      "created_at": "2026-08-24T12:54:42.966Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "검증 완료: ST 침투 레인 연속성 · seed=DEV-RECENT-1787575948505-19\n\n여전히 침투패스 상황에서 공격수가 좌우로 시야를 흔들면서 어쩔줄을 몰라함.\n버그가 고쳐지지 않았음",
-      "size_bytes": 2572840,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-f01306d4-c2bb-472e-9188-098df821d4d8",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
-      "created_at": "2026-08-24T12:54:03.228Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787575897894-18\n\n다른 상황으로 해봐도 LB와 RB가 서로 자리를 바꾸는 현상, CM이 갑자기 공을 잡으러 수비라인까지 달려들어버리는 현상, 중앙수비가 우왕좌왕 하는것은 그대로임",
-      "size_bytes": 2692108,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-79471388-9836-46df-a8f7-e19e4001652d",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
-      "created_at": "2026-08-24T12:53:05.989Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787575803967-13\n\n상황 시작 하자 마자 LB와 RB가 반대 위치에 존재해서 서로 자리를 바꾸는 상황임.",
-      "size_bytes": 1993548,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-a7ac2872-169c-4840-bb66-9926916a2f7d",
+  "latestAttachedReportId": "umt053h3-142e4891-a7fa-470a-96b6-b015bc25aa42",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -514,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-a7ac2872-169c-4840-bb66-9926916a2f7d",
-      "build": "USER-MATCH-TEST-V0.5.4-R17",
+      "reportId": "umt053h3-142e4891-a7fa-470a-96b6-b015bc25aa42",
+      "build": "USER-MATCH-TEST-V0.5.4-R19",
       "step": 78,
-      "description": "여전히 상황이 시작 될때 분명히 상대 공격 진영에서 선택이 시작 되었는데 우리 수비 4명과 상대 공격 3명은 이제 경기가 시작 된 것 처럼 원래 위치에서 천천히 올라옴.",
-      "category": "조작권/선택",
-      "priority": 3,
-      "reportedAt": "2026-08-25T08:47:33.157Z"
+      "description": "이번 검증: 노마크 ST 슈팅 선택지 노출 · seed=DEV-RECENT-1787659287292-19 · 박스 안에서 ST가 공을 안정적으로 소유한 상태입니다. 주인공 ST를 선택했을 때 슈팅이 바로 보이고 자동 실행되지는 않는지 확인하세요.\n\nST가 슈팅 선택지는 뜨지만 노마크 찬스에서 빠르게 슈팅을 할 수 있는 상황인데도 멈춰서 슈팅을 해버림 왜 1:1인데 멈춰서 수비가 오길 기다리는지 알 수 없음 \n\n슈팅 선택지가 뜨니까 에러 부분에서는 PASS지만 다이렉트 슈팅이라는 부분에서는 탈락임",
+      "category": "수비/전술",
+      "priority": 5,
+      "reportedAt": "2026-08-25T12:04:44.273Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -543,18 +543,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 999,
-      "endSecond": 999,
+      "startSecond": 1462,
+      "endSecond": 1462,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 709,
-      "endSecond": 718.000000000002,
+      "startSecond": 1286,
+      "endSecond": 1294.9999999999918,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 538639,
-    "previousSerializedBytes": 1476394
+    "currentSerializedBytes": 184557,
+    "previousSerializedBytes": 1577680
   }
 }
