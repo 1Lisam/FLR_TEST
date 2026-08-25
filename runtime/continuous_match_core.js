@@ -466,7 +466,7 @@ function movePlayers(m,dt){
     const markedSpeed=controlledMarker?Math.hypot(Number(markedPlayer.vx||0),Number(markedPlayer.vy||0)):0,markedGap=controlledMarker?dist(p,markedPlayer):99;
     const localMarkedVx=controlledMarker?(p.team===HOME?Number(markedPlayer.vx||0):-Number(markedPlayer.vx||0)):0,runnerGoalward=controlledMarker&&localMarkedVx<-2.15;
     const realTurnAndRun=controlledMarker&&(p.action==='MARK_TURN_AND_RUN'||(motionTask==='WIDE_RUN_TRACK'&&runnerGoalward&&markedGap>3.4));
-    if(controlledMarker&&!realTurnAndRun){const cap=p.role==='FB'?4.85:4.60;vmax=Math.min(vmax,cap);}
+    if(controlledMarker&&!realTurnAndRun){const cap=p.role==='FB'?6.45:6.05;vmax=Math.min(vmax,cap);}
     // R15: reconnecting to the midfield screen is a controlled recovery jog, not a full-speed
     // magnetic snap to a formation anchor.  The tactical target remains live and may update again.
     if(p.tacticalTask==='PIVOT_RECONNECT')vmax=Math.min(vmax,3.20);
@@ -495,8 +495,8 @@ function movePlayers(m,dt){
     }
     let desired=Math.min(vmax,Math.sqrt(Math.max(0,2*a*d)));
     if(controlledMarker&&!realTurnAndRun){
-      const catchup=markedGap>7.0?2.35:markedGap>4.5?1.25:.52;
-      desired=Math.min(desired,clamp(markedSpeed+catchup,.72,vmax));
+      const catchup=markedGap>5.5?1.55:markedGap>2.6?.88:.30;
+      desired=Math.min(desired,clamp(markedSpeed+catchup,.62,vmax));
     }
     const userCarry=m.userChoiceControl?.playerId===p.id&&m.userChoiceControl?.mode==='CARRY'&&m.userChoiceControl?.controllerOwned?m.userChoiceControl:null,carryHorizon=Math.max(Number(p.lockTargetUntil||0),Number(userCarry?.until||0)),carrySpeed=Math.hypot(p.vx||0,p.vy||0),carryAlign=carrySpeed>.05?((p.vx||0)*n.x+(p.vy||0)*n.y)/carrySpeed:1,activeCarryFlow=p.hasBall&&['CARRY_FORWARD','DRIBBLE_EVADE'].includes(p.action)&&carryAlign>.55&&(carryHorizon>m.time+.16||d>.90);
     // R20 report: a live dribble may modulate stride, but every short internal waypoint must not
@@ -609,12 +609,13 @@ function stabilizeWideMarkingStandoff(m,dt){
     if(defender.role!=='FB'||!defender.markTargetId)continue;
     const task=defender.tacticalTask||defender.action||'';if(!['WIDE_RUN_TRACK','WIDE_GOALSIDE_CONTAIN','WIDE_GOALSIDE_RECOVER'].includes(task))continue;
     const attacker=playerById(m,defender.markTargetId);if(!attacker||attacker.team===defender.team||attacker.id===m.ball.ownerId)continue;
-    const dl=worldToLocal(defender.team,defender.x,defender.y),al=worldToLocal(defender.team,attacker.x,attacker.y),localAttVx=defender.team===HOME?Number(attacker.vx||0):-Number(attacker.vx||0),retreating=localAttVx>.35,desired=retreating?2.95:2.10,d=dist(defender,attacker);
-    if(d<desired){const side=Math.sign(dl.y-al.y)||(['LB'].includes(defender.slot)?-1:1),wantL={x:al.x-desired,y:al.y+side*(retreating?.70:.48)},want=localToWorld(defender.team,wantL.x,wantL.y),dx=want.x-defender.x,dy=want.y-defender.y,g=Math.hypot(dx,dy)||1,step=Math.min(g,(retreating?2.65:2.30)*dt);defender.x=clamp(defender.x+dx/g*step,.6,104.4);defender.y=clamp(defender.y+dy/g*step,.6,67.4);m.stats.wideMarkStandoffCorrections=(m.stats.wideMarkStandoffCorrections||0)+1;}
+    const dl=worldToLocal(defender.team,defender.x,defender.y),al=worldToLocal(defender.team,attacker.x,attacker.y),localAttVx=defender.team===HOME?Number(attacker.vx||0):-Number(attacker.vx||0),retreating=localAttVx>.35,attackerSpeed=Math.hypot(Number(attacker.vx||0),Number(attacker.vy||0)),goalGap=retreating?clamp(1.45+attackerSpeed*.05,1.45,1.75):clamp(1.25+attackerSpeed*.07,1.30,1.90),insideOffset=Math.sign(34-al.y)*clamp(Math.abs(34-al.y)*.06,.55,1.55),ideal={x:al.x-goalGap,y:al.y+insideOffset},d=dist(defender,attacker);
+    // Only repair a nearby relationship; a genuinely beaten FB still has to run back physically.
+    if(d<5.2){const needGoal=dl.x>al.x-.55,needInside=Math.abs(dl.y-34)>Math.abs(al.y-34)+.15;if(needGoal||needInside||d<.78){const want=localToWorld(defender.team,ideal.x,ideal.y),dx=want.x-defender.x,dy=want.y-defender.y,g=Math.hypot(dx,dy)||1,step=Math.min(g,(d<.78?2.35:1.65)*dt);defender.x=clamp(defender.x+dx/g*step,.6,104.4);defender.y=clamp(defender.y+dy/g*step,.6,67.4);m.stats.wideMarkStandoffCorrections=(m.stats.wideMarkStandoffCorrections||0)+1;}}
     const dx=defender.x-attacker.x,dy=defender.y-attacker.y,rd=Math.hypot(dx,dy)||1,ux=dx/rd,uy=dy/rd,closing=(Number(defender.vx||0)-Number(attacker.vx||0))*ux+(Number(defender.vy||0)-Number(attacker.vy||0))*uy;
-    if(rd<desired+.45&&closing<-.12){const remove=Math.min(-closing,retreating?1.60:1.18);defender.vx+=ux*remove;defender.vy+=uy*remove;}
-    const attackerSpeed=Math.hypot(Number(attacker.vx||0),Number(attacker.vy||0)),defenderSpeed=Math.hypot(Number(defender.vx||0),Number(defender.vy||0));
-    if(rd<6.0&&attackerSpeed<2.2&&defenderSpeed>3.85){const sc=3.85/defenderSpeed;defender.vx*=sc;defender.vy*=sc;m.stats.wideMarkBrakingCorrections=(m.stats.wideMarkBrakingCorrections||0)+1;}
+    if(rd<1.05&&closing<-.12){const remove=Math.min(-closing,1.35);defender.vx+=ux*remove;defender.vy+=uy*remove;}
+    const defenderSpeed=Math.hypot(Number(defender.vx||0),Number(defender.vy||0));
+    if(rd<4.8&&attackerSpeed<2.2&&defenderSpeed>3.85){const sc=3.85/defenderSpeed;defender.vx*=sc;defender.vy*=sc;m.stats.wideMarkBrakingCorrections=(m.stats.wideMarkBrakingCorrections||0)+1;}
   }
 }
 function stabilizeOwnerDefenders(m,dt){

@@ -175,7 +175,11 @@ function defensiveAssignments(state,players,team){
       if(front[0]&&front[0].d<=frontLimit&&ol.x>=27.5)out.press=front[0].p.id;
       if(!out.press){
         const fb=teamPs.filter(p=>p.role==='FB'&&(['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0];
-        if(fb&&fb.d<=15.5)out.press=fb.p.id;
+        const oppPrefix=opp==='HOME'?'H':'A',sameSideWing=players[`${oppPrefix}-${side>0?'LW':'RW'}`],wingAdvance=sameSideWing?(sameSideWing.team==='HOME'?sameSideWing.x:105-sameSideWing.x):0,wingNeedsGuard=!!(fb&&sameSideWing&&sameSideWing.id!==state.ball.ownerId&&wingAdvance>=55&&dist(fb.p,sameSideWing)<=22);
+        // R22: a fullback is the last same-side gate. Do not send him to press the opponent
+        // fullback while an advanced winger is sitting behind him without a completed handoff.
+        // This is the exact RB->LB / free-LW failure reported in the R21 visual test.
+        if(fb&&fb.d<=15.5&&!wingNeedsGuard)out.press=fb.p.id;
       }
       if(out.press){
         const cover=teamPs.filter(p=>p.role==='FB'&&p.id!==out.press&&(['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0]?.p;
@@ -204,11 +208,15 @@ function defensiveAssignments(state,players,team){
 }
 
 function markRelationTarget(state,p,threat){
-  const base=shapeBase(state,p.id),pp=predicted(threat,p.role==='FB'?.46:.35);
-  if(p.role!=='FB'){const goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.2,y:pp.y+(p.slot==='LCB'?-0.7:p.slot==='RCB'?0.7:0)};return capAround(base,raw,p.role==='CB'?12:14);}
-  const pl=local(p.team,pp.x,pp.y),bl=local(p.team,base.x,base.y),localVx=p.team==='HOME'?Number(threat.vx||0):-Number(threat.vx||0),retreating=localVx>.35;
-  const gap=retreating?3.75:2.85,laneBlend=retreating?.30:.14,maxUpfield=bl.x+(retreating?1.5:4.0),tx=retreating?Math.min(pl.x-gap,maxUpfield):pl.x-gap,ty=pl.y+(bl.y-pl.y)*laneBlend,raw=world(p.team,clamp(tx,4,101),clamp(ty,4,64));
-  return capAround(base,raw,14);
+  const base=shapeBase(state,p.id),pp=predicted(threat,p.role==='FB'?.34:.35);
+  if(p.role!=='FB'){const goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*1.8,y:pp.y+(p.slot==='LCB'?-0.45:p.slot==='RCB'?0.45:0)};return capAround(base,raw,p.role==='CB'?14:16);}
+  const pl=local(p.team,pp.x,pp.y),localVx=p.team==='HOME'?Number(threat.vx||0):-Number(threat.vx||0),towardOwnGoal=localVx<-.35,threatSpeed=Math.hypot(Number(threat.vx||0),Number(threat.vy||0));
+  // R22 goal/inside-side relation: the defender's own goal is local x=0, therefore the
+  // marker must stay at a smaller local x than the winger. The old code used the opposite
+  // velocity sign and then pulled y back toward the touchline-shaped base, which could leave
+  // the RB behind/outside the LW. Use a live 1.25-1.95m cushion and shade toward the centre.
+  const gap=towardOwnGoal?clamp(1.55+threatSpeed*.08,1.6,1.95):clamp(1.15+threatSpeed*.06,1.2,1.55),insideOffset=Math.sign(34-pl.y)*clamp(Math.abs(34-pl.y)*(towardOwnGoal?.075:.055),.55,towardOwnGoal?1.75:1.35),tx=pl.x-gap,ty=pl.y+insideOffset,raw=world(p.team,clamp(tx,3.5,101.5),clamp(ty,4,64));
+  return raw;
 }
 
 
@@ -319,8 +327,16 @@ function candidateIntent(state,players,p,assignments,now){
     return{kind:'SUPPORT',target:capAround(base,blend(base,w,.50),13),targetId:null,score:.73};
   }
   if(p.role==='WF'||p.role==='FB'){
-    const rel=owner?predicted(owner,.30):abstractBallWorld(state),behind=p.role==='FB'?-9:-2;
-    const lateral=p.slot.includes('L')?-7:p.slot.includes('R')?7:0,relation={x:clamp(rel.x+dir*behind,5,100),y:clamp(rel.y+lateral,5,63)};
+    const rel=owner?predicted(owner,.30):abstractBallWorld(state);
+    if(p.role==='WF'&&owner?.role==='ST'&&phase!=='TRANSITION'){
+      const ol=local(p.team,owner.x,owner.y);
+      // R22 striker-context coherence: if the ST legitimately receives in midfield, the
+      // wingers must be part of the same midfield picture rather than remaining 12-20m upfield
+      // like two normal forwards while only the striker has been pulled down. Keep them a few
+      // metres ahead/wide of the live ST until the attack advances again.
+      if(ol.x<62){const side=p.slot.includes('L')?-1:1,targetLocal={x:clamp(ol.x+5.5,24,68),y:clamp(ol.y+side*12,6,62)},w=world(p.team,targetLocal.x,targetLocal.y);return{kind:'SUPPORT',target:w,targetId:owner.id,score:.86};}
+    }
+    const behind=p.role==='FB'?-9:-2,lateral=p.slot.includes('L')?-7:p.slot.includes('R')?7:0,relation={x:clamp(rel.x+dir*behind,5,100),y:clamp(rel.y+lateral,5,63)};
     const w=p.role==='FB'?.22:.34,max=p.role==='FB'?7:11;
     return{kind:'SUPPORT',target:capAround(base,blend(base,relation,w),max),targetId:owner?.id||null,score:.68};
   }
@@ -388,7 +404,12 @@ function separation(players,p,radius=2.0){
 function steerOne(state,players,p,dt){
   const role=p.role,baseMs=MAX_SPEED[role]||7,baseMa=MAX_ACCEL[role]||5;
   const controlledMarker=p.intentKind==='MARK'&&(role==='FB'||role==='CB');
-  const ms=controlledMarker?(role==='FB'?4.8:4.5):baseMs,ma=controlledMarker?4.2:baseMa;
+  // R22: a back line supporting its own attack should already travel with the attack during
+  // compressed Hybrid time. Once it is close to its live cover/support relation it must not
+  // keep sprinting at defender top speed and burst into the choice scene like a late arrival.
+  // This is locomotion, not a scene-entry placement correction.
+  const controlledAttackBack=p.team===state.possession&&(role==='FB'||role==='CB')&&['SUPPORT','COVER'].includes(p.intentKind)&&state.phase!=='TRANSITION';
+  const ms=controlledMarker?(role==='FB'?6.45:6.05):controlledAttackBack?(role==='FB'?5.8:5.35):baseMs,ma=controlledMarker?5.15:controlledAttackBack?4.6:baseMa;
   let tx=p.intentTargetX,ty=p.intentTargetY;
   const target=players[p.intentTargetId];
   if(target&&['MARK','PRESS'].includes(p.intentKind)){
@@ -403,13 +424,22 @@ function steerOne(state,players,p,dt){
     }
   }
   const dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy);
-  const slow=p.intentKind==='SHAPE'?6.0:p.intentKind==='COVER'?4.5:p.intentKind==='MARK'?5.0:p.intentKind==='PRESS'?6.0:3.2;
-  let desiredSpeed=d<.18?0:ms*clamp(d/slow,.18,1);
-  if(controlledMarker&&target){const targetSpeed=Math.hypot(Number(target.vx||0),Number(target.vy||0));desiredSpeed=Math.min(desiredSpeed,clamp(targetSpeed+(d>4.5?1.15:.45),.75,ms));}
+  const slow=controlledAttackBack?(role==='FB'?8.2:8.8):p.intentKind==='SHAPE'?6.0:p.intentKind==='COVER'?4.5:p.intentKind==='MARK'?5.0:p.intentKind==='PRESS'?6.0:3.2;
+  const minRatio=controlledAttackBack?.06:.18;
+  let desiredSpeed=d<.18?0:ms*clamp(d/slow,minRatio,1);
+  if(controlledAttackBack){
+    const owner=players[state.ball?.ownerId],ownerSpeed=owner?Math.hypot(Number(owner.vx||0),Number(owner.vy||0)):0;
+    // Near the relation target, keep moving with the phase rather than stopping dead, but
+    // cap the remaining catch-up pace so 1-5m of debt is paid as a jog instead of a sprint.
+    const relationCap=d<2.5?Math.max(.55,ownerSpeed*.28+1.0):d<5.5?Math.max(1.25,ownerSpeed*.42+1.65):ms;
+    desiredSpeed=Math.min(desiredSpeed,relationCap);
+  }
+  if(controlledMarker&&target){const targetSpeed=Math.hypot(Number(target.vx||0),Number(target.vy||0));desiredSpeed=Math.min(desiredSpeed,clamp(targetSpeed+(d>3.0?.95:.32),.65,ms));}
   const desiredVx=d>.01?dx/d*desiredSpeed:0,desiredVy=d>.01?dy/d*desiredSpeed:0,dvx=desiredVx-p.vx,dvy=desiredVy-p.vy;
   const sep=separation(players,p,p.intentKind==='PRESS'?1.75:1.85);
   let ax=dvx/Math.max(.35,dt*2.2)+sep.x*2.0,ay=dvy/Math.max(.35,dt*2.2)+sep.y*2.0;
-  const braking=controlledMarker&&(Math.hypot(p.vx,p.vy)>desiredSpeed+.35||p.vx*desiredVx+p.vy*desiredVy<0),accelLimit=braking?ma*1.55:ma;
+  const overSpeed=Math.hypot(p.vx,p.vy)>desiredSpeed+.30,reverse=p.vx*desiredVx+p.vy*desiredVy<0;
+  const braking=(controlledMarker&&(overSpeed||reverse))||(controlledAttackBack&&(overSpeed||reverse||d<2.0)),accelLimit=braking?ma*(controlledAttackBack?1.85:1.55):ma;
   const amag=Math.hypot(ax,ay);if(amag>accelLimit){ax=ax/amag*accelLimit;ay=ay/amag*accelLimit;}
   p.vx=clamp(p.vx+ax*dt,-ms,ms);p.vy=clamp(p.vy+ay*dt,-ms,ms);
   const sp=Math.hypot(p.vx,p.vy);if(sp>ms){p.vx=p.vx/sp*ms;p.vy=p.vy/sp*ms;}
@@ -457,7 +487,16 @@ function resolveOffBallThreatSeparation(state,players){
     const near=Object.values(players).filter(d=>d.team!==attackTeam&&d.role!=='GK').map(d=>({d,dist:Math.hypot(d.x-a.x,d.y-a.y),priority:(d.intentKind==='MARK'&&d.intentTargetId===a.id?5:0)+(d.role==='CB'?1.2:d.role==='FB'?.8:0)})).filter(x=>x.dist<5.7).sort((u,v)=>v.priority-u.priority||u.dist-v.dist);
     if(!near.length)continue;
     const place=(d,need,sideBias=0)=>{let dx=d.x-a.x,dy=d.y-a.y,dd=Math.hypot(dx,dy);if(dd<.01){const goalX=d.team==='HOME'?0:105;dx=goalX-a.x;dy=(d.slot?.startsWith('L')?-1:1)*2;dd=Math.hypot(dx,dy)||1;}const nx=dx/dd,ny=dy/dd;d.x=clamp(a.x+nx*need,3,102);d.y=clamp(a.y+ny*need+sideBias,3,65);d.intentTargetX=d.x;d.intentTargetY=d.y;d.vx*=.35;d.vy*=.35;};
-    if(near[0].dist<1.30)place(near[0].d,1.35,0);
+    if(near[0].dist<1.30){
+      const primary=near[0].d;
+      if(primary.intentKind==='MARK'&&primary.intentTargetId===a.id){
+        // R22: collision separation must not freeze a wrong-side relationship. The old
+        // radial push preserved whichever side the marker happened to be on and created the
+        // visible ~1m 'wall'. Project the primary marker toward its live goal/inside-side
+        // relation instead; this is only a short contact-resolution correction.
+        const ideal=markRelationTarget(state,primary,a),dx=ideal.x-a.x,dy=ideal.y-a.y,dd=Math.hypot(dx,dy)||1,need=clamp(dd,1.25,1.95);primary.x=clamp(a.x+dx/dd*need,3,102);primary.y=clamp(a.y+dy/dd*need,3,65);primary.intentTargetX=ideal.x;primary.intentTargetY=ideal.y;primary.vx*=.55;primary.vy*=.55;
+      }else place(primary,1.35,0);
+    }
     for(let i=1;i<near.length;i++){
       const z=near[i];if(z.dist>=5.35)continue;const side=z.d.slot==='LCB'||z.d.slot==='LB'?-1:1;place(z.d,5.45,side*.55);
       if(z.d.intentKind==='MARK'&&z.d.intentTargetId===a.id){z.d.intentKind='COVER';z.d.intentTargetId=null;z.d.intentScore=Math.min(z.d.intentScore||.6,.72);}
