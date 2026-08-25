@@ -1,0 +1,3 @@
+R19 engine patch sha256=b57f3eeff63c8ecb191bce342f5745b2eb19c913febb8e842e3428851fc17cef
+R19 checklist overlay sha256=e06a9e6f498488780557de2300550febe3a4be817f9490aca6cd17632d6a908c
+Validated local regressions: R19 12/12, R17 22/22, defense 21/21, contextual 5/5, continuity 5/5.
