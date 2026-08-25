@@ -1,0 +1,95 @@
+name: FLR R19 ONE SHOT
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flr-r19-one-shot
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.issue.title == '[FLR_DEPLOY] R19 ONE SHOT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify untouched R17 game baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=6c07a66de7183693b9223ff02203db51157342a1
+          git cat-file -e "$BASE^{commit}"
+          changed="$(git diff --name-only "$BASE" HEAD)"
+          test "$changed" = '.github/workflows/flr-r19-one-shot.yml'
+          echo "Baseline ancestry verified: only the one-shot workflow was added after $BASE"
+
+      - name: Checkout staged validated payload
+        uses: actions/checkout@v4
+        with:
+          ref: automation/tt-deploy
+          path: _incoming
+          fetch-depth: 1
+
+      - name: Verify and apply R19 engine payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat _incoming/.flr/incoming.patch.part* > /tmp/r19.patch
+          echo 'b57f3eeff63c8ecb191bce342f5745b2eb19c913febb8e842e3428851fc17cef  /tmp/r19.patch' | sha256sum -c -
+          git apply --check /tmp/r19.patch
+          git apply /tmp/r19.patch
+
+      - name: Verify and apply refreshed visual checklist
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat _incoming/.flr/checklist.patch.part* > /tmp/r19-checklist.patch
+          echo 'e06a9e6f498488780557de2300550febe3a4be817f9490aca6cd17632d6a908c  /tmp/r19-checklist.patch' | sha256sum -c -
+          git apply --check /tmp/r19-checklist.patch
+          git apply /tmp/r19-checklist.patch
+
+      - name: Validate exact R19 public contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check in_pitch_choice_ui.js
+          node --check live_hybrid_session_v02.js
+          node --check live_v06_scene_authority_browser.js
+          node --check runtime/continuous_match_core.js
+          node --check runtime/hybrid_spatial_intent_v2.js
+          node --check runtime/protagonist_match_controller.js
+          node --check runtime/tactical_movement.js
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'V0.5.4 R19 TEST' index.html
+          grep -q 'FORMATION_CONTINUITY' index.html
+          grep -q 'DEFENSIVE_ROLE_STABILITY' index.html
+          grep -q 'MARK_TARGET_STABILITY' index.html
+          grep -q 'CARRY_CONTINUITY' index.html
+          grep -q 'ST_SHOT_VISIBILITY' index.html
+          grep -q "'FORMATION_CONTINUITY'" live_hybrid_session_v02.js
+          grep -q "'ST_SHOT_VISIBILITY'" live_hybrid_session_v02.js
+          ! grep -q '>2\. 패스 비행 중 풀백 측면 추적<' index.html
+          echo 'R19 public contract PASS'
+
+      - name: Commit R19 and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _incoming
+          git config user.name 'FLR Test Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -- CHANGELOG.md index.html in_pitch_choice_ui.js live_hybrid_session_v02.js live_v06_scene_authority_browser.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js runtime/tactical_movement.js step71_hybrid_v06_ui.js
+          git rm .github/workflows/flr-r19-one-shot.yml
+          git diff --cached --quiet && { echo NO_CHANGES; exit 1; }
+          git commit -m 'Deploy USER-MATCH-TEST V0.5.4 R19 with refreshed visual verification checklist'
+          git push origin main
