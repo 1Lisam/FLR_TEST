@@ -1,18 +1,18 @@
 {
   "schemaVersion": "FLR_REPORT_EXPORT_INDEX_1.0",
   "status": "PASS",
-  "workflowRunId": "32848225016",
-  "sourceCommit": "68a496ba72374e2f187567dcad310284b5407622",
-  "requestedAt": "2026-08-25T21:32:00+09:00",
-  "collectedAt": "2026-08-25T12:33:41.345807Z",
-  "currentBuild": "USER-MATCH-TEST-V0.5.4-R19",
-  "sinceCreatedAt": "2026-08-25T11:00:00Z",
-  "safetyOverlapMinutes": 30,
+  "workflowRunId": "32859354126",
+  "sourceCommit": "68e4f19344f2db56d0bd282c9290b7093ec5c395",
+  "requestedAt": "2026-08-25T23:23:00+09:00",
+  "collectedAt": "2026-08-25T14:25:25.242206Z",
+  "currentBuild": "USER-MATCH-TEST-V0.5.4-R20",
+  "sinceCreatedAt": "2026-08-25T13:00:00Z",
+  "safetyOverlapMinutes": 60,
   "count": 5,
   "currentBuildCount": 5,
   "lateOlderBuildCount": 0,
   "failedDownloads": 0,
-  "artifactId": "9563181690",
-  "artifactUrl": "https://github.com/1Lisam/FLR_TEST/actions/runs/32848225016/artifacts/9563181690",
-  "artifactDigest": "ca093802f318ac2df9bc0de8d7975504f7864aaf7ff7b0007a12ad54792a595a"
+  "artifactId": "9567499037",
+  "artifactUrl": "https://github.com/1Lisam/FLR_TEST/actions/runs/32859354126/artifacts/9567499037",
+  "artifactDigest": "17386326eddbd1fd7cf8efb86cafdf7ad6448b209073a38fee5bf6baac23b413"
 }

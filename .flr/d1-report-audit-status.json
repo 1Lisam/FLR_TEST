@@ -4,6 +4,56 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-85b0c450-9a2f-4cc4-9f42-5594e407f6a6",
+      "build": "USER-MATCH-TEST-V0.5.4-R20",
+      "created_at": "2026-08-25T14:21:35.694Z",
+      "category": "2D 움직임",
+      "priority": 2,
+      "description": "검증 완료: 노마크 ST 러닝 슈팅 판단 시점 · seed=DEV-RECENT-1787667561209-13 · JSON/버그리포트 사용 가능\n\n이것도 꽤 자연스러워 졌지만 테스트라 그런지 골세레머니가 나오지 않음.",
+      "size_bytes": 2128538,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-b4326662-9b71-4e6a-973c-deabe839e847",
+      "build": "USER-MATCH-TEST-V0.5.4-R20",
+      "created_at": "2026-08-25T14:20:23.447Z",
+      "category": "2D 움직임",
+      "priority": 5,
+      "description": "검증 완료: 공 운반 중 멈칫 반복 방지 · seed=DEV-RECENT-1787667492153-7\n4번 공운반은 일단 LB가 운반하는걸 보면 합격",
+      "size_bytes": 2507758,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-1b3e51dd-9100-4b5a-a660-c715cfa89478",
+      "build": "USER-MATCH-TEST-V0.5.4-R20",
+      "created_at": "2026-08-25T14:19:27.568Z",
+      "category": "2D 움직임",
+      "priority": 5,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787667382016-4\n\n앞서 다른 항목에서도 나왔듯 LW가 속도를 줄이자 RB는 가속도를 이기지 못하고 잠시 속도를 줄였다가 다시 LW에게 돌진하는 상황임\n\n앞선 항목에도 이야기 했듯 먼저 수비진영 에서 공격수를 바라보고 해야하지\n지금 시작하자마자 공격수들이 수비의 뒤로 달려나가고 그걸 수비수들은 급하게 따라가다가 투우 처럼 밀려나간다는 느낌이 강함.\n\n그래서 이것도 2번 항목과 같이 불합격",
+      "size_bytes": 2239743,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-05acd0b2-148d-4515-8f42-701448d4725b",
+      "build": "USER-MATCH-TEST-V0.5.4-R20",
+      "created_at": "2026-08-25T14:17:51.630Z",
+      "category": "2D 움직임",
+      "priority": 5,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787667196812-2\n\n변경되지 않음\n여전히 우리 RB는 전진하면서 스타트 하는 바람에 뒤쪽 LW를 놓치고\n이후에 LW를 따라다니는데 마치 투우사 처럼 LW가 위로 올라가자 마자 RB는 가속도를 못 줄이고 미끄러 졌다가 다시 따라가는게 여전히 위성형 궤도임\n\nRCB와 LCB 역시 ST에게 빙글 빙글 돌면서 자기 포지션을 찾지 못하고 앞으로 갔다 뒤로 갔다를 반복함 그냥 ST를 따라가게 세팅해놓고 던져놓으면 이렇게 될 것 같음 \n\n전력 질주가 아니라 언제든지 멈출수 있게 젠 걸음로 수비 한다고 생각하면 적용하기가 편할 거 같음\n\n이 부분 또한 몇번의 테스트 내내 불합격이므로 다시 수정이 필요",
+      "size_bytes": 2650496,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-15e108d5-d112-43d7-920e-6f5e05ec45ad",
+      "build": "USER-MATCH-TEST-V0.5.4-R20",
+      "created_at": "2026-08-25T14:14:54.243Z",
+      "category": "조작권/선택",
+      "priority": 5,
+      "description": "검증 완료: 선택 장면 포메이션 연속성 · seed=DEV-RECENT-1787667099438-1\n\n여전히 블루팀(우리팀) 의 수비는 수비 포메이션부터 출발함.\n원래 대로라면 우리 공격 장면이니 하프라인까지 올라가던지 중간에서 조금 라인을 넘어서 세컨 볼 방지하는 상태로 '시작' 되어야 하는데 '시작' 이 포메이션이 여전히 체스말 장기말 배치한것 처럼 정해진 위치에서 시작하는 것이라 이건 불합격.\n\n몇번의 테스트에도 해결이 안됨 최우선으로 해결 할 수 있도록 할 것.",
+      "size_bytes": 1363475,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-142e4891-a7fa-470a-96b6-b015bc25aa42",
       "build": "USER-MATCH-TEST-V0.5.4-R19",
       "created_at": "2026-08-25T12:06:27.024Z",
@@ -452,59 +502,9 @@
       "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787588177858-21\n\n이건 다른 문제인데 상황이 볼이 넘겨지자 마자 ST가 갑자기 뒤로 전력질주 해버려서 미드필드들을 재치고 뒤로 달려나가버림.\n\n상황상 전혀 맞지 않는데다가 ST의 속도도 너무 빨라보임",
       "size_bytes": 2266130,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-5ad72363-2bbe-432b-90a5-c67acea6bece",
-      "build": "USER-MATCH-TEST-V0.5.4-R14",
-      "created_at": "2026-08-24T16:17:51.999Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787588129298-19 · JSON/버그리포트 사용 가능\n\n풀백은 이제 자리를 지키는것 같아서 OK인데 앞선 리포트에서 이야기 한 것 처럼 LB가 자꾸 달려나오는 문제는 해결 해야함",
-      "size_bytes": 3434367,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-8babcda1-6b23-42db-97da-b3918a085304",
-      "build": "USER-MATCH-TEST-V0.5.4-R14",
-      "created_at": "2026-08-24T16:17:01.904Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "이번 검증: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787588061906-18\n\n몇번을 해봐도 CM이 측면 패스 후 자기 혼자 가운데로 달려가서 올라가버림\n\n강제검증이라 그런건지 아니면 패스 후 뒤로 빠지는것도, 앞으로 달려나가는것도 아닌 그냥 위로 이동만 하는 상황이 이 시드 말고도 여러 시드에서 동일하게 보임.",
-      "size_bytes": 3055949,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-3f7c69b2-6611-4769-b600-62dcba211037",
-      "build": "USER-MATCH-TEST-V0.5.4-R14",
-      "created_at": "2026-08-24T16:15:34.192Z",
-      "category": "수비/전술",
-      "priority": 5,
-      "description": "늘 이야기 했던것 처럼 플레이를 시작했는데 포메이션이 정말 정갈하게 깔림\n축구를 하던 도중 선택지가 뜬게 아니라 지금부터 선택지가 떠야하니 포메이션을 깔아놓은것으로 밖에는 안보임\n\n*이것 필수적으로 확인해주기 바람. 10일째 안고쳐짐",
-      "size_bytes": 1453871,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-64d5f7fc-2a0c-4ad5-8c05-6c31c6e3977c",
-      "build": "USER-MATCH-TEST-V0.5.4-R14",
-      "created_at": "2026-08-24T16:14:05.394Z",
-      "category": "수비/전술",
-      "priority": 3,
-      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787586978212-1\n\n우리팀 LB와 상대팀 LB 둘 다 자기 포지션을 안지키는거 같아.\n상황이 시작될때 우리 LB는 뜬금없이 많이 나와 있어서 추후 볼이 돌아갈때 상대 RW가 노마크 상태임",
-      "size_bytes": 1318347,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h3-56da9d2c-f330-4aca-ae74-6f5451cdec5c",
-      "build": "USER-MATCH-TEST-V0.5.3-HF3",
-      "created_at": "2026-08-24T13:00:01.597Z",
-      "category": "패스/공격",
-      "priority": 3,
-      "description": "6번 항목은 몇번을 해도 오프사이드 상황이 나오지 않아서 검증이 안됨 강제 검증을 위해 상황을 다시 깔아주길 바람",
-      "size_bytes": 684165,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-142e4891-a7fa-470a-96b6-b015bc25aa42",
+  "latestAttachedReportId": "umt053h3-85b0c450-9a2f-4cc4-9f42-5594e407f6a6",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -514,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-142e4891-a7fa-470a-96b6-b015bc25aa42",
-      "build": "USER-MATCH-TEST-V0.5.4-R19",
+      "reportId": "umt053h3-85b0c450-9a2f-4cc4-9f42-5594e407f6a6",
+      "build": "USER-MATCH-TEST-V0.5.4-R20",
       "step": 78,
-      "description": "이번 검증: 노마크 ST 슈팅 선택지 노출 · seed=DEV-RECENT-1787659287292-19 · 박스 안에서 ST가 공을 안정적으로 소유한 상태입니다. 주인공 ST를 선택했을 때 슈팅이 바로 보이고 자동 실행되지는 않는지 확인하세요.\n\nST가 슈팅 선택지는 뜨지만 노마크 찬스에서 빠르게 슈팅을 할 수 있는 상황인데도 멈춰서 슈팅을 해버림 왜 1:1인데 멈춰서 수비가 오길 기다리는지 알 수 없음 \n\n슈팅 선택지가 뜨니까 에러 부분에서는 PASS지만 다이렉트 슈팅이라는 부분에서는 탈락임",
-      "category": "수비/전술",
-      "priority": 5,
-      "reportedAt": "2026-08-25T12:04:44.273Z"
+      "description": "검증 완료: 노마크 ST 러닝 슈팅 판단 시점 · seed=DEV-RECENT-1787667561209-13 · JSON/버그리포트 사용 가능\n\n이것도 꽤 자연스러워 졌지만 테스트라 그런지 골세레머니가 나오지 않음.",
+      "category": "2D 움직임",
+      "priority": 2,
+      "reportedAt": "2026-08-25T14:19:52.330Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": true,
@@ -543,18 +543,18 @@
       "reportScope"
     ],
     "currentReportScope": {
-      "startSecond": 1462,
-      "endSecond": 1462,
+      "startSecond": 1264,
+      "endSecond": 1294.8,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": {
-      "startSecond": 1286,
-      "endSecond": 1294.9999999999918,
+      "startSecond": 1057,
+      "endSecond": 1065.9999999999918,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "currentSerializedBytes": 184557,
-    "previousSerializedBytes": 1577680
+    "currentSerializedBytes": 974065,
+    "previousSerializedBytes": 1379678
   }
 }
