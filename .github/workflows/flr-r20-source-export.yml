@@ -1,0 +1,32 @@
+name: FLR R20 Source Export
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/r20-source-export-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Pack exact current main source
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/flr_r20_source
+          rsync -a --exclude='.git' --exclude='.github/workflows/flr-r20-source-export.yml' ./ /tmp/flr_r20_source/
+          git rev-parse HEAD > /tmp/flr_r20_source/EXPORTED_MAIN_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flr-r20-source-${{ github.run_id }}
+          path: /tmp/flr_r20_source
+          if-no-files-found: error
+          retention-days: 2
