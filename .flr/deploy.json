@@ -18,5 +18,6 @@
   "removedFiles": [],
   "patchSha256": "b57f3eeff63c8ecb191bce342f5745b2eb19c913febb8e842e3428851fc17cef",
   "commitMessage": "Deploy USER-MATCH-TEST V0.5.4 R19 continuity and R17 feedback fixes",
-  "patchEncoding": "git-binary-delta"
+  "patchEncoding": "git-binary-delta",
+  "triggerNonce": "r19-deploy-20260825-1917"
 }
