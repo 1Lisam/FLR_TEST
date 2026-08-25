@@ -456,6 +456,17 @@ function movePlayers(m,dt){
     const agilityAttr=abilityValue(m,p,'agility'),turnRate=(2.15+agilityAttr/100*3.05);
     const n={x:dx/d,y:dy/d},accelAttr=abilityValue(m,p,'acceleration'),paceAttr=abilityValue(m,p,'pace'),a=(ROLE_ACCEL[p.role]||5)*movementFactor(accelAttr,0.34);
     let vmax=(ROLE_SPEED[p.role]||7)*movementFactor(paceAttr,0.32)*(p.sprint?1:0.76);
+    // R21 candidate / R20 user reports: a marker is not a homing missile.  The direct presser
+    // may still accelerate hard, but a FB/CB with an assigned runner should approach at a
+    // controlled pace and shed speed as soon as that runner slows.  This is deliberately
+    // task-scoped so recovery chases, emergency presses and real turn-and-run moments keep
+    // their full physical ceiling.
+    const motionTask=String(p.tacticalTask||p.action||''),markedPlayer=p.markTargetId?playerById(m,p.markTargetId):null;
+    const controlledMarker=!!markedPlayer&&markedPlayer.team!==p.team&&['FB','CB'].includes(p.role)&&['MARK_LANE_SCREEN','WIDE_RUN_TRACK','WIDE_GOALSIDE_CONTAIN','WIDE_GOALSIDE_RECOVER'].includes(motionTask);
+    const markedSpeed=controlledMarker?Math.hypot(Number(markedPlayer.vx||0),Number(markedPlayer.vy||0)):0,markedGap=controlledMarker?dist(p,markedPlayer):99;
+    const localMarkedVx=controlledMarker?(p.team===HOME?Number(markedPlayer.vx||0):-Number(markedPlayer.vx||0)):0,runnerGoalward=controlledMarker&&localMarkedVx<-2.15;
+    const realTurnAndRun=controlledMarker&&(p.action==='MARK_TURN_AND_RUN'||(motionTask==='WIDE_RUN_TRACK'&&runnerGoalward&&markedGap>3.4));
+    if(controlledMarker&&!realTurnAndRun){const cap=p.role==='FB'?4.85:4.60;vmax=Math.min(vmax,cap);}
     // R15: reconnecting to the midfield screen is a controlled recovery jog, not a full-speed
     // magnetic snap to a formation anchor.  The tactical target remains live and may update again.
     if(p.tacticalTask==='PIVOT_RECONNECT')vmax=Math.min(vmax,3.20);
@@ -463,12 +474,12 @@ function movePlayers(m,dt){
     // centre-back-style emergency sprint through midfield. Explicit press/chase tasks are untouched.
     if(['ST','WF'].includes(p.role)&&p.tacticalTask==='HOLD_BLOCK')vmax=Math.min(vmax,4.20);
     if(p.role==='GK'&&p.tacticalTask==='GK_SAVE_SET'){const gkMove=(abilityValue(m,p,'reaction')+abilityValue(m,p,'agility'))/2;vmax=clamp(5.85+(gkMove-60)*0.032,5.25,7.05);}
-    const pathFacing=Math.atan2(n.y,n.x),explicitFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing,beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:pathFacing,lowSpeed=Math.hypot(p.vx||0,p.vy||0);
+    const pathFacing=Math.atan2(n.y,n.x),markFacing=controlledMarker&&!realTurnAndRun&&markedGap<=7.5?Math.atan2(markedPlayer.y-p.y,markedPlayer.x-p.x):null,explicitFacing=Number.isFinite(markFacing)?markFacing:(Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing),beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:pathFacing,lowSpeed=Math.hypot(p.vx||0,p.vy||0);
     // R16 feedback: a forward standing on a sub-metre micro-target must not spin through a
     // large arc just because that tiny target redraws around him. Real runs are unchanged;
     // only low-speed, no-explicit-facing micro-adjustments hold the existing posture.
     const microRunTask=['ATTACK_OPEN_CHANNEL','PIN_AND_RUN','PIN_CENTRE_BACKS'].includes(p.tacticalTask),microTargetHold=['ST','WF'].includes(p.role)&&!Number.isFinite(explicitFacing)&&((d<0.85&&lowSpeed<0.95)||(microRunTask&&d<1.35&&lowSpeed<1.55));
-    const desiredFacing=microTargetHold?beforeFacing:((d<0.95&&Number.isFinite(explicitFacing))?explicitFacing:pathFacing),facingError=Math.abs(angleDiff(beforeFacing,desiredFacing));
+    const desiredFacing=microTargetHold?beforeFacing:(Number.isFinite(markFacing)?markFacing:((d<0.95&&Number.isFinite(explicitFacing))?explicitFacing:pathFacing)),facingError=Math.abs(angleDiff(beforeFacing,desiredFacing));
     const effectiveTurnRate=(['ST','WF'].includes(p.role)&&lowSpeed<1.55&&!Number.isFinite(explicitFacing))?Math.min(turnRate,1.65):turnRate;p.bodyAngle=approachAngle(beforeFacing,desiredFacing,effectiveTurnRate*dt);
     // STEP39 V0.3: body orientation now has a visible physical cost.  A player facing
     // the wrong way must pivot before reaching full acceleration; agility shortens that delay.
@@ -483,6 +494,10 @@ function movePlayers(m,dt){
       else if(p.team!==owner.team&&p.sprint&&['FB','CB','CM'].includes(p.role))vmax=vmax;
     }
     let desired=Math.min(vmax,Math.sqrt(Math.max(0,2*a*d)));
+    if(controlledMarker&&!realTurnAndRun){
+      const catchup=markedGap>7.0?2.35:markedGap>4.5?1.25:.52;
+      desired=Math.min(desired,clamp(markedSpeed+catchup,.72,vmax));
+    }
     const userCarry=m.userChoiceControl?.playerId===p.id&&m.userChoiceControl?.mode==='CARRY'&&m.userChoiceControl?.controllerOwned?m.userChoiceControl:null,carryHorizon=Math.max(Number(p.lockTargetUntil||0),Number(userCarry?.until||0)),carrySpeed=Math.hypot(p.vx||0,p.vy||0),carryAlign=carrySpeed>.05?((p.vx||0)*n.x+(p.vy||0)*n.y)/carrySpeed:1,activeCarryFlow=p.hasBall&&['CARRY_FORWARD','DRIBBLE_EVADE'].includes(p.action)&&carryAlign>.55&&(carryHorizon>m.time+.16||d>.90);
     // R20 report: a live dribble may modulate stride, but every short internal waypoint must not
     // become a visible brake pulse. Keep locomotion momentum through the same authorized carry
@@ -490,7 +505,7 @@ function movePlayers(m,dt){
     if(activeCarryFlow){const established=carrySpeed>=2.45,continuityFloor=Math.min(vmax*(established?.88:.82),Math.max(established?2.85:2.35,carrySpeed*(established?.96:.92)));desired=Math.max(desired,continuityFloor);}
     if(finalThirdPaceMode&&(p.hasBall||p.sprint)&&!activeCarryFlow){const arrivalScale=clamp(d/1.35,0.12,1);desired=Math.min(desired,Math.sqrt(Math.max(0,2*a*d))*0.88,vmax*arrivalScale);}
     const tvx=n.x*desired,tvy=n.y*desired;
-    const dvx=tvx-p.vx,dvy=tvy-p.vy,dv=Math.hypot(dvx,dvy),maxDv=a*dt*(0.58+0.42*turnMoveScale),sc=dv>maxDv?maxDv/(dv||1):1;p.vx+=dvx*sc;p.vy+=dvy*sc;
+    const dvx=tvx-p.vx,dvy=tvy-p.vy,dv=Math.hypot(dvx,dvy),currentSpeed=Math.hypot(p.vx||0,p.vy||0),brakingMarker=controlledMarker&&!realTurnAndRun&&currentSpeed>desired+.30,maxDv=a*dt*(0.58+0.42*turnMoveScale)*(brakingMarker?1.65:1),sc=dv>maxDv?maxDv/(dv||1):1;p.vx+=dvx*sc;p.vy+=dvy*sc;
     const mx=p.vx*dt,my=p.vy*dt,travel=Math.hypot(mx,my);if(travel>=d){p.x=p.tx;p.y=p.ty;p.vx=p.vy=0;}else{const restartThrower=!!(m.restart&&m.restart.kind==='THROW_IN'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&p.tacticalTask==='THROW_IN_THROWER');p.x=clamp(p.x+mx,0.8,104.2);p.y=clamp(p.y+my,restartThrower?-1.2:0.8,restartThrower?69.2:67.2);}
     if(p.hasBall&&['CARRY_FORWARD','DRIBBLE_EVADE','COMMITTED_BOX_CARRY','TAKE_ON'].includes(p.action)){m.stats.carryDistance=(m.stats.carryDistance||0)+travel;if(p.action==='TAKE_ON')m.stats.takeOnDistance=(m.stats.takeOnDistance||0)+travel;}
   }
@@ -582,6 +597,11 @@ function stabilizeMarkingBodies(m,dt){
       defender.vx=defender.team===HOME?dvx:-dvx;defender.vy=defender.team===HOME?dvy:-dvy;
       m.stats.markBodyCorrections=(m.stats.markBodyCorrections||0)+1;
     }
+    // A nearby runner who has stopped or checked his run should make the marker settle too.
+    // Limit only the excess closing velocity; this is a visual/physical braking guard, not a
+    // teleport and not a restriction on a genuine turn-and-run recovery.
+    const attackerSpeed=Math.hypot(Number(attacker.vx||0),Number(attacker.vy||0)),defenderSpeed=Math.hypot(Number(defender.vx||0),Number(defender.vy||0));
+    if(d<4.6&&attackerSpeed<2.2&&defenderSpeed>3.85){const cap=3.85,sc=cap/defenderSpeed;defender.vx*=sc;defender.vy*=sc;}
   }
 }
 function stabilizeWideMarkingStandoff(m,dt){
@@ -593,6 +613,8 @@ function stabilizeWideMarkingStandoff(m,dt){
     if(d<desired){const side=Math.sign(dl.y-al.y)||(['LB'].includes(defender.slot)?-1:1),wantL={x:al.x-desired,y:al.y+side*(retreating?.70:.48)},want=localToWorld(defender.team,wantL.x,wantL.y),dx=want.x-defender.x,dy=want.y-defender.y,g=Math.hypot(dx,dy)||1,step=Math.min(g,(retreating?2.65:2.30)*dt);defender.x=clamp(defender.x+dx/g*step,.6,104.4);defender.y=clamp(defender.y+dy/g*step,.6,67.4);m.stats.wideMarkStandoffCorrections=(m.stats.wideMarkStandoffCorrections||0)+1;}
     const dx=defender.x-attacker.x,dy=defender.y-attacker.y,rd=Math.hypot(dx,dy)||1,ux=dx/rd,uy=dy/rd,closing=(Number(defender.vx||0)-Number(attacker.vx||0))*ux+(Number(defender.vy||0)-Number(attacker.vy||0))*uy;
     if(rd<desired+.45&&closing<-.12){const remove=Math.min(-closing,retreating?1.60:1.18);defender.vx+=ux*remove;defender.vy+=uy*remove;}
+    const attackerSpeed=Math.hypot(Number(attacker.vx||0),Number(attacker.vy||0)),defenderSpeed=Math.hypot(Number(defender.vx||0),Number(defender.vy||0));
+    if(rd<6.0&&attackerSpeed<2.2&&defenderSpeed>3.85){const sc=3.85/defenderSpeed;defender.vx*=sc;defender.vy*=sc;m.stats.wideMarkBrakingCorrections=(m.stats.wideMarkBrakingCorrections||0)+1;}
   }
 }
 function stabilizeOwnerDefenders(m,dt){
