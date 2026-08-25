@@ -1,0 +1,7 @@
+Public visual verification list for R19:
+1. FORMATION_CONTINUITY
+2. DEFENSIVE_ROLE_STABILITY
+3. MARK_TARGET_STABILITY
+4. CARRY_CONTINUITY
+5. ST_SHOT_VISIBILITY
+Incoming-flight timing and RW post-reception direction remain internal regression/natural-play report checks.
