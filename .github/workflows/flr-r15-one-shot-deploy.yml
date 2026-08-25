@@ -1,8 +1,10 @@
 name: FLR R15 one-shot atomic deploy
 
 on:
-  issues:
-    types: [opened]
+  push:
+    branches: [main]
+    paths:
+      - '.flr/r15-deploy-trigger-v2.json'
 
 permissions:
   contents: write
@@ -13,7 +15,6 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event.issue.title == '[FLR_DEPLOY] R15 ONE SHOT'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -113,8 +114,9 @@ jobs:
           set -euo pipefail
           git config user.name 'FLR R15 Deploy Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git rm -f .flr/r15-deploy.patch.gz.b64 .flr/r15-one-shot-trigger.json
+          git rm -f .flr/r15-deploy.patch.gz.b64 .flr/r15-one-shot-trigger.json || true
           git rm -f .flr/r15-choice-ux.part00 .flr/r15-choice-ux.part01 .flr/r15-choice-ux.part02 .flr/r15-choice-ux.part03 .flr/r15-choice-ux.part04 .flr/r15-choice-ux.part05 .flr/r15-choice-ux.part06
+          git rm -f .flr/r15-deploy-issue-trigger-required.txt .flr/r15-deploy-ready.json .flr/r15-deploy-trigger-guard.txt .flr/r15-deploy-trigger-note.json .flr/r15-deploy-trigger-v2.json || true
           git rm .github/workflows/flr-r15-one-shot-deploy.yml
           git add CHANGELOG.md in_pitch_choice_ui.js index.html live_hybrid_session_v02.js live_v06_scene_authority_browser.js runtime/continuous_match_core.js runtime/protagonist_match_controller.js runtime/tactical_movement.js runtime/technical_test.css step71_hybrid_v06_ui.js
           git diff --cached --quiet && { echo 'NO_STAGED_CHANGES'; exit 1; }
