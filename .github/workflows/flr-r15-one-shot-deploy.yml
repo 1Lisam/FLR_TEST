@@ -1,11 +1,8 @@
 name: FLR R15 one-shot atomic deploy
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/flr-r15-one-shot-deploy.yml'
-      - '.flr/r15-one-shot-trigger.json'
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
@@ -16,6 +13,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event.issue.title == '[FLR_DEPLOY] R15 ONE SHOT'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -50,8 +48,7 @@ jobs:
             'runtime/tactical_movement.js':'f3ac5ec59101e0a57648be6299ac73dfd8178159cc1b74a5c18bf5e2586dd57a',
           }
           for path,want in expected.items():
-              data=pathlib.Path(path).read_bytes()
-              got=hashlib.sha256(data).hexdigest()
+              got=hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
               if got!=want:
                   raise SystemExit(f'HASH_MISMATCH {path} expected={want} got={got}')
               print(f'OK {path} {got}')
