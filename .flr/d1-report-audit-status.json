@@ -4,6 +4,36 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-49335f23-7ae0-4adf-8a44-38d57d341305",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T04:55:32.877Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "선택지가 LW, RW 모두 오프사이드 라인 안에만 있는 상태에서 선택지가 떴음\n이부분은 명백한 오프사이드이나 오프사이드 표시가 뜨지 않음.",
+      "size_bytes": 1599011,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-41df64d3-e58f-404b-811d-0224b317c4a5",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T04:53:50.271Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "이전 상황에서 중거리 슛(우리팀)이 한것이 들어갔으나\n화면 가운데 뜨는 창에는 득점 표시가 안뜨고 밋밋하게 표시가 됨",
+      "size_bytes": 2896678,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-a140560d-2222-41d7-adc6-7b9f3da50cbe",
+      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "created_at": "2026-08-25T04:53:11.078Z",
+      "category": "2D 움직임",
+      "priority": 3,
+      "description": "로빙 패스 후 원터치 선택지인데\n이전에 문제가 되었던것 처럼 공이 출발도 하기 전에 선택지가 뜨는 문제가 발생함.\n\n이 부분의 경우 이렇게 해버리면 '내 캐릭터 선택지도 아닌데 왜 선택지가 뜨지?' 하는 의문이 생김",
+      "size_bytes": 6490414,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-1c596025-ce41-46d3-99de-22cf0286cbd6",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "created_at": "2026-08-25T04:41:40.958Z",
@@ -472,39 +502,9 @@
       "description": "7:0 이라는 수치가 나온것과 우리팀 득점 장면은 대부분 뜬금없이 포메이션이 다 구성된 곳에서 득점자 하나만 돌출 되어 ST와 함께 패널티 라인 안에 들어와 있고 수비수들은 모두 자기 포메이션을 유지 중인 상황인데 이게 맞나?\n\n이러면 '득점자만 앞에두고 나머지는 그냥 던져놓자' 라고 해서 갑자기 득점자만 툭 튀어나온 느낌이라 우리가 지향하는 '뒤에서 시뮬레이션 계산을 하던 포메이션을 그대로 드러나자'가 절대 아닌게 드러나는데?",
       "size_bytes": 4046581,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt051-7af55f13-b377-4c5c-9242-a6c86d45c0df",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:11:52.654Z",
-      "category": "기타",
-      "priority": 3,
-      "description": "1. 이것도 다른 건의 사항인데 공격수들의 쇄도가 꽤나 적은것 같아. 그들이 돌파 하는 것도 좀 보고 싶은데 공을 잡고 있더라도 모두 오프사이드 라인 이상은 넘어가지 않으려는 것 같음\n\n2.",
-      "size_bytes": 0,
-      "chunk_count": 0
-    },
-    {
-      "report_id": "umt051-666fc044-4d36-4d2d-9e16-1ea98d776f14",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:10:37.795Z",
-      "category": "기타",
-      "priority": 3,
-      "description": "이건 JSON이 없이 다른 이야기 인데\n1. 패스 중 꽤나 긴 패스라고 판단 되면 공중 패스로 판단 하는 경우도 필요 할 것 같음.\n2. 그리고 선택지 캐릭터 오른쪽 위에 O 표시가 있는것의 의미를 모르겠음\n3. 2. 의 항목 때문에 공이 햇갈림, 공의 표현을 바꿔줘야 할  것같음 축구공 모양 스프라이트를 쓰던지 아니면 공임을 알 수 있는 다른 문양을 쓰던지",
-      "size_bytes": 0,
-      "chunk_count": 0
-    },
-    {
-      "report_id": "umt051-8e44fd09-7ae9-4587-8fc1-ef3c856c0e8a",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T12:08:52.915Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "아까부터 선택 직전에 장면이 한번 되돌아갔다가 돌아오는 버퍼링 같은 현상이 발생 중임",
-      "size_bytes": 5437298,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-1c596025-ce41-46d3-99de-22cf0286cbd6",
+  "latestAttachedReportId": "umt053h3-49335f23-7ae0-4adf-8a44-38d57d341305",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
@@ -514,13 +514,13 @@
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-1c596025-ce41-46d3-99de-22cf0286cbd6",
+      "reportId": "umt053h3-49335f23-7ae0-4adf-8a44-38d57d341305",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "step": 78,
-      "description": "공간 침투시 ST 앞에서 수비가 버벅 거리고\n패스 이후 LW 앞에서 수비가 버벅 거리는 현상 발견 됨",
-      "category": "2D 움직임",
+      "description": "선택지가 LW, RW 모두 오프사이드 라인 안에만 있는 상태에서 선택지가 떴음\n이부분은 명백한 오프사이드이나 오프사이드 표시가 뜨지 않음.",
+      "category": "수비/전술",
       "priority": 3,
-      "reportedAt": "2026-08-25T04:42:27.775Z"
+      "reportedAt": "2026-08-25T04:56:19.685Z"
     },
     "currentSituationPresent": true,
     "previousSituationPresent": false,
@@ -535,13 +535,13 @@
     ],
     "previousSituationKeys": [],
     "currentReportScope": {
-      "startSecond": 682.2000000000035,
-      "endSecond": 693.500000000006,
+      "startSecond": 5331.700000000279,
+      "endSecond": 5364.800000000311,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
     "previousReportScope": null,
-    "currentSerializedBytes": 1836972,
+    "currentSerializedBytes": 1777687,
     "previousSerializedBytes": 0
   }
 }
