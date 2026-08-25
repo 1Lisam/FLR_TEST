@@ -1,11 +1,11 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.3",
-  "build": "USER-MATCH-TEST-V0.5.4-R15",
+  "build": "USER-MATCH-TEST-V0.5.4-R17",
   "limit": 50,
   "exportLimit": 200,
-  "sinceCreatedAt": "2026-08-25T02:40:00Z",
+  "sinceCreatedAt": "2026-08-25T07:45:00Z",
   "overlapMinutes": 30,
-  "requestedAt": "2026-08-25T12:52:00+09:00",
-  "purpose": "R15 user-test triage acquisition only: export every current R15 report plus any report submitted after the R15 deployment safety-overlap cursor. No engine or UI changes.",
-  "runNonce": "r15-user-test-triage-20260825-1252"
+  "requestedAt": "2026-08-25T17:47:00+09:00",
+  "purpose": "R17 user-test triage acquisition: collect all current R17 reports plus safety-overlap late reports before starting R18 formation-continuity work. No game code changes in this audit request.",
+  "runNonce": "r17-user-test-triage-20260825-1747"
 }
