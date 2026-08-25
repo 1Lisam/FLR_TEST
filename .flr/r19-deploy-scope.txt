@@ -1,0 +1,11 @@
+Changed public files:
+CHANGELOG.md
+index.html
+in_pitch_choice_ui.js
+live_hybrid_session_v02.js
+live_v06_scene_authority_browser.js
+runtime/continuous_match_core.js
+runtime/hybrid_spatial_intent_v2.js
+runtime/protagonist_match_controller.js
+runtime/tactical_movement.js
+step71_hybrid_v06_ui.js
