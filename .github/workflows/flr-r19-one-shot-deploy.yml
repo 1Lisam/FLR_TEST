@@ -1,0 +1,58 @@
+name: FLR R19 one-shot deploy
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    if: github.event.issue.title == '[FLR_DEPLOY] USER MATCH TEST V0.5.4 R19'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch validated payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin automation/tt-deploy
+          changed='CHANGELOG.md index.html in_pitch_choice_ui.js live_v06_scene_authority_browser.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js runtime/tactical_movement.js step71_hybrid_v06_ui.js live_hybrid_session_v02.js'
+          git diff --quiet 6c07a66de7183693b9223ff02203db51157342a1..HEAD -- $changed || { echo 'GAME_BASELINE_CHANGED'; exit 1; }
+          : > /tmp/r19.patch
+          while IFS= read -r f; do git show "origin/automation/tt-deploy:$f" >> /tmp/r19.patch; done < <(git ls-tree -r --name-only origin/automation/tt-deploy | grep '^.flr/incoming.patch.part' | sort)
+          echo 'b57f3eeff63c8ecb191bce342f5745b2eb19c913febb8e842e3428851fc17cef  /tmp/r19.patch' | sha256sum -c -
+          git apply --check /tmp/r19.patch
+          git apply /tmp/r19.patch
+          : > /tmp/checklist.patch
+          while IFS= read -r f; do git show "origin/automation/tt-deploy:$f" >> /tmp/checklist.patch; done < <(git ls-tree -r --name-only origin/automation/tt-deploy | grep '^.flr/checklist.patch.part' | sort)
+          echo 'e06a9e6f498488780557de2300550febe3a4be817f9490aca6cd17632d6a908c  /tmp/checklist.patch' | sha256sum -c -
+          git apply --check /tmp/checklist.patch
+          git apply /tmp/checklist.patch
+
+      - name: Validate R19 runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in in_pitch_choice_ui.js live_v06_scene_authority_browser.js live_hybrid_session_v02.js step71_hybrid_v06_ui.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js runtime/tactical_movement.js; do node --check "$f"; done
+          grep -q 'V0.5.4 R19 TEST' index.html
+          grep -q 'FORMATION_CONTINUITY' index.html
+          grep -q 'ST_SHOT_VISIBILITY' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.4-R19' step71_hybrid_v06_ui.js
+
+      - name: Commit R19
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR R19 Deploy Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add CHANGELOG.md index.html in_pitch_choice_ui.js live_v06_scene_authority_browser.js live_hybrid_session_v02.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js runtime/protagonist_match_controller.js runtime/tactical_movement.js step71_hybrid_v06_ui.js
+          git diff --cached --quiet && { echo NO_CHANGES; exit 1; }
+          git commit -m 'Deploy USER-MATCH-TEST V0.5.4 R19 continuity and feedback fixes'
+          git push origin main
