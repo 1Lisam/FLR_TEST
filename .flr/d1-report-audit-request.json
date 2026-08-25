@@ -1,11 +1,11 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.3",
-  "build": "USER-MATCH-TEST-V0.5.4-R14",
+  "build": "USER-MATCH-TEST-V0.5.4-R15",
   "limit": 50,
-  "exportLimit": 500,
-  "sinceCreatedAt": "2026-08-24T12:30:00Z",
+  "exportLimit": 200,
+  "sinceCreatedAt": "2026-08-25T02:40:00Z",
   "overlapMinutes": 30,
-  "requestedAt": "2026-08-25T02:03:00+09:00",
-  "purpose": "V27 authoritative D1 acquisition: export every current R14 report plus every report submitted after the safety-overlap cursor regardless of older build. Deduplicate later by reportId and persist raw JSON locally. Data acquisition only; no engine changes.",
-  "runNonce": "v27-r14-raw-export-20260825-0203"
+  "requestedAt": "2026-08-25T12:52:00+09:00",
+  "purpose": "R15 user-test triage acquisition only: export every current R15 report plus any report submitted after the R15 deployment safety-overlap cursor. No engine or UI changes.",
+  "runNonce": "r15-user-test-triage-20260825-1252"
 }
