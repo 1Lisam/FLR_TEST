@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/flr-r15-one-shot-deploy.yml'
+      - '.flr/r15-one-shot-trigger.json'
 
 permissions:
   contents: write
@@ -76,6 +77,7 @@ jobs:
           git config user.name 'FLR R15 Deploy Bot'
           git config user.email 'actions@users.noreply.github.com'
           git rm .flr/r15-deploy.patch.gz.b64
+          git rm -f .flr/r15-one-shot-trigger.json || true
           git rm .github/workflows/flr-r15-one-shot-deploy.yml
           git add index.html live_hybrid_session_v02.js live_v06_scene_authority_browser.js step71_hybrid_v06_ui.js runtime/continuous_match_core.js runtime/protagonist_match_controller.js runtime/tactical_movement.js
           git diff --cached --quiet && { echo 'NO_STAGED_CHANGES'; exit 1; }
