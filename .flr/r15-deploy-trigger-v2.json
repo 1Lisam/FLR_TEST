@@ -1,1 +1,1 @@
-{"deploy":"USER-MATCH-TEST-V0.5.4-R15","candidate":"PASS_FOR_TEST_DEPLOY_CHOICE_UX","trigger":"push-once","attempt":2}
+{"purpose":"R15 exact final deploy retry","nonce":"2026-08-25T11:40:00+09:00","source":"sealed-local-final"}
