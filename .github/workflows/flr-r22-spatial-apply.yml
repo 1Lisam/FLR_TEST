@@ -73,7 +73,10 @@ jobs:
           git add -A
           echo 'Changed files before commit:'
           git diff --cached --name-only
-          test "$(git diff --cached --name-only | wc -l)" -eq 5
+          # This commit contains five game-file edits plus deletion of the four temporary patch chunks
+          # and the temporary apply workflow. In the final branch-vs-main comparison those five temporary
+          # additions cancel out, leaving exactly the five intended game files.
+          test "$(git diff --cached --name-only | wc -l)" -eq 10
           git diff --cached --name-only | grep -qx 'index.html'
           git diff --cached --name-only | grep -qx 'live_hybrid_session_v02.js'
           git diff --cached --name-only | grep -qx 'runtime/continuous_match_core.js'
