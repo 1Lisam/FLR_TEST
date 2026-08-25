@@ -16,7 +16,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Verify untouched R14 patch bases
+      - name: Verify untouched R14 bases
         shell: bash
         run: |
           set -euo pipefail
@@ -46,30 +46,56 @@ jobs:
               got = hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
               if got != want:
                   raise SystemExit(f'BASE_HASH_MISMATCH {path} expected={want} got={got}')
-              print(f'BASE_OK {path}')
+          print('R14_BASE_HASHES_OK')
           PY
 
-      - name: Reassemble and verify exact R15 choice UX payload
+      - name: Apply sealed old R15 patch
         shell: bash
         run: |
           set -euo pipefail
-          echo '88b85db9c534116ae51608c43c736b2b72d301dd28503cb2ce96f4dd70f00dde  .flr/r15-choice-ux.part00' | sha256sum -c -
-          echo 'a9aecfc25ef349826c2d88b260d8fd9a351f9b08a3a4eb726bca4bd1732a3353  .flr/r15-choice-ux.part01' | sha256sum -c -
-          echo '8bc16566698dd2f864f303717e640ec792698e22f1795034a2fe0ec9a741e463  .flr/r15-choice-ux.part02' | sha256sum -c -
-          echo 'b5c12ca5b66eed2383c1c96743a9333224fb268ecd3d1d4ffbf5546f924d50f3  .flr/r15-choice-ux.part03' | sha256sum -c -
-          echo 'c16271695ee71d1abc79ce83443c1b0b5c2bb79cf5dd0eb3e43c27fe64de630e  .flr/r15-choice-ux.part04' | sha256sum -c -
-          echo '9531d799dfe0b006e48480c10371014f93b23abda8869317cc1231e3de220e40  .flr/r15-choice-ux.part05' | sha256sum -c -
-          echo '96d070298995f489f4ef552171608518c755c1e214212af7d8c6ab53277d3e8e  .flr/r15-choice-ux.part06' | sha256sum -c -
-          cat .flr/r15-choice-ux.part00 .flr/r15-choice-ux.part01 .flr/r15-choice-ux.part02 .flr/r15-choice-ux.part03 .flr/r15-choice-ux.part04 .flr/r15-choice-ux.part05 .flr/r15-choice-ux.part06 > /tmp/r15.b64
-          echo '42ec0385b3c7412279dc5382616ebfcd37c75e57f6f9f3fa392c587b51df4c65  /tmp/r15.b64' | sha256sum -c -
-          base64 -d /tmp/r15.b64 > /tmp/r15.patch.gz
-          echo '239bebdac5c130904a0d9426e7435b9ca6e6c569cd59eaf8b27b33b490ef9aa6  /tmp/r15.patch.gz' | sha256sum -c -
-          gzip -dc /tmp/r15.patch.gz > /tmp/r15.patch
-          echo '132b7a3aa0c434827bebbe297e1fbc96471a9e431eb0c4bc82cda0573c2bdd46  /tmp/r15.patch' | sha256sum -c -
-          git apply --check /tmp/r15.patch
-          git apply /tmp/r15.patch
+          base64 -d .flr/r15-deploy.patch.gz.b64 > /tmp/r15-old.patch.gz
+          gzip -dc /tmp/r15-old.patch.gz > /tmp/r15-old.patch
+          git apply --check /tmp/r15-old.patch
+          git apply /tmp/r15-old.patch
+          python - <<'PY'
+          import hashlib, pathlib
+          expected = {
+            'CHANGELOG.md':'1890525295a00c1377925f610fc8ef86a3cef1f1d3918f44e2ae6b604c37e784',
+            'in_pitch_choice_ui.js':'5613fac56b9c843336d63bb3ae9eebb173e3e6b6077ddf666190445c6d1330e5',
+            'index.html':'50303dd018297cff4ad1e86cb883473d65ed32b630a26bf343f39dc4ae85f597',
+            'live_hybrid_session_v02.js':'56e1bdf3cdfe1d193f5b4a58864f2638d9b40294323fceaf5b9bece18f2f78bb',
+            'live_v06_scene_authority_browser.js':'0b312d456b7d92a742d59ac4d9245ea511eb2bb404fe966743133edc050ae862',
+            'runtime/continuous_match_core.js':'b0bcc35d40ce4417959ad8dbdd0b75118358f07d423ecc19111063ada2c0683d',
+            'runtime/protagonist_match_controller.js':'ccfa63abef2c168f8ebccc6eda168592fc0a9161184ea0f75a59f161637cf7d6',
+            'runtime/tactical_movement.js':'f3ac5ec59101e0a57648be6299ac73dfd8178159cc1b74a5c18bf5e2586dd57a',
+            'runtime/technical_test.css':'0cf94f95243e9cc4874cee9fdadf938e6013aad6ee96f9f6cc09b496a3f7af4a',
+            'step71_hybrid_v06_ui.js':'588ba0290c10aac65e6aad8a3c47c218631c75ec725dd249ad24777ed2025ec7',
+          }
+          for path, want in expected.items():
+              got = hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
+              if got != want:
+                  raise SystemExit(f'OLD_R15_HASH_MISMATCH {path} expected={want} got={got}')
+          print('OLD_R15_HASHES_OK')
+          PY
 
-      - name: Verify exact final R15 meaningful-choice candidate
+      - name: Apply exact meaningful-choice delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'e59e4d3602ebc654c87063c527ba1658b3b0f8b9e62217a62eb4a48324f5184e  .flr/r15-delta.part00' | sha256sum -c -
+          echo '177033f8c00b457c9711222fe1383e261c6df89759cbc3a8177421ca1a874a82  .flr/r15-delta.part01' | sha256sum -c -
+          echo '1a4205e680d68c536b9df334e77a343eda664f24ee4ee4ee1319209c7dfba6e2  .flr/r15-delta.part02' | sha256sum -c -
+          echo 'b55929d14145ca2531be9d96255625be84342f3540892cda81a185da8d912f3f  .flr/r15-delta.part03' | sha256sum -c -
+          cat .flr/r15-delta.part00 .flr/r15-delta.part01 .flr/r15-delta.part02 .flr/r15-delta.part03 > /tmp/r15-delta.b64
+          echo '37fb31aad75851a084a0ad195d394210e6dc2ebe1c9263e4049eb950305d6d37  /tmp/r15-delta.b64' | sha256sum -c -
+          base64 -d /tmp/r15-delta.b64 > /tmp/r15-delta.gz
+          echo 'bdb256aa9613ed304f4f32d3517e18e8d04b1f6712339d78cae71f69453defae  /tmp/r15-delta.gz' | sha256sum -c -
+          gzip -dc /tmp/r15-delta.gz > /tmp/r15-delta.patch
+          echo '1a7236fa9a054063df2b215ed3726e33c18de96adcb555946a97151f75f73347  /tmp/r15-delta.patch' | sha256sum -c -
+          git apply --check /tmp/r15-delta.patch
+          git apply /tmp/r15-delta.patch
+
+      - name: Verify exact final R15 candidate
         shell: bash
         run: |
           set -euo pipefail
@@ -91,15 +117,10 @@ jobs:
               got = hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
               if got != want:
                   raise SystemExit(f'FINAL_HASH_MISMATCH {path} expected={want} got={got}')
-              print(f'FINAL_OK {path}')
+          print('FINAL_R15_HASHES_OK')
           PY
           grep -q 'V0.5.4 R15 TEST' index.html
           grep -q 'USER-MATCH-TEST-V0.5.4-R15' step71_hybrid_v06_ui.js
-
-      - name: Syntax gate
-        shell: bash
-        run: |
-          set -euo pipefail
           node --check in_pitch_choice_ui.js
           node --check live_hybrid_session_v02.js
           node --check live_v06_scene_authority_browser.js
@@ -108,17 +129,17 @@ jobs:
           node --check runtime/protagonist_match_controller.js
           node --check runtime/tactical_movement.js
 
-      - name: Commit exact R15 and remove deployment helpers
+      - name: Commit final R15 and remove deploy helpers
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'FLR R15 Deploy Bot'
           git config user.email 'actions@users.noreply.github.com'
           git rm -f .flr/r15-deploy.patch.gz.b64 .flr/r15-one-shot-trigger.json || true
-          git rm -f .flr/r15-choice-ux.part00 .flr/r15-choice-ux.part01 .flr/r15-choice-ux.part02 .flr/r15-choice-ux.part03 .flr/r15-choice-ux.part04 .flr/r15-choice-ux.part05 .flr/r15-choice-ux.part06
+          git rm -f .flr/r15-choice-ux.part00 .flr/r15-choice-ux.part01 .flr/r15-choice-ux.part02 .flr/r15-choice-ux.part03 .flr/r15-choice-ux.part04 .flr/r15-choice-ux.part05 .flr/r15-choice-ux.part06 || true
+          git rm -f .flr/r15-delta.part00 .flr/r15-delta.part01 .flr/r15-delta.part02 .flr/r15-delta.part03
           git rm -f .flr/r15-deploy-issue-trigger-required.txt .flr/r15-deploy-ready.json .flr/r15-deploy-trigger-guard.txt .flr/r15-deploy-trigger-note.json .flr/r15-deploy-trigger-v2.json || true
-          git rm .github/workflows/flr-r15-one-shot-deploy.yml
+          git rm -f .github/workflows/flr-r15-one-shot-deploy.yml
           git add CHANGELOG.md in_pitch_choice_ui.js index.html live_hybrid_session_v02.js live_v06_scene_authority_browser.js runtime/continuous_match_core.js runtime/protagonist_match_controller.js runtime/tactical_movement.js runtime/technical_test.css step71_hybrid_v06_ui.js
-          git diff --cached --quiet && { echo 'NO_STAGED_CHANGES'; exit 1; }
           git commit -m 'Deploy USER-MATCH-TEST V0.5.4 R15 meaningful choice UX'
           git push origin HEAD:main
