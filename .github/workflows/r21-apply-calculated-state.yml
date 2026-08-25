@@ -1,0 +1,65 @@
+name: R21 apply calculated scene state
+on:
+  push:
+    branches: [r21-r20-feedback-start-shape]
+    paths:
+      - '.github/workflows/r21-apply-calculated-state.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: r21-r20-feedback-start-shape
+          fetch-depth: 0
+      - name: Rebuild and verify patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .flr/r21calc/chunk-* > /tmp/r21.b64
+          echo 'e93928948d0972798ed29b0c5684e213d9b042c66669b0ecc5140103a5fd9b73  /tmp/r21.b64' | sha256sum -c -
+          base64 -d /tmp/r21.b64 | gzip -d > /tmp/r21.patch
+          echo 'aff5fe8c1bf67f356ae3b075fee20eb4104c8ad8aa19733cd2c869cd0f305ff7  /tmp/r21.patch' | sha256sum -c -
+      - name: Verify R20 baseline and apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/hybrid_spatial_intent_v2.js)" = '013df66847bf13640799bc1c2294fadd481abb82'
+          test "$(git hash-object runtime/continuous_match_core.js)" = '170f6264643bac4daa728ef86beb6cf9c8be8c8b'
+          test "$(git hash-object live_hybrid_session_v02.js)" = '13ccb432e0cdc93822eee9e98cd0244f6a6f12fc'
+          test "$(git hash-object step71_hybrid_v06_ui.js)" = '01b658108917a4c44179c48074039cc9eef59faf'
+          test "$(git hash-object index.html)" = '8b82bf23c629932d2278887dde981c19ccd96b47'
+          test ! -e runtime/formation_definition.js
+          git apply --check /tmp/r21.patch
+          git apply /tmp/r21.patch
+      - name: Verify R21 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '6a49e182fcd3f37c9914bd2753f541dad44f359ef1d3de705b653d48c0a63fa3  index.html' | sha256sum -c -
+          echo '09f3bd4a0d53efc19676ede9e196428946cd3c0ce23e82ffad725c4aade5a971  live_hybrid_session_v02.js' | sha256sum -c -
+          echo '728ae8a68fba85b419a99ebc415aa98de0fd5fc510a8b405beba756a589024f2  runtime/continuous_match_core.js' | sha256sum -c -
+          echo 'e671ed7b17eb89138be49a0db91be21047deff2bfa4f9af00f00c6cdda959801  runtime/formation_definition.js' | sha256sum -c -
+          echo 'd94cf494819f931a47b2fe0a2357c2fd675c4ad394377165714db795aac3d2bf  runtime/hybrid_spatial_intent_v2.js' | sha256sum -c -
+          echo '5bd84f6c35815d664e5424eb5d0f9016303e22dff0c8105a8f73a117c910d7ef  step71_hybrid_v06_ui.js' | sha256sum -c -
+          node --check runtime/formation_definition.js
+          node --check runtime/hybrid_spatial_intent_v2.js
+          node --check runtime/continuous_match_core.js
+          node --check live_hybrid_session_v02.js
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'USER-MATCH-TEST-V0.5.4-R21' step71_hybrid_v06_ui.js
+          grep -q 'runtime/formation_definition.js' index.html
+          ! grep -q 'restDefenceLine' runtime/formation_definition.js
+      - name: Commit clean R21 branch state
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .flr/r21calc
+          rm -f .github/workflows/r21-apply-calculated-state.yml
+          git config user.name 'FLR R21 Apply Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'deploy: USER MATCH TEST V0.5.4 R21 calculated scene state'
+          git push origin HEAD:r21-r20-feedback-start-shape
