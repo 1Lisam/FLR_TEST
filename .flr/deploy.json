@@ -1,0 +1,22 @@
+{
+  "baseCommit": "6c07a66de7183693b9223ff02203db51157342a1",
+  "validationStatus": "PASS_FOR_USER_VISUAL_RETEST",
+  "step79Started": false,
+  "fromBuild": "USER-MATCH-TEST-V0.5.4-R17",
+  "toBuild": "USER-MATCH-TEST-V0.5.4-R19",
+  "changedFiles": [
+    "CHANGELOG.md",
+    "index.html",
+    "in_pitch_choice_ui.js",
+    "live_v06_scene_authority_browser.js",
+    "runtime/continuous_match_core.js",
+    "runtime/hybrid_spatial_intent_v2.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js",
+    "step71_hybrid_v06_ui.js"
+  ],
+  "removedFiles": [],
+  "patchSha256": "b57f3eeff63c8ecb191bce342f5745b2eb19c913febb8e842e3428851fc17cef",
+  "commitMessage": "Deploy USER-MATCH-TEST V0.5.4 R19 continuity and R17 feedback fixes",
+  "patchEncoding": "git-binary-delta"
+}
