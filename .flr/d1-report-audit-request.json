@@ -1,11 +1,11 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.3",
-  "build": "USER-MATCH-TEST-V0.5.4-R20",
+  "build": "USER-MATCH-TEST-V0.5.4-R21",
   "limit": 50,
   "exportLimit": 200,
-  "sinceCreatedAt": "2026-08-25T13:00:00Z",
-  "overlapMinutes": 60,
-  "requestedAt": "2026-08-25T23:23:00+09:00",
-  "purpose": "R20 user-test triage: collect the latest R20 bug reports and attached raw bundles after the user confirmed upload completion. Audit-only request; no game code changes.",
-  "runNonce": "r20-user-test-triage-20260825-2323"
+  "sinceCreatedAt": "2026-08-25T15:20:00Z",
+  "overlapMinutes": 30,
+  "requestedAt": "2026-08-26T00:45:00+09:00",
+  "purpose": "R21 user-test triage: collect the latest bug reports and attached raw bundles, with special focus on defenders/fullbacks appearing to join the attack late from stale positions. Audit-only request; no game code changes.",
+  "runNonce": "r21-user-test-triage-20260826-0045"
 }
