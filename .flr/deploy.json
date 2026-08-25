@@ -1,5 +1,5 @@
 {
-  "baseCommit": "6c07a66de7183693b9223ff02203db51157342a1",
+  "baseCommit": "bc50c7d0cbef356d79455fbc36e67a7cdf4a0dc7",
   "validationStatus": "PASS_FOR_USER_VISUAL_RETEST",
   "step79Started": false,
   "fromBuild": "USER-MATCH-TEST-V0.5.4-R17",
@@ -19,5 +19,5 @@
   "patchSha256": "b57f3eeff63c8ecb191bce342f5745b2eb19c913febb8e842e3428851fc17cef",
   "commitMessage": "Deploy USER-MATCH-TEST V0.5.4 R19 continuity and R17 feedback fixes",
   "patchEncoding": "git-binary-delta",
-  "triggerNonce": "r19-deploy-20260825-1917"
+  "triggerNonce": "r19-pr-base-20260825-1930"
 }
