@@ -9,19 +9,33 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           ref: r21-r20-feedback-start-shape
           fetch-depth: 0
-      - name: Rebuild and verify patch
+      - name: Rebuild and verify patch with Python
         shell: bash
         run: |
           set -euo pipefail
-          cat .flr/r21calc/chunk-* > /tmp/r21.b64
-          echo 'e93928948d0972798ed29b0c5684e213d9b042c66669b0ecc5140103a5fd9b73  /tmp/r21.b64' | sha256sum -c -
-          base64 -d /tmp/r21.b64 | gzip -d > /tmp/r21.patch
-          echo 'aff5fe8c1bf67f356ae3b075fee20eb4104c8ad8aa19733cd2c869cd0f305ff7  /tmp/r21.patch' | sha256sum -c -
+          python3 - <<'PY'
+          import base64, gzip, hashlib, pathlib
+          parts=[]
+          for i in range(9):
+              p=pathlib.Path(f'.flr/r21calc/chunk-{i:02d}')
+              parts.append(p.read_bytes())
+          enc=b''.join(parts)
+          assert len(enc)==25196, len(enc)
+          assert hashlib.sha256(enc).hexdigest()=='e93928948d0972798ed29b0c5684e213d9b042c66669b0ecc5140103a5fd9b73'
+          gz=base64.b64decode(enc, validate=True)
+          assert hashlib.sha256(gz).hexdigest()=='703699605ea467b2783d51027e0546ee222146b9f516c5e4bf148be58a0492ff'
+          patch=gzip.decompress(gz)
+          assert len(patch)==69239, len(patch)
+          assert hashlib.sha256(patch).hexdigest()=='aff5fe8c1bf67f356ae3b075fee20eb4104c8ad8aa19733cd2c869cd0f305ff7'
+          pathlib.Path('/tmp/r21.patch').write_bytes(patch)
+          print('PATCH_REBUILD_OK')
+          PY
       - name: Verify R20 baseline and apply
         shell: bash
         run: |
@@ -61,5 +75,6 @@ jobs:
           git config user.name 'FLR R21 Apply Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add -A
+          git diff --cached --check
           git commit -m 'deploy: USER MATCH TEST V0.5.4 R21 calculated scene state'
           git push origin HEAD:r21-r20-feedback-start-shape
