@@ -1,1 +1,0 @@
-R15 deployment uses an issue event only. This guard file does not trigger deployment.

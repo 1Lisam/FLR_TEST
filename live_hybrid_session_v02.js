@@ -80,7 +80,7 @@ function createDeveloperScenario(opts={}){
  if(key==='PASS_FLIGHT_WIDE_TRACK'){
   const ps=s.spatial.players,owner=ps['H-CM'],rw=ps['H-RW'],lw=ps['H-LW'];owner.x=68+j('pf-owner-x',.7);owner.y=34+j('pf-owner-y',1.2);owner.vx=1.0;owner.vy=0;rw.x=80+j('pf-rw-x',.5);rw.y=55+j('pf-rw-y',1.0);rw.vx=2.0;rw.vy=-.1;lw.x=78+j('pf-lw-x',.5);lw.y=13+j('pf-lw-y',1.0);lw.vx=1.7;lw.vy=.1;for(const [id,x,y] of [['A-LB',77,55],['A-LCB',80,41],['A-RCB',80,27],['A-RB',77,13]]){if(ps[id]){ps[id].x=x+j(id+'x',.55);ps[id].y=y+j(id+'y',.8);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
  }else if(key==='OFFSIDE_INVOLVEMENT'){
-  const ps=s.spatial.players,owner=ps['H-CM'],st=ps['H-ST'],rw=ps['H-RW'];owner.x=70+j('ox',1.2);owner.y=34+j('oy',2.0);owner.vx=1.2;owner.vy=0;st.x=83.7+j('stx',.35);st.y=38+j('sty',1.6);st.vx=2.0;st.vy=0;rw.x=83.9+j('rwx',.35);rw.y=53+j('rwy',1.6);rw.vx=2.4;rw.vy=-.2;for(const [id,x,y] of [['A-LB',82,55],['A-LCB',82.5,41],['A-RCB',83.2,27],['A-RB',81.5,13],['A-GK',99,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.7);ps[id].y=y+j(id+'y',1.0);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
+  const ps=s.spatial.players,owner=ps['H-CM'],st=ps['H-ST'],rw=ps['H-RW'];owner.x=70+j('ox',1.2);owner.y=34+j('oy',2.0);owner.vx=1.2;owner.vy=0;st.x=84.55+j('stx',.15);st.y=38+j('sty',1.6);st.vx=.7;st.vy=0;rw.x=84.85+j('rwx',.15);rw.y=53+j('rwy',1.6);rw.vx=.9;rw.vy=-.1;for(const [id,x,y] of [['A-LB',82.1,55],['A-LCB',82.9,41],['A-RCB',83.4,27],['A-RB',81.7,13],['A-GK',99,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.25);ps[id].y=y+j(id+'y',.8);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
  }else if(key==='DEFENSIVE_ROLE_STABILITY'){
   const ps=s.spatial.players,owner=ps['H-LB'];owner.x=64+j('dr-owner-x',.8);owner.y=14+j('dr-owner-y',1.0);owner.vx=1.1;owner.vy=0;for(const [id,x,y] of [['H-LW',75,10],['H-ST',79,33],['H-LCM',65,23],['A-RB',74,12],['A-RCB',78,29],['A-CM',67,34],['A-RCM',69,47]]){if(ps[id]){ps[id].x=x+j(id+'x',.65);ps[id].y=y+j(id+'y',.9);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-LB'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
  }else if(key==='MARK_TARGET_STABILITY'){
@@ -92,6 +92,10 @@ function createDeveloperScenario(opts={}){
  }else{
   advanceSpatial(session,1.5);
  }
+ // R15 user-view continuity: every forced verification starts from a short piece of actual
+ // Hybrid spatial motion rather than exposing the freshly seeded formation anchors as frame 0.
+ // This only advances player intent/positions; it does not resolve a future outcome.
+ if(key!=='OFFSIDE_INVOLVEMENT')advanceSpatial(session,1.0);
  const e=addEvent(session,'DEVELOPER_RECENT_FIX','HOME',{scenario:key,label,ownerId:s.ball.ownerId,forcedContextOnly:true,futureOutcomePrecomputed:false});
  const boundary=makeWindow(session,e,reason);boundary.id=`DEV-${key}-${hashSeed(scenarioSeed).toString(16).slice(0,8)}`;boundary.sceneId=boundary.id;boundary.developerScenario={key,label,instruction,seed:scenarioSeed,forcedContextOnly:true,futureOutcomePrecomputed:false};boundary.stateSnapshot.spatial=spatialSnapshot(s);session.status='PAUSED';session.boundary=boundary;
  return{session,key,label,instruction,seed:scenarioSeed,boundary,futureOutcomePrecomputed:false};

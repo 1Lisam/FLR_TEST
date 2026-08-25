@@ -413,7 +413,14 @@ function movePlayers(m,dt){
     }
     const agilityAttr=abilityValue(m,p,'agility'),turnRate=(2.15+agilityAttr/100*3.05);
     const n={x:dx/d,y:dy/d},accelAttr=abilityValue(m,p,'acceleration'),paceAttr=abilityValue(m,p,'pace'),a=(ROLE_ACCEL[p.role]||5)*movementFactor(accelAttr,0.34);
-    let vmax=(ROLE_SPEED[p.role]||7)*movementFactor(paceAttr,0.32)*(p.sprint?1:0.76);if(p.role==='GK'&&p.tacticalTask==='GK_SAVE_SET'){const gkMove=(abilityValue(m,p,'reaction')+abilityValue(m,p,'agility'))/2;vmax=clamp(5.85+(gkMove-60)*0.032,5.25,7.05);}
+    let vmax=(ROLE_SPEED[p.role]||7)*movementFactor(paceAttr,0.32)*(p.sprint?1:0.76);
+    // R15: reconnecting to the midfield screen is a controlled recovery jog, not a full-speed
+    // magnetic snap to a formation anchor.  The tactical target remains live and may update again.
+    if(p.tacticalTask==='PIVOT_RECONNECT')vmax=Math.min(vmax,3.20);
+    // Front players can recover into a block, but a default HOLD_BLOCK must not look like a
+    // centre-back-style emergency sprint through midfield. Explicit press/chase tasks are untouched.
+    if(['ST','WF'].includes(p.role)&&p.tacticalTask==='HOLD_BLOCK')vmax=Math.min(vmax,4.20);
+    if(p.role==='GK'&&p.tacticalTask==='GK_SAVE_SET'){const gkMove=(abilityValue(m,p,'reaction')+abilityValue(m,p,'agility'))/2;vmax=clamp(5.85+(gkMove-60)*0.032,5.25,7.05);}
     const pathFacing=Math.atan2(n.y,n.x),explicitFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing,desiredFacing=(d<0.95&&Number.isFinite(explicitFacing))?explicitFacing:pathFacing,beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:desiredFacing,facingError=Math.abs(angleDiff(beforeFacing,desiredFacing));p.bodyAngle=approachAngle(beforeFacing,desiredFacing,turnRate*dt);
     // STEP39 V0.3: body orientation now has a visible physical cost.  A player facing
     // the wrong way must pivot before reaching full acceleration; agility shortens that delay.

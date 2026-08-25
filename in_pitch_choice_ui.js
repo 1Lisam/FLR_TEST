@@ -84,8 +84,8 @@ function createController(cfg){
     const title=make('div','in-pitch-choice-title');title.textContent=player?(player.id===heroId()?`내 선수 · ${player.slot||player.role}`:(hero&&player.team===hero.team?`같은 팀 ${player.slot||player.role}`:`상대 ${player.slot||player.role}`)):'선택';menu.appendChild(title);
     const grid=make('div','in-pitch-choice-grid');
     for(const o of options){
-      const b=make('button','in-pitch-choice-option');b.type='button';b.setAttribute('role','menuitem');const tip=o.tooltip||o.hint||'';
-      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.textContent=shortLabel(o);
+      const b=make('button','in-pitch-choice-option');b.type='button';b.setAttribute('role','menuitem');const baseTip=o.tooltip||o.hint||'',tip=o.recommended?`추천 행동\n${baseTip}`:baseTip;
+      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.dataset.recommended=o.recommended?'true':'false';b.classList.toggle('recommended',!!o.recommended);b.setAttribute('aria-label',`${shortLabel(o)}${o.recommended?' · 추천 행동':''}`);b.textContent=shortLabel(o);
       b.addEventListener('mouseenter',()=>showTooltipFor(b,tip));b.addEventListener('mouseleave',hideTooltip);b.addEventListener('focus',()=>showTooltipFor(b,tip));b.addEventListener('blur',hideTooltip);
       b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();if(locked||generation!==menuGeneration||performance.now()<menuArmAt){resetPointerCommit();return;}pointerCommit={pointerId:ev.pointerId,generation,choiceId:o.id,targetId:o.targetId||null,button:b};});
       b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();const c=pointerCommit;resetPointerCommit();if(!c||c.pointerId!==ev.pointerId||c.generation!==generation||c.button!==b)return;commitChoice(o,anchorId,generation,ev.pointerType||'pointer');});
@@ -144,7 +144,7 @@ function createController(cfg){
   function show(nextPending,nextSnapshot){pending=nextPending;snapshot=nextSnapshot;selectedId=null;locked=false;rootEl.hidden=false;menu.hidden=true;menu.innerHTML='';leader.hidden=true;resetPointerCommit();renderRunArrows();renderTargets()}
   function hide(){pending=null;snapshot=null;selectedId=null;locked=false;rootEl.hidden=true;runArrows.innerHTML='';targets.innerHTML='';hideMenu(true)}
   function setLocked(v){locked=!!v;rootEl.classList.toggle('locked',locked);if(locked)resetPointerCommit()}
-  function state(){return{version:API_VERSION,visible:!rootEl.hidden,selectedId,locked,menuGeneration,groups:getGroups().map(g=>({anchorId:g.anchorId,options:g.options.map(o=>({id:o.id,targetId:o.targetId,label:o.label}))}))}}
+  function state(){return{version:API_VERSION,visible:!rootEl.hidden,selectedId,locked,menuGeneration,groups:getGroups().map(g=>({anchorId:g.anchorId,options:g.options.map(o=>({id:o.id,targetId:o.targetId,label:o.label,recommended:!!o.recommended}))}))}}
   stage.addEventListener('pointerdown',ev=>{if(rootEl.hidden||locked||menu.hidden)return;if(ev.target.closest?.('.in-pitch-target,.in-pitch-choice-menu,.in-pitch-choice-tooltip'))return;hideMenu(false);});
   window.addEventListener('resize',()=>{if(!rootEl.hidden&&snapshot)update(snapshot)});
   return{show,hide,update,selectTarget,setLocked,state};

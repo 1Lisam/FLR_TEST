@@ -14,7 +14,7 @@ function ballXY(ctx){
  const y=ctx.ball.lane==='LEFT'?18:ctx.ball.lane==='RIGHT'?50:34;return localToWorld(ctx.possession,x,y);
 }
 function safeHeroAttackPosition(m,hp,bxy){
- const team=hp.team,attackDir=team==='HOME'?1:-1,opp=m.players.filter(p=>p.team!==team&&p.role!=='GK').map(p=>p.x).sort((a,b)=>a-b);
+ const team=hp.team,attackDir=team==='HOME'?1:-1,opp=m.players.filter(p=>p.team!==team).map(p=>p.x).sort((a,b)=>a-b);
  const secondLast=team==='HOME'?(opp.at(-2)??96):(opp[1]??9),ballRef=bxy.x;
  const line=team==='HOME'?Math.max(secondLast,ballRef):Math.min(secondLast,ballRef);
  let x=line-attackDir*0.65;

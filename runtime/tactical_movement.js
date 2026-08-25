@@ -234,7 +234,11 @@ function attackTask(m,p,ctx){
       return{lx:x,ly:y,task:'FULLBACK_WIDE_SUPPORT',sprint:Math.abs(local.x-x)>4.0};
     }
     // Far-side full-back protects the counter rather than collapsing into the penalty area.
-    const x=clamp((phase==='FINAL_THIRD'||phase==='CHANCE'?mid-4:mid-8)+(ss?3:-4),24,72),y=34+sg*27.0;
+    // R15: the far-side player must remain a true rest-defence outlet.  He can slide with the
+    // attack, but should not climb into a winger-like height merely because the ball is deep on
+    // the opposite flank.  The ball-side FB logic above still owns real overlaps/support runs.
+    const farRestX=clamp(Math.min(mid-8,progress-22),26,49.0);
+    const x=ss?clamp((phase==='FINAL_THIRD'||phase==='CHANCE'?mid-1:mid-5),24,72):farRestX,y=34+sg*27.0;
     return{lx:x,ly:y,task:ss?'OUTSIDE_SUPPORT':'REST_BALANCE',sprint:ss&&progress>50};
   }
   if(p.role==='CM'){
@@ -265,7 +269,14 @@ function attackTask(m,p,ctx){
       const surgeSide=ctx.fullbackSurge&&ctx.fullbackSurgeSlot==='LB'?-1:ctx.fullbackSurge&&ctx.fullbackSurgeSlot==='RB'?1:0;
       if(surgeSide&&(phase==='FINAL_THIRD'||phase==='CHANCE'))x=clamp(x-1.2,24,60);
       const y=clamp(lerp(34,by,phase==='BUILD_UP'?0.18:0.08)+surgeSide*2.2,18,50);
-      return{lx:x,ly:y,task:progress<22?'DROP_BETWEEN_LINES':phase==='BUILD_UP'?'DROP_TO_BUILD':surgeSide?'PIVOT_WIDE_COVER':'PIVOT_SCREEN',sprint:Math.abs(local.x-x)>5.0};
+      const task=progress<22?'DROP_BETWEEN_LINES':phase==='BUILD_UP'?'DROP_TO_BUILD':surgeSide?'PIVOT_WIDE_COVER':'PIVOT_SCREEN';
+      // R15: after a possession wave the pivot reconnects in steps instead of instantly receiving
+      // a distant static anchor.  This changes only the current off-ball route, not the next action.
+      if(task==='PIVOT_SCREEN'&&Math.abs(local.x-x)>6.0){
+        const reconnectX=local.x+clamp(x-local.x,-4.0,4.0),reconnectY=local.y+clamp(y-local.y,-2.8,2.8);
+        return{lx:clamp(reconnectX,24,76),ly:clamp(reconnectY,18,50),task:'PIVOT_RECONNECT',sprint:false};
+      }
+      return{lx:x,ly:y,task,sprint:Math.abs(local.x-x)>5.0};
     }
     if(pr.midfieldRunner===p.slot){
       if(phase==='BUILD_UP'){
@@ -609,7 +620,9 @@ function preferredDefenceRoles(m,team,owner,ball,field,candidates){
   let genericCover=null;
   if(genericPress){
     const cbCover=field.filter(p=>p.role==='CB'&&p.id!==genericPress.id).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0]?.p||null;
-    genericCover=(ball.x<42?cbCover:null)||ranked.find(c=>c.p.id!==genericPress.id)?.p||null;
+    // R15: the secondary screen is structural work.  A striker/winger may press from the
+    // front, but must not become the generic second defender and sprint through midfield.
+    genericCover=(ball.x<42?cbCover:null)||ranked.find(c=>c.p.id!==genericPress.id&&!['ST','WF'].includes(c.p.role))?.p||null;
   }
   return{press:genericPress,cover:genericCover,mode:genericWide?'GENERIC_WIDE_ROLE_AWARE':'GENERIC_ROLE_AWARE'};
 }
@@ -748,7 +761,7 @@ function assignDefence(m,team,ctx){
       const relY=worldToLocal(team,p.x,p.y).y-ball.y,containSide=Math.abs(relY)>0.25?Math.sign(relY):sideSign(p.slot)||1;
       lx=clamp(ball.x-gap,3,96);ly=ball.y+containSide*(commit?0.38:0.62)+(34-ball.y)*0.015;task=commit?'ENGAGE':'PRESS_CONTAIN';sprint=dist(p,owner)>3.2;
       }
-    }else if(cover&&p.id===cover.id&&dist(p,m.ball)<20){
+    }else if(cover&&p.id===cover.id&&['CB','FB','CM'].includes(p.role)&&dist(p,m.ball)<20){
       // V0.4: the second defender is not a second ball-chaser.  He protects the
       // carrier-to-goal shooting corridor from a goal-side position.
       const ownerL=owner?worldToLocal(team,owner.x,owner.y):ball;
