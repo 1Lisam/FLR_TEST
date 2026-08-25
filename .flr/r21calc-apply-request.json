@@ -1,6 +1,0 @@
-{
-  "schemaVersion": "FLR_R21_CALCULATED_STATE_APPLY_REQUEST_1.1",
-  "build": "USER-MATCH-TEST-V0.5.4-R21",
-  "purpose": "Deploy calculated live-state scene entry with no canned formation reset.",
-  "patchSha256": "aff5fe8c1bf67f356ae3b075fee20eb4104c8ad8aa19733cd2c869cd0f305ff7"
-}
