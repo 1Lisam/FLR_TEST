@@ -89,7 +89,16 @@ function setControlled(m,p,snap=true,receiveMeta=null){
     // A through-ball still rewards an active run; ordinary/long receptions open the first touch
     // into the attacking view instead of continuing a baseball-style chase through the ball.
     const incomingTravel=incomingSpeed>0.2?norm(Number(receiveMeta.incomingVx)||0,Number(receiveMeta.incomingVy)||0):moveVec;
-    let touchVec;if(kind==='THROUGH'&&sp>0.75)touchVec=norm(moveVec.x*.78+goalVec.x*.22,moveVec.y*.78+goalVec.y*.22);else if(sp>0.45)touchVec=norm(moveVec.x*.62+incomingTravel.x*.20+goalVec.x*.18,moveVec.y*.62+incomingTravel.y*.20+goalVec.y*.18);else touchVec=norm(incomingTravel.x*.78+goalVec.x*.22,incomingTravel.y*.78+goalVec.y*.22);
+    let touchVec;
+    if(kind==='THROUGH'&&sp>0.75)touchVec=norm(moveVec.x*.78+goalVec.x*.22,moveVec.y*.78+goalVec.y*.22);
+    else if(kind==='PASS'){
+      // R19 report: an ordinary/progressive pass receiver often accelerates toward the meeting
+      // point before contact. That convergence vector is NOT the desired post-touch direction.
+      // Open the first touch into the attacking view, with only a small contribution from the
+      // incoming ball path, so a RW receiving at his feet does not keep drifting back/up-field.
+      touchVec=norm(incomingTravel.x*.28+goalVec.x*.72,incomingTravel.y*.28+goalVec.y*.72);
+    }else if(sp>0.45)touchVec=norm(moveVec.x*.48+incomingTravel.x*.20+goalVec.x*.32,moveVec.y*.48+incomingTravel.y*.20+goalVec.y*.32);
+    else touchVec=norm(incomingTravel.x*.62+goalVec.x*.38,incomingTravel.y*.62+goalVec.y*.38);
     const throughMomentum=kind==='THROUGH'&&sp>0.75,continuation=throughMomentum?clamp(sp*.92,4.2,5.8):kind==='THROUGH'?3.10:kind==='CUTBACK'?1.20:kind==='LONG_PASS'?1.05:1.15;
     p.tx=clamp(p.x+touchVec.x*continuation,1,104);p.ty=clamp(p.y+touchVec.y*continuation,1,67);p.tacticalTask='FIRST_TOUCH_FLOW';p.sprint=throughMomentum;if(throughMomentum)p.receiveRunContinuationUntil=m.time+1.05;
     // Pre-contact scan opens the body between the incoming ball and the attacking view. Through
@@ -392,6 +401,25 @@ function onBallScanFacingTarget(m,p){
   const side=lockedSide||Math.sign(diff||1);p.scanFacingSide=side;p.scanFacingSideUntil=Math.max(Number(p.scanFacingSideUntil||0),m.time+0.90);
   return goalAngle+side*maxAway;
 }
+function extendActiveCarryWaypoint(m,p){
+  if(!p||m.ball.mode!=='CONTROLLED'||m.ball.ownerId!==p.id||!['CARRY_FORWARD','DRIBBLE_EVADE'].includes(p.action))return false;
+  const user=m.userChoiceControl?.playerId===p.id&&m.userChoiceControl?.mode==='CARRY'&&m.userChoiceControl?.controllerOwned?m.userChoiceControl:null;
+  const horizon=Math.max(Number(p.lockTargetUntil||0),user?Number(user.until||0):0);
+  const remainTime=horizon-m.time,remain=dist(p,{x:p.tx,y:p.ty});
+  // R19 report: open-field carries used a chain of short waypoints. Reaching each waypoint
+  // triggered the generic arrival branch (velocity = 0) before ownerThink supplied the next
+  // point, producing a visible stop-start-stop rhythm. Extend only the SAME already-authorized
+  // carry vector shortly before arrival; defenders/collisions still determine actual speed.
+  if(remainTime<=.16||remain>1.45)return false;
+  const l=worldToLocal(p.team,p.x,p.y),tl=worldToLocal(p.team,p.tx,p.ty),vl={x:dir(p.team)*(p.vx||0),y:p.vy||0};
+  let dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy);
+  if(n<.18){dx=Math.max(.45,vl.x);dy=vl.y*.28;n=Math.hypot(dx,dy);}
+  if(n<.12){dx=1;dy=0;n=1;}
+  // Never turn a forward carry backwards merely to preserve momentum.
+  if(dx/n<.12){dx=Math.max(.35,Math.abs(dx));n=Math.hypot(dx,dy);}
+  const pressure=ballCarrierPressureDistance(m,p),ext=clamp(1.65+remainTime*2.05+(pressure>2.8?.55:0),1.65,4.1),nx=clamp(l.x+dx/n*ext,4,96.2),ny=clamp(l.y+dy/n*ext,4,64),w=localToWorld(p.team,nx,ny);
+  p.tx=w.x;p.ty=w.y;p.sprint=p.sprint&&pressure>2.0;m.stats.carryWaypointContinuityExtensions=(m.stats.carryWaypointContinuityExtensions||0)+1;return true;
+}
 function movePlayers(m,dt){
   const owner=playerById(m,m.ball.ownerId);
   const ownerLocal=owner?worldToLocal(owner.team,owner.x,owner.y):null;
@@ -406,6 +434,7 @@ function movePlayers(m,dt){
       const progressDelta=dir(p.team)*((p.tx??p.x)-p.x);
       if(progressDelta<-.28){p.tx=clamp(p.x+dir(p.team)*.95,1,104);p.ty=clamp(p.y+(p.ty-p.y)*.20,1,67);}
     }
+    extendActiveCarryWaypoint(m,p);
     const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy),scanFacing=onBallScanFacingTarget(m,p);
     // R16 feedback: hybrid scene entry may carry a legitimate previous-frame velocity that
     // points opposite the newly-authoritative tactical target. Bleed only that opposing
@@ -2269,8 +2298,14 @@ function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='
   applyResolvedOwnerAction(m,owner,action);
   let intentUntil=null;
   if(c.id==='CARRY'){
-    intentUntil=Math.max(Number(owner.lockTargetUntil||0),m.time+3.20);owner.nextThink=intentUntil;
-    m.userChoiceControl={playerId:owner.id,choice:c.id,mode:'CARRY',startedAt:m.time,until:intentUntil,controllerOwned:true,futureOutcomePrecomputed:false};
+    // R19: CARRY means advance into space, not spend a fixed 3.2s wrestling through a closed
+    // lane. When the frozen current-state candidate itself says the runway is tight, shorten
+    // only the execution window and reopen the next user decision sooner. No result odds change.
+    const carrySpace=Number(c.meta?.space),carryPressure=Number(c.meta?.pressure),clearRunway=!!c.meta?.clearRunway;
+    const congested=!clearRunway&&((Number.isFinite(carrySpace)&&carrySpace<1.6)||(Number.isFinite(carryPressure)&&carryPressure<1.55));
+    const carryWindow=clearRunway?3.20:(congested?1.65:2.35);
+    intentUntil=Math.max(Number(owner.lockTargetUntil||0),m.time+carryWindow);owner.nextThink=intentUntil;
+    m.userChoiceControl={playerId:owner.id,choice:c.id,mode:'CARRY',startedAt:m.time,until:intentUntil,controllerOwned:true,futureOutcomePrecomputed:false,congestedAtChoice:congested};
   }else if(c.id==='HOLD'){
     intentUntil=m.time+2.35;owner.nextThink=intentUntil;owner.lockTargetUntil=Math.max(owner.lockTargetUntil||0,intentUntil);
     m.userChoiceControl={playerId:owner.id,choice:c.id,mode:'HOLD',startedAt:m.time,until:intentUntil,controllerOwned:true,futureOutcomePrecomputed:false};

@@ -141,7 +141,14 @@ function createController(cfg){
     }
   }
   function update(nextSnapshot){snapshot=nextSnapshot||snapshot;if(rootEl.hidden||!pending||!snapshot)return;renderRunArrows();renderTargets();if(selectedId){const exists=getGroups().some(g=>g.anchorId===selectedId);if(exists){[...targets.querySelectorAll('.in-pitch-target')].find(e=>e.dataset.playerId===selectedId)?.classList.add('selected');positionMenu(selectedId)}else hideMenu(true)}}
-  function show(nextPending,nextSnapshot){pending=nextPending;snapshot=nextSnapshot;selectedId=null;locked=false;rootEl.hidden=false;menu.hidden=true;menu.innerHTML='';leader.hidden=true;resetPointerCommit();renderRunArrows();renderTargets()}
+  function show(nextPending,nextSnapshot){pending=nextPending;snapshot=nextSnapshot;selectedId=null;locked=false;rootEl.hidden=false;menu.hidden=true;menu.innerHTML='';leader.hidden=true;resetPointerCommit();renderRunArrows();renderTargets();
+    // R19 severe UX guard: if the live decision contains SHOT, the on-ball hero must not
+    // require a second discovery step before the user can even see that shooting is available.
+    // Open the hero's self-action menu, but never commit or preselect an action. Other target
+    // rings remain available and exact choiceId/targetId authority is unchanged.
+    const hg=getGroups().find(g=>g.anchorId===heroId());
+    if(hg?.options?.some(o=>o.id==='SHOT'))requestAnimationFrame(()=>{if(pending&&!locked)selectTarget(heroId())});
+  }
   function hide(){pending=null;snapshot=null;selectedId=null;locked=false;rootEl.hidden=true;runArrows.innerHTML='';targets.innerHTML='';hideMenu(true)}
   function setLocked(v){locked=!!v;rootEl.classList.toggle('locked',locked);if(locked)resetPointerCommit()}
   function state(){return{version:API_VERSION,visible:!rootEl.hidden,selectedId,locked,menuGeneration,groups:getGroups().map(g=>({anchorId:g.anchorId,options:g.options.map(o=>({id:o.id,targetId:o.targetId,label:o.label,recommended:!!o.recommended}))}))}}

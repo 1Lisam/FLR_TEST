@@ -165,15 +165,20 @@ function defensiveAssignments(state,players,team){
     const ol=local(team,owner.x,owner.y),wide=Math.abs(ol.y-34)>14.5||owner.role==='WF'||owner.role==='FB',side=ol.y<34?-1:1;
     if(wide){
       const front=teamPs.filter(p=>['WF','CM','ST'].includes(p.role)).map(p=>{
-        const base=shapeBase(state,p.id),anchorDist=dist(p,base),d=dist(p,owner),pside=['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0;
-        if(anchorDist>pressLeash(p.role)+4||d>17.5)return null;
+        const base=shapeBase(state,p.id),anchorDist=dist(p,base),d=dist(p,owner),pside=['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0,maxFrontD=p.role==='WF'?22.0:17.5;
+        if(anchorDist>pressLeash(p.role)+4||d>maxFrontD)return null;
         if(p.role==='WF'&&pside!==side)return null;
         if(p.role==='CM'&&pside&&pside!==side)return null;
         if(p.role==='ST'&&(d>9.5||ol.x<40))return null;
-        let score=d;if(p.role==='WF')score-=4.8;else if(p.role==='CM')score-=p.slot==='CM'?1.8:3.3;else score+=.8;
+        // R19: this assignment happens in Hybrid BEFORE the choice boundary. A same-side
+        // winger may be 18-20m away yet still must start recovering/pressing before the FB
+        // abandons his line. Match the high-resolution wide-pressure hierarchy here so the
+        // choice scene inherits an already-live responsibility instead of waking it up.
+        let score=d;if(p.role==='WF'){score-=4.8;if(d>17.5)score+=3.4;}else if(p.role==='CM')score-=p.slot==='CM'?1.8:3.3;else score+=.8;
         return{p,d,score};
       }).filter(Boolean).sort((a,b)=>a.score-b.score||a.d-b.d);
-      if(front[0]&&front[0].d<=16.5&&ol.x>=27.5)out.press=front[0].p.id;
+      const frontLimit=front[0]?.p.role==='WF'?21.5:16.5;
+      if(front[0]&&front[0].d<=frontLimit&&ol.x>=27.5)out.press=front[0].p.id;
       if(!out.press){
         const fb=teamPs.filter(p=>p.role==='FB'&&(['LB','LCM','LW'].includes(p.slot)?-1:['RB','RCM','RW'].includes(p.slot)?1:0)===side).map(p=>({p,d:dist(p,owner)})).sort((a,b)=>a.d-b.d)[0];
         if(fb&&fb.d<=15.5)out.press=fb.p.id;
