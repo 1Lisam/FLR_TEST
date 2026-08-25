@@ -1,22 +1,23 @@
 (function(root,factory){
-  const api=factory();
+  const fd=(root&&root.FLRPG_FORMATION_DEFINITION)||((typeof require==='function')?require('./formation_definition.js'):null);
+  const api=factory(fd);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.FLRPG_HYBRID_SPATIAL_INTENT_V2=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(FORMATION){
 'use strict';
 // Experimental reference-bench prototype only.
 // It is deliberately isolated from production V0.5.2 files.
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const SLOT_ROLE={GK:'GK',LB:'FB',LCB:'CB',RCB:'CB',RB:'FB',LCM:'CM',CM:'CM',RCM:'CM',LW:'WF',ST:'ST',RW:'WF'};
-const SLOTS=['GK','LB','LCB','RCB','RB','LCM','CM','RCM','LW','ST','RW'];
 const LOCAL={GK:[6,34],LB:[25,9],LCB:[22,25],RCB:[22,43],RB:[25,59],LCM:[45,20],CM:[45,34],RCM:[45,48],LW:[65,8],ST:[70,34],RW:[65,60]};
+const SLOTS=['GK','LB','LCB','RCB','RB','LCM','CM','RCM','LW','ST','RW'];
 const MAX_SPEED={GK:5.8,FB:7.2,CB:6.9,CM:7.1,WF:7.7,ST:7.6};
 const MAX_ACCEL={GK:4.2,FB:5.0,CB:4.8,CM:5.0,WF:5.3,ST:5.2};
 
 function ids(){return ['H','A'].flatMap(p=>SLOTS.map(s=>`${p}-${s}`));}
 function slotOf(id){return String(id||'').split('-').slice(1).join('-');}
-function roleOf(id){return SLOT_ROLE[slotOf(id)]||'CM';}
+function roleOf(id){return FORMATION?FORMATION.roleFamily(slotOf(id)):(SLOT_ROLE[slotOf(id)]||'CM');}
 function teamOf(id){return String(id||'').startsWith('A-')?'AWAY':'HOME';}
 function other(team){return team==='HOME'?'AWAY':'HOME';}
 function attackDir(team){return team==='HOME'?1:-1;}
@@ -40,21 +41,14 @@ function abstractBallWorld(state){
 // Exact design family used by current Hybrid, retained only as the SHAPE reference.
 function shapeBase(state,id){
   const team=teamOf(id),slot=slotOf(id),role=roleOf(id),poss=state.possession===team,pr=Number(state.ball.progress||.5)*100;
-  const st=state.structure?.[team]||{lineHeight:50,width:50};
-  let [x,y]=LOCAL[slot]||[45,34];
-  x+=(poss?1:-1)*clamp((pr-50)*.18,-8,10);
-  x+=(Number(st.lineHeight||50)-50)*.08;
+  const st=state.structure?.[team]||{lineHeight:50,width:50},bw=abstractBallWorld(state),bly=team==='HOME'?bw.y:68-bw.y;
+  if(FORMATION){const q=FORMATION.shapeReferenceLocal({slot,role,inPossession:poss,progress:pr,phase:state.phase,width:st.width,lineHeight:st.lineHeight,ballLocalY:bly});return world(team,q.x,q.y);}
+  let [x,y]=LOCAL[slot]||[45,34];x+=(poss?1:-1)*clamp((pr-50)*.18,-8,10);x+=(Number(st.lineHeight||50)-50)*.08;
   if(poss&&role==='CM'&&['FINAL_THIRD','CHANCE'].includes(state.phase))x=Math.max(x,slot==='CM'?58:67);
   if(poss&&role==='WF'&&['FINAL_THIRD','CHANCE'].includes(state.phase))x=Math.max(x,74);
   if(poss&&role==='ST'&&['FINAL_THIRD','CHANCE'].includes(state.phase))x=Math.max(x,80);
-  const width=clamp(Number(st.width||50)/50,.75,1.25);y=34+(y-34)*width;
-  const bw=abstractBallWorld(state),bly=team==='HOME'?bw.y:68-bw.y,nearLeft=bly<27,nearRight=bly>41;
-  const nearSide=(nearLeft&&['LB','LCM','LW'].includes(slot))||(nearRight&&['RB','RCM','RW'].includes(slot));
-  if(role==='CM')x+=poss?(slot==='CM'?-1.1:(nearSide?2.2:.7)):(slot==='CM'?.4:(nearSide?-1.0:.8));
-  else if(role==='FB')x+=poss?(nearSide?2.0:-.5):(nearSide?.6:-.3);
-  else if(role==='WF')x+=poss?(nearSide?1.4:2.4):(nearSide?-1.0:.4);
-  if(role!=='GK')y+=(bly-y)*(poss?.06:.12);
-  return world(team,clamp(x,4,101),clamp(y,4,64));
+  const width=clamp(Number(st.width||50)/50,.75,1.25);y=34+(y-34)*width;const nearLeft=bly<27,nearRight=bly>41,nearSide=(nearLeft&&['LB','LCM','LW'].includes(slot))||(nearRight&&['RB','RCM','RW'].includes(slot));
+  if(role==='CM')x+=poss?(slot==='CM'?-1.1:(nearSide?2.2:.7)):(slot==='CM'?.4:(nearSide?-1.0:.8));else if(role==='FB')x+=poss?(nearSide?2.0:-.5):(nearSide?.6:-.3);else if(role==='WF')x+=poss?(nearSide?1.4:2.4):(nearSide?-1.0:.4);if(role!=='GK')y+=(bly-y)*(poss?.06:.12);return world(team,clamp(x,4,101),clamp(y,4,64));
 }
 
 function makePlayers(state){
@@ -217,6 +211,36 @@ function markRelationTarget(state,p,threat){
   return capAround(base,raw,14);
 }
 
+
+// R21: possession back-line movement is path-dependent. Formation coordinates are a reference
+// for role/lane only; they are NOT a phase preset and are never copied into a scene boundary.
+// The target below is recalculated from the live carrier, live counter outlets, current player
+// position/velocity and current team structure. Two seeds that reached the same abstract phase
+// can therefore retain different spatial histories instead of converging to a canned line.
+function possessionBacklineIntent(state,players,p,owner){
+  const team=p.team,cur=local(team,p.x,p.y),base=local(team,shapeBase(state,p.id).x,shapeBase(state,p.id).y),ol=owner?local(team,owner.x,owner.y):{x:clamp(Number(state.ball.progress||.5)*105,3,102),y:34};
+  const localVx=team==='HOME'?Number(p.vx||0):-Number(p.vx||0),st=state.structure?.[team]||{},debt=clamp(Number(st.transitionDebt||0),0,1),lineBias=(Number(st.lineHeight||50)-50)*.045;
+  const outlets=Object.values(players).filter(q=>q.team!==team&&q.role!=='GK').map(q=>({q,l:local(team,q.x,q.y)})).filter(x=>x.l.x<ol.x+10);
+  const laneThreat=outlets.slice().sort((a,b)=>(Math.abs(a.l.y-base.y)*.32+a.l.x*.055)-(Math.abs(b.l.y-base.y)*.32+b.l.x*.055))[0]||null;
+  const frontOutlets=outlets.filter(x=>['ST','WF'].includes(x.q.role)).sort((a,b)=>a.l.x-b.l.x);
+  const outletX=frontOutlets.length?frontOutlets[Math.floor((frontOutlets.length-1)*.5)].l.x:(laneThreat?.l.x??cur.x);
+  if(p.role==='CB'){
+    const carrierGap=clamp(19.5+debt*7.5+Math.abs(ol.y-34)*.035,18,29),connectedX=ol.x-carrierGap;
+    const liveThreatX=laneThreat?.l.x??outletX,contextX=connectedX*.60+liveThreatX*.24+outletX*.16+lineBias;
+    const projectedX=cur.x+localVx*.70,targetX=clamp(projectedX+clamp(contextX-projectedX,-8.5,9.0),8,Math.max(12,ol.x-7));
+    const threatY=laneThreat?.l.y??base.y,contextY=base.y*.58+threatY*.27+cur.y*.15,targetY=clamp(cur.y+clamp(contextY-cur.y,-4.6,4.6),7,61);
+    return{kind:'COVER',target:world(team,targetX,targetY),targetId:laneThreat?.q.id||null,score:.82};
+  }
+  if(p.role==='FB'){
+    const s=FORMATION?FORMATION.side(p.slot):(p.slot==='LB'?'LEFT':'RIGHT'),near=(ol.y<28&&s==='LEFT')||(ol.y>40&&s==='RIGHT'),carrierGap=near?clamp(8.5+debt*5,8,14):clamp(15+debt*6,13,23),connectedX=ol.x-carrierGap;
+    const liveThreatX=laneThreat?.l.x??outletX,contextX=connectedX*(near?.68:.48)+liveThreatX*(near?.18:.30)+outletX*(near?.14:.22)+lineBias;
+    const projectedX=cur.x+localVx*.75,targetX=clamp(projectedX+clamp(contextX-projectedX,-8.0,10.5),7,Math.max(11,ol.x-4));
+    const laneY=base.y,relationY=near?clamp(ol.y+(s==='LEFT'?-7:7),5,63):laneY,contextY=laneY*.60+relationY*.25+cur.y*.15,targetY=clamp(cur.y+clamp(contextY-cur.y,-5.2,5.2),5,63);
+    return{kind:'SUPPORT',target:world(team,targetX,targetY),targetId:owner?.id||null,score:near?.79:.73};
+  }
+  return null;
+}
+
 function candidateIntent(state,players,p,assignments,now){
   const inPoss=p.team===state.possession,base=shapeBase(state,p.id),owner=players[state.ball.ownerId],dir=attackDir(p.team),phase=state.phase;
   if(p.role==='GK')return{kind:'SHAPE',target:base,targetId:null,score:.65};
@@ -262,6 +286,8 @@ function candidateIntent(state,players,p,assignments,now){
     const ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state),target=capAround({x:p.x,y:p.y},ref,12);
     return{kind:'SUPPORT',target,targetId:null,score:.95};
   }
+  const backlineIntent=(p.role==='CB'||p.role==='FB')?possessionBacklineIntent(state,players,p,owner):null;
+  if(backlineIntent)return backlineIntent;
   const abstractProg=Number(state.ball.progress||.5),ownerLocal=owner?local(p.team,owner.x,owner.y):null,liveProg=ownerLocal?localProgressOf(p.team,owner.x):abstractProg,prog=Math.min(abstractProg,liveProg+.065);
   if((p.role==='ST'||p.role==='WF')&&prog>=.56&&['PROGRESSION','FINAL_THIRD','CHANCE'].includes(phase)){
     const cur=local(p.team,p.x,p.y),step=p.role==='ST'?7.2:6.4,ballX=ownerLocal?.x??prog*105,defLine=attackLineLocal(players,p.team),maxGap=p.role==='ST'?22:20;
@@ -360,7 +386,9 @@ function separation(players,p,radius=2.0){
 }
 
 function steerOne(state,players,p,dt){
-  const role=p.role,ms=MAX_SPEED[role]||7,ma=MAX_ACCEL[role]||5;
+  const role=p.role,baseMs=MAX_SPEED[role]||7,baseMa=MAX_ACCEL[role]||5;
+  const controlledMarker=p.intentKind==='MARK'&&(role==='FB'||role==='CB');
+  const ms=controlledMarker?(role==='FB'?4.8:4.5):baseMs,ma=controlledMarker?4.2:baseMa;
   let tx=p.intentTargetX,ty=p.intentTargetY;
   const target=players[p.intentTargetId];
   if(target&&['MARK','PRESS'].includes(p.intentKind)){
@@ -376,11 +404,13 @@ function steerOne(state,players,p,dt){
   }
   const dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy);
   const slow=p.intentKind==='SHAPE'?6.0:p.intentKind==='COVER'?4.5:p.intentKind==='MARK'?5.0:p.intentKind==='PRESS'?6.0:3.2;
-  const desiredSpeed=d<.18?0:ms*clamp(d/slow,.18,1);
-  const dvx=(d>.01?dx/d*desiredSpeed:0)-p.vx,dvy=(d>.01?dy/d*desiredSpeed:0)-p.vy;
+  let desiredSpeed=d<.18?0:ms*clamp(d/slow,.18,1);
+  if(controlledMarker&&target){const targetSpeed=Math.hypot(Number(target.vx||0),Number(target.vy||0));desiredSpeed=Math.min(desiredSpeed,clamp(targetSpeed+(d>4.5?1.15:.45),.75,ms));}
+  const desiredVx=d>.01?dx/d*desiredSpeed:0,desiredVy=d>.01?dy/d*desiredSpeed:0,dvx=desiredVx-p.vx,dvy=desiredVy-p.vy;
   const sep=separation(players,p,p.intentKind==='PRESS'?1.75:1.85);
   let ax=dvx/Math.max(.35,dt*2.2)+sep.x*2.0,ay=dvy/Math.max(.35,dt*2.2)+sep.y*2.0;
-  const amag=Math.hypot(ax,ay);if(amag>ma){ax=ax/amag*ma;ay=ay/amag*ma;}
+  const braking=controlledMarker&&(Math.hypot(p.vx,p.vy)>desiredSpeed+.35||p.vx*desiredVx+p.vy*desiredVy<0),accelLimit=braking?ma*1.55:ma;
+  const amag=Math.hypot(ax,ay);if(amag>accelLimit){ax=ax/amag*accelLimit;ay=ay/amag*accelLimit;}
   p.vx=clamp(p.vx+ax*dt,-ms,ms);p.vy=clamp(p.vy+ay*dt,-ms,ms);
   const sp=Math.hypot(p.vx,p.vy);if(sp>ms){p.vx=p.vx/sp*ms;p.vy=p.vy/sp*ms;}
   p.x=clamp(p.x+p.vx*dt,3,102);p.y=clamp(p.y+p.vy*dt,3,65);
