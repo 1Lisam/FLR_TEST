@@ -4,6 +4,86 @@
   "count": 50,
   "reports": [
     {
+      "report_id": "umt053h3-919f6196-6bb4-4d3a-aebe-52136e0abaa2",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:50:43.351Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787640645511-12 \n\n오프사이드 항목이 자연스러워 진 것 같음 이 부분은 PASS로 보고 장면 검증 목록에서 삭제해도 될 것 같음\n\n다만 아까전에 다른 리포트에 쓴 것 처럼 오프사이드 경고에 대한 결정을 해야 할 것 같음",
+      "size_bytes": 1198543,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-5b0a883d-49f7-44fd-b207-317dc0ccf7c8",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:49:12.444Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: ST 침투 레인 연속성 · seed=DEV-RECENT-1787640562943-9\n\n4번 ST 침투 레인 연속성은 아까전에 PASS 한거 같은데 테스트가 남아 있네 수정 바람",
+      "size_bytes": 2592063,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-3bd40610-4e07-45b7-854e-49c77a682ca9",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:48:30.936Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 같은 마크 대상 유지 · seed=DEV-RECENT-1787640445712-8\n\n여전히 불합격.\n\n수비수가 맡은 공격수에게 줄에 매달려 끌려 가는 것 같이 반응이 늦음.\n공격수가 앞으로 전진 하고 나서야 수비수가 그 뒤를 따라가는 상황이 일어나는데 그러면 수비하는 이유가 없음\n\n수비수가 공격수의 앞에서 뒷걸음질 치며 수비하다가 공격수가 빠르게 달려 나가면 본인도 몸을 바꿔서 달려 나가면서 공격수를 마킹해야 하는 상황인데\n수비수가 공격수와 거리를 멀찍이 유지하면서 공격수가 뭘 하던 '돌파당한것'도 아니고 그냥 공격수의 뒤를 뱀꼬리 처럼 따라다니는 모습이 되어버림",
+      "size_bytes": 3101146,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-5b041fed-e9ee-4659-bc70-937b9fc7cf7f",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:46:34.411Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787640358272-7\n\n1. 다만 V0.5.4에서 2번 패스 비행중 풀백 측면 추적은 정상적으로 전진패스를 하더라도 풀백들이 RW와 LW를 마킹하러 달려가고 ST도 마킹 되니 이 부분은 테스트 PASS로 취급해도 됨\n\n2. 다만 이 상황에서는 득점 상황인데 내가 관여하지 않은 득점 상황에서 메인에 뜨는 메시지가 1:0이던 2:0이던 스코어를 알려줬으면 좋겠음",
+      "size_bytes": 2510200,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-34a9b34e-7930-4345-89a2-b68325607a67",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:45:02.761Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "이번 검증: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787640255608-5\n\n이전에도 등록한거지만 상황이 시작할때 RB와 LB가 자기 포지션을 고수한다고 LW와 RW를 마킹 하지 않고 있다가 상황이 시작 되면 급하게 달라 붙음.\n\n늘 강조하는 선택을 시작하고 나서야 포메이션이 움직이는걸 지양해야한다는 원칙에 정면으로 반대 됨.",
+      "size_bytes": 2002407,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-329bb384-f651-4499-8b37-7d512afb2fd7",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:43:10.558Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 패스 비행 중 풀백 측면 추적 · seed=DEV-RECENT-1787640128168-3 · JSON/버그리포트 사용 가능\n\n오프사이드 경고가 뜨는데 혹시 오프사이드는 테스트 할때만 뜨게 할건지 아니면 정식 플레이 할때도 뜨게 할건지 궁금함. \n\n만약 정식 플레이에도 뜨게 할거면 오프사이드 판단을 플레이어가 하는데 있어서 정답을 제시하는거니 우리가 원하는 방향이 아니라고 생각함",
+      "size_bytes": 2019280,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-cf389864-f14b-421d-b7d0-ace138df75e0",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:41:13.625Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787640081824-2\n\n많은 부분에서 CM이 DM처럼 행동하는데 아무리 DM이라도 CM들이 올라오면 뒤 따라서 어느 정도 허리 부분은 지원 해줘야 하는건 아닌가? 라는 생각이 듬",
+      "size_bytes": 2562210,
+      "chunk_count": 1
+    },
+    {
+      "report_id": "umt053h3-fac8e1fe-f46f-4d5c-9a00-244b2c139bc1",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
+      "created_at": "2026-08-25T06:40:31.270Z",
+      "category": "수비/전술",
+      "priority": 3,
+      "description": "검증 완료: 수비 역할·타깃 안정성 · seed=DEV-RECENT-1787639880217-1\n\n시작 장면에서 블루팀 LB가 엄청나게 공격을 위해 나와 있는데 상대 RW는 수비 할 의지가 전혀 없고 거기에 달라 붙은게 상대 RCB도 아니고 RB라서 우리 LW가 엄청나게 노마크 찬스로 존재함.\n\n1. LB가 이렇게 올라 와 있는건 있을 수 있는데 그걸 위험 부담이 없는 RW가 압박을 하지 않는 부분은 이상함.\n\n2. LB가 이렇게 올라 와 있을 경우 미드필더나 공격수 쪽에서 압박이 들어가야지 레드팀 RB가 자기 포메이션을 버리면서 달려가는 것은 아니라고 봄\n\n3. LW가 노마크 찬스인데 공이 달라 붙자 마자 RCB가 먼저 막고 RB는 뒤늦게 합류 하는 바람에 두 선수가 모두 동시 압박을 하게 되고 반대편 블루팀의 RCM과 RW는 매우 공간이 널널해짐\n\n4. 근데 이 와중에 CM은 수비 진영에서 아무것도 안하고 있는게 좀 많이 어색함",
+      "size_bytes": 1274842,
+      "chunk_count": 1
+    },
+    {
       "report_id": "umt053h3-317658f8-29f0-4b1c-b366-40a605311b82",
       "build": "USER-MATCH-TEST-V0.5.4-R15",
       "created_at": "2026-08-25T05:05:05.200Z",
@@ -422,108 +502,28 @@
       "description": "검증 완료: 3CM 지원 역할 분산 · seed=DEV-RECENT-1787550909999-20\n역시 공 소유자를 같은 방향으로 쫒아간다는 느낌은 사라졌으나\n공이 RW에게 전달 될때 ,ST 에게 전달 될때 수비수들이 일직선으로 달리는게 아니라 좌우좌우좌우좌우 하면서 지그재그로 떨면서 달려나가는 모습임",
       "size_bytes": 2582648,
       "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h2-333ca294-e134-4bce-966f-c1a342f6336e",
-      "build": "USER-MATCH-TEST-V0.5.3-HF2",
-      "created_at": "2026-08-24T05:53:49.251Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "검증 완료: 공 위치-공격수 거리 동기화 · seed=DEV-RECENT-1787550810767-13\n\n여러개를 시험해 봤으나 우리가 검증하려는 목적인 LB가 중원에 있는데 ST와 RW가 골키퍼 앞에 나가는건 고쳐졌으나 여전히 공격수 앞에서 CB 등 수비수들이 시선 고정이 안된 채 좌우로 덜덜 떨고 있는 현상과 공격수가 프리징 되는 현상이 발생함",
-      "size_bytes": 2578048,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt053h2-0098b8c8-46ba-470e-be72-51f831b74798",
-      "build": "USER-MATCH-TEST-V0.5.3-HF2",
-      "created_at": "2026-08-24T05:52:24.380Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "검증 완료: 공 위치-공격수 거리 동기화 · seed=DEV-RECENT-1787550734911-1\n\n공격수가 공을 잡은채로 멈춰있고 수비수는 거기에 접근해서 아무것도 안하고 비비기만 하는 상황\n\n원래 검증과는 별개로 이런 문제가 발생함",
-      "size_bytes": 1280050,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt052-65749ef0-a4fb-420a-af16-f3cff1ebf37e",
-      "build": "USER-MATCH-TEST-V0.5.2",
-      "created_at": "2026-08-23T23:19:26.235Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "해당 상황도 오프사이드 인데 오프사이드 이후 바로 우리 선수가 뒤로 이동하고 상황이 끊기니 현실성이 없음\n\n오프사이드 상황 이후 잠깐이나마 왜 오프사이드인지 선으로 보여줬으면 함 선은 구현되어 있으니까",
-      "size_bytes": 562768,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt052-d90cd322-0396-4521-9382-0581b3e5f5f3",
-      "build": "USER-MATCH-TEST-V0.5.2",
-      "created_at": "2026-08-23T23:17:16.792Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "이부분 다시보기 눌렀는데 재생이 안됨\n\n또한 오프사이드는 공격전개가 안되었을 경우에는 경기 진행 그대로 가는 경우도 잦음",
-      "size_bytes": 566409,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt052-31984cc7-cba8-4a12-9ec5-ec0d85aad37d",
-      "build": "USER-MATCH-TEST-V0.5.2",
-      "created_at": "2026-08-23T23:15:36.364Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "우려했던것 처럼 CM이 공을 졸졸 쫒아다니는 느낌임\n다른 선수들도 비슷",
-      "size_bytes": 3332031,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt052-95ad81d7-096b-45ec-b464-d9ac2bdbffb3",
-      "build": "USER-MATCH-TEST-V0.5.2",
-      "created_at": "2026-08-23T23:14:35.804Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "여전히 공격이 너무 깊숙한 곳에서 시작하고 있고 선택후 상황이 끝날때 즈음에는 CM들이 수비보다 아래로 내려감",
-      "size_bytes": 2832498,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt052-33b9e4a8-7f53-4fce-93f2-fccc560faa99",
-      "build": "USER-MATCH-TEST-V0.5.2",
-      "created_at": "2026-08-23T23:12:54.346Z",
-      "category": "2D 움직임",
-      "priority": 3,
-      "description": "이전처럼 포메이션이 만들어진채 뿌려지는 건 아니지만 공이 LB에서 시작되는 타이밍에 플레이어와 공격진은 GK옆에서 스타트 하는건 이상하다",
-      "size_bytes": 1098513,
-      "chunk_count": 1
-    },
-    {
-      "report_id": "umt051-a13ae7a5-73a6-4d99-88fe-9c41d53d7534",
-      "build": "USER-MATCH-TEST-V0.5.1",
-      "created_at": "2026-08-23T14:08:52.700Z",
-      "category": "기타",
-      "priority": 2,
-      "description": "1. 모든 포지션에 선택함에 있어 어떤 것이 확률적으로 좋은 선택일지 각 선택에 % 가 표기되면 좋을 것 같음\n\n2. 상황종료 후 3초후에 재개되는것이 흐름을 끊는 느낌\n버튼을 눌러 바로 진행가능하게 하는게 있긴하나 아래쪽에 배치되어 버튼이 없다가 생기는 상태라서 잘보이게 버튼 고정을 해두던지 아에 스페이스바 같은거 눌러서 바로 넘어갈 수 있게 하면좋을 둣\n\n3. 키퍼 다이빙 캐치, 펀칭 같은 선택지가 추가 되면 좋을둣\n\n4. 반칙이 구현 된다면 카드, 프리킥도 구현\n\n5. 경기 종료후 화면 가운데 종료, 승패(스코어) 글씨가 뜨면 좋을 듯\n(경기가 종료되었다는 느낌이 들지 않음)",
-      "size_bytes": 2028560,
-      "chunk_count": 1
     }
   ],
-  "latestAttachedReportId": "umt053h3-317658f8-29f0-4b1c-b366-40a605311b82",
+  "latestAttachedReportId": "umt053h3-919f6196-6bb4-4d3a-aebe-52136e0abaa2",
   "latestBundle": {
     "schemaVersion": "FLR_BUG_REPORT_BUNDLE_0.3",
     "scope": {
       "currentSituation": true,
-      "previousSituation": false,
+      "previousSituation": true,
       "previousRule": "IMMEDIATE_PREVIOUS_SITUATION_START_TO_END",
       "olderSituationsIncluded": false
     },
     "bugReportContext": {
-      "reportId": "umt053h3-317658f8-29f0-4b1c-b366-40a605311b82",
-      "build": "USER-MATCH-TEST-V0.5.4-R15",
+      "reportId": "umt053h3-919f6196-6bb4-4d3a-aebe-52136e0abaa2",
+      "build": "USER-MATCH-TEST-V0.5.4-R16",
       "step": 78,
-      "description": "선택 시점에서 중심점이 어디인진 모르겠으나 LW와 RW는 명백히 RB와 LB 의 뒤에 있는 상황  LW에게 패스 한 시점에서 오프사이드 선언이 되지 않았는데 이게 정상인지 확인 바람",
-      "category": "2D 움직임",
+      "description": "검증 완료: 오프사이드 실제 관여 시점 · seed=DEV-RECENT-1787640645511-12 \n\n오프사이드 항목이 자연스러워 진 것 같음 이 부분은 PASS로 보고 장면 검증 목록에서 삭제해도 될 것 같음\n\n다만 아까전에 다른 리포트에 쓴 것 처럼 오프사이드 경고에 대한 결정을 해야 할 것 같음",
+      "category": "수비/전술",
       "priority": 3,
-      "reportedAt": "2026-08-25T05:05:51.917Z"
+      "reportedAt": "2026-08-25T06:51:30.408Z"
     },
     "currentSituationPresent": true,
-    "previousSituationPresent": false,
+    "previousSituationPresent": true,
     "currentSituationKeys": [
       "schemaVersion",
       "canonicalContract",
@@ -533,15 +533,28 @@
       "futureOutcomePrecomputed",
       "reportScope"
     ],
-    "previousSituationKeys": [],
+    "previousSituationKeys": [
+      "schemaVersion",
+      "canonicalContract",
+      "hybridBefore",
+      "highResolution",
+      "hybridAfter",
+      "futureOutcomePrecomputed",
+      "reportScope"
+    ],
     "currentReportScope": {
-      "startSecond": 375.4000000000008,
-      "endSecond": 387.20000000000346,
+      "startSecond": 1214,
+      "endSecond": 1217.3,
       "cumulativeMatchHistoryIncluded": false,
       "keepsFullSituationFrames": true
     },
-    "previousReportScope": null,
-    "currentSerializedBytes": 1904805,
-    "previousSerializedBytes": 0
+    "previousReportScope": {
+      "startSecond": 780,
+      "endSecond": 783.0000000000007,
+      "cumulativeMatchHistoryIncluded": false,
+      "keepsFullSituationFrames": true
+    },
+    "currentSerializedBytes": 691100,
+    "previousSerializedBytes": 637872
   }
 }
