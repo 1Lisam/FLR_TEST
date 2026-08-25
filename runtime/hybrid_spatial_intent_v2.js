@@ -209,6 +209,14 @@ function defensiveAssignments(state,players,team){
   return out;
 }
 
+function markRelationTarget(state,p,threat){
+  const base=shapeBase(state,p.id),pp=predicted(threat,p.role==='FB'?.46:.35);
+  if(p.role!=='FB'){const goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.2,y:pp.y+(p.slot==='LCB'?-0.7:p.slot==='RCB'?0.7:0)};return capAround(base,raw,p.role==='CB'?12:14);}
+  const pl=local(p.team,pp.x,pp.y),bl=local(p.team,base.x,base.y),localVx=p.team==='HOME'?Number(threat.vx||0):-Number(threat.vx||0),retreating=localVx>.35;
+  const gap=retreating?3.75:2.85,laneBlend=retreating?.30:.14,maxUpfield=bl.x+(retreating?1.5:4.0),tx=retreating?Math.min(pl.x-gap,maxUpfield):pl.x-gap,ty=pl.y+(bl.y-pl.y)*laneBlend,raw=world(p.team,clamp(tx,4,101),clamp(ty,4,64));
+  return capAround(base,raw,14);
+}
+
 function candidateIntent(state,players,p,assignments,now){
   const inPoss=p.team===state.possession,base=shapeBase(state,p.id),owner=players[state.ball.ownerId],dir=attackDir(p.team),phase=state.phase;
   if(p.role==='GK')return{kind:'SHAPE',target:base,targetId:null,score:.65};
@@ -228,9 +236,9 @@ function candidateIntent(state,players,p,assignments,now){
       return{kind:'PRESS',target:capAround(base,raw,pressLeash(p.role)),targetId:owner.id,score:1.0};
     }
     const threatEntry=Object.entries(assignments.markerByThreat).find(([,marker])=>marker===p.id);
-    if(threatEntry){const threat=players[threatEntry[0]],pp=predicted(threat,.35),goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.2,y:pp.y+(p.slot==='LCB'?-0.7:p.slot==='RCB'?0.7:0)},max=p.role==='CB'?12:14;return{kind:'MARK',target:capAround(base,raw,max),targetId:threat.id,score:.94};}
+    if(threatEntry){const threat=players[threatEntry[0]];return{kind:'MARK',target:markRelationTarget(state,p,threat),targetId:threat.id,score:.94};}
     const wideCoverTarget=assignments.wideCoverByDefender?.[p.id];
-    if(wideCoverTarget){const threat=players[wideCoverTarget];if(threat){const pp=predicted(threat,.38),goalSide=p.team==='HOME'?-1:1,raw={x:pp.x+goalSide*2.35,y:pp.y};return{kind:'MARK',target:capAround(base,raw,14),targetId:threat.id,score:.93};}}
+    if(wideCoverTarget){const threat=players[wideCoverTarget];if(threat)return{kind:'MARK',target:markRelationTarget(state,p,threat),targetId:threat.id,score:.93};}
     const markerEntry=Object.entries(assignments.coverByMarker).find(([,cover])=>cover===p.id);
     if(markerEntry){const marker=players[markerEntry[0]],threat=players[marker?.intentTargetId],goalX=p.team==='HOME'?0:105;if(threat){const dx=goalX-threat.x,dy=34-threat.y,dg=Math.max(.01,Math.hypot(dx,dy)),side=p.slot==='LCB'?-1:p.slot==='RCB'?1:0,raw={x:threat.x+dx/dg*4.8,y:threat.y+dy/dg*4.8+side*1.25};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}const raw={x:marker.x+(goalX-marker.x)*.16,y:marker.y+(34-marker.y)*.32};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}
     if(['CB','FB','CM'].includes(p.role)){
@@ -241,7 +249,19 @@ function candidateIntent(state,players,p,assignments,now){
 
   // Spatial ownership is authoritative for live movement. The abstract progress can advance
   // in compressed event time, but off-ball teammates must react to where the ball actually is.
-  if(p.id===state.ball.ownerId){const bw=abstractBallWorld(state),target=capAround({x:p.x,y:p.y},bw,12);return{kind:'SUPPORT',target,targetId:null,score:.95};}
+  if(p.id===state.ball.ownerId){
+    // R20: the spatial carrier and compressed progress must use one longitudinal coordinate.
+    // `localProgressOf()` is x/105, so steering the live carrier toward a separate zone-shaped
+    // abstractBallWorld() could pull a deep-box owner 8-10m backwards even while progress said
+    // the attack had advanced. Keep the owner tethered to the actual progress coordinate and
+    // only use lane as the lateral reference. This moves a live body; it does not resolve an action.
+    const pr=clamp(Number(state.ball.progress||.5),.03,.97),deepForward=['ST','WF'].includes(p.role)&&pr>=.80;
+    // Keep the narrow R20 fix on deep forwards, where the report exposed an 8-10m backwards
+    // pull. Midfield/build-up carriers retain the established R19 spatial behaviour so this
+    // correction cannot reshape unrelated defensive ecology.
+    const ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state),target=capAround({x:p.x,y:p.y},ref,12);
+    return{kind:'SUPPORT',target,targetId:null,score:.95};
+  }
   const abstractProg=Number(state.ball.progress||.5),ownerLocal=owner?local(p.team,owner.x,owner.y):null,liveProg=ownerLocal?localProgressOf(p.team,owner.x):abstractProg,prog=Math.min(abstractProg,liveProg+.065);
   if((p.role==='ST'||p.role==='WF')&&prog>=.56&&['PROGRESSION','FINAL_THIRD','CHANCE'].includes(phase)){
     const cur=local(p.team,p.x,p.y),step=p.role==='ST'?7.2:6.4,ballX=ownerLocal?.x??prog*105,defLine=attackLineLocal(players,p.team),maxGap=p.role==='ST'?22:20;
@@ -346,8 +366,7 @@ function steerOne(state,players,p,dt){
   if(target&&['MARK','PRESS'].includes(p.intentKind)){
     const base=shapeBase(state,p.id),goalSide=p.team==='HOME'?-1:1;
     if(p.intentKind==='MARK'){
-      const pp=predicted(target,.35),raw={x:pp.x+goalSide*2.2,y:pp.y+(p.slot==='LCB'?-0.7:p.slot==='RCB'?0.7:0)};
-      const capped=capAround(base,raw,p.role==='CB'?12:14);tx=capped.x;ty=capped.y;
+      const capped=markRelationTarget(state,p,target);tx=capped.x;ty=capped.y;
     }else{
       const pp=predicted(target,.18),alreadyGoalSide=p.team==='HOME'?p.x<=pp.x:p.x>=pp.x;
       let lateral=0;
@@ -416,6 +435,19 @@ function resolveOffBallThreatSeparation(state,players){
   }
 }
 
+function syncDynamicRelationTargets(state,players){
+  for(const p of Object.values(players)){
+    const target=players[p.intentTargetId];if(!target)continue;
+    if(p.intentKind==='MARK'){
+      const q=markRelationTarget(state,p,target);p.intentTargetX=q.x;p.intentTargetY=q.y;
+    }else if(p.intentKind==='PRESS'){
+      const base=shapeBase(state,p.id),pp=predicted(target,.18),goalSide=p.team==='HOME'?-1:1,alreadyGoalSide=p.team==='HOME'?p.x<=pp.x:p.x>=pp.x;
+      let lateral=0;if(!alreadyGoalSide&&dist(p,pp)<2.4){const relY=p.y-pp.y,side=Math.abs(relY)>.25?Math.sign(relY):(['LB','LCB','LCM','LW'].includes(p.slot)?-1:1);lateral=side*1.3;}
+      const q=capAround(base,{x:pp.x+goalSide*1.3,y:pp.y+lateral},pressLeash(p.role));p.intentTargetX=q.x;p.intentTargetY=q.y;
+    }
+  }
+}
+
 function advanceV2(state,players,seconds,opts={}){
   // Hybrid time is compressed event time. `seconds` controls how much continuous spatial
   // motion we sample, while clockSeconds advances tactical responsibility/TTL across the
@@ -433,6 +465,10 @@ function advanceV2(state,players,seconds,opts={}){
   }
   resolveOffBallThreatSeparation(state,players);
   resolveBodySeparation(players,.68);
+  // R20 seam continuity: relation targets must describe the FINAL Hybrid frame, not the
+  // first substep of a compressed interval. Otherwise high-res inherits a stale mark point
+  // and the defender appears to react one beat after the attacker has already accelerated.
+  syncDynamicRelationTargets(state,players);
   if(state.ball)state.ball.progress=endProgress;
   if(opts.mutateTime!==false)state.second=start+clockSeconds;return{players,switches};
 }

@@ -1,3 +1,15 @@
+# USER-MATCH-TEST V0.5.4 R20 — 2026-08-25 — Live Scene Continuity / Running Finish / Marking Standoff
+
+- Replaces the formation-continuity forced fixture with a real Hybrid pre-roll capture: the developer check now advances live Hybrid actions first, catches a naturally formed attacking situation, and promotes the exact 22-player positions/velocities into high resolution.
+- Preserves the Hybrid ball owner's inherited velocity at the scene seam instead of rebuilding it from a fresh owner target.
+- Keeps deep ST/WF spatial progression consistent with the live carrier so a box runner is not pulled several metres backward by an abstract progress/coordinate mismatch.
+- Transfers authority to the protagonist during an obvious in-box running finish while the run is still live; SHOT remains a user choice and is never auto-executed.
+- Synchronizes final Hybrid MARK/PRESS relation targets to the last Hybrid frame so wide defenders do not start reacting a beat after attackers.
+- Changes full-back wide tracking from exact-player coordinate chasing to threat-aware goal-side standoff: off-ball retreating wingers can no longer drag the full-back backwards in bumper-car contact.
+- Smooths active CARRY/DRIBBLE locomotion through short internal waypoints so normal open carries no longer pulse-brake on every touch.
+- R20 exact-report regression: 9/9 PASS. Retained short V0.5.4 defence regression: PASS. Long nested R14 contextual wrapper exceeded the local command timeout and is not claimed as PASS/FAIL.
+- No shot/goal result probabilities, quotas or score targeting were changed.
+
 # USER-MATCH-TEST V0.5.4 R17 — 2026-08-25 — Defensive Responsibility / Offside UX
 
 - Removes every player-facing predictive `오프사이드 위험` warning from selectable players and pass choices. Risky choices remain available and Law 11 enforcement remains live; hidden risk metadata is retained only for QA.

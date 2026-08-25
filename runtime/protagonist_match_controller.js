@@ -423,9 +423,18 @@ function readyForOnBallPause(s,f,importance){
     const controlAge=Math.max(0,s.m.time-(h.controlledSince||s.m.time));
     if(!(s.forceNextChoice||episodeContinuation(s,f))||controlAge<1.05)return false;
   }
+  const newControl=Math.abs((h.controlledSince||-1)-s.lastPauseControlledSince)>.001;
+  const shotIx=(f.candidates||[]).findIndex(c=>isShotChoice(c.id)),shotCandidate=shotIx>=0?(f.candidates||[])[shotIx]:null;
+  const runningSpeed=Math.hypot(Number(h.vx||0),Number(h.vy||0)),controlAge=Math.max(0,s.m.time-(h.controlledSince||s.m.time));
+  const alignedFinish=Number(f.shot?.facingAlignment??0)>=.72||Number(f.shot?.bodyAngleDiff??99)<=Math.PI*.46;
+  // R20 report: a striker who is already carrying a controlled ball into a clean shooting lane
+  // must receive the decision WHILE the run is alive. Waiting for nextThink/lockTarget to expire
+  // let CARRY_SCAN -> PROTECT_SCAN brake the striker to 0 m/s before showing SHOT. This gate only
+  // transfers current-state authority to the user; it does not choose or resolve the shot.
+  const liveRunningFinish=!!(newControl&&shotCandidate&&shotIx<=1&&f.shot?.inBox&&Number(f.shot?.dGoal??99)<=16.5&&!f.shot?.backToGoal&&alignedFinish&&runningSpeed>=.90&&controlAge>=.18&&s.m.time-s.lastPauseAt>=.35);
+  if(liveRunningFinish){s.m.stats.userRunningFinishCheckpointWins=(s.m.stats.userRunningFinishCheckpointWins||0)+1;return true;}
   if(s.forceNextChoice||episodeContinuation(s,f))return true;
   const critical=!!(f.shot?.oneVOne||(f.shot?.inBox&&f.shot?.openWindow&&(f.shot?.blockers??9)<=1));
-  const newControl=Math.abs((h.controlledSince||-1)-s.lastPauseControlledSince)>.001;
   // A newly-controlled 1v1 / open-box chance belongs to the player before NPC ownerThink.
   // Do not allow nextThink/lockTarget to fire an automatic shot and only pause on the rebound.
   if(critical&&newControl&&s.m.time-s.lastPauseAt>=.45)return true;

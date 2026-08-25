@@ -1034,8 +1034,12 @@ function enforceFullbackWideRunnerResponsibility(m,team,owner){
     // WIDE_LINE_RECOVER orbiting without ignoring a genuinely live wide run.
     if(releaseSame&&!clearlyOnside)continue;
     if(releaseSame&&clearlyOnside){fb.wideReleaseHoldUntil=0;fb.wideReleaseTargetId=null;}
-    const tx=clamp(wl.x-2.5,6,42),ty=clamp(lerp(wl.y,34,.10),5,63),w=localToWorld(team,tx,ty);
-    fb.tx=w.x;fb.ty=w.y;fb.markTargetId=wf.a.id;fb.action=fb.tacticalTask='WIDE_RUN_TRACK';fb.sprint=dist(fb,wf.a)>4.2||dist(fb,w)>2.8;
+    const base=defendingBlockAnchors(pr,ball.x,ball.y,fb.slot,fb.role),localVx=team===HOME?Number(wf.a.vx||0):-Number(wf.a.vx||0),retreating=localVx>.35||['FAR_SIDE_RECOVER','WIDE_DELIVERY_HOLD'].includes(wf.a.tacticalTask);
+    // R20: a full-back tracks the threat, not the attacker's exact coordinates. When the winger
+    // retreats or pauses, keep a 3-4m goal-side cushion and reconnect to the zone instead of
+    // being dragged backwards into bumper-car contact. A fresh forward run still closes the gap.
+    const gap=retreating?3.85:2.85,rawX=wl.x-gap,tx=clamp(retreating?Math.min(rawX,base.x+1.5):rawX,6,42),ty=clamp(lerp(wl.y,base.y,retreating?.30:.14),5,63),w=localToWorld(team,tx,ty);
+    fb.tx=w.x;fb.ty=w.y;fb.markTargetId=wf.a.id;fb.action=fb.tacticalTask='WIDE_RUN_TRACK';fb.sprint=dist(fb,wf.a)>(retreating?5.0:4.2)||dist(fb,w)>2.8;
     fb.wideTrackTargetId=wf.a.id;fb.wideTrackHoldUntil=Math.max(Number(fb.wideTrackHoldUntil||0),m.time+.72);
   }
 }

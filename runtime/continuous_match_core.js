@@ -483,7 +483,12 @@ function movePlayers(m,dt){
       else if(p.team!==owner.team&&p.sprint&&['FB','CB','CM'].includes(p.role))vmax=vmax;
     }
     let desired=Math.min(vmax,Math.sqrt(Math.max(0,2*a*d)));
-    if(finalThirdPaceMode&&(p.hasBall||p.sprint)){const arrivalScale=clamp(d/1.35,0.12,1);desired=Math.min(desired,Math.sqrt(Math.max(0,2*a*d))*0.88,vmax*arrivalScale);}
+    const userCarry=m.userChoiceControl?.playerId===p.id&&m.userChoiceControl?.mode==='CARRY'&&m.userChoiceControl?.controllerOwned?m.userChoiceControl:null,carryHorizon=Math.max(Number(p.lockTargetUntil||0),Number(userCarry?.until||0)),carrySpeed=Math.hypot(p.vx||0,p.vy||0),carryAlign=carrySpeed>.05?((p.vx||0)*n.x+(p.vy||0)*n.y)/carrySpeed:1,activeCarryFlow=p.hasBall&&['CARRY_FORWARD','DRIBBLE_EVADE'].includes(p.action)&&carryAlign>.55&&(carryHorizon>m.time+.16||d>.90);
+    // R20 report: a live dribble may modulate stride, but every short internal waypoint must not
+    // become a visible brake pulse. Keep locomotion momentum through the same authorized carry
+    // while the direction remains similar; contact, sharp turns and the end of the carry still slow.
+    if(activeCarryFlow){const established=carrySpeed>=2.45,continuityFloor=Math.min(vmax*(established?.88:.82),Math.max(established?2.85:2.35,carrySpeed*(established?.96:.92)));desired=Math.max(desired,continuityFloor);}
+    if(finalThirdPaceMode&&(p.hasBall||p.sprint)&&!activeCarryFlow){const arrivalScale=clamp(d/1.35,0.12,1);desired=Math.min(desired,Math.sqrt(Math.max(0,2*a*d))*0.88,vmax*arrivalScale);}
     const tvx=n.x*desired,tvy=n.y*desired;
     const dvx=tvx-p.vx,dvy=tvy-p.vy,dv=Math.hypot(dvx,dvy),maxDv=a*dt*(0.58+0.42*turnMoveScale),sc=dv>maxDv?maxDv/(dv||1):1;p.vx+=dvx*sc;p.vy+=dvy*sc;
     const mx=p.vx*dt,my=p.vy*dt,travel=Math.hypot(mx,my);if(travel>=d){p.x=p.tx;p.y=p.ty;p.vx=p.vy=0;}else{const restartThrower=!!(m.restart&&m.restart.kind==='THROW_IN'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&p.tacticalTask==='THROW_IN_THROWER');p.x=clamp(p.x+mx,0.8,104.2);p.y=clamp(p.y+my,restartThrower?-1.2:0.8,restartThrower?69.2:67.2);}
@@ -491,6 +496,7 @@ function movePlayers(m,dt){
   }
   resolveSpacing(m);
   stabilizeMarkingBodies(m,dt);
+  stabilizeWideMarkingStandoff(m,dt);
   stabilizeOwnerDefenders(m,dt);
   stabilizeBallCarrierDefenderCrowding(m,dt);
   stabilizeOffBallDefenderCrowding(m,dt);
@@ -576,6 +582,17 @@ function stabilizeMarkingBodies(m,dt){
       defender.vx=defender.team===HOME?dvx:-dvx;defender.vy=defender.team===HOME?dvy:-dvy;
       m.stats.markBodyCorrections=(m.stats.markBodyCorrections||0)+1;
     }
+  }
+}
+function stabilizeWideMarkingStandoff(m,dt){
+  for(const defender of m.players){
+    if(defender.role!=='FB'||!defender.markTargetId)continue;
+    const task=defender.tacticalTask||defender.action||'';if(!['WIDE_RUN_TRACK','WIDE_GOALSIDE_CONTAIN','WIDE_GOALSIDE_RECOVER'].includes(task))continue;
+    const attacker=playerById(m,defender.markTargetId);if(!attacker||attacker.team===defender.team||attacker.id===m.ball.ownerId)continue;
+    const dl=worldToLocal(defender.team,defender.x,defender.y),al=worldToLocal(defender.team,attacker.x,attacker.y),localAttVx=defender.team===HOME?Number(attacker.vx||0):-Number(attacker.vx||0),retreating=localAttVx>.35,desired=retreating?2.95:2.10,d=dist(defender,attacker);
+    if(d<desired){const side=Math.sign(dl.y-al.y)||(['LB'].includes(defender.slot)?-1:1),wantL={x:al.x-desired,y:al.y+side*(retreating?.70:.48)},want=localToWorld(defender.team,wantL.x,wantL.y),dx=want.x-defender.x,dy=want.y-defender.y,g=Math.hypot(dx,dy)||1,step=Math.min(g,(retreating?2.65:2.30)*dt);defender.x=clamp(defender.x+dx/g*step,.6,104.4);defender.y=clamp(defender.y+dy/g*step,.6,67.4);m.stats.wideMarkStandoffCorrections=(m.stats.wideMarkStandoffCorrections||0)+1;}
+    const dx=defender.x-attacker.x,dy=defender.y-attacker.y,rd=Math.hypot(dx,dy)||1,ux=dx/rd,uy=dy/rd,closing=(Number(defender.vx||0)-Number(attacker.vx||0))*ux+(Number(defender.vy||0)-Number(attacker.vy||0))*uy;
+    if(rd<desired+.45&&closing<-.12){const remove=Math.min(-closing,retreating?1.60:1.18);defender.vx+=ux*remove;defender.vy+=uy*remove;}
   }
 }
 function stabilizeOwnerDefenders(m,dt){
