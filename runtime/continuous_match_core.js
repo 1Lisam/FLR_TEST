@@ -101,8 +101,13 @@ function setControlled(m,p,snap=true,receiveMeta=null){
     // INTERNAL V0.6 rhythm: receivers keep moving through the first touch, but do not
     // instantly ping-pong the ball again after 0.1~0.2s. Through-ball receivers still
     // decide fastest; aerial/pressured receptions need a little longer to settle.
-    const pressure=nearestOppDistance(m,p),settle=delivery==='AERIAL'?(0.70+m.r()*0.22):pressure<1.55?(0.56+m.r()*0.20):kind==='THROUGH'?(0.34+m.r()*0.15):(0.53+m.r()*0.18);
-    const flowTargetHold=throughMomentum?Math.max(1.05,settle):Math.min(settle,0.62);p.lockTargetUntil=m.time+flowTargetHold;p.nextThink=m.time+settle;p.receiveFlowUntil=m.time+flowTargetHold;
+    const pressure=nearestOppDistance(m,p);let settle=delivery==='AERIAL'?(0.70+m.r()*0.22):pressure<1.55?(0.56+m.r()*0.20):kind==='THROUGH'?(0.34+m.r()*0.15):(0.53+m.r()*0.18);
+    const receiveLocal=worldToLocal(p.team,p.x,p.y),decisiveThroughFlow=kind==='THROUGH'&&['ST','WF','CM'].includes(p.role)&&receiveLocal.x>=80&&pressure>=1.65;
+    // R16 feedback: a successful through-ball reception in the attacking lane must not be
+    // locked into first-touch animation until the defence has already recovered. The ball
+    // is still physically controlled; this only reopens the next live decision earlier.
+    if(decisiveThroughFlow)settle=Math.min(settle,0.58);
+    const flowTargetHold=throughMomentum?(decisiveThroughFlow?Math.max(0.58,settle):Math.max(1.05,settle)):Math.min(settle,0.62);p.lockTargetUntil=m.time+flowTargetHold;p.nextThink=m.time+settle;p.receiveFlowUntil=m.time+flowTargetHold;
     m.stats.flowReceives=(m.stats.flowReceives||0)+1;if(delivery==='AERIAL')m.stats.flowAerialReceives=(m.stats.flowAerialReceives||0)+1;else m.stats.flowGroundReceives=(m.stats.flowGroundReceives||0)+1;
     m.stats.maxFlowReceiveDelay=Math.max(m.stats.maxFlowReceiveDelay||0,settle);
   }
@@ -402,6 +407,14 @@ function movePlayers(m,dt){
       if(progressDelta<-.28){p.tx=clamp(p.x+dir(p.team)*.95,1,104);p.ty=clamp(p.y+(p.ty-p.y)*.20,1,67);}
     }
     const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy),scanFacing=onBallScanFacingTarget(m,p);
+    // R16 feedback: hybrid scene entry may carry a legitimate previous-frame velocity that
+    // points opposite the newly-authoritative tactical target. Bleed only that opposing
+    // component during the first 0.45s; current position and live target remain untouched.
+    if(Number.isFinite(p.hybridEntryAt)&&m.time-p.hybridEntryAt<=0.45&&d>0.08){
+      const ndx=dx/d,ndy=dy/d,along=(p.vx||0)*ndx+(p.vy||0)*ndy,side=-((p.vx||0)*ndy)+(p.vy||0)*ndx,speed0=Math.hypot(p.vx||0,p.vy||0);
+      if(along<-.20){const opposeDamp=clamp(1-dt*8.0,0.18,0.70);p.vx=ndx*(along*opposeDamp)-ndy*(side*.72);p.vy=ndy*(along*opposeDamp)+ndx*(side*.72);}
+      else if(speed0>2.2&&along/Math.max(.01,speed0)<.35){const sideDamp=clamp(1-dt*7.2,.24,.62);p.vx=ndx*along-ndy*(side*sideDamp);p.vy=ndy*along+ndx*(side*sideDamp);}
+    }
     if(d<0.02){
       p.vx=0;p.vy=0;
       const stationaryFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing;
@@ -421,7 +434,13 @@ function movePlayers(m,dt){
     // centre-back-style emergency sprint through midfield. Explicit press/chase tasks are untouched.
     if(['ST','WF'].includes(p.role)&&p.tacticalTask==='HOLD_BLOCK')vmax=Math.min(vmax,4.20);
     if(p.role==='GK'&&p.tacticalTask==='GK_SAVE_SET'){const gkMove=(abilityValue(m,p,'reaction')+abilityValue(m,p,'agility'))/2;vmax=clamp(5.85+(gkMove-60)*0.032,5.25,7.05);}
-    const pathFacing=Math.atan2(n.y,n.x),explicitFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing,desiredFacing=(d<0.95&&Number.isFinite(explicitFacing))?explicitFacing:pathFacing,beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:desiredFacing,facingError=Math.abs(angleDiff(beforeFacing,desiredFacing));p.bodyAngle=approachAngle(beforeFacing,desiredFacing,turnRate*dt);
+    const pathFacing=Math.atan2(n.y,n.x),explicitFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing,beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:pathFacing,lowSpeed=Math.hypot(p.vx||0,p.vy||0);
+    // R16 feedback: a forward standing on a sub-metre micro-target must not spin through a
+    // large arc just because that tiny target redraws around him. Real runs are unchanged;
+    // only low-speed, no-explicit-facing micro-adjustments hold the existing posture.
+    const microRunTask=['ATTACK_OPEN_CHANNEL','PIN_AND_RUN','PIN_CENTRE_BACKS'].includes(p.tacticalTask),microTargetHold=['ST','WF'].includes(p.role)&&!Number.isFinite(explicitFacing)&&((d<0.85&&lowSpeed<0.95)||(microRunTask&&d<1.35&&lowSpeed<1.55));
+    const desiredFacing=microTargetHold?beforeFacing:((d<0.95&&Number.isFinite(explicitFacing))?explicitFacing:pathFacing),facingError=Math.abs(angleDiff(beforeFacing,desiredFacing));
+    const effectiveTurnRate=(['ST','WF'].includes(p.role)&&lowSpeed<1.55&&!Number.isFinite(explicitFacing))?Math.min(turnRate,1.65):turnRate;p.bodyAngle=approachAngle(beforeFacing,desiredFacing,effectiveTurnRate*dt);
     // STEP39 V0.3: body orientation now has a visible physical cost.  A player facing
     // the wrong way must pivot before reaching full acceleration; agility shortens that delay.
     const alignment=clamp(1-facingError/Math.PI,0,1),turnMoveScale=0.18+0.82*Math.pow(alignment,1.25);vmax*=turnMoveScale;
@@ -535,15 +554,15 @@ function stabilizeOwnerDefenders(m,dt){
   if(!m._ownerBodyLocks)m._ownerBodyLocks={};
   for(const defender of m.players){
     if(defender.team===owner.team||defender.role==='GK')continue;
-    const task=defender.tacticalTask||defender.action||'';
-    if(!['PRESS_CONTAIN','CLOSE_DOWN','SHOT_LANE_COVER'].includes(task))continue;
-    const d=dist(defender,owner),maxD=task==='SHOT_LANE_COVER'?6.2:3.8;if(d>maxD)continue;
+    const task=defender.tacticalTask||defender.action||'',wideGoalSide=['WIDE_GOALSIDE_CONTAIN','WIDE_GOALSIDE_RECOVER'].includes(task);
+    if(!['PRESS_CONTAIN','CLOSE_DOWN','SHOT_LANE_COVER','WIDE_GOALSIDE_CONTAIN','WIDE_GOALSIDE_RECOVER'].includes(task))continue;
+    const d=dist(defender,owner),maxD=wideGoalSide?9.5:(task==='SHOT_LANE_COVER'?6.2:3.8);if(d>maxD)continue;
     const dl=worldToLocal(defender.team,defender.x,defender.y),ol=worldToLocal(defender.team,owner.x,owner.y);
     const gap=ol.x-dl.x; // positive = defender goal-side
     let nx=dl.x,ny=dl.y;
     const isCover=task==='SHOT_LANE_COVER';
-    const minGap=isCover?1.05:0.32,maxGap=isCover?4.80:2.85,repairBehind=isCover?-1.00:-0.62;
-    if(gap>=repairBehind&&gap<minGap){const want=ol.x-minGap,step=(isCover?1.30:1.05)*dt;nx+=clamp(want-nx,-step,step);}
+    const minGap=wideGoalSide?.80:(isCover?1.05:0.32),maxGap=wideGoalSide?4.20:(isCover?4.80:2.85),repairBehind=wideGoalSide?-4.40:(isCover?-1.00:-0.62);
+    if(gap>=repairBehind&&gap<minGap){const want=ol.x-minGap,step=(wideGoalSide?1.60:(isCover?1.30:1.05))*dt;nx+=clamp(want-nx,-step,step);}
     else if(gap>maxGap){const want=ol.x-maxGap,step=(isCover?1.05:0.85)*dt;nx+=clamp(want-nx,-step,step);}
     // A cover defender may legitimately switch lateral corridors. A contain presser,
     // however, should not repeatedly cut through the carrier to the opposite shoulder.
@@ -1396,6 +1415,19 @@ function executeGKClear(m,owner){
 }
 function ownerThink(m,owner){
   if(m.ball.mode!=='CONTROLLED'||m.ball.ownerId!==owner.id)return;
+  // A controller-owned protagonist action is already the user's explicit current-state input.
+  // Maintain that physical action BEFORE the generic interactive-ownership lock below.  R15
+  // returned too early here, so a chosen CARRY could reach its initial ~1m target and then
+  // freeze while the controller still owned another ~2s of carry time.  This maintenance may
+  // extend only the already-selected carry trajectory; it never chooses a new action/result.
+  const userControl=m.userChoiceControl;
+  if(userControl&&userControl.playerId===owner.id&&userControl.controllerOwned){
+    if(userControl.mode==='CARRY'&&m.time<Number(userControl.until||0)-0.05){
+      const remain=dist(owner,{x:owner.tx,y:owner.ty});
+      if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?dx/n:1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,clamp(l.x+ux*step,4,96.2),clamp(l.y+uy*step,4,64));owner.tx=w.x;owner.ty=w.y;owner.action=inOppPenaltyArea(owner.team,owner.x,owner.y)?'COMMITTED_BOX_CARRY':'CARRY_FORWARD';owner.tacticalTask=owner.action;owner.sprint=!inOppPenaltyArea(owner.team,owner.x,owner.y)&&step>2.4;m.stats.userCarryIntentExtensions=(m.stats.userCarryIntentExtensions||0)+1;}
+    }
+    return;
+  }
   // STEP76 canonical interactive-ownership lock: once a user-play episode has opened a
   // protagonist choice, owner AI may NEVER choose a pass/shot/carry for that protagonist.
   // Physics, movement, pressure and challenges keep running; the controller must reopen the
@@ -1415,21 +1447,25 @@ function ownerThink(m,owner){
   // STEP40 V0.4: a protagonist choice owns the NEXT decision until the controller
   // finishes that choice window. Movement/duels/challenges still run in the normal
   // engine, but owner AI may not silently replace CARRY/HOLD/TAKE_ON with a pass/shot.
-  const userControl=m.userChoiceControl;
   if(userControl&&userControl.playerId===owner.id){
-    if(userControl.controllerOwned){
-      if(userControl.mode==='CARRY'&&m.time<Number(userControl.until||0)-0.05&&m.ball.mode==='CONTROLLED'&&m.ball.ownerId===owner.id){
-        const remain=dist(owner,{x:owner.tx,y:owner.ty});
-        if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?dx/n:1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,clamp(l.x+ux*step,4,96.2),clamp(l.y+uy*step,4,64));owner.tx=w.x;owner.ty=w.y;owner.action=inOppPenaltyArea(owner.team,owner.x,owner.y)?'COMMITTED_BOX_CARRY':'CARRY_FORWARD';owner.tacticalTask=owner.action;owner.sprint=!inOppPenaltyArea(owner.team,owner.x,owner.y)&&step>2.4;m.stats.userCarryIntentExtensions=(m.stats.userCarryIntentExtensions||0)+1;}
-      }
-      return;
-    }
     if(m.time<=Number(userControl.until||0)+0.001)return;
     m.userChoiceControl=null;owner.nextThink=Math.max(owner.nextThink||0,m.time);return;
   }
   // A committed carry/evasion/turn has a short execution window. Pressure may accelerate the NEXT decision,
   // but must not redraw the movement target every simulation tick while the action is still being executed.
   if((owner.lockTargetUntil||0)>m.time&&['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY','TAKE_ON','TURN_BACK','DUEL_ESCAPE','FIRST_TOUCH_FLOW','TURNING_SHOT_PREP'].includes(owner.action)){
+    // A clean shooting picture after a successful through break can exist for only a fraction
+    // of the generic carry-interrupt cadence. Inspect this narrow, current-state condition on
+    // every controlled frame so the previous animation lock cannot hide that new decision.
+    // This only releases the lock; chooseOwnerAction still decides whether to shoot or carry.
+    if(['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY'].includes(owner.action)){
+      const throughAge=m.time-(owner.lastReceivedPassAt||-99);
+      if(owner.lastReceivedFlightKind==='THROUGH'&&throughAge>=0.55&&throughAge<=2.75&&m.time-(owner.lastThroughBreakDecisionReopenAt||-99)>=0.34){
+        const tsi=shotAssessment(m,owner),tsl=worldToLocal(owner.team,owner.x,owner.y);
+        const throughDecisionOpen=tsi.inBox&&tsi.blockers.length===0&&tsi.dGoal<=22.5&&Number(tsi.facingAlignment??0)>=0.55&&Math.abs(tsl.y-34)<=18.5&&['ST','WF','CM'].includes(owner.role);
+        if(throughDecisionOpen){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;owner.nextThink=m.time;owner.lastThroughBreakDecisionReopenAt=m.time;m.stats.throughBreakDecisionReopens=(m.stats.throughBreakDecisionReopens||0)+1;}
+      }
+    }
     if(['DRIBBLE_EVADE','CARRY_FORWARD','COMMITTED_BOX_CARRY','TAKE_ON','FIRST_TOUCH_FLOW'].includes(owner.action)&&m.time-(owner.lastCarryInterruptCheck||-99)>=(owner.action==='TAKE_ON'?0.14:0.22)){
       owner.lastCarryInterruptCheck=m.time;
       // Do not shoot *during* an unresolved take-on duel. Once the defender has actually been
@@ -1689,6 +1725,10 @@ function resolveCrossLanding(m){
   const td=m.ball.targetX==null?99:Math.hypot(m.ball.x-m.ball.targetX,m.ball.y-m.ball.targetY);if(td>2.6||m.ball.z>3.5)return false;
   const atkTeam=m.ball.lastTouchTeam,near=m.players.filter(p=>p.id!==m.ball.lastTouchPlayer&&dist(p,m.ball)<6.0).map(p=>({p,d:dist(p,m.ball)}));if(!near.length)return false;
   const atk=near.filter(o=>o.p.team===atkTeam).sort((a,b)=>a.d-b.d)[0],def=near.filter(o=>o.p.team!==atkTeam).sort((a,b)=>a.d-b.d)[0],intended=playerById(m,m.ball.intendedReceiverId);
+  // An offside intended receiver contesting an aerial cross is already involved in active play.
+  // Enforce the frozen release decision before the specialized aerial resolver can replace the
+  // FLIGHT state with a header/control/loose-ball outcome.
+  if(atk?.p&&intended&&atk.p.id===intended.id&&callFrozenOffsideOnReceiverInvolvement(m,atk.p,'AERIAL_CROSS_CHALLENGE'))return true;
   let outcome='LOOSE';
   if(AERIAL&&typeof AERIAL.resolve==='function'){const ar=AERIAL.resolve(m,{attacker:atk?.p||null,defender:def?.p||null,attackerDistance:atk?.d??9,defenderDistance:def?.d??9,intendedId:intended?.id||null,roll:m.r()});outcome=ar.outcome;m.stats.aerialDuels=(m.stats.aerialDuels||0)+((atk&&def)?1:0);if((atk&&def)&&outcome==='ATK')m.stats.aerialDuelsWonByAttack=(m.stats.aerialDuelsWonByAttack||0)+1;else if((atk&&def)&&outcome==='DEF')m.stats.aerialDuelsWonByDefence=(m.stats.aerialDuelsWonByDefence||0)+1;}
   else if(def&&!atk)outcome='DEF';
@@ -1716,7 +1756,12 @@ function resolveLongPassAerialContest(m){
   if(!near.length)return false;
   const atk=near.filter(o=>o.p.team===passTeam).sort((a,b)=>a.d-b.d)[0],def=near.filter(o=>o.p.team!==passTeam).sort((a,b)=>a.d-b.d)[0];
   if(!atk&&!def||Math.min(atk?.d??99,def?.d??99)>1.55)return false;
-  const intended=playerById(m,m.ball.intendedReceiverId),strikeTick=Math.floor((m.time-(m.ball.age||0))*20),baseKey=`${m.seed}|LONG_AERIAL|${strikeTick}|${m.ball.lastTouchPlayer||'-'}|${m.ball.intendedReceiverId||'-'}`,u=(tag)=>deterministicUnit(`${baseKey}|${tag}`),ar=AERIAL&&typeof AERIAL.resolve==='function'?AERIAL.resolve(m,{attacker:atk?.p||null,defender:def?.p||null,attackerDistance:atk?.d??9,defenderDistance:def?.d??9,intendedId:intended?.id||null,roll:u('CONTEST')}):{outcome:def?'DEF':atk?'ATK':'LOOSE'};
+  const intended=playerById(m,m.ball.intendedReceiverId);
+  // Same Law 11 guard for the dedicated long-aerial contest path. A challenge by the frozen
+  // offside intended receiver is involvement even if the following duel would have produced
+  // a knockdown/miscontrol instead of clean control.
+  if(atk?.p&&intended&&atk.p.id===intended.id&&callFrozenOffsideOnReceiverInvolvement(m,atk.p,'AERIAL_LONG_CHALLENGE'))return true;
+  const strikeTick=Math.floor((m.time-(m.ball.age||0))*20),baseKey=`${m.seed}|LONG_AERIAL|${strikeTick}|${m.ball.lastTouchPlayer||'-'}|${m.ball.intendedReceiverId||'-'}`,u=(tag)=>deterministicUnit(`${baseKey}|${tag}`),ar=AERIAL&&typeof AERIAL.resolve==='function'?AERIAL.resolve(m,{attacker:atk?.p||null,defender:def?.p||null,attackerDistance:atk?.d??9,defenderDistance:def?.d??9,intendedId:intended?.id||null,roll:u('CONTEST')}):{outcome:def?'DEF':atk?'ATK':'LOOSE'};
   if(atk&&def){m.stats.aerialDuels=(m.stats.aerialDuels||0)+1;if(ar.outcome==='ATK')m.stats.aerialDuelsWonByAttack=(m.stats.aerialDuelsWonByAttack||0)+1;else if(ar.outcome==='DEF')m.stats.aerialDuelsWonByDefence=(m.stats.aerialDuelsWonByDefence||0)+1;}
   m.stats.longAerialContests=(m.stats.longAerialContests||0)+1;
   const incomingVx=m.ball.vx||0,incomingVy=m.ball.vy||0,incomingSpeed=Math.hypot(incomingVx,incomingVy),contactZ=m.ball.z||0;
@@ -1772,6 +1817,19 @@ function tryNpcOneTouchPass(m,p,flightKind,sourceId,passTeam,incomingSpeed){
   executePass(m,p,targetOpt.p,'PASS',{...targetOpt,running:false},'NPC_ONE_TOUCH');p.lastDecision='NPC_ONE_TOUCH_PASS';m.stats.npcOneTouchPasses=(m.stats.npcOneTouchPasses||0)+1;m.npcOneTouchChainUntil=m.time+.72;return true;
 }
 
+function callFrozenOffsideOnReceiverInvolvement(m,p,reason='TOUCH'){
+  // Law 11 position is frozen at release. If that frozen-offside intended receiver is the
+  // player who actually reaches/touches the pass, the offence must be enforced before any
+  // control, one-touch, bobble or miscontrol transition can replace the FLIGHT ball state.
+  // This is intentionally receiver-specific: an opponent interception or another team-mate
+  // touching the ball does not trigger the intended receiver's frozen offside offence.
+  if(m.ball.mode!=='FLIGHT'||m.ball.offsideAtRelease!==true||m.ball.offsideCalled||!p||m.ball.intendedReceiverId!==p.id)return false;
+  const source=playerById(m,m.ball.lastTouchPlayer);if(!source||source.team!==p.team)return false;
+  const involvementGap=dist(p,m.ball),flightAge=Number(m.ball.age)||0;
+  m.ball.offsideCalled=true;m.stats.offsides++;
+  event(m,'OFFSIDE',`${subjectName(p.name)} 오프사이드 위치에 있었습니다.`,{actorId:p.id,team:p.team,releaseFrozen:true,involvementGap:Number(involvementGap.toFixed(3)),flightAge:Number(flightAge.toFixed(3)),involvementType:reason});
+  startDeadRestart(m,'OFFSIDE',other(p.team),p.x,p.y);return true;
+}
 function captureLooseOrFlight(m){
   if(!['LOOSE','FLIGHT'].includes(m.ball.mode))return;
   // A committed shot deflection headed over the goal-line is the visible continuation of
@@ -1793,6 +1851,9 @@ function captureLooseOrFlight(m){
     if(d>r)continue;if(m.ball.z>(p.role==='GK'?2.5:1.45))continue;if(isShot&&p.team===m.ball.shotTeam)continue;candidates.push({p,d});
   }
   if(!candidates.length)return;candidates.sort((a,b)=>a.d-b.d);const p=candidates[0].p;
+  // Receiver touch is involvement under Law 11. Enforce the frozen release decision before
+  // any receive outcome can erase intendedReceiverId/offsideAtRelease from the ball object.
+  if(passFlight&&p.team===m.ball.lastTouchTeam&&callFrozenOffsideOnReceiverInvolvement(m,p,'RECEIVER_TOUCH'))return;
   const incomingSourceId=m.ball.lastTouchPlayer,incomingPassTeam=m.ball.lastTouchTeam;if(passFlight&&flightKind!=='CROSS'&&p.team===incomingPassTeam){const ir=consumeIncomingIntent(m,p,flightKind,incomingSourceId,incomingPassTeam);if(ir.handled)return;}
   if(passFlight&&flightKind!=='CROSS'&&m.ball.passMiscontrol&&m.ball.intendedReceiverId===p.id){
     const oldVx=m.ball.vx,oldVy=m.ball.vy;setLoose(m,m.ball.x,m.ball.y,oldVx*0.28+(m.r()-0.5)*3.8,oldVy*0.28+(m.r()-0.5)*3.8,m.ball.lastTouchTeam,m.ball.lastTouchPlayer);m.stats.passLooseBalls=(m.stats.passLooseBalls||0)+1;m.stats.looseBalls++;event(m,'PASS_MISCONTROL',`${subjectName(p.name)} 패스를 완전히 잡지 못해 공이 흘렀습니다.`);return;
@@ -1856,15 +1917,23 @@ function startDeadRestart(m,kind,team,x,y,cross=null){const deferredOffside=kind
     ballReturn={phase:'OUT_HOLD',startedAt:m.time,holdUntil:m.time+0.34,returnUntil:m.time+1.08,from:{x:outX,y:outY},to:{x,y}};
   }else if(kind==='OFFSIDE'){
     const fromX=Number.isFinite(m.ball?.x)?m.ball.x:x,fromY=Number.isFinite(m.ball?.y)?m.ball.y:y;bx=fromX;by=fromY;
+    // Preserve only presentation inertia. Interaction is already dead, so this cannot change
+    // the offside result or create a future outcome; it simply avoids a ball freezing mid-flight.
+    const v0={x:Number(m.ball?.vx)||0,y:Number(m.ball?.vy)||0,z:Number(m.ball?.z)||0,vz:Number(m.ball?.vz)||0};
     ballReturn={phase:'OUT_HOLD',startedAt:m.time,holdUntil:m.time+0.28,returnUntil:m.time+1.18,from:{x:fromX,y:fromY},to:{x,y}};
+    m._pendingOffsideCoast={startedAt:m.time,from:{x:fromX,y:fromY,z:v0.z},vx:v0.x,vy:v0.y,vz:v0.vz,duration:0.72};
   }
   m.ball={mode:'DEAD',x:bx,y:by,z:0,vx:0,vy:0,vz:0,ownerId:null,kind,lastTouchTeam:m.lastTouchTeam,lastTouchPlayer:m.lastTouchPlayer};m.ballOwner=null;m.possession=team;m.phase=kind;
-  m.restart={kind,team,x,y,until:m.time+(kind==='THROW_IN'?1.35:0.9),stage:deferredOffside?'CALL_REVIEW':'SETUP',setupStartedAt:m.time,ballReturn,deferredDeadClock:deferredOffside,callReviewUntil:deferredOffside?m.time+1.60:null};m.nextShape=m.time;
+  m.restart={kind,team,x,y,until:m.time+(kind==='THROW_IN'?1.35:0.9),stage:deferredOffside?'CALL_REVIEW':'SETUP',setupStartedAt:m.time,ballReturn,deferredDeadClock:deferredOffside,callReviewUntil:deferredOffside?m.time+1.60:null,offsideCoast:deferredOffside?(m._pendingOffsideCoast||null):null};m._pendingOffsideCoast=null;m.nextShape=m.time;
   if(deferredOffside){
     // Hold the actual positions briefly so the pass/run and referee call are readable before
     // the dead-clock jump. This is presentation continuity, not delayed result computation.
     for(const p of m.players){p.tx=p.x;p.ty=p.y;p.vx*=.25;p.vy*=.25;p.action='OFFSIDE_CALL_REVIEW';p.tacticalTask='OFFSIDE_CALL_REVIEW';p.sprint=false;if(Number.isFinite(m.ball.x)&&Number.isFinite(m.ball.y))p.faceTargetAngle=Math.atan2(m.ball.y-p.y,m.ball.x-p.x);}
-  }else if(RESTARTS&&typeof RESTARTS.begin==='function'){const setup=RESTARTS.begin(m);if(kind==='THROW_IN'&&setup?.kickerId&&setup.targets?.[setup.kickerId]){const thrower=playerById(m,setup.kickerId),t=setup.targets[setup.kickerId];if(thrower&&t){thrower.x=t.x;thrower.y=t.y;thrower.vx=thrower.vy=0;thrower.tx=t.x;thrower.ty=t.y;m.ball.x=t.x;m.ball.y=t.y;}}}}
+  }else if(RESTARTS&&typeof RESTARTS.begin==='function'){
+    // R16 feedback: restart setup owns targets, not player coordinates. The thrower now
+    // walks/runs from the live out-of-play position to the touchline instead of teleporting.
+    RESTARTS.begin(m);
+  }}
 function updateDeadBallReturn(m,r){
   const br=r?.ballReturn;if(!br)return true;
   if(br.phase==='OUT_HOLD'){if(m.time<br.holdUntil)return false;br.phase='RETURNING';}
@@ -1889,6 +1958,9 @@ function updateDeadBallReturn(m,r){
 function performRestart(m){
   const r=m.restart;if(!r)return false;
   if(r.kind==='OFFSIDE'&&r.stage==='CALL_REVIEW'){
+    const coast=r.offsideCoast;if(coast){const age=Math.max(0,m.time-coast.startedAt),dur=Math.max(.15,coast.duration||.72),u=clamp(age/dur,0,1),travel=(1-Math.pow(1-u,3))*dur/3;
+      m.ball.mode='DEAD';m.ball.x=clamp(coast.from.x+coast.vx*travel,-1.2,106.2);m.ball.y=clamp(coast.from.y+coast.vy*travel,-1.2,69.2);m.ball.z=Math.max(0,(coast.from.z||0)+(coast.vz||0)*age-4.905*age*age);
+      if(u>=1)r.offsideCoast=null;}
     if(m.time<(r.callReviewUntil||m.time))return false;
     if(r.deferredDeadClock){consumeCompressedDeadClock(m,'OFFSIDE');r.deferredDeadClock=false;}
     r.stage='SETUP';r.setupStartedAt=m.time;r.until=m.time+.90;
@@ -2080,8 +2152,10 @@ function applyResolvedOwnerAction(m,owner,action){
       const sa=shotAssessment(m,owner),blockers=Array.isArray(sa.blockers)?sa.blockers.length:Number(sa.blockers||0),central=Math.abs(ol.y-34),bodyReady=!!sa.oneVOne||(!sa.turningRequired&&Number(sa.facingAlignment??1)>=.38),strongFinish=!!sa.inBox&&!!sa.openWindow&&blockers===0&&sa.dGoal<=18.5&&central<=12.5&&bodyReady&&['ST','WF','CM'].includes(owner.role);
       if(strongFinish){action={type:'SHOT',reason:'STRONG_ATTACK_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}
       else{
-        const opts=passOptions(m,owner,true),runner=opts.filter(o=>o?.p?.role==='ST'&&!o.offsideRisk&&o.block===0&&o.open>=1.2&&o.forward>=2.5&&(o.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p?.tacticalTask))&&o.leadForward>=2.5).sort((a,b)=>b.leadForward-a.leadForward)[0]||null;
-        if(runner){action={type:'PASS',target:runner.p,kind:'THROUGH',option:runner,reason:'COMMITTED_RUNNER_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}
+        const recentThroughBreak=owner.lastReceivedFlightKind==='THROUGH'&&m.time-(owner.lastReceivedPassAt||-99)<=1.45&&ol.x>=82&&sa.dGoal<=25&&blockers===0&&Number(sa.facingAlignment??0)>=.58&&['ST','WF','CM'].includes(owner.role);
+        if(recentThroughBreak){action={type:'CARRY',reason:'THROUGH_RECEIVE_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}
+        else{const opts=passOptions(m,owner,true),runner=opts.filter(o=>o?.p?.role==='ST'&&!o.offsideRisk&&o.block===0&&o.open>=1.2&&o.forward>=2.5&&(o.running||['ST_RELEASE_RUN','WIDE_RELEASE_OUTLET'].includes(o.p?.tacticalTask))&&o.leadForward>=2.5).sort((a,b)=>b.leadForward-a.leadForward)[0]||null;
+        if(runner){action={type:'PASS',target:runner.p,kind:'THROUGH',option:runner,reason:'COMMITTED_RUNNER_NO_HARMFUL_BACKPASS'};m.stats.strongAttackBackpassGuards=(m.stats.strongAttackBackpassGuards||0)+1;}}
       }
     }
   }

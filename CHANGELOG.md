@@ -1,3 +1,20 @@
+# USER-MATCH-TEST V0.5.4 R16 — 2026-08-25 — User Feedback Hotfix
+
+- Fixes same-side full-back goal-side recovery and closes excessive stand-off distance against live wide carriers without adding ball-swarm behaviour.
+- Recovers LW/RW into the midfield defensive layer while preserving ST as the primary counter outlet.
+- Dampens inherited hybrid-entry velocity only when it initially points against the new live tactical target.
+- Prevents low-speed ST/WF micro-target redraws from producing orbit/spin body rotation while preserving useful lateral run search.
+- Keeps explicit protagonist CARRY physically executing for the full controller-owned window instead of stopping after the initial short target.
+- Reopens current-state attacking judgment sooner after a successful through-ball reception in a decisive lane; no shot outcome is forced.
+- Removes throw-in restart teleporting and preserves visible offside-ball inertia after the interaction is already dead.
+- Shows Law 11 offside-risk metadata on every relevant receiver option and target marker without deleting the risky choice.
+- Delays incoming one-touch choice UI until the pass has visibly travelled at least one frame.
+- Promotes a later teammate GOAL in the same live Episode over a stale earlier choice-result card.
+- Enforces frozen-at-release offside before receiver control, bobble, miscontrol, one-touch, aerial long-pass contest, or aerial cross contest can erase the flight state.
+- User-report focused regression: 19/19 PASS. Retained defence regression: 21/21 PASS. Offside batch: 100/100 offside calls with 0 misses and 100/100 onside cases with 0 false calls.
+- Chromium headless smoke is an environment WATCH in this session: the local Chromium process itself timed out before producing DOM/screenshot on repeated attempts.
+- This is the locally sealed hotfix candidate; GitHub is used only after deployment approval.
+
 # USER-MATCH-TEST V0.5.4 R15 — 2026-08-25 — Meaningful Choice UX
 
 - Removes the protagonist UI's global six-choice hard cap. Six is now only the maximum number of visually highlighted recommended actions.

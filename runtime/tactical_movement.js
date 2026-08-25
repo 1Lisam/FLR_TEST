@@ -412,7 +412,12 @@ function defendingBlockAnchors(pr,ballX,ballY,slot,role){
   if(role==='CB'){x=line;y=34+sg*8.0*compactScale+latShift*0.38;}
   else if(role==='FB'){x=line+1.5;y=34+sg*25.5*compactScale+latShift*0.48;}
   else if(role==='CM'){x=mid;y=34+sg*11.0*compactScale+latShift*0.78;}
-  else if(role==='WF'){x=front;y=34+sg*22.0*compactScale+latShift*0.80;}
+  else if(role==='WF'){
+    // R16 feedback: when possession is lost the wingers recover into the midfield layer
+    // instead of standing on the same high line as the striker. ST remains the primary
+    // counter outlet; LW/RW become realistic ball-side/far-side recovery options.
+    x=mid+3.5;y=34+sg*19.0*compactScale+latShift*0.80;
+  }
   else if(role==='ST'){x=front+2;y=34+latShift*0.50;}
   else{x=6;y=34+latShift*0.25;}
   return{x:clamp(x,4,84),y:clamp(y,5,63)};
@@ -719,9 +724,23 @@ function assignDefence(m,team,ctx){
     const dangerBase=dangerBlockAnchor(pr,ball,p.slot,p.role);
     const base=dangerBase||defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role);let lx=base.x,ly=base.y,task=dangerBase?.task||'HOLD_BLOCK',sprint=!!dangerBase&&Math.abs(worldToLocal(team,p.x,p.y).x-lx)>2.5;
     const beatenTarget=(p.beatenRecoveryUntil||0)>m.time?playerById(m,p.beatenRecoveryTargetId):null;
+    const ownerLocal=owner&&owner.team!==team?worldToLocal(team,owner.x,owner.y):null;
+    const ownerSide=ownerLocal?(ownerLocal.y<34?-1:1):0,fbSide=sideSign(p.slot);
+    const sameSideWideCarrier=!!(p.role==='FB'&&ownerLocal&&owner?.role==='WF'&&fbSide&&fbSide===ownerSide&&ownerLocal.x<58&&Math.abs(ownerLocal.y-34)>=11.5);
     if(beatenTarget&&beatenTarget.team!==p.team){
       const al=worldToLocal(team,beatenTarget.x,beatenTarget.y),dl=worldToLocal(team,p.x,p.y);
       lx=clamp(al.x+1.35,3,96);ly=clamp(lerp(dl.y,al.y,0.86),4,64);task='RECOVERY_CHASE';sprint=true;
+    }else if(sameSideWideCarrier){
+      // R16 feedback: a same-side full-back may press/contain, but must not run beyond
+      // the live winger and leave him goal-side. Keep the FB in a useful 1.35~4.2m
+      // goal-side band, close enough to delay the carrier without becoming a second ball swarm.
+      const pl=worldToLocal(team,p.x,p.y),dangerGap=ownerLocal.x<30?1.35:ownerLocal.x<42?1.75:2.15;
+      const minGoalSide=ownerLocal.x-4.20,maxGoalSide=ownerLocal.x-dangerGap;
+      lx=clamp(Math.max(base.x,minGoalSide),6,maxGoalSide);
+      ly=clamp(lerp(base.y,ownerLocal.y,ownerLocal.x<35?0.78:0.66),5,63);
+      task=dist(p,owner)<=4.8?'WIDE_GOALSIDE_CONTAIN':'WIDE_GOALSIDE_RECOVER';
+      p.markTargetId=owner.id;sprint=dist(p,owner)>4.0||Math.abs(pl.x-lx)>1.6;
+      p.pressCommitUntil=0;
     }else if((p.pressRecoverUntil||0)>m.time){
       task='RECOVER_SHAPE';
     }else if(p.role==='FB'&&wideVacancies[p.slot]&&p.id===wideVacancies[p.slot].fbId&&!(press&&p.id===press.id&&owner&&dist(p,owner)<8.5)){
@@ -994,6 +1013,17 @@ function enforceFullbackWideRunnerResponsibility(m,team,owner){
 }
 
 
+function enforceWideCarrierFullbackGoalSide(m,team,owner){
+  if(!owner||owner.team===team||m.ball.mode!=='CONTROLLED'||owner.role!=='WF')return;
+  const ol=worldToLocal(team,owner.x,owner.y);
+  if(ol.x>=58||Math.abs(ol.y-34)<11.5)return;
+  const sg=ol.y<34?-1:1,fb=outfield(m,team).find(p=>p.role==='FB'&&sideSign(p.slot)===sg);
+  if(!fb)return;
+  const pr=profile(m,team),base=defendingBlockAnchors(pr,ol.x,ol.y,fb.slot,fb.role),goalGap=ol.x<30?1.55:ol.x<42?1.85:2.15;
+  const tx=clamp(Math.max(base.x,ol.x-4.2),6,ol.x-goalGap),inside=sg<0?1:-1,ty=clamp(ol.y+inside*1.8,5,63),w=localToWorld(team,tx,ty);
+  fb.tx=w.x;fb.ty=w.y;fb.markTargetId=owner.id;fb.action=fb.tacticalTask=dist(fb,owner)<=4.6?'WIDE_GOALSIDE_CONTAIN':'WIDE_GOALSIDE_RECOVER';fb.sprint=dist(fb,owner)>3.5||dist(fb,w)>1.4;
+}
+
 function enforceBackFourDropTogether(m,team,threat){
   if(!threat||threat.team===team||!['CONTROLLED','FLIGHT'].includes(m.ball.mode))return;
   const ball=worldToLocal(team,m.ball.x,m.ball.y),pr=profile(m,team),backs=outfield(m,team).filter(p=>['CB','FB'].includes(p.role));if(backs.length<4)return;
@@ -1118,7 +1148,7 @@ function applyAerialFirstBallChallenger(m,team){
 function defenceRoleFamily(p,lock){
   const t=String(p.tacticalTask||p.action||'');
   if(p.id===lock?.pressId||['PRESS_CONTAIN','ENGAGE','RECOVERY_CHASE','EMERGENCY_TRACK'].includes(t))return'PRESS';
-  if(['WIDE_RUN_TRACK','TRANSITION_WIDE_COVER'].includes(t))return'WIDE_TRACK';
+  if(['WIDE_RUN_TRACK','TRANSITION_WIDE_COVER','WIDE_GOALSIDE_CONTAIN','WIDE_GOALSIDE_RECOVER'].includes(t))return'WIDE_TRACK';
   if(p.markTargetId||t==='MARK'||t==='MARK_LANE_SCREEN')return'MARK';
   if(p.id===lock?.coverId||/COVER|SCREEN|TUCK|REST_DEFENCE|BLOCK/.test(t))return'COVER';
   return'SHAPE';
@@ -1180,7 +1210,7 @@ function assign(m){
     m._lastTacticalPossession=poss;
   }
   const owner=playerById(m,m.ball.ownerId),flightThreat=m.ball.mode==='FLIGHT'&&['PASS','LONG_PASS','THROUGH','CROSS','CUTBACK'].includes(m.ball.kind)&&m.ball.intendedReceiverId?playerById(m,m.ball.intendedReceiverId):null,liveThreat=owner||flightThreat,ctx={owner};
-  assignAttack(m,poss,ctx);stabilizeStrikerRunLane(m,poss,owner);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);applyAerialFirstBallChallenger(m,defTeam);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceFullbackWideRunnerResponsibility(m,defTeam,liveThreat);enforceBackFourDropTogether(m,defTeam,liveThreat);enforceWideLaneHierarchy(m,poss);stabilizeDefensiveResponsibilities(m,defTeam,liveThreat);
+  assignAttack(m,poss,ctx);stabilizeStrikerRunLane(m,poss,owner);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);applyAerialFirstBallChallenger(m,defTeam);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceFullbackWideRunnerResponsibility(m,defTeam,liveThreat);enforceBackFourDropTogether(m,defTeam,liveThreat);enforceWideLaneHierarchy(m,poss);stabilizeDefensiveResponsibilities(m,defTeam,liveThreat);enforceWideCarrierFullbackGoalSide(m,defTeam,owner);
   m.tactical={
     formation:{HOME:FORMATION,AWAY:FORMATION},
     profile:{HOME:PROFILES.HOME.id,AWAY:PROFILES.AWAY.id},

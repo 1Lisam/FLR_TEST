@@ -274,6 +274,18 @@ function onBallOptions(frame){
     const c={id:'AVAILABLE_PASS',targetId:o.p.id,targetName:`같은 팀 ${o.p.slot}`,meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:Number(o.forward||0),d:Number(o.d||0),receiverPressure:Number(o.open||0),contested:o.block>0||o.open<1.8,laneBlockers:Number(o.block||0),offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0),meaningfulReceiverFloor:true}};
     const row={id:c.id,targetId:c.targetId,targetName:c.targetName,family:'패스',label:labelFor(c),meta:deep(c.meta)};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);
   }
+  // R16 report hotfix: every pass variant to a live marginal-offside receiver must carry the
+  // same Law 11 risk metadata. Availability is unchanged; this only makes the already-computed
+  // release risk visible to the player instead of hiding it on SAFE/THROUGH/LOFTED variants.
+  for(const row of out){
+    if(row.family!=='패스'||!row.targetId)continue;
+    const phys=rawByTarget.get(row.targetId);
+    if(!phys?.offsideRisk)continue;
+    row.meta={...(row.meta||{}),offsideRisk:true,offsideMargin:Number(phys.offsideMargin||0)};
+    const warn=`오프사이드 위험: 현재 패스 순간 위치 기준 약 ${Number(phys.offsideMargin||0).toFixed(1)}m 앞서 있습니다.`;
+    row.hint=row.hint?`${warn}\n${row.hint}`:warn;
+    row.tooltip=row.hint;
+  }
   const exactSeen=new Set(),unique=[];
   for(const row of out){const k=`${row.id}|${row.targetId||''}`;if(exactSeen.has(k))continue;exactSeen.add(k);unique.push(row);}
   const scoreFor=row=>{
@@ -420,7 +432,7 @@ function readyForOnBallPause(s,f,importance){
   if((h.lockTargetUntil||0)>s.m.time+.04)return false;if(h.nextThink>s.m.time+.14)return false;
   if(!newControl&&!gapReady(s,importance))return false;if(newControl&&s.m.time-s.lastPauseAt<.55)return false;if(!newControl&&s.m.time-s.lastPauseAt<1.75)return false;return true;
 }
-function readyForIncomingPause(s,f,importance){if(f.kind!=='INCOMING_BALL')return false;const eta=Number(f.eta);if(!Number.isFinite(eta)||eta<.07||eta>.82)return false;const mode=normalizeMode(s.mode),age=s.m.time-s.lastPauseAt,chain=episodeContinuation(s,f);if(chain)return age>=.08;if(mode==='IMPORTANT'&&importance<MODES.IMPORTANT.threshold)return false;if(mode==='DECISIVE_ONLY'&&importance<MODES.DECISIVE_ONLY.threshold)return false;if(['FULL_MATCH','PLAYER_ALL','PLAYER_FOCUS'].includes(mode))return age>=.22;if(mode==='IMPORTANT')return age>=18;if(mode==='DECISIVE_ONLY')return age>=24;return false;}
+function readyForIncomingPause(s,f,importance){if(f.kind!=='INCOMING_BALL')return false;const eta=Number(f.eta);if(!Number.isFinite(eta)||eta<.07||eta>.82)return false;const ball=s.m.ball||{},flightAge=Number(ball.age||0),ox=Number(ball.originX),oy=Number(ball.originY),travel=Number.isFinite(ox)&&Number.isFinite(oy)?Math.hypot(Number(ball.x||0)-ox,Number(ball.y||0)-oy):0;if(flightAge<.095||travel<.55){s.m.stats.userIncomingChoiceVisibleFlightDeferrals=(s.m.stats.userIncomingChoiceVisibleFlightDeferrals||0)+1;return false;}const mode=normalizeMode(s.mode),age=s.m.time-s.lastPauseAt,chain=episodeContinuation(s,f);if(chain)return age>=.08;if(mode==='IMPORTANT'&&importance<MODES.IMPORTANT.threshold)return false;if(mode==='DECISIVE_ONLY'&&importance<MODES.DECISIVE_ONLY.threshold)return false;if(['FULL_MATCH','PLAYER_ALL','PLAYER_FOCUS'].includes(mode))return age>=.22;if(mode==='IMPORTANT')return age>=18;if(mode==='DECISIVE_ONLY')return age>=24;return false;}
 function readyForDefPause(s,f,importance){if(f.kind!=='DEFENDING')return false;const gkThreat=f.role==='GK';if(!gkThreat&&f.distance>5.6)return false;if(gkThreat){const sh=f.threatShot||{},urgent=!!sh.oneVOne||(!!sh.openWindow&&Number(sh.dGoal??99)<=18.0);if(!urgent)return false;}const mode=normalizeMode(s.mode),age=s.m.time-s.lastPauseAt;if(mode==='IMPORTANT'&&age<150)return false;if(mode==='DECISIVE_ONLY'&&age<210)return false;if(!gapReady(s,importance))return false;const h=hero(s);if(!h||h.nextChallengeAt>s.m.time+.25)return false;return true;}
 function sanitizeFrameForScene(q){if(!q)return null;const f=q.frame||{};return{kind:f.kind,playerId:f.playerId,team:f.team,role:f.role,slot:f.slot,time:Number((f.time||0).toFixed(3)),localX:Number.isFinite(f.localX)?Number(f.localX.toFixed(3)):null,localY:Number.isFinite(f.localY)?Number(f.localY.toFixed(3)):null,pressure:Number.isFinite(f.pressure)?Number(f.pressure.toFixed(3)):null,space:Number.isFinite(f.space)?Number(f.space.toFixed(3)):null,held:Number.isFinite(f.held)?Number(f.held.toFixed(3)):null,shot:f.shot?deep(f.shot):null,distance:Number.isFinite(f.distance)?Number(f.distance.toFixed(3)):null,opponentId:f.opponentId||null,opponentName:f.opponentName||null,opponentAttackX:Number.isFinite(f.opponentAttackX)?Number(f.opponentAttackX.toFixed(3)):null,goalSideMargin:Number.isFinite(f.goalSideMargin)?Number(f.goalSideMargin.toFixed(3)):null,threatTarget:f.threatTarget?deep(f.threatTarget):null,threatShot:f.threatShot?deep(f.threatShot):null,eta:Number.isFinite(f.eta)?Number(f.eta.toFixed(3)):null,contactX:Number.isFinite(f.contactX)?Number(f.contactX.toFixed(3)):null,contactY:Number.isFinite(f.contactY)?Number(f.contactY.toFixed(3)):null,contactZ:Number.isFinite(f.contactZ)?Number(f.contactZ.toFixed(3)):null,incomingSpeed:Number.isFinite(f.incomingSpeed)?Number(f.incomingSpeed.toFixed(3)):null,flightKind:f.flightKind||null,sourceId:f.sourceId||null,candidates:(f.candidates||[]).map(c=>({id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,score:c.score,meta:c.meta?deep(c.meta):null}))};}
 function maybeCheckpoint(s){
