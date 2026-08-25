@@ -1,0 +1,5 @@
+{
+  "schemaVersion": "FLR_R20_SOURCE_EXPORT_REQUEST_1.0",
+  "requestedAt": "2026-08-25T21:50:00+09:00",
+  "purpose": "Export exact current R19 public main source as the local R20 development baseline. No game code changes."
+}
