@@ -1,7 +1,0 @@
-{
-  "status": "R25_BRANCH_READY",
-  "baseline": "ecec4a51f25f396d6640d9762c10fe2bb33c3579",
-  "branch_head_before_marker": "42c0f4bd678edd84cd72f2c9eb7f9066bdad332e",
-  "verified_files": 6,
-  "local_gate": "ALL_R25_QA_PASS"
-}
