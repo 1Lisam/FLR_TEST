@@ -1,11 +1,11 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.3",
-  "build": "USER-MATCH-TEST-V0.5.4-R24",
+  "build": "USER-MATCH-TEST-V0.5.4-R25",
   "limit": 100,
   "exportLimit": 300,
-  "sinceCreatedAt": "2026-08-26T12:42:50Z",
-  "overlapMinutes": 5,
-  "requestedAt": "2026-08-27T00:14:00+09:00",
-  "purpose": "R24 user-test triage after user judged the build overall FAIL. Collect all newly submitted R24 reports with attached raw bundles. Analyze each report from actual 22-player coordinates, velocities, roles, possession, phase, and preceding event history. Do not assume R24 direction is correct; identify whether R24 fixes introduced regressions in formation continuity, winger lane behavior, forward depth, wide defensive recovery, CB mark/cover spacing, or any other gameplay behavior. Audit-only request; no gameplay changes in this commit.",
-  "runNonce": "r24-overall-fail-triage-20260827-0014"
+  "sinceCreatedAt": "2026-08-26T17:20:00Z",
+  "overlapMinutes": 10,
+  "requestedAt": "2026-08-27T02:50:00+09:00",
+  "purpose": "R25 user-test triage after user judged the build overall FAIL. Collect every newly submitted R25 report with attached raw bundle and retain a short overlap around deployment. Analyze each report from the actual 22-player state, velocities, tactical roles, marking ownership, possession/phase, previous situation, choice and event history. Compare the user's visual description against the recorded motion rather than trusting internal R25 QA labels. Group repeated symptoms by shared root cause and identify why R25 synthetic/exact-report QA passed while live user play still failed. Audit-only request; no gameplay changes in this commit.",
+  "runNonce": "r25-overall-fail-triage-20260827-0250"
 }
