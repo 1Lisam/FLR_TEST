@@ -23,5 +23,5 @@
     "runtime/tactical_movement.js"
   ],
   "resultDir": ".flr/qa-results/V0.5.4-R26-TRANSPORT-VERIFY",
-  "runNonce": "2026-08-27T08:18+09:00-r26-transport-integrity"
+  "runNonce": "2026-08-27T08:23+09:00-r26-transport-diagnostic-2"
 }
