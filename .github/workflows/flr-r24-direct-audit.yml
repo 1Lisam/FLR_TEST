@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Read R24 reports only
+      - name: Read R24 reports and D1 storage totals
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -35,19 +35,23 @@ jobs:
           curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H 'Content-Type: application/json' --data-binary @/tmp/query.json > /tmp/d1-query.json
           python3 - <<'PY'
           import json,pathlib
-          q=json.load(open('/tmp/d1-query.json'))
-          assert q.get('success') is True, q
+          q=json.load(open('/tmp/d1-query.json')); assert q.get('success') is True, q
           rows=((q.get('result') or [{}])[0].get('results') or [])
           pathlib.Path('/tmp/r24-audit/index.json').write_text(json.dumps({'count':len(rows),'reports':rows},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           with open('/tmp/ids.tsv','w',encoding='utf-8') as f:
               for r in rows:
-                  if int(r.get('chunk_count') or 0)>0:
-                      f.write(f"{r['report_id']}\t{r['build']}\n")
+                  if int(r.get('chunk_count') or 0)>0:f.write(f"{r['report_id']}\t{r['build']}\n")
           PY
           while IFS=$'\t' read -r rid build; do
             [ -n "$rid" ] || continue
             curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" -o "/tmp/r24-audit/raw/${rid}.json"
           done < /tmp/ids.tsv
+          python3 - <<'PY' >/tmp/storage-body.json
+          import json
+          sql='SELECT COUNT(*) AS report_count, COALESCE(SUM(size_bytes),0) AS raw_json_bytes, COALESCE(SUM(chunk_count),0) AS chunk_count, MIN(created_at) AS oldest, MAX(created_at) AS newest FROM bug_reports; SELECT COUNT(*) AS chunk_rows, COALESCE(SUM(LENGTH(data)),0) AS stored_text_chars FROM bug_report_chunks; SELECT build, COUNT(*) AS report_count, COALESCE(SUM(size_bytes),0) AS raw_json_bytes, COALESCE(SUM(chunk_count),0) AS chunk_count FROM bug_reports GROUP BY build ORDER BY MAX(created_at) DESC;'
+          print(json.dumps({'sql':sql}))
+          PY
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H 'Content-Type: application/json' --data-binary @/tmp/storage-body.json > /tmp/r24-audit/storage.json
       - uses: actions/upload-artifact@v4
         with:
           name: r24-direct-audit-${{ github.run_id }}
