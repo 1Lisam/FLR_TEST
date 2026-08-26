@@ -1,57 +1,46 @@
-name: FLR R25 Branch Apply Temporary
+name: FLR HF3 Candidate Build
 
 on:
   push:
     branches: [main]
     paths:
-      - '.flr/r25-deploy-trigger.json'
+      - '.flr/hf3-candidate-build-request.json'
 
 permissions:
   contents: write
 
 jobs:
-  build-r25:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout HF3 branch
+        uses: actions/checkout@v4
         with:
-          ref: r25-user-test
+          ref: test/v053-hf3-role-stability
           fetch-depth: 0
 
-      - name: Apply exact R23 to R25 patch
-        shell: bash
-        run: |
-          set -euo pipefail
-          git merge-base --is-ancestor ecec4a51f25f396d6640d9762c10fe2bb33c3579 HEAD
-          cat .flr/r25_patch_*.b64part | base64 -d | gunzip > /tmp/r25.patch
-          patch --dry-run -p0 < /tmp/r25.patch
-          patch -p0 < /tmp/r25.patch
+      - name: Apply HF3 structural transformer
+        run: python .flr/v053_hf3_apply.py
 
-      - name: Verify exact R25 result
+      - name: Syntax and protected-source smoke
         shell: bash
         run: |
           set -euo pipefail
-          echo 'e8bf5ec8e71aba767e2dacfad2563d96e6b29b3e13f82c909d5c840cfd5bae92  index.html' | sha256sum -c -
-          echo 'a8bbd8be0890786a424d01fc38d8c949a55b80067bb8314ef4fda9fbf95ad917  live_hybrid_session_v02.js' | sha256sum -c -
-          echo '288a5021f172892d6b92e34bf2b18537028ebedf47fe1c199eb56f1540f99baf  runtime/hybrid_spatial_intent_v2.js' | sha256sum -c -
-          echo 'fb57473cc9d9c5ab37f68f9b9ea70f21ab1d52f2c2409eebe5c1caf7d044dc4d  runtime/tactical_movement.js' | sha256sum -c -
-          echo '325a9a9836a1685db6b6f10d91e4cecf9efa47f939f6e858978f1e1eb5f5a79d  scene_debug_export.js' | sha256sum -c -
-          echo '6a1bdb951dee7365974069e36303ed5ccb0fe36f42f1144f3f288468089bdc86  step71_hybrid_v06_ui.js' | sha256sum -c -
-          grep -q 'V0.5.4 R25 TEST' index.html
-          node --check live_hybrid_session_v02.js
-          node --check runtime/hybrid_spatial_intent_v2.js
           node --check runtime/tactical_movement.js
-          node --check scene_debug_export.js
-          node --check step71_hybrid_v06_ui.js
+          node --check runtime/continuous_match_core.js
+          grep -q "stabilizeDefensiveResponsibilities" runtime/tactical_movement.js
+          grep -q "involvementGap" runtime/continuous_match_core.js
+          grep -q 'GITHUB_REPO = "FLR_TEST"' bug-report-worker/wrangler.toml
+          grep -q 'futureOutcomePrecomputed:false' live_hybrid_session_v02.js
 
-      - name: Commit clean R25 branch
+      - name: Commit candidate to HF3 branch
         shell: bash
         run: |
           set -euo pipefail
-          rm -f .flr/r25_patch_*.b64part .github/workflows/r25-apply.yml
-          git add -A
-          git config user.name 'FLR R25 Deploy Bot'
+          git config user.name 'FLR HF3 Candidate Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git commit -m 'Build R25 user test from R23 accepted baseline'
-          git push origin HEAD:r25-user-test
+          git add runtime/tactical_movement.js runtime/continuous_match_core.js bug-report-worker/wrangler.toml .flr/v053_hf3_apply.py
+          git diff --cached --quiet && exit 0
+          git commit -m 'Build V0.5.3 HF3 role stability candidate'
+          git push origin HEAD:test/v053-hf3-role-stability
