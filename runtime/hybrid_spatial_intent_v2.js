@@ -292,8 +292,8 @@ function candidateIntent(state,players,p,assignments,now){
     // Keep the narrow R20 fix on deep forwards, where the report exposed an 8-10m backwards
     // pull. Midfield/build-up carriers retain the established R19 spatial behaviour so this
     // correction cannot reshape unrelated defensive ecology.
-    const ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state),target=capAround({x:p.x,y:p.y},ref,12);
-    return{kind:'SUPPORT',target,targetId:null,score:.95};
+    let ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state);const latestKind=state.chain?.at(-1)?.kind,progressiveTransfer=['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(latestKind);if(progressiveTransfer){const cur=local(p.team,p.x,p.y),rl=local(p.team,ref.x,ref.y);if(rl.x<cur.x)ref=world(p.team,cur.x,rl.y);}
+    const target=capAround({x:p.x,y:p.y},ref,12);return{kind:'SUPPORT',target,targetId:null,score:.95};
   }
   const backlineIntent=(p.role==='CB'||p.role==='FB')?possessionBacklineIntent(state,players,p,owner):null;
   if(backlineIntent)return backlineIntent;

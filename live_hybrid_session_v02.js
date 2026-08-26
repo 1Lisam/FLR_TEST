@@ -211,7 +211,7 @@ function selectionSpatialCoherence(state,heroTeam='HOME',heroRole='CM'){
   if(ownerX>=58&&late.length)reasons.push('BACKLINE_LATE_CATCHUP_RUSH');
   if(heroTeam===poss&&heroRole==='ST'){
    const st=sp[`${px}-ST`],lw=sp[`${px}-LW`],rw=sp[`${px}-RW`];
-   if(st&&lw&&rw){const sx=lx(st),wingAvg=(lx(lw)+lx(rw))/2,wingMax=Math.max(lx(lw),lx(rw));if(sx<62&&wingAvg-sx>9){const opp=poss==='HOME'?'A':'H',oppBacks=['LB','LCB','RCB','RB'].map(slot=>sp[`${opp}-${slot}`]).filter(Boolean),oppLine=oppBacks.length?oppBacks.reduce((a,p)=>a+lx(p),0)/oppBacks.length:0,wholeCounterPicture=wingMax<=sx+11&&wingAvg<=64&&oppLine>=65;if(!wholeCounterPicture)reasons.push('ISOLATED_STRIKER_MIDFIELD');}}
+   if(st&&lw&&rw){const sx=lx(st),wingAvg=(lx(lw)+lx(rw))/2,wingMax=Math.max(lx(lw),lx(rw));if(sx<68&&wingAvg-sx>9){const opp=poss==='HOME'?'A':'H',oppBacks=['LB','LCB','RCB','RB'].map(slot=>sp[`${opp}-${slot}`]).filter(Boolean),oppLine=oppBacks.length?oppBacks.reduce((a,p)=>a+lx(p),0)/oppBacks.length:0,wholeCounterPicture=wingMax<=sx+11&&wingAvg<=64&&oppLine>=65;if(!wholeCounterPicture)reasons.push('ISOLATED_STRIKER_MIDFIELD');}}
   }
  }
  return{ok:reasons.length===0,reasons};
