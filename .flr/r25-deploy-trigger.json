@@ -1,0 +1,6 @@
+{
+  "task": "build-r25-user-test-from-r23",
+  "baseline": "ecec4a51f25f396d6640d9762c10fe2bb33c3579",
+  "target_branch": "r25-user-test",
+  "requested_at": "2026-08-27T02:20:00+09:00"
+}
