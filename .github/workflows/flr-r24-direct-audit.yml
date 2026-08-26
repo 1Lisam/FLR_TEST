@@ -1,0 +1,55 @@
+name: FLR R24 Direct D1 Audit
+
+on:
+  push:
+    branches: [audit-r24-direct-macos]
+    paths:
+      - '.github/workflows/flr-r24-direct-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: macos-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Read R24 reports only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r24-audit/raw
+          npx --yes wrangler@latest d1 list --json > /tmp/d1-list.json
+          dbid="$(python3 -c "import json; j=json.load(open('/tmp/d1-list.json')); print(next(((r.get('uuid') or r.get('id') or '') for r in j if r.get('name')=='flr-bug-reports'),''))")"
+          test -n "$dbid"
+          python3 - <<'PY' > /tmp/query.json
+          import json
+          print(json.dumps({'sql':'SELECT report_id, build, created_at, category, priority, description, size_bytes, chunk_count, summary_json FROM bug_reports WHERE build = ? ORDER BY created_at DESC LIMIT 100','params':['USER-MATCH-TEST-V0.5.4-R24']}))
+          PY
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${dbid}/query" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H 'Content-Type: application/json' --data-binary @/tmp/query.json > /tmp/d1-query.json
+          python3 - <<'PY'
+          import json,pathlib
+          q=json.load(open('/tmp/d1-query.json'))
+          assert q.get('success') is True, q
+          rows=((q.get('result') or [{}])[0].get('results') or [])
+          pathlib.Path('/tmp/r24-audit/index.json').write_text(json.dumps({'count':len(rows),'reports':rows},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          with open('/tmp/ids.tsv','w',encoding='utf-8') as f:
+              for r in rows:
+                  if int(r.get('chunk_count') or 0)>0:
+                      f.write(f"{r['report_id']}\t{r['build']}\n")
+          PY
+          while IFS=$'\t' read -r rid build; do
+            [ -n "$rid" ] || continue
+            curl -fsS "https://flr-bug-reporter.sikarops.workers.dev/reports/${build}/${rid}.json" -o "/tmp/r24-audit/raw/${rid}.json"
+          done < /tmp/ids.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r24-direct-audit-${{ github.run_id }}
+          path: /tmp/r24-audit
+          if-no-files-found: error
