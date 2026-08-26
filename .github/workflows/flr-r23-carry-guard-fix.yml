@@ -1,0 +1,32 @@
+name: FLR R23 In-box Carry Guard Fix
+on:
+  push:
+    branches: [r23-r22-report-fixes]
+    paths: ['.github/workflows/flr-r23-carry-guard-fix.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: r23-r22-report-fixes}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Patch close-goal in-box carry
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('runtime/continuous_match_core.js');s=p.read_text(encoding='utf-8')
+          old="const forward=angleTouch?0.18:(l.x<90.5?Math.min(2.10,stride):l.x>92.0?-0.45:0.65);\n    tx=clamp(l.x+forward,87.5,94.0);ty=clamp(l.y+lateral,15,53);"
+          new="const forward=angleTouch?0.18:(l.x<90.5?Math.min(2.10,stride):l.x>92.0?0:0.65);\n    tx=Math.max(l.x,clamp(l.x+forward,87.5,96.2));ty=clamp(l.y+lateral,15,53);"
+          if s.count(old)!=1: raise SystemExit(f'expected carry block once, found {s.count(old)}')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
+          node --check runtime/continuous_match_core.js
+          grep -q 'l.x>92.0?0:0.65' runtime/continuous_match_core.js
+      - name: Commit and clean failed QA workflow
+        run: |
+          rm -f .github/workflows/flr-r23-carry-guard-fix.yml .github/workflows/flr-r23-qa2345.yml
+          git config user.name 'FLR R23 Candidate Bot'; git config user.email 'actions@users.noreply.github.com'; git add -A; git commit -m 'candidate: forbid backward in-box carry target'; git push origin HEAD:r23-r22-report-fixes
