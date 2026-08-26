@@ -276,6 +276,7 @@ function candidateIntent(state,players,p,assignments,now){
     if(['CB','FB','CM'].includes(p.role)){
       const goalX=p.team==='HOME'?0:105,blend=p.role==='CM'?.08:.12;return{kind:'COVER',target:{x:base.x+(goalX-base.x)*blend,y:base.y+(34-base.y)*.08},targetId:null,score:.61};
     }
+    if(['ST','WF'].includes(p.role)){const ballWorld=state.spatial?.ball||abstractBallWorld(state),bl=local(p.team,ballWorld.x,ballWorld.y),slotY=p.slot==='LW'?14:p.slot==='RW'?54:34,recoverX=clamp(bl.x+(p.role==='ST'?21:18),44,66),recoverLocal={x:recoverX,y:clamp(slotY+(bl.y-slotY)*(p.role==='ST'?.16:.10),6,62)},raw=world(p.team,recoverLocal.x,recoverLocal.y);return{kind:'RECOVER',target:capAround(base,raw,18),targetId:null,score:.66};}
     return{kind:'RECOVER',target:base,targetId:null,score:.56};
   }
 

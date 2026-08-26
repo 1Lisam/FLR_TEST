@@ -13,7 +13,7 @@ function defaultTeam(id,name,attackDirection){return{id,name,attackDirection,sha
 function lanePool(team,lane,phase){const p=team==='HOME'?'H':'A';if(phase==='BUILD_UP')return[`${p}-LCB`,`${p}-RCB`,`${p}-LB`,`${p}-RB`,`${p}-LCM`,`${p}-RCM`];if(lane==='LEFT')return[`${p}-LW`,`${p}-LB`,`${p}-LCM`,`${p}-ST`];if(lane==='RIGHT')return[`${p}-RW`,`${p}-RB`,`${p}-RCM`,`${p}-ST`];return[`${p}-CM`,`${p}-LCM`,`${p}-RCM`,`${p}-ST`];}
 function pick(session,arr){return arr[Math.floor(nextRandom(session)*arr.length)];}
 function strikerReceiveContextOK(state,team,receiveLocalX){
- const sp=state.spatial?.players;if(!sp||receiveLocalX>=62||state.phase==='TRANSITION')return true;
+ const sp=state.spatial?.players;if(!sp||receiveLocalX>=68||state.phase==='TRANSITION')return true;
  const p=team==='HOME'?'H':'A',lx=q=>team==='HOME'?q.x:105-q.x,lw=sp[`${p}-LW`],rw=sp[`${p}-RW`];if(!lw||!rw)return false;
  const wingMax=Math.max(lx(lw),lx(rw)),wingAvg=(lx(lw)+lx(rw))/2,opp=other(team),backs=Object.values(sp).filter(q=>q.team===opp&&['CB','FB'].includes(q.role));
  const oppLine=backs.length?backs.reduce((a,q)=>a+lx(q),0)/backs.length:0;
@@ -33,7 +33,7 @@ function pickActor(session,team,state,kind){
  if(sp){
   const ball=state.spatial?.ball,ax=ball?.x,ay=ball?.y,targetLocalX=clamp(Number(state.ball.progress||.5)*105,3,102);
   let pool=(kind==='SHOT'?(state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`]):lanePool(team,state.ball.lane,state.phase)).filter(id=>sp[id]);
-  pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,targetLocalX));
+  pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,team==='HOME'?sp[id].x:105-sp[id].x));
   if(pool.length){
    const laneY=state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34,rows=pool.map(id=>{const q=sp[id],qx=team==='HOME'?q.x:105-q.x,qy=team==='HOME'?q.y:68-q.y,dBall=Number.isFinite(ax)&&Number.isFinite(ay)?Math.hypot(q.x-ax,q.y-ay):Math.abs(qx-targetLocalX),dTarget=Math.abs(qx-targetLocalX),dLane=Math.abs(qy-laneY);return{id,score:dBall*.70+dTarget*.22+dLane*.08};}).sort((a,b)=>a.score-b.score),top=rows.slice(0,Math.min(3,rows.length)),weights=top.map((x,i)=>Math.max(.12,1/(1+x.score*.18+i*.12))),sum=weights.reduce((a,b)=>a+b,0),r=nextRandom(session)*sum;let acc=0;for(let i=0;i<top.length;i++){acc+=weights[i];if(r<=acc)return top[i].id;}return top[0].id;
   }
@@ -45,7 +45,7 @@ function pickTarget(session,team,state,actor){
  const p=team==='HOME'?'H':'A',sp=state.spatial?.players||null,targetX=clamp(Number(state.ball.progress||.5)*105,3,102),actorP=sp?.[actor]||null,actorX=actorP?(team==='HOME'?actorP.x:105-actorP.x):null;
  let pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`,`${p}-LB`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`,`${p}-RB`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];pool=pool.filter(x=>x!==actor);
  if(sp){
-  pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,targetX));
+  pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,team==='HOME'?sp[id].x:105-sp[id].x));
   const scored=pool.map(id=>{const q=sp[id];if(!q)return{id,score:999};const qx=team==='HOME'?q.x:105-q.x,qy=team==='HOME'?q.y:68-q.y,laneY=state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34,dx=Math.abs(qx-targetX),dy=Math.abs(qy-laneY),forwardPenalty=actorX==null?0:Math.max(0,actorX-5-qx)*.55;return{id,score:dx*.90+dy*.14+forwardPenalty};}).sort((a,b)=>a.score-b.score);
   const plausible=scored.filter(x=>x.score<=18);if(plausible.length){const top=plausible.slice(0,Math.min(3,plausible.length)),weights=top.map((x,i)=>Math.max(.15,1/(1+x.score*.12+i*.08))),sum=weights.reduce((a,b)=>a+b,0),r=nextRandom(session)*sum;let acc=0;for(let i=0;i<top.length;i++){acc+=weights[i];if(r<=acc)return top[i].id;}return top[0].id;}
  }
