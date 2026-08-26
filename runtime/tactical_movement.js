@@ -6,6 +6,7 @@
 'use strict';
 
 const FLOW=(typeof globalThis!=='undefined'&&globalThis.FLRPG_MATCH_FLOW_RESOLUTION)||((typeof require==='function')?(()=>{try{return require('./match_flow_resolution.js')}catch(_e){return null}})():null);
+const RESP=(typeof globalThis!=='undefined'&&globalThis.FLRPG_DEFENSIVE_RESPONSIBILITY_CORE)||((typeof require==='function')?(()=>{try{return require('./defensive_responsibility_core.js')}catch(_e){return null}})():null);
 const HOME='HOME',AWAY='AWAY';
 const FORMATION='4-3-3';
 const PROFILES={
@@ -1180,6 +1181,46 @@ function applyAerialFirstBallChallenger(m,team){
   m._aerialFirstBallChallenger={team,playerId:ch.id,kind,at:m.time,targetX:tx,targetY:ty};
 }
 
+function assignDefenceR25(m,team,ctx){
+  if(!RESP)return false;
+  const pr=profile(m,team),ps=teamPlayers(m,team),owner=ctx.owner,graph=RESP.buildResponsibilityGraph({team,players:m.players,ball:m.ball,owner,now:m.time});
+  m._r25DefensiveResponsibility=m._r25DefensiveResponsibility||{};m._r25DefensiveResponsibility[team]=graph;
+  const ball=worldToLocal(team,m.ball.x,m.ball.y);
+  for(const p of ps){
+    if(p.role==='GK'){
+      let lx=clamp(5.4+ball.x*0.035,5,9.0),ly=lerp(34,ball.y,0.18),task='GK_SET',sprint=false;
+      if(m.ball.mode==='LOOSE'&&ball.x<18&&Math.abs(ball.y-34)<23&&dist(p,m.ball)<11){lx=ball.x;ly=ball.y;task='GK_RUSH';sprint=true;}
+      if(updateGoalkeeperShotReaction(m,p))continue;
+      const ui=m.userGoalkeeperPositionIntent,uiActive=ui&&ui.playerId===p.id&&ui.team===p.team&&m.time<=(ui.until||0);
+      if(uiActive&&task==='GK_SET'){if(ui.mode==='STEP_OUT')lx=clamp(lx+1.45,4.8,10.2);else if(ui.mode==='HOLD_DEPTH')lx=clamp(lx-.05,4.8,9.4);task=ui.mode==='STEP_OUT'?'GK_SET_STEP_OUT_INTENT':'GK_SET_HOLD_DEPTH_INTENT';}
+      applyTarget(p,lx,ly,task,sprint,m);p.faceTargetAngle=Math.atan2((m.ball.y||34)-p.y,(m.ball.x||52.5)-p.x);if(Math.hypot(p.vx||0,p.vy||0)<0.70)p.bodyAngle=p.faceTargetAngle;continue;
+    }
+    const r=graph.byDefender[p.id],baseDanger=dangerBlockAnchor(pr,ball,p.slot,p.role),base=baseDanger||defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role),pl=worldToLocal(team,p.x,p.y);
+    let lx=base.x,ly=base.y,task=baseDanger?.task||'R25_BLOCK',sprint=false;p.markTargetId=null;
+    const target=r?.targetId?playerById(m,r.targetId):null;
+    if(r?.kind==='PRESS'&&target){
+      const al=worldToLocal(team,target.x,target.y),rel=al.y<34?-1:1,goalGap=target.role==='ST'?1.55:1.75;
+      lx=clamp(al.x-goalGap,4,96);ly=clamp(al.y-rel*.35+(34-al.y)*.05,4,64);task='R25_PRIMARY_PRESS';p.markTargetId=target.id;sprint=dist(p,target)>4.2;
+    }else if(r?.kind==='MARK'&&target){
+      const al=worldToLocal(team,target.x,target.y),inside=Math.sign(34-al.y)*clamp(Math.abs(34-al.y)*.08,.55,1.65),gap=p.role==='FB'?1.45:1.75;
+      lx=clamp(al.x-gap,4,96);ly=clamp(al.y+inside,4,64);task='R25_PRIMARY_MARK';p.markTargetId=target.id;sprint=dist(p,target)>4.8||Math.abs(pl.x-lx)>2.4;
+    }else if(r?.kind==='COVER'){
+      if(p.role==='CB'){
+        const side=sideSign(p.slot),line=Math.min(base.x,clamp(ball.x+5.2,8,32));lx=clamp(line,7,39);ly=clamp(34+side*7.2+(ball.y-34)*.18,20,48);task='R25_CENTRAL_DEPTH_COVER';
+      }else{lx=base.x;ly=base.y;task='R25_SECONDARY_COVER';}
+      sprint=Math.hypot(pl.x-lx,pl.y-ly)>4.0;
+    }else if(r?.kind==='BLOCK'){
+      if(p.role==='CM'){
+        const side=sideSign(p.slot),screenX=clamp(ball.x+10.5,22,58),screenY=p.slot==='CM'?34:34+side*10.5+(ball.y-34)*.30;
+        lx=lerp(base.x,screenX,.64);ly=lerp(base.y,screenY,.66);task=p.slot==='CM'?'R25_CENTRAL_SCREEN':'R25_HALFSPACE_SCREEN';
+      }else if(p.role==='FB')task='R25_FLANK_BLOCK';else task='R25_BLOCK';
+      sprint=Math.hypot(pl.x-lx,pl.y-ly)>4.8;
+    }
+    applyTarget(p,lx,ly,task,sprint,m);
+  }
+  return true;
+}
+
 function defenceRoleFamily(p,lock){
   const t=String(p.tacticalTask||p.action||'');
   if(p.id===lock?.pressId||['PRESS_CONTAIN','ENGAGE','RECOVERY_CHASE','EMERGENCY_TRACK'].includes(t))return'PRESS';
@@ -1278,7 +1319,7 @@ function assign(m){
     m._lastTacticalPossession=poss;
   }
   const owner=playerById(m,m.ball.ownerId),flightThreat=m.ball.mode==='FLIGHT'&&['PASS','LONG_PASS','THROUGH','CROSS','CUTBACK'].includes(m.ball.kind)&&m.ball.intendedReceiverId?playerById(m,m.ball.intendedReceiverId):null,liveThreat=owner||flightThreat,ctx={owner};
-  assignAttack(m,poss,ctx);stabilizeStrikerRunLane(m,poss,owner);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);applyAerialFirstBallChallenger(m,defTeam);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceFullbackWideRunnerResponsibility(m,defTeam,liveThreat);enforceBackFourDropTogether(m,defTeam,liveThreat);enforceWideLaneHierarchy(m,poss);stabilizeDefensiveResponsibilities(m,defTeam,liveThreat);enforceWideCarrierFullbackGoalSide(m,defTeam,owner);preserveHybridEntryContinuity(m);
+  assignAttack(m,poss,ctx);stabilizeStrikerRunLane(m,poss,owner);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss),useR25=!!(RESP&&owner&&m.ball.mode==='CONTROLLED'&&!m.restart);if(useR25){assignDefenceR25(m,defTeam,ctx);targetSeparation(m);enforceWideLaneHierarchy(m,poss);preserveHybridEntryContinuity(m);}else{assignDefence(m,defTeam,ctx);applyAerialFirstBallChallenger(m,defTeam);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceFullbackWideRunnerResponsibility(m,defTeam,liveThreat);enforceBackFourDropTogether(m,defTeam,liveThreat);enforceWideLaneHierarchy(m,poss);stabilizeDefensiveResponsibilities(m,defTeam,liveThreat);enforceWideCarrierFullbackGoalSide(m,defTeam,owner);preserveHybridEntryContinuity(m);}
   m.tactical={
     formation:{HOME:FORMATION,AWAY:FORMATION},
     profile:{HOME:PROFILES.HOME.id,AWAY:PROFILES.AWAY.id},

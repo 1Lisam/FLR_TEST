@@ -100,6 +100,57 @@ function developerSpatialFromProgress(s,progress){
  if(owner){owner.x=clamp(actualX,3,102);owner.y=actualY;owner.intentTargetX=owner.x;owner.intentTargetY=owner.y;}
  return{atSecond:s.second,source:'DEVELOPER_RECENT_FIX_SEED',lastBallProgress:tmp.ball.progress,lastPossession:s.possession,players,ball:{x:owner?.x??bw.x,y:owner?.y??bw.y,ownerId:tmp.ball.ownerId||null}};
 }
+function applyDeveloperScenarioVariant(s,key,scenarioSeed,j){
+ const ps=s.spatial?.players;if(!ps)return{variantVersion:'R25_SCENARIO_VARIANT_0.1',applied:false};
+ const pick=(salt,items)=>items[Math.floor(devUnit(scenarioSeed,salt)*items.length)%items.length],
+       clampX=(p,dx)=>{if(p&&p.role!=='GK')p.x=clamp(p.x+dx,3,102)},
+       shiftBallToOwner=()=>{const o=ps[s.ball.ownerId];if(o)s.spatial.ball={x:o.x,y:o.y,ownerId:o.id};};
+ // These axes change football context, not just cosmetic jitter. The exact player/choice
+ // identities remain untouched so each focused regression still tests the same contract.
+ const blockBand=pick('variant-block',['DEEP','MID','HIGH']),blockDx=blockBand==='DEEP'?3.8:blockBand==='HIGH'?-3.6:0,
+       wingerMode=pick('variant-wing',['WIDE','BALANCED','INSIDE']),
+       strikerLane=pick('variant-st',['LEFT_CHANNEL','CENTRAL','RIGHT_CHANNEL']),
+       supportSide=pick('variant-eight',['LCM_HIGH','BALANCED','RCM_HIGH']),
+       stage=pick('variant-stage',['EARLY','MID','LATE']),
+       stageDx=stage==='EARLY'?-3.2:stage==='LATE'?3.4:0;
+ // Finishing/offside fixtures have narrow geometric contracts. They still receive clearly
+ // different block/support/run contexts, while longitudinal shifts are deliberately smaller.
+ const safeStageDx=key==='ST_SHOT_VISIBILITY'?stageDx*.28:key==='OFFSIDE_INVOLVEMENT'?stageDx*.20:stageDx;
+ if(Math.abs(safeStageDx)>.01){
+  for(const p of Object.values(ps)){if(p.role!=='GK')clampX(p,safeStageDx);}
+ }
+ // Opponent line height is a major visual/tactical axis. Keep the goalkeeper out of it.
+ for(const p of Object.values(ps)){if(p.team==='AWAY'&&['CB','FB','CM'].includes(p.role))clampX(p,blockDx);}
+ // Attack width / half-space occupancy.
+ const lw=ps['H-LW'],rw=ps['H-RW'];
+ if(lw&&rw){
+  if(wingerMode==='WIDE'){lw.y=clamp(lw.y-4.8,4,64);rw.y=clamp(rw.y+4.8,4,64);}
+  else if(wingerMode==='INSIDE'){lw.y=clamp(lw.y+5.0,4,64);rw.y=clamp(rw.y-5.0,4,64);}
+ }
+ // ST lane is deliberately a football lane choice, not random noise. Do not move the ST in
+ // the dedicated offside test because that exact line relationship is the thing under test.
+ const st=ps['H-ST'];
+ if(st&&key!=='OFFSIDE_INVOLVEMENT'){
+  const dy=strikerLane==='LEFT_CHANNEL'?-5.8:strikerLane==='RIGHT_CHANNEL'?5.8:0;
+  st.y=clamp(st.y+dy,7,61);if(strikerLane!=='CENTRAL')st.vy=(dy<0?-0.35:0.35);
+ }
+ // Which no.8 is the advanced support changes the support triangle seen by the player.
+ const lcm=ps['H-LCM'],rcm=ps['H-RCM'];
+ if(lcm&&rcm){
+  if(supportSide==='LCM_HIGH'){clampX(lcm,4.6);clampX(rcm,-1.7);lcm.y=clamp(lcm.y-1.4,8,60);}
+  else if(supportSide==='RCM_HIGH'){clampX(rcm,4.6);clampX(lcm,-1.7);rcm.y=clamp(rcm.y+1.4,8,60);}
+ }
+ // A little scenario-specific role texture makes repeated focused cases distinct without
+ // changing the focused owner/choice contract.
+ if(key==='DEFENSIVE_ROLE_STABILITY'||key==='MARK_TARGET_STABILITY'){
+  const cm=ps['A-CM'];if(cm)cm.y=clamp(cm.y+(supportSide==='LCM_HIGH'?-3.5:supportSide==='RCM_HIGH'?3.5:0),8,60);
+ }
+ if(key==='STRIKER_RUN_LANE'&&st)st.vx=1.0+devUnit(scenarioSeed,'variant-st-speed')*1.9;
+ if(key==='CARRIER_SHIELD_FLOW'&&st)st.vx=.25+devUnit(scenarioSeed,'variant-shield-speed')*.8;
+ shiftBallToOwner();
+ const owner=ps[s.ball.ownerId];if(owner){s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);if(key!=='CARRY_CONTINUITY')s.phase=phaseFromProgress(s.ball.progress);}
+ return{variantVersion:'R25_SCENARIO_VARIANT_0.1',applied:true,blockBand,blockLineDelta:Number(blockDx.toFixed(2)),wingerMode,strikerLane,supportSide,stage,stageDelta:Number(safeStageDx.toFixed(2))};
+}
 function advanceNaturalDeveloperContext(session,key){
  const s=session.state;let actions=0,matched=false;session.stepMin=2;session.stepMax=4;
  const ready=()=>{
@@ -172,6 +223,7 @@ function createDeveloperScenario(opts={}){
  }else{
   advanceSpatial(session,1.5);
  }
+ const developerVariant=applyDeveloperScenarioVariant(s,key,scenarioSeed,j);
  // R15 user-view continuity: every forced verification starts from a short piece of actual
  // Hybrid spatial motion rather than exposing the freshly seeded formation anchors as frame 0.
  // This only advances player intent/positions; it does not resolve a future outcome.
@@ -193,7 +245,7 @@ function createDeveloperScenario(opts={}){
   const owner=s.spatial?.players?.['H-LB'];if(owner){const sp=Math.max(2.8,Math.hypot(owner.vx||0,owner.vy||0));owner.vx=sp;owner.vy=0;owner.intentKind='CARRY';owner.intentTargetId=null;owner.intentTargetX=clamp(owner.x+10.0,3,101);owner.intentTargetY=owner.y;owner.intentSince=s.second-.5;owner.intentMinUntil=s.second+2.8;owner.intentMaxUntil=s.second+5.0;owner.sourceTask='HYBRID_CARRY_CONTINUE';for(const q of Object.values(s.spatial.players)){if(q.team===owner.team||q.role==='GK')continue;const dx=q.x-owner.x,dy=q.y-owner.y,d=Math.hypot(dx,dy);if(d<4.6){const side=q.y>=owner.y?1:-1;q.x=clamp(owner.x+5.2,3,102);q.y=clamp(owner.y+side*4.1,3,65);q.vx=0;q.vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-LB'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);}
  }
  const e=addEvent(session,'DEVELOPER_RECENT_FIX','HOME',{scenario:key,label,ownerId:s.ball.ownerId,forcedContextOnly:true,futureOutcomePrecomputed:false});
- const boundary=makeWindow(session,e,reason);boundary.id=`DEV-${key}-${hashSeed(scenarioSeed).toString(16).slice(0,8)}`;boundary.sceneId=boundary.id;boundary.developerScenario={key,label,instruction,seed:scenarioSeed,forcedContextOnly:true,futureOutcomePrecomputed:false};boundary.stateSnapshot.spatial=spatialSnapshot(s);session.status='PAUSED';session.boundary=boundary;
+ const boundary=makeWindow(session,e,reason);boundary.id=`DEV-${key}-${hashSeed(scenarioSeed).toString(16).slice(0,8)}`;boundary.sceneId=boundary.id;boundary.developerScenario={key,label,instruction,seed:scenarioSeed,forcedContextOnly:true,variant:developerVariant,futureOutcomePrecomputed:false};boundary.stateSnapshot.spatial=spatialSnapshot(s);session.status='PAUSED';session.boundary=boundary;
  return{session,key,label,instruction,seed:scenarioSeed,boundary,futureOutcomePrecomputed:false};
 }
 function structureIntegrity(state){const issues=[];for(const team of['HOME','AWAY']){const s=state.structure[team];if(s.midfieldOccupancy<1&&s.transitionDebt<.55)issues.push(`${team}:MIDFIELD_EMPTY_WITHOUT_CAUSE`);if(s.backLineOccupancy<2&&s.transitionDebt<.65)issues.push(`${team}:BACKLINE_EMPTY_WITHOUT_CAUSE`);if(s.width<28||s.width>78)issues.push(`${team}:WIDTH_OUT_OF_RANGE`);if(s.lineHeight<20||s.lineHeight>82)issues.push(`${team}:LINE_OUT_OF_RANGE`);}return{ok:!issues.length,issues};}

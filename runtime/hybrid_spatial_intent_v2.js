@@ -5,6 +5,7 @@
   else root.FLRPG_HYBRID_SPATIAL_INTENT_V2=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(FORMATION){
 'use strict';
+const RESP=(typeof globalThis!=='undefined'&&globalThis.FLRPG_DEFENSIVE_RESPONSIBILITY_CORE)||((typeof require==='function')?(()=>{try{return require('./defensive_responsibility_core.js')}catch(_e){return null}})():null);
 // Experimental reference-bench prototype only.
 // It is deliberately isolated from production V0.5.2 files.
 
@@ -152,7 +153,7 @@ function maxIntentDuration(kind){
 function intentPriority(kind){return({PRESS:1.0,MARK:.92,COVER:.82,RUN:.88,RECOVER:.80,SUPPORT:.68,SHAPE:.35})[kind]||.3;}
 
 function pressLeash(role){return({ST:10.5,WF:11.5,CM:10.8,FB:14.5})[role]||12;}
-function defensiveAssignments(state,players,team){
+function legacyDefensiveAssignments(state,players,team){
   const opp=other(team),owner=players[state.ball.ownerId],teamPs=Object.values(players).filter(p=>p.team===team&&p.role!=='GK');
   const out={press:null,markerByThreat:{},coverByMarker:{},wideCoverByDefender:{}};
   if(owner&&owner.team===opp){
@@ -204,6 +205,17 @@ function defensiveAssignments(state,players,team){
   const handoff=wingInfo.filter(x=>x.inside&&x.threatAdvance>=80&&x.w.id!==state.ball.ownerId).sort((a,b)=>(b.threatAdvance-a.threatAdvance)||(a.centrality-b.centrality));
   if(freeCbs.length&&handoff.length){const h=handoff[0],preferredSlot=h.w.slot==='LW'?'RCB':'LCB',preferred=freeCbs.find(p=>p.slot===preferredSlot)||freeCbs.sort((a,b)=>dist(a,h.w)-dist(b,h.w))[0];if(preferred&&dist(preferred,h.w)<=20){out.markerByThreat[h.w.id]=preferred.id;if(stMarker&&out.coverByMarker[stMarker.id]===preferred.id)delete out.coverByMarker[stMarker.id];}}
   for(const info of wingInfo){const {w,candidate,threatAdvance}=info;if(w.id===state.ball.ownerId)continue;if(out.markerByThreat[w.id])continue;const trackLimit=threatAdvance>=90?30:threatAdvance>=80?24:18;if(candidate&&dist(candidate,w)<=trackLimit){if(candidate.id!==out.press)out.markerByThreat[w.id]=candidate.id;else if(threatAdvance>=80){const backupSlot=w.slot==='LW'?'RCB':'LCB',used=new Set(Object.values(out.markerByThreat)),backup=cb.find(p=>p.slot===backupSlot&&!used.has(p.id))||nearest(players,w,p=>p.team===team&&p.role==='CB'&&p.id!==out.press&&!used.has(p.id))?.p;if(backup&&dist(backup,w)<=18)out.markerByThreat[w.id]=backup.id;}}}
+  return out;
+}
+
+function defensiveAssignments(state,players,team){
+  if(!RESP)return legacyDefensiveAssignments(state,players,team);
+  const rows=Object.values(players),owner=players[state.ball.ownerId]||null,ballWorld=state.spatial?.ball||abstractBallWorld(state),graph=RESP.buildResponsibilityGraph({team,players:rows,ball:{...ballWorld,ownerId:state.ball.ownerId},owner,now:Number(state.second||0)}),out={press:null,markerByThreat:{},coverByMarker:{},wideCoverByDefender:{},responsibilityByDefender:graph.byDefender,graph};
+  for(const r of Object.values(graph.byDefender||{})){
+    if(r.kind==='PRESS')out.press=r.defenderId;
+    else if(r.kind==='MARK'&&r.targetId)out.markerByThreat[r.targetId]=r.defenderId;
+    else if(r.kind==='COVER'&&r.targetId&&players[r.targetId]?.team===team)out.coverByMarker[r.targetId]=r.defenderId;
+  }
   return out;
 }
 
@@ -273,6 +285,14 @@ function candidateIntent(state,players,p,assignments,now){
     if(wideCoverTarget){const threat=players[wideCoverTarget];if(threat)return{kind:'MARK',target:markRelationTarget(state,p,threat),targetId:threat.id,score:.93};}
     const markerEntry=Object.entries(assignments.coverByMarker).find(([,cover])=>cover===p.id);
     if(markerEntry){const marker=players[markerEntry[0]],threat=players[marker?.intentTargetId],goalX=p.team==='HOME'?0:105;if(threat){const dx=goalX-threat.x,dy=34-threat.y,dg=Math.max(.01,Math.hypot(dx,dy)),side=p.slot==='LCB'?-1:p.slot==='RCB'?1:0,raw={x:threat.x+dx/dg*4.8,y:threat.y+dy/dg*4.8+side*1.25};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}const raw={x:marker.x+(goalX-marker.x)*.16,y:marker.y+(34-marker.y)*.32};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}
+    const assigned=assignments.responsibilityByDefender?.[p.id];
+    if(assigned&&['COVER','BLOCK'].includes(assigned.kind)&&['CB','FB','CM'].includes(p.role)){
+      const bw=state.spatial?.ball||abstractBallWorld(state),bl=local(p.team,bw.x,bw.y),cur=local(p.team,p.x,p.y),side=['LB','LCB','LCM'].includes(p.slot)?-1:['RB','RCB','RCM'].includes(p.slot)?1:0;let tl;
+      if(p.role==='CB')tl={x:clamp(bl.x+5.5,10,42),y:clamp(34+side*7+(bl.y-34)*.16,20,48)};
+      else if(p.role==='FB')tl={x:clamp(bl.x+7.5,14,50),y:clamp(34+side*23+(bl.y-34)*.22,7,61)};
+      else tl={x:clamp(Math.max(cur.x-1.2,bl.x+10),24,64),y:p.slot==='CM'?34:clamp(34+side*10+(bl.y-34)*.28,13,55)};
+      return{kind:'COVER',target:world(p.team,tl.x,tl.y),targetId:null,score:assigned.kind==='COVER'?.84:.72};
+    }
     if(['CB','FB','CM'].includes(p.role)){
       const goalX=p.team==='HOME'?0:105,blend=p.role==='CM'?.08:.12;return{kind:'COVER',target:{x:base.x+(goalX-base.x)*blend,y:base.y+(34-base.y)*.08},targetId:null,score:.61};
     }
@@ -321,11 +341,11 @@ function candidateIntent(state,players,p,assignments,now){
       return{kind:'COVER',target:capAround(base,w,12),targetId:null,score:.84};
     }
     if(p.slot===nearSlot){
-      const lat=p.slot==='LCM'?-6:6,relation=world(p.team,clamp(ol.x-5,5,100),clamp(ol.y+lat,5,63));
-      return{kind:'SUPPORT',target:capAround(base,blend(base,relation,.60),13),targetId:owner?.id||null,score:.78};
+      const lat=p.slot==='LCM'?-6:6,cur=local(p.team,p.x,p.y),wantedX=Math.max(cur.x-1.35,clamp(ol.x-5,5,100)),relation=world(p.team,wantedX,clamp(ol.y+lat,5,63));
+      return{kind:'SUPPORT',target:capAround({x:p.x,y:p.y},blend({x:p.x,y:p.y},relation,.72),10),targetId:owner?.id||null,score:.80};
     }
-    const farY=p.slot==='LCM'?21:47,targetLocal={x:clamp(ol.x-8,30,82),y:farY},w=world(p.team,targetLocal.x,targetLocal.y);
-    return{kind:'SUPPORT',target:capAround(base,blend(base,w,.50),13),targetId:null,score:.73};
+    const farY=p.slot==='LCM'?21:47,cur=local(p.team,p.x,p.y),targetLocal={x:clamp(Math.max(cur.x-1.35,ol.x-8),30,82),y:farY},w=world(p.team,targetLocal.x,targetLocal.y);
+    return{kind:'SUPPORT',target:capAround({x:p.x,y:p.y},blend({x:p.x,y:p.y},w,.66),10),targetId:null,score:.75};
   }
   if(p.role==='WF'||p.role==='FB'){
     const rel=owner?predicted(owner,.30):abstractBallWorld(state);
