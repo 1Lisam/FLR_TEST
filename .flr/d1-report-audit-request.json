@@ -1,11 +1,11 @@
 {
   "schemaVersion": "FLR_D1_REPORT_AUDIT_REQUEST_1.3",
-  "build": "USER-MATCH-TEST-V0.5.4-R23",
+  "build": "USER-MATCH-TEST-V0.5.4-R24",
   "limit": 100,
   "exportLimit": 300,
-  "sinceCreatedAt": "2026-08-26T10:50:00Z",
-  "overlapMinutes": 10,
-  "requestedAt": "2026-08-26T20:56:00+09:00",
-  "purpose": "R23 user-test triage after user completed another visual test pass. Collect all newly submitted R23 reports with attached raw bundles; focus on remaining formation/spatial continuity, fullback marking, CB responsibility movement, and any new regressions. User explicitly accepted recent-fix items 4 CARRY_CONTINUITY and 5 ST_SHOT_VISIBILITY as PASS; retire them from user-facing forced verification while preserving internal regression coverage. Audit-only request; no gameplay changes in this commit.",
-  "runNonce": "r23-user-test-triage-20260826-2056"
+  "sinceCreatedAt": "2026-08-26T12:42:50Z",
+  "overlapMinutes": 5,
+  "requestedAt": "2026-08-27T00:14:00+09:00",
+  "purpose": "R24 user-test triage after user judged the build overall FAIL. Collect all newly submitted R24 reports with attached raw bundles. Analyze each report from actual 22-player coordinates, velocities, roles, possession, phase, and preceding event history. Do not assume R24 direction is correct; identify whether R24 fixes introduced regressions in formation continuity, winger lane behavior, forward depth, wide defensive recovery, CB mark/cover spacing, or any other gameplay behavior. Audit-only request; no gameplay changes in this commit.",
+  "runNonce": "r24-overall-fail-triage-20260827-0014"
 }
