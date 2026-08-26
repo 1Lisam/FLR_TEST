@@ -7,40 +7,33 @@ on:
       - '.flr/hf3-candidate-build-request.json'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Checkout HF3 branch
+      - name: Checkout current main
         uses: actions/checkout@v4
         with:
-          ref: test/v053-hf3-role-stability
-          fetch-depth: 0
+          ref: main
+          fetch-depth: 1
 
-      - name: Apply HF3 structural transformer
-        run: python .flr/v053_hf3_apply.py
-
-      - name: Syntax and protected-source smoke
+      - name: Record exact source commit
         shell: bash
         run: |
           set -euo pipefail
-          node --check runtime/tactical_movement.js
-          node --check runtime/continuous_match_core.js
-          grep -q "stabilizeDefensiveResponsibilities" runtime/tactical_movement.js
-          grep -q "involvementGap" runtime/continuous_match_core.js
-          grep -q 'GITHUB_REPO = "FLR_TEST"' bug-report-worker/wrangler.toml
-          grep -q 'futureOutcomePrecomputed:false' live_hybrid_session_v02.js
+          git rev-parse HEAD > R26_SOURCE_COMMIT.txt
+          printf 'R26 baseline export only; no game files modified.\n' > R26_SOURCE_EXPORT.txt
 
-      - name: Commit candidate to HF3 branch
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'FLR HF3 Candidate Bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add runtime/tactical_movement.js runtime/continuous_match_core.js bug-report-worker/wrangler.toml .flr/v053_hf3_apply.py
-          git diff --cached --quiet && exit 0
-          git commit -m 'Build V0.5.3 HF3 role stability candidate'
-          git push origin HEAD:test/v053-hf3-role-stability
+      - name: Upload current FLR source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: flr-r26-source-recovery-${{ github.run_id }}
+          path: |
+            .
+            !.git/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
