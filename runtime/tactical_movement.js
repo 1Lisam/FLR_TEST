@@ -1024,9 +1024,11 @@ function enforceFullbackWideRunnerResponsibility(m,team,owner){
   const lock=m._defenceRoleLocks?.[team]||{},attackers=outfield(m,other(team)).filter(a=>a.role==='WF'),pr=profile(m,team),ball=worldToLocal(team,m.ball.x,m.ball.y);
   const nominalCbLine=['LCB','RCB'].map(slot=>defendingBlockAnchors(pr,ball.x,ball.y,slot,'CB').x).reduce((a,b)=>a+b,0)/2,onsideFloor=Math.min(ball.x,nominalCbLine);
   for(const fb of outfield(m,team).filter(p=>p.role==='FB')){
-    if(fb.id===lock.pressId)continue;
     const sg=sideSign(fb.slot),wf=attackers.map(a=>({a,l:worldToLocal(team,a.x,a.y)})).filter(o=>(o.l.y<34?-1:1)===sg&&o.l.x<=52).sort((a,b)=>a.l.x-b.l.x)[0];
     if(!wf)continue;
+    // A full-back may press the actual wide carrier, but must not abandon a live same-side winger
+    // merely because the generic press lock briefly nominated him against another ball carrier.
+    if(fb.id===lock.pressId&&owner.id===wf.a.id)continue;
     const wl=wf.l,releaseSame=fb.wideReleaseTargetId===wf.a.id&&(fb.wideReleaseHoldUntil||0)>m.time,clearlyOnside=m.ball.mode!=='CONTROLLED'||wl.x>=onsideFloor+.45;
     // R19: hysteresis at the offside/back-line boundary. Once the FB has handed an offside
     // runner back to the line, do not reacquire the same runner on the very next 0.25s shape
@@ -1206,9 +1208,9 @@ function stabilizeDefensiveResponsibilities(m,team,owner){
     if(prev){
       const oldMark=playerById(m,prev.markTargetId),oldMarkGap=oldMark?dist(p,oldMark):99;
       const oldMarkRelevant=!!oldMark&&oldMark.team!==team&&oldMarkGap<=14.5;
-      const familyChanged=prev.family!==family,markChanged=prev.markTargetId!==proposed.markTargetId;
+      const familyChanged=prev.family!==family,markChanged=prev.markTargetId!==proposed.markTargetId,taskChanged=prev.task!==proposed.task;
       const holdActive=m.time<Number(prev.minUntil||0);
-      if(holdActive&&!semanticEmergency&&(familyChanged||(markChanged&&oldMarkRelevant))){p.tacticalTask=prev.task;p.action=prev.action;p.markTargetId=prev.markTargetId||null;}
+      if(holdActive&&!semanticEmergency&&(familyChanged||(markChanged&&oldMarkRelevant)||(p.role==='CB'&&taskChanged))){p.tacticalTask=prev.task;p.action=prev.action;p.markTargetId=prev.markTargetId||null;}
       const finalFamily=defenceRoleFamily(p,lock),finalMark=p.markTargetId||null,semanticChanged=prev.family!==finalFamily||prev.markTargetId!==finalMark;
       if(semanticChanged){prev.minUntil=m.time+defensiveResponsibilityHold(finalFamily);prev.since=m.time;prev.laneUntil=m.time;}
       const xAlpha=hardMotionEmergency?.82:fastMotion?.68:.46;p.tx=lerp(Number(prev.tx),Number(p.tx),xAlpha);
