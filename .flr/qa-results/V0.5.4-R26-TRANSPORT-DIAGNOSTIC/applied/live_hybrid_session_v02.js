@@ -1,0 +1,314 @@
+(function(root,factory){const v2=(root&&root.FLRPG_HYBRID_SPATIAL_INTENT_V2)||((typeof require==='function')?require('./runtime/hybrid_spatial_intent_v2.js'):null),fd=(root&&root.FLRPG_FORMATION_DEFINITION)||((typeof require==='function')?require('./runtime/formation_definition.js'):null),api=factory(v2,fd);if(typeof module==='object'&&module.exports)module.exports=api;else root.FLRPG_LIVE_HYBRID_SESSION_V02=api;})(typeof globalThis!=='undefined'?globalThis:this,function(V2REF,FORMATION){
+'use strict';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function hashSeed(s){let h=2166136261>>>0;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function nextRandom(session){let x=session.rngState>>>0;x^=(x<<13);x^=(x>>>17);x^=(x<<5);session.rngState=x>>>0;return (session.rngState>>>0)/4294967296;}
+const deep=v=>v==null?v:JSON.parse(JSON.stringify(v));
+const SLOT_ROLE={GK:'GK',LB:'FB',LCB:'CB',RCB:'CB',RB:'FB',LCM:'CM',CM:'CM',RCM:'CM',LW:'WF',ST:'ST',RW:'WF'};
+const SPATIAL_LOCAL={GK:[6,34],LB:[25,9],LCB:[22,25],RCB:[22,43],RB:[25,59],LCM:[45,20],CM:[45,34],RCM:[45,48],LW:[65,8],ST:[70,34],RW:[65,60]};
+function slotOf(id){return String(id||'').split('-').slice(1).join('-');}
+function roleOf(id){return FORMATION?FORMATION.roleFamily(slotOf(id)):(SLOT_ROLE[slotOf(id)]||'CM');}
+function other(team){return team==='HOME'?'AWAY':'HOME';}
+function defaultTeam(id,name,attackDirection){return{id,name,attackDirection,shape:{formation:'4-3-3',lineHeight:50,width:50,compactness:62,midfieldOccupancy:3,backLineOccupancy:4,frontOccupancy:3},intent:{tempo:50,press:50,directness:45,fullbackRisk:42},fatigue:0,score:0};}
+function lanePool(team,lane,phase){const p=team==='HOME'?'H':'A';if(phase==='BUILD_UP')return[`${p}-LCB`,`${p}-RCB`,`${p}-LB`,`${p}-RB`,`${p}-LCM`,`${p}-RCM`];if(lane==='LEFT')return[`${p}-LW`,`${p}-LB`,`${p}-LCM`,`${p}-ST`];if(lane==='RIGHT')return[`${p}-RW`,`${p}-RB`,`${p}-RCM`,`${p}-ST`];return[`${p}-CM`,`${p}-LCM`,`${p}-RCM`,`${p}-ST`];}
+function pick(session,arr){return arr[Math.floor(nextRandom(session)*arr.length)];}
+function strikerReceiveContextOK(state,team,receiveLocalX){
+ const sp=state.spatial?.players;if(!sp||receiveLocalX>=68||state.phase==='TRANSITION')return true;
+ const p=team==='HOME'?'H':'A',lx=q=>team==='HOME'?q.x:105-q.x,lw=sp[`${p}-LW`],rw=sp[`${p}-RW`];if(!lw||!rw)return false;
+ const wingMax=Math.max(lx(lw),lx(rw)),wingAvg=(lx(lw)+lx(rw))/2,opp=other(team),backs=Object.values(sp).filter(q=>q.team===opp&&['CB','FB'].includes(q.role));
+ const oppLine=backs.length?backs.reduce((a,q)=>a+lx(q),0)/backs.length:0;
+ // A striker may legitimately receive in midfield during a counter. Outside transition,
+ // the whole picture must explain it: both wingers are also connected to midfield and the
+ // opponent back line is high. A lone ST dropping 15-25m behind normal wingers is rejected.
+ return wingMax<=receiveLocalX+9&&wingAvg<=64&&oppLine>=65;
+}
+function pickActor(session,team,state,kind){
+ const p=team==='HOME'?'H':'A',owner=state.ball.ownerId;
+ // The player already carrying the spatial ball remains the actor. This prevents low-res
+ // events from silently teleporting possession between named positions.
+ if(owner&&teamOfPlayer(owner)===team){
+  if(kind!=='SHOT'||['ST','WF','CM'].includes(roleOf(owner)))return owner;
+ }
+ const sp=state.spatial?.players||null;
+ if(sp){
+  const ball=state.spatial?.ball,ax=ball?.x,ay=ball?.y,targetLocalX=clamp(Number(state.ball.progress||.5)*105,3,102);
+  let pool=(kind==='SHOT'?(state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`]):lanePool(team,state.ball.lane,state.phase)).filter(id=>sp[id]);
+  pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,team==='HOME'?sp[id].x:105-sp[id].x));
+  if(pool.length){
+   const laneY=state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34,rows=pool.map(id=>{const q=sp[id],qx=team==='HOME'?q.x:105-q.x,qy=team==='HOME'?q.y:68-q.y,dBall=Number.isFinite(ax)&&Number.isFinite(ay)?Math.hypot(q.x-ax,q.y-ay):Math.abs(qx-targetLocalX),dTarget=Math.abs(qx-targetLocalX),dLane=Math.abs(qy-laneY);return{id,score:dBall*.70+dTarget*.22+dLane*.08};}).sort((a,b)=>a.score-b.score),top=rows.slice(0,Math.min(3,rows.length)),weights=top.map((x,i)=>Math.max(.12,1/(1+x.score*.18+i*.12))),sum=weights.reduce((a,b)=>a+b,0),r=nextRandom(session)*sum;let acc=0;for(let i=0;i<top.length;i++){acc+=weights[i];if(r<=acc)return top[i].id;}return top[0].id;
+  }
+ }
+ if(kind==='SHOT'){const pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];return pick(session,pool);}
+ const actor=pick(session,lanePool(team,state.ball.lane,state.phase));if(Number(state.ball.progress)<.28&&roleOf(actor)==='ST')return state.ball.lane==='LEFT'?`${p}-LCM`:state.ball.lane==='RIGHT'?`${p}-RCM`:`${p}-CM`;return actor;
+}
+function pickTarget(session,team,state,actor){
+ const p=team==='HOME'?'H':'A',sp=state.spatial?.players||null,targetX=clamp(Number(state.ball.progress||.5)*105,3,102),actorP=sp?.[actor]||null,actorX=actorP?(team==='HOME'?actorP.x:105-actorP.x):null;
+ let pool=state.ball.lane==='LEFT'?[`${p}-LW`,`${p}-ST`,`${p}-LCM`,`${p}-LB`]:state.ball.lane==='RIGHT'?[`${p}-RW`,`${p}-ST`,`${p}-RCM`,`${p}-RB`]:[`${p}-ST`,`${p}-CM`,`${p}-LCM`,`${p}-RCM`];pool=pool.filter(x=>x!==actor);
+ if(sp){
+  pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,team==='HOME'?sp[id].x:105-sp[id].x));
+  const scored=pool.map(id=>{const q=sp[id];if(!q)return{id,score:999};const qx=team==='HOME'?q.x:105-q.x,qy=team==='HOME'?q.y:68-q.y,laneY=state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34,dx=Math.abs(qx-targetX),dy=Math.abs(qy-laneY),forwardPenalty=actorX==null?0:Math.max(0,actorX-5-qx)*.55;return{id,score:dx*.90+dy*.14+forwardPenalty};}).sort((a,b)=>a.score-b.score);
+  const plausible=scored.filter(x=>x.score<=18);if(plausible.length){const top=plausible.slice(0,Math.min(3,plausible.length)),weights=top.map((x,i)=>Math.max(.15,1/(1+x.score*.12+i*.08))),sum=weights.reduce((a,b)=>a+b,0),r=nextRandom(session)*sum;let acc=0;for(let i=0;i<top.length;i++){acc+=weights[i];if(r<=acc)return top[i].id;}return top[0].id;}
+ }
+ let target=pick(session,pool)||`${p}-ST`;if(Number(state.ball.progress)<.28&&roleOf(target)==='ST')target=state.ball.lane==='LEFT'?`${p}-LCM`:state.ball.lane==='RIGHT'?`${p}-RCM`:`${p}-CM`;if(target===actor)target=`${p}-CM`===actor?`${p}-LCM`:`${p}-CM`;return target;
+}
+function phaseFromProgress(p){if(p<0.32)return'BUILD_UP';if(p<0.62)return'PROGRESSION';if(p<0.82)return'FINAL_THIRD';return'CHANCE';}
+function zoneFromProgress(p){if(p<0.28)return'OWN_THIRD';if(p<0.62)return'MIDFIELD';if(p<0.88)return'FINAL_THIRD';return'BOX';}
+const SPATIAL_SLOTS=['GK','LB','LCB','RCB','RB','LCM','CM','RCM','LW','ST','RW'];
+function spatialPlayerIds(){return['H','A'].flatMap(prefix=>SPATIAL_SLOTS.map(slot=>`${prefix}-${slot}`));}
+function teamOfPlayer(id){return String(id||'').startsWith('A-')?'AWAY':'HOME';}
+function localToWorld(team,x,y){return team==='HOME'?{x,y}:{x:105-x,y:68-y};}
+function abstractBallWorld(state){const team=state.possession,pr=clamp(Number(state.ball.progress)||.5,.02,.99),zone=state.zone||zoneFromProgress(pr);let x;if(zone==='OWN_THIRD')x=clamp(12+pr*22,12,34);else if(zone==='MIDFIELD')x=clamp(30+pr*35,32,62);else if(zone==='FINAL_THIRD')x=clamp(60+(pr-.60)*62,64,84.5);else{x=clamp(78+(pr-.78)*((state.ball.lane==='CENTER')?42:55),80,state.ball.lane==='CENTER'?91.8:94.2);}const y=state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34;return localToWorld(team,x,y);}
+function spatialBase(state,id){const team=teamOfPlayer(id),slot=slotOf(id),role=roleOf(id),poss=state.possession===team,pr=Number(state.ball.progress||.5)*100,st=state.structure[team]||{lineHeight:50,width:50,transitionDebt:0},bw=abstractBallWorld(state),bly=team==='HOME'?bw.y:68-bw.y;if(FORMATION){const q=FORMATION.shapeReferenceLocal({slot,role,inPossession:poss,progress:pr,phase:state.phase,width:st.width,lineHeight:st.lineHeight,ballLocalY:bly});return localToWorld(team,q.x,q.y);}let [x,y]=SPATIAL_LOCAL[slot]||[45,34];x+=(poss?1:-1)*clamp((pr-50)*.18,-8,10);x+=(Number(st.lineHeight||50)-50)*.08;if(poss&&role==='CM'&&['FINAL_THIRD','CHANCE'].includes(state.phase))x=Math.max(x,slot==='CM'?58:67);if(poss&&role==='WF'&&['FINAL_THIRD','CHANCE'].includes(state.phase))x=Math.max(x,74);if(poss&&role==='ST'&&['FINAL_THIRD','CHANCE'].includes(state.phase))x=Math.max(x,80);const width=clamp(Number(st.width||50)/50,.75,1.25);y=34+(y-34)*width;const nearLeft=bly<27,nearRight=bly>41,nearSide=(nearLeft&&['LB','LCM','LW'].includes(slot))||(nearRight&&['RB','RCM','RW'].includes(slot));if(role==='CM')x+=poss?(slot==='CM'?-1.1:(nearSide?2.2:.7)):(slot==='CM'?.4:(nearSide?-1.0:.8));else if(role==='FB')x+=poss?(nearSide?2.0:-.5):(nearSide?.6:-.3);else if(role==='WF')x+=poss?(nearSide?1.4:2.4):(nearSide?-1.0:.4);if(role!=='GK')y+=(bly-y)*(poss?.06:.12);return localToWorld(team,clamp(x,4,101),clamp(y,4,64));}
+
+function createSpatialState(state){const players={};for(const id of spatialPlayerIds()){const q=spatialBase(state,id);players[id]={id,x:q.x,y:q.y,vx:0,vy:0};}const bw=abstractBallWorld(state),owner=players[state.ball.ownerId];if(owner){owner.x=bw.x;owner.y=bw.y;}return{atSecond:state.second,source:'HYBRID_CONTINUOUS_SPATIAL_0.1',players,ball:{x:owner?.x??bw.x,y:owner?.y??bw.y,ownerId:state.ball.ownerId||null}};}
+function advanceSpatial(session,dt){
+ const s=session.state,sp=s.spatial||(s.spatial=createSpatialState(s)),seconds=Math.max(.1,Number(dt)||.1),bw=abstractBallWorld(s),owner=s.ball.ownerId||null,startProgress=Number.isFinite(Number(sp.lastBallProgress))?Number(sp.lastBallProgress):Number(s.ball.progress||.5);
+ if(!V2REF)throw new Error('V2 reference prototype unavailable');
+ for(const id of spatialPlayerIds()){
+  const q=sp.players[id]||(sp.players[id]={id,...spatialBase(s,id),vx:0,vy:0});
+  q.team=q.team||teamOfPlayer(id);q.slot=q.slot||slotOf(id);q.role=q.role||roleOf(id);
+  if(!q.intentKind){const b=spatialBase(s,id),now=Math.max(0,s.second-seconds);q.intentKind='SHAPE';q.intentTargetId=null;q.intentTargetX=b.x;q.intentTargetY=b.y;q.intentSince=now;q.intentMinUntil=now;q.intentMaxUntil=now+3.0;q.intentScore=.2;q.lastPossession=s.possession;}
+ }
+ // R22 temporal continuity: the match clock and the 22-player spatial clock advance together.
+ // R21 still advanced ordinary Hybrid events by 4-12 seconds while moving bodies for only 1.5s;
+ // that guaranteed late 'catch-up' sprints when a choice scene opened. An explicit debug cap is
+ // still supported, but production defaults to the full elapsed interval.
+ const explicitCap=Number(session.opts?.spatialMotionCap),motionSeconds=Number.isFinite(explicitCap)&&explicitCap>0?Math.min(seconds,Math.max(1.5,explicitCap)):seconds;
+ V2REF.advanceV2(s,sp.players,motionSeconds,{clockSeconds:seconds,startTime:Math.max(0,s.second-seconds),mutateTime:false,substep:.25,startProgress});
+ const op=sp.players[owner];if(op){
+  sp.ball={x:op.x,y:op.y,ownerId:owner};
+  // Keep the compressed match-state progress tethered to the position of the actual carrier.
+  // This prevents FINAL_THIRD/CHANCE from running 15-25m ahead of the 2D ball and dragging
+  // forwards to the goalkeeper while the carrier is still in midfield.
+  const abstractBefore=Number(s.ball.progress||.5),spatialProgress=localProgress(s.possession,op.x),maxAbstractLead=.065,maxSpatialLead=.035,reconciled=clamp(abstractBefore,spatialProgress-maxSpatialLead,spatialProgress+maxAbstractLead);
+  sp.abstractProgressBefore=abstractBefore;sp.spatialProgress=spatialProgress;sp.progressGapBefore=abstractBefore-spatialProgress;sp.progressReconciled=reconciled;
+  s.ball.progress=reconciled;s.zone=zoneFromProgress(reconciled);if(s.phase!=='TRANSITION')s.phase=phaseFromProgress(reconciled);
+ }else sp.ball={x:bw.x,y:bw.y,ownerId:null};
+ sp.lastBallProgress=Number(s.ball.progress||.5);sp.lastPossession=s.possession;sp.atSecond=s.second;sp.source='HYBRID_INTENT_V2_WIP';return sp;
+}
+function spatialSnapshot(state){return state.spatial?deep(state.spatial):null;}
+function createState(opts={}){const home=opts.home||defaultTeam('HOME','블루팀',1),away=opts.away||defaultTeam('AWAY','레드팀',-1);const state={schemaVersion:'HYBRID_LIVE_STATE_0.4',second:0,minute:0,score:{HOME:0,AWAY:0},possession:'HOME',zone:'MIDFIELD',phase:'BUILD_UP',danger:.12,ball:{team:'HOME',lane:'CENTER',progress:.48,ownerId:'H-CM'},teams:{HOME:deep(home),AWAY:deep(away)},structure:{HOME:{midfieldOccupancy:3,backLineOccupancy:4,width:home.shape.width,lineHeight:home.shape.lineHeight,transitionDebt:0},AWAY:{midfieldOccupancy:3,backLineOccupancy:4,width:away.shape.width,lineHeight:away.shape.lineHeight,transitionDebt:0}},chain:[],resolvedEvents:[],sceneCandidates:[],counters:{actions:0,turnovers:0,shots:0,goals:0,heroWindows:0,highResChoices:0},lastHighRes:null,spatial:null};state.spatial=createSpatialState(state);return state;}
+function createSession(opts={}){const protagonistPerformance=deep(opts.protagonistPerformance||{rating:6.5,recklessFailures:0,substitutionPressure:0,managerUsageTrustDelta:0,lastImpact:null,history:[]}),protagonistMatchStats=deep(opts.protagonistMatchStats||{shots:0,goals:0,tacklesWon:0,fouls:0,interceptions:0,saves:0,parries:0,blocks:0,clearances:0,goalsConceded:0});return{schemaVersion:'HYBRID_LIVE_SESSION_0.3',status:'RUNNING',opts:deep(opts),durationSeconds:opts.durationSeconds||5400,stepMin:opts.stepMin||4,stepMax:opts.stepMax||12,rngState:hashSeed(opts.seed||'FLR-LIVE-HYBRID-02')||0x9e3779b9,state:createState(opts),protagonistPerformance,protagonistMatchStats,boundary:null,handledBoundaryIds:[],resumeCount:0,lastHeroWindowAt:-999,highResHistory:[],finalWindowDone:false,lastSetPieceAt:-999,fineStepUntil:-999,_promotionHistory:[]};}
+
+const DEV_RECENT_SCENARIOS=['FORMATION_CONTINUITY','DEFENSIVE_ROLE_STABILITY','MARK_TARGET_STABILITY','CARRY_CONTINUITY','ST_SHOT_VISIBILITY','PASS_FLIGHT_WIDE_TRACK','STRIKER_RUN_LANE','CARRIER_SHIELD_FLOW','OFFSIDE_INVOLVEMENT'];
+function devUnit(seed,salt){const h=hashSeed(`${seed}|${salt}`);return(h>>>0)/4294967296;}
+function developerSpatialFromProgress(s,progress){
+ if(!V2REF)throw new Error('V2 reference prototype unavailable');
+ const tmp=deep(s);tmp.ball.progress=clamp(progress,.05,.95);tmp.zone=zoneFromProgress(tmp.ball.progress);tmp.phase=phaseFromProgress(tmp.ball.progress);tmp.spatial=null;
+ const players=V2REF.makePlayers(tmp),owner=players[tmp.ball.ownerId],bw=V2REF.abstractBallWorld(tmp),actualX=tmp.possession==='HOME'?tmp.ball.progress*105:105-tmp.ball.progress*105,actualY=tmp.ball.lane==='LEFT'?18:tmp.ball.lane==='RIGHT'?50:34;
+ for(const p of Object.values(players)){p.intentSince=s.second-2;p.intentMinUntil=s.second-2;p.intentMaxUntil=s.second+3;p.lastPossession=s.possession;}
+ if(owner){owner.x=clamp(actualX,3,102);owner.y=actualY;owner.intentTargetX=owner.x;owner.intentTargetY=owner.y;}
+ return{atSecond:s.second,source:'DEVELOPER_RECENT_FIX_SEED',lastBallProgress:tmp.ball.progress,lastPossession:s.possession,players,ball:{x:owner?.x??bw.x,y:owner?.y??bw.y,ownerId:tmp.ball.ownerId||null}};
+}
+function applyDeveloperScenarioVariant(s,key,scenarioSeed,j){
+ const ps=s.spatial?.players;if(!ps)return{variantVersion:'R25_SCENARIO_VARIANT_0.1',applied:false};
+ const pick=(salt,items)=>items[Math.floor(devUnit(scenarioSeed,salt)*items.length)%items.length],
+       clampX=(p,dx)=>{if(p&&p.role!=='GK')p.x=clamp(p.x+dx,3,102)},
+       shiftBallToOwner=()=>{const o=ps[s.ball.ownerId];if(o)s.spatial.ball={x:o.x,y:o.y,ownerId:o.id};};
+ // These axes change football context, not just cosmetic jitter. The exact player/choice
+ // identities remain untouched so each focused regression still tests the same contract.
+ const blockBand=pick('variant-block',['DEEP','MID','HIGH']),blockDx=blockBand==='DEEP'?3.8:blockBand==='HIGH'?-3.6:0,
+       wingerMode=pick('variant-wing',['WIDE','BALANCED','INSIDE']),
+       strikerLane=pick('variant-st',['LEFT_CHANNEL','CENTRAL','RIGHT_CHANNEL']),
+       supportSide=pick('variant-eight',['LCM_HIGH','BALANCED','RCM_HIGH']),
+       stage=pick('variant-stage',['EARLY','MID','LATE']),
+       stageDx=stage==='EARLY'?-3.2:stage==='LATE'?3.4:0;
+ // Finishing/offside fixtures have narrow geometric contracts. They still receive clearly
+ // different block/support/run contexts, while longitudinal shifts are deliberately smaller.
+ const safeStageDx=key==='ST_SHOT_VISIBILITY'?stageDx*.28:key==='OFFSIDE_INVOLVEMENT'?stageDx*.20:stageDx;
+ if(Math.abs(safeStageDx)>.01){
+  for(const p of Object.values(ps)){if(p.role!=='GK')clampX(p,safeStageDx);}
+ }
+ // Opponent line height is a major visual/tactical axis. Keep the goalkeeper out of it.
+ for(const p of Object.values(ps)){if(p.team==='AWAY'&&['CB','FB','CM'].includes(p.role))clampX(p,blockDx);}
+ // Attack width / half-space occupancy.
+ const lw=ps['H-LW'],rw=ps['H-RW'];
+ if(lw&&rw){
+  if(wingerMode==='WIDE'){lw.y=clamp(lw.y-4.8,4,64);rw.y=clamp(rw.y+4.8,4,64);}
+  else if(wingerMode==='INSIDE'){lw.y=clamp(lw.y+5.0,4,64);rw.y=clamp(rw.y-5.0,4,64);}
+ }
+ // ST lane is deliberately a football lane choice, not random noise. Do not move the ST in
+ // the dedicated offside test because that exact line relationship is the thing under test.
+ const st=ps['H-ST'];
+ if(st&&key!=='OFFSIDE_INVOLVEMENT'){
+  const dy=strikerLane==='LEFT_CHANNEL'?-5.8:strikerLane==='RIGHT_CHANNEL'?5.8:0;
+  st.y=clamp(st.y+dy,7,61);if(strikerLane!=='CENTRAL')st.vy=(dy<0?-0.35:0.35);
+ }
+ // Which no.8 is the advanced support changes the support triangle seen by the player.
+ const lcm=ps['H-LCM'],rcm=ps['H-RCM'];
+ if(lcm&&rcm){
+  if(supportSide==='LCM_HIGH'){clampX(lcm,4.6);clampX(rcm,-1.7);lcm.y=clamp(lcm.y-1.4,8,60);}
+  else if(supportSide==='RCM_HIGH'){clampX(rcm,4.6);clampX(lcm,-1.7);rcm.y=clamp(rcm.y+1.4,8,60);}
+ }
+ // A little scenario-specific role texture makes repeated focused cases distinct without
+ // changing the focused owner/choice contract.
+ if(key==='DEFENSIVE_ROLE_STABILITY'||key==='MARK_TARGET_STABILITY'){
+  const cm=ps['A-CM'];if(cm)cm.y=clamp(cm.y+(supportSide==='LCM_HIGH'?-3.5:supportSide==='RCM_HIGH'?3.5:0),8,60);
+ }
+ if(key==='STRIKER_RUN_LANE'&&st)st.vx=1.0+devUnit(scenarioSeed,'variant-st-speed')*1.9;
+ if(key==='CARRIER_SHIELD_FLOW'&&st)st.vx=.25+devUnit(scenarioSeed,'variant-shield-speed')*.8;
+ shiftBallToOwner();
+ const owner=ps[s.ball.ownerId];if(owner){s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);if(key!=='CARRY_CONTINUITY')s.phase=phaseFromProgress(s.ball.progress);}
+ return{variantVersion:'R25_SCENARIO_VARIANT_0.1',applied:true,blockBand,blockLineDelta:Number(blockDx.toFixed(2)),wingerMode,strikerLane,supportSide,stage,stageDelta:Number(safeStageDx.toFixed(2))};
+}
+function advanceNaturalDeveloperContext(session,key){
+ const s=session.state;let actions=0,matched=false;session.stepMin=2;session.stepMax=4;
+ const ready=()=>{
+  if(actions<28||!s.spatial)return false;
+  if(key==='FORMATION_CONTINUITY')return s.possession==='HOME'&&s.ball.progress>=.64&&s.ball.progress<=.86&&['PROGRESSION','FINAL_THIRD','CHANCE'].includes(s.phase)&&selectionSpatialCoherence(s,'HOME','ST').ok;
+  return false;
+ };
+ while(actions++<180&&s.second<session.durationSeconds-30){
+  const pre=capturePromotionState(session),dt=2+Math.floor(nextRandom(session)*3);s.second+=dt;s.minute=s.second/60;updateStructure(session);doAction(session,{suppressWindows:true},pre);advanceSpatial(session,dt);
+  if(ready()){matched=true;break;}
+ }
+ s.spatial.source='HYBRID_NATURAL_DEVELOPER_CAPTURE';s.spatial.atSecond=s.second;
+ return{actions,matched,atSecond:s.second};
+}
+function createDeveloperScenario(opts={}){
+ const scenarioSeed=String(opts.seed||`DEV-RECENT-${Date.now()}`),requested=String(opts.key||''),ix=Math.floor(devUnit(scenarioSeed,'scenario')*DEV_RECENT_SCENARIOS.length),key=DEV_RECENT_SCENARIOS.includes(requested)?requested:DEV_RECENT_SCENARIOS[ix];
+ const midfieldHero=key==='PASS_FLIGHT_WIDE_TRACK'||key==='OFFSIDE_INVOLVEMENT',heroId=key==='CARRY_CONTINUITY'?'H-LB':(midfieldHero?'H-CM':'H-ST'),heroRole=key==='CARRY_CONTINUITY'?'CB':(midfieldHero?'CM':'ST'),session=createSession({...opts,seed:scenarioSeed,heroTeam:'HOME',heroRole,heroPlayerId:heroId,durationSeconds:1800});
+ const s=session.state,j=(salt,span=1)=>(devUnit(scenarioSeed,salt)-.5)*2*span;
+ if(key==='FORMATION_CONTINUITY'){
+  const label='선택 장면 포메이션 연속성',instruction='실제 Hybrid 경기를 진행하다 포착된 장면입니다. 첫 프레임은 포메이션 기준점으로 재배치하지 않고 직전까지 계산된 22명의 실제 위치와 속도를 그대로 이어받아야 합니다. 시드가 달라지면 경기 경로가 달라지는 만큼 시작 배치도 달라지는지 확인하세요.',natural=advanceNaturalDeveloperContext(session,key);
+  const e=addEvent(session,'DEVELOPER_RECENT_FIX','HOME',{scenario:key,label,ownerId:s.ball.ownerId,naturalContext:true,naturalPreRollActions:natural.actions,naturalMatched:natural.matched,futureOutcomePrecomputed:false});
+  const boundary=makeWindow(session,e,'ATTACKING_INVOLVEMENT');boundary.id=`DEV-${key}-${hashSeed(scenarioSeed).toString(16).slice(0,8)}`;boundary.sceneId=boundary.id;boundary.developerScenario={key,label,instruction,seed:scenarioSeed,forcedContextOnly:false,naturalContext:true,naturalPreRollActions:natural.actions,naturalMatched:natural.matched,futureOutcomePrecomputed:false};boundary.stateSnapshot.spatial=spatialSnapshot(s);session.status='PAUSED';session.boundary=boundary;
+  return{session,key,label,instruction,seed:scenarioSeed,boundary,futureOutcomePrecomputed:false};
+ }
+ s.second=600+Math.floor(devUnit(scenarioSeed,'time')*900);s.minute=s.second/60;s.score={HOME:0,AWAY:0};s.possession='HOME';s.ball.team='HOME';s.danger=.48+j('danger',.08);s.structure.HOME.width=50+j('hw',5);s.structure.AWAY.width=50+j('aw',5);s.structure.HOME.lineHeight=50+j('hl',4);s.structure.AWAY.lineHeight=50+j('al',4);
+ let label='',instruction='',actualProgress=.58,abstractProgress=.58,ownerId='H-LB',lane='LEFT',reason='ATTACKING_INVOLVEMENT';
+ if(key==='FORMATION_CONTINUITY'){
+  actualProgress=.74+j('actual',.015);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';label='선택 장면 포메이션 연속성';instruction='선택 장면 첫 프레임부터 직전 경기 위치와 움직임이 이어지고, 선수들이 기본 포메이션 위치에서 새로 올라오지 않는지 확인하세요.';
+ }else if(key==='DEFENSIVE_ROLE_STABILITY'){
+  actualProgress=.64+j('actual',.02);abstractProgress=actualProgress;ownerId='H-LB';lane='LEFT';label='수비 역할·타깃 안정성';instruction='수비수가 공격수를 먼저 바라보며 통제된 걸음으로 대응하는지 확인하세요. 공격수가 감속했는데 수비수만 전력 가속을 유지해 미끄러지거나 위성처럼 돌아 나가면 실패입니다.';
+ }else if(key==='PASS_FLIGHT_WIDE_TRACK'){
+  actualProgress=.66+j('actual',.015);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';reason='MIDFIELD_INVOLVEMENT';label='패스 비행 중 풀백 측면 추적';instruction='RW 또는 LW 쪽 전진 패스를 선택한 뒤 공이 비행하는 동안 해당 측면 풀백이 침투자를 놓고 HOLD로 풀리지 않는지 확인하세요.';
+ }else if(key==='MARK_TARGET_STABILITY'){
+  actualProgress=.72+j('actual',.015);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';label='같은 마크 대상 유지';instruction='같은 공격수를 맡은 수비수가 속도 변화에 맞춰 제동하고, 불필요한 돌진·오버슈트 없이 마크 관계를 유지하는지 확인하세요.';
+ }else if(key==='STRIKER_RUN_LANE'){
+  actualProgress=.76+j('actual',.015);abstractProgress=actualProgress;ownerId='H-RW';lane='RIGHT';label='ST 침투 레인 연속성';instruction='측면에서 전개되는 동안 ST가 중앙/니어/파 포스트 의도를 너무 짧은 간격으로 번갈아 좌우 왕복하지 않는지 확인하세요.';
+ }else if(key==='CARRY_CONTINUITY'){
+  actualProgress=.58+j('actual',.012);abstractProgress=actualProgress;ownerId='H-LB';lane='LEFT';label='공 운반 중 멈칫 반복 방지';instruction='LB가 같은 전진 의도로 공을 운반하는 동안 짧은 내부 목표점마다 완전히 멈췄다가 다시 출발하지 않는지 확인하세요.';
+ }else if(key==='ST_SHOT_VISIBILITY'){
+  actualProgress=.885+j('actual',.004);abstractProgress=actualProgress;ownerId='H-ST';lane='CENTER';label='노마크 ST 러닝 슈팅 판단 시점';instruction='박스 안에서 ST가 달리는 중 공을 안정적으로 소유한 상태입니다. 멈춰 수비를 기다리지 않고 달리는 흐름에서 슈팅 선택이 열리며 자동 실행되지는 않는지 확인하세요.';reason='ATTACKING_INVOLVEMENT';
+ }else if(key==='CARRIER_SHIELD_FLOW'){
+  actualProgress=.77+j('actual',.012);abstractProgress=actualProgress;ownerId='H-ST';lane='CENTER';label='공격수 멈칫·SHIELD_SCAN 반복 방지';instruction='ST가 압박을 읽는 짧은 멈칫 뒤 다시 판단하고 움직이며, 같은 자리에서 SHIELD_SCAN을 반복하지 않는지 확인하세요.';
+ }else{
+  actualProgress=.67+j('actual',.02);abstractProgress=actualProgress;ownerId='H-CM';lane='CENTER';reason='MIDFIELD_INVOLVEMENT';label='오프사이드 실제 관여 시점';instruction='전방 침투 패스를 골라 오프사이드 위치가 패스 순간에 고정되고, 실제 공 관여 시점에 판정이 보이는지 확인하세요.';
+ }
+ s.ball.ownerId=ownerId;s.ball.lane=lane;s.ball.progress=clamp(abstractProgress,.05,.95);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);s.spatial=developerSpatialFromProgress({...s,ball:{...s.ball,progress:actualProgress}},actualProgress);
+ if(key==='FORMATION_CONTINUITY'){
+  const ps=s.spatial.players,owner=ps['H-CM'];owner.x=78+j('fc-owner-x',.5);owner.y=34+j('fc-owner-y',.7);owner.vx=2.2;owner.vy=.15;
+  for(const [id,x,y,vx,vy] of [['H-LW',86,15,2.4,.25],['H-ST',88,34,2.7,-.1],['H-RW',85,52,2.3,-.2],['A-LB',80,52,-1.4,-.1],['A-LCB',83,40,-1.2,.1],['A-RCB',82,27,-1.1,-.1],['A-RB',79,14,-1.3,.1]]){if(ps[id]){Object.assign(ps[id],{x:x+j(id+'x',.35),y:y+j(id+'y',.5),vx,vy});}}
+  s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';
+ }else if(key==='CARRY_CONTINUITY'){
+  const ps=s.spatial.players,owner=ps['H-LB'];Object.assign(owner,{x:56+j('ccx',.4),y:16+j('ccy',.5),vx:3.1,vy:.15});owner.intentKind='CARRY';owner.intentTargetX=74;owner.intentTargetY=16;owner.intentSince=s.second-1;owner.intentMinUntil=s.second+2;owner.intentMaxUntil=s.second+5;
+  s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-LB'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='BUILD_UP';
+ }else if(key==='ST_SHOT_VISIBILITY'){
+  const ps=s.spatial.players,owner=ps['H-ST'];Object.assign(owner,{x:92.8+j('ssx',.25),y:34+j('ssy',.55),vx:.35,vy:0,bodyAngle:0});
+  for(const [id,x,y] of [['A-LCB',88.2,42],['A-RCB',88.4,26],['A-LB',86.5,54],['A-RB',86.5,14],['A-GK',101,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.25);ps[id].y=y+j(id+'y',.4);ps[id].vx=0;ps[id].vy=0;}}
+  s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-ST'};s.ball.progress=localProgress('HOME',owner.x);s.zone='ATTACKING_THIRD';s.phase='FINAL_THIRD';s.danger=.88;
+ }else if(key==='PASS_FLIGHT_WIDE_TRACK'){
+  const ps=s.spatial.players,owner=ps['H-CM'],rw=ps['H-RW'],lw=ps['H-LW'];owner.x=68+j('pf-owner-x',.7);owner.y=34+j('pf-owner-y',1.2);owner.vx=1.0;owner.vy=0;rw.x=80+j('pf-rw-x',.5);rw.y=55+j('pf-rw-y',1.0);rw.vx=2.0;rw.vy=-.1;lw.x=78+j('pf-lw-x',.5);lw.y=13+j('pf-lw-y',1.0);lw.vx=1.7;lw.vy=.1;for(const [id,x,y] of [['A-LB',77,55],['A-LCB',80,41],['A-RCB',80,27],['A-RB',77,13]]){if(ps[id]){ps[id].x=x+j(id+'x',.55);ps[id].y=y+j(id+'y',.8);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
+ }else if(key==='OFFSIDE_INVOLVEMENT'){
+  const ps=s.spatial.players,owner=ps['H-CM'],st=ps['H-ST'],rw=ps['H-RW'];owner.x=70+j('ox',1.2);owner.y=34+j('oy',2.0);owner.vx=1.2;owner.vy=0;st.x=84.55+j('stx',.15);st.y=38+j('sty',1.6);st.vx=.7;st.vy=0;rw.x=84.85+j('rwx',.15);rw.y=53+j('rwy',1.6);rw.vx=.9;rw.vy=-.1;for(const [id,x,y] of [['A-LB',82.1,55],['A-LCB',82.9,41],['A-RCB',83.4,27],['A-RB',81.7,13],['A-GK',99,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.25);ps[id].y=y+j(id+'y',.8);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
+ }else if(key==='DEFENSIVE_ROLE_STABILITY'){
+  const ps=s.spatial.players,owner=ps['H-LB'];owner.x=64+j('dr-owner-x',.8);owner.y=14+j('dr-owner-y',1.0);owner.vx=1.1;owner.vy=0;for(const [id,x,y] of [['H-LW',75,10],['H-ST',79,33],['H-LCM',65,23],['A-RB',74,12],['A-RCB',78,29],['A-CM',67,34],['A-RCM',69,47]]){if(ps[id]){ps[id].x=x+j(id+'x',.65);ps[id].y=y+j(id+'y',.9);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-LB'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);
+ }else if(key==='MARK_TARGET_STABILITY'){
+  const ps=s.spatial.players,owner=ps['H-CM'];owner.x=75+j('mk-owner-x',.7);owner.y=34+j('mk-owner-y',.8);for(const [id,x,y] of [['H-ST',84,34],['H-LW',82,17],['H-RW',82,51],['A-LCB',81,41],['A-RCB',81,27],['A-LB',79,54],['A-RB',79,14],['A-CM',72,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.5);ps[id].y=y+j(id+'y',.7);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-CM'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';
+ }else if(key==='STRIKER_RUN_LANE'){
+  const ps=s.spatial.players,owner=ps['H-RW'],st=ps['H-ST'];owner.x=80+j('st-owner-x',.6);owner.y=55+j('st-owner-y',.8);owner.vx=1.0;owner.vy=-.1;st.x=82+j('st-x',.5);st.y=34+j('st-y',1.0);st.vx=1.2;st.vy=0;for(const [id,x,y] of [['A-LCB',82,41],['A-RCB',82,27],['A-RB',79,13],['H-RCM',73,46]]){if(ps[id]){ps[id].x=x+j(id+'x',.5);ps[id].y=y+j(id+'y',.7);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-RW'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';
+ }else if(key==='CARRIER_SHIELD_FLOW'){
+  const ps=s.spatial.players,owner=ps['H-ST'];owner.x=80+j('sh-owner-x',.45);owner.y=34+j('sh-owner-y',.7);owner.vx=.4;owner.vy=0;for(const [id,x,y] of [['A-LCB',82.2,39],['A-RCB',82.5,29],['H-LW',78,14],['H-RW',78,54],['H-CM',70,34]]){if(ps[id]){ps[id].x=x+j(id+'x',.45);ps[id].y=y+j(id+'y',.65);ps[id].vx=0;ps[id].vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-ST'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';s.danger=Math.max(.62,s.danger);
+ }else{
+  advanceSpatial(session,1.5);
+ }
+ const developerVariant=applyDeveloperScenarioVariant(s,key,scenarioSeed,j);
+ // R15 user-view continuity: every forced verification starts from a short piece of actual
+ // Hybrid spatial motion rather than exposing the freshly seeded formation anchors as frame 0.
+ // This only advances player intent/positions; it does not resolve a future outcome.
+ if(key!=='OFFSIDE_INVOLVEMENT'){
+  // R22: defensive verification is allowed to open only after the deliberately wrong-side
+  // seed has physically established the relation being tested. This advances the real Hybrid
+  // locomotion in short beats; it never teleports the marker or manufactures a scene layout.
+  if(key==='DEFENSIVE_ROLE_STABILITY'||key==='MARK_TARGET_STABILITY'){
+   let elapsed=0;while(elapsed<7.0){s.second+=.5;s.minute=s.second/60;advanceSpatial(session,.5);elapsed+=.5;const rb=s.spatial?.players?.['A-RB'],lw=s.spatial?.players?.['H-LW'];if(elapsed>=2.0&&rb&&lw&&rb.intentKind==='MARK'&&rb.intentTargetId==='H-LW'&&rb.x-lw.x>.15&&rb.y-lw.y>.35&&Math.hypot(rb.x-lw.x,rb.y-lw.y)<3.2)break;}
+  }else{s.second+=1.0;s.minute=s.second/60;advanceSpatial(session,1.0);}
+ }
+ if(key==='ST_SHOT_VISIBILITY'){
+  // R20 visual report: the focused finishing check must enter high-res with an actually live
+  // striker run. The old seed placed the ST in the box, advanced one Hybrid second, then handed
+  // high-res a nearly stationary SUPPORT state, so the test itself manufactured the stop.
+  const owner=s.spatial?.players?.['H-ST'];if(owner){const speed=2.75;owner.vx=speed;owner.vy=0;owner.intentKind='SUPPORT';owner.intentTargetId=null;owner.intentTargetX=clamp(owner.x+5.0,3,101);owner.intentTargetY=owner.y;owner.intentSince=s.second-.4;owner.intentMinUntil=s.second+2.4;owner.intentMaxUntil=s.second+4.8;owner.sourceTask='HYBRID_FINISH_RUN';s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-ST'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase='FINAL_THIRD';}
+ }
+ if(key==='CARRY_CONTINUITY'){
+  const owner=s.spatial?.players?.['H-LB'];if(owner){const sp=Math.max(2.8,Math.hypot(owner.vx||0,owner.vy||0));owner.vx=sp;owner.vy=0;owner.intentKind='CARRY';owner.intentTargetId=null;owner.intentTargetX=clamp(owner.x+10.0,3,101);owner.intentTargetY=owner.y;owner.intentSince=s.second-.5;owner.intentMinUntil=s.second+2.8;owner.intentMaxUntil=s.second+5.0;owner.sourceTask='HYBRID_CARRY_CONTINUE';for(const q of Object.values(s.spatial.players)){if(q.team===owner.team||q.role==='GK')continue;const dx=q.x-owner.x,dy=q.y-owner.y,d=Math.hypot(dx,dy);if(d<4.6){const side=q.y>=owner.y?1:-1;q.x=clamp(owner.x+5.2,3,102);q.y=clamp(owner.y+side*4.1,3,65);q.vx=0;q.vy=0;}}s.spatial.ball={x:owner.x,y:owner.y,ownerId:'H-LB'};s.ball.progress=localProgress('HOME',owner.x);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);}
+ }
+ const e=addEvent(session,'DEVELOPER_RECENT_FIX','HOME',{scenario:key,label,ownerId:s.ball.ownerId,forcedContextOnly:true,futureOutcomePrecomputed:false});
+ const boundary=makeWindow(session,e,reason);boundary.id=`DEV-${key}-${hashSeed(scenarioSeed).toString(16).slice(0,8)}`;boundary.sceneId=boundary.id;boundary.developerScenario={key,label,instruction,seed:scenarioSeed,forcedContextOnly:true,variant:developerVariant,futureOutcomePrecomputed:false};boundary.stateSnapshot.spatial=spatialSnapshot(s);session.status='PAUSED';session.boundary=boundary;
+ return{session,key,label,instruction,seed:scenarioSeed,boundary,futureOutcomePrecomputed:false};
+}
+function structureIntegrity(state){const issues=[];for(const team of['HOME','AWAY']){const s=state.structure[team];if(s.midfieldOccupancy<1&&s.transitionDebt<.55)issues.push(`${team}:MIDFIELD_EMPTY_WITHOUT_CAUSE`);if(s.backLineOccupancy<2&&s.transitionDebt<.65)issues.push(`${team}:BACKLINE_EMPTY_WITHOUT_CAUSE`);if(s.width<28||s.width>78)issues.push(`${team}:WIDTH_OUT_OF_RANGE`);if(s.lineHeight<20||s.lineHeight>82)issues.push(`${team}:LINE_OUT_OF_RANGE`);}return{ok:!issues.length,issues};}
+function updateStructure(session){const s=session.state;for(const team of['HOME','AWAY']){const ts=s.teams[team],x=s.structure[team],inPoss=s.possession===team,risk=ts.intent.fullbackRisk/100*(inPoss?1:.35),trans=s.phase==='TRANSITION'?.18:0;x.transitionDebt=clamp(x.transitionDebt*.72+trans+risk*.06,0,1);x.midfieldOccupancy=clamp(Math.round(ts.shape.midfieldOccupancy-(x.transitionDebt>.62?1:0)),1,4);x.backLineOccupancy=clamp(Math.round(ts.shape.backLineOccupancy-(risk>.55?1:0)-(x.transitionDebt>.75?1:0)),2,5);x.width=clamp(ts.shape.width+(inPoss?6:-3)+(nextRandom(session)-.5)*3,30,75);x.lineHeight=clamp(ts.shape.lineHeight+(inPoss?5:-5)+(s.phase==='TRANSITION'?(nextRandom(session)-.5)*8:0),22,80);}}
+function addEvent(session,kind,team,detail={}){const s=session.state,e={id:`E${String(s.resolvedEvents.length+1).padStart(5,'0')}`,t:s.second,minute:Number((s.second/60).toFixed(2)),kind,team,zone:s.zone,phase:s.phase,detail:deep(detail),context:{possession:s.possession,danger:Number(s.danger.toFixed(3)),ball:{...s.ball},structure:deep(s.structure)}};s.resolvedEvents.push(e);s.chain.push(e);if(s.chain.length>12)s.chain.shift();return e;}
+function causalContext(state,max=8){return state.chain.slice(-max).map(e=>deep(e));}
+function heroId(session){const t=session.opts.heroTeam||'HOME',r=session.opts.heroRole||'CM',p=t==='HOME'?'H':'A';return session.opts.heroPlayerId||`${p}-${r==='ST'?'ST':r==='CB'?'LCB':r==='GK'?'GK':'CM'}`;}
+function selectionSpatialCoherence(state,heroTeam='HOME',heroRole='CM'){
+ const sp=state.spatial?.players;if(!sp)return{ok:true,reasons:[]};
+ const reasons=[],poss=state.possession,px=poss==='HOME'?'H':'A',lx=p=>poss==='HOME'?p.x:105-p.x,speed=p=>Math.hypot(Number(p?.vx||0),Number(p?.vy||0));
+ if(state.phase!=='TRANSITION'){
+  const owner=sp[state.ball.ownerId],ownerX=owner?lx(owner):Number(state.ball.progress||.5)*105,backs=['LB','LCB','RCB','RB'].map(slot=>sp[`${px}-${slot}`]).filter(Boolean),backMean=backs.length?backs.reduce((a,p)=>a+lx(p),0)/backs.length:ownerX;
+  if(ownerX>=62&&ownerX-backMean>47)reasons.push('BACKLINE_TEMPORALLY_DETACHED');
+  const late=backs.filter(p=>['SUPPORT','COVER'].includes(p.intentKind)&&speed(p)>4.5&&Math.hypot(Number(p.intentTargetX??p.x)-p.x,Number(p.intentTargetY??p.y)-p.y)<6.0);
+  if(ownerX>=58&&late.length)reasons.push('BACKLINE_LATE_CATCHUP_RUSH');
+  if(heroTeam===poss&&heroRole==='ST'){
+   const st=sp[`${px}-ST`],lw=sp[`${px}-LW`],rw=sp[`${px}-RW`];
+   if(st&&lw&&rw){const sx=lx(st),wingAvg=(lx(lw)+lx(rw))/2,wingMax=Math.max(lx(lw),lx(rw));if(sx<68&&wingAvg-sx>9){const opp=poss==='HOME'?'A':'H',oppBacks=['LB','LCB','RCB','RB'].map(slot=>sp[`${opp}-${slot}`]).filter(Boolean),oppLine=oppBacks.length?oppBacks.reduce((a,p)=>a+lx(p),0)/oppBacks.length:0,wholeCounterPicture=wingMax<=sx+11&&wingAvg<=64&&oppLine>=65;if(!wholeCounterPicture)reasons.push('ISOLATED_STRIKER_MIDFIELD');}}
+  }
+ }
+ return{ok:reasons.length===0,reasons};
+}
+function makeWindow(session,sourceEvent,reason){const s=session.state,id=`HW${String(s.counters.heroWindows+1).padStart(4,'0')}`;s.counters.heroWindows++;session.lastHeroWindowAt=s.second;const b={id,type:'PROTAGONIST_2D_WINDOW',sceneId:id,atSecond:s.second,sourceEventId:sourceEvent.id,reason,heroPlayerId:heroId(session),heroRole:session.opts.heroRole||'CM',heroTeam:session.opts.heroTeam||'HOME',protagonistPerformance:deep(session.protagonistPerformance),stateSnapshot:{second:s.second,score:{...s.score},possession:s.possession,zone:s.zone,phase:s.phase,danger:s.danger,ball:{...s.ball},structure:deep(s.structure),spatial:spatialSnapshot(s)},preContext:causalContext(s,8),futureOutcomePrecomputed:false,choicePrecomputed:false};s.sceneCandidates.push(deep(b));return b;}
+function capturePromotionState(session){const s=session.state;return{second:s.second,minute:s.minute,score:deep(s.score),possession:s.possession,zone:s.zone,phase:s.phase,danger:s.danger,ball:deep(s.ball),structure:deep(s.structure),spatial:spatialSnapshot(s),chain:deep(s.chain),counters:deep(s.counters),resolvedEventLen:s.resolvedEvents.length,sceneCandidateLen:s.sceneCandidates.length,teamScores:{HOME:s.teams.HOME.score,AWAY:s.teams.AWAY.score},lastHeroWindowAt:session.lastHeroWindowAt,lastSetPieceAt:session.lastSetPieceAt};}
+function restorePromotionState(session,cap){const s=session.state;s.second=cap.second;s.minute=cap.minute;s.score=deep(cap.score);s.possession=cap.possession;s.zone=cap.zone;s.phase=cap.phase;s.danger=cap.danger;s.ball=deep(cap.ball);s.structure=deep(cap.structure);s.spatial=deep(cap.spatial);s.chain=deep(cap.chain);s.counters=deep(cap.counters);s.resolvedEvents.splice(cap.resolvedEventLen);s.sceneCandidates.splice(cap.sceneCandidateLen);s.teams.HOME.score=cap.teamScores.HOME;s.teams.AWAY.score=cap.teamScores.AWAY;session.lastHeroWindowAt=cap.lastHeroWindowAt;session.lastSetPieceAt=cap.lastSetPieceAt;}
+function promoteFromStepStart(session,pre,sourceEvent,reason){const triggerT=Number(sourceEvent?.t??session.state.second),history=session._promotionHistory||[],ht=session.opts.heroTeam||'HOME',hr=session.opts.heroRole||'CM',eligible=history.filter(x=>x.second<=triggerT-12.0&&x.second>=triggerT-28.0),coherent=eligible.filter(x=>selectionSpatialCoherence(x,ht,hr).ok),fallback=[pre,history.at(-1)].filter(Boolean).find(x=>selectionSpatialCoherence(x,ht,hr).ok),chosen=coherent.length?coherent.at(-1):fallback;if(!chosen){session.state.counters.spatialCoherenceWindowSkips=(session.state.counters.spatialCoherenceWindowSkips||0)+1;return null;}restorePromotionState(session,chosen);const trigger={id:`PROMOTE-${sourceEvent?.id||'EVENT'}`,kind:sourceEvent?.kind||'ATTACKING_TRIGGER',detail:deep(sourceEvent?.detail||{}),previewOnly:true},b=makeWindow(session,trigger,reason);b.rewoundFromCalculatedHistory=true;b.promotedTriggerAtSecond=triggerT;return b;}
+function makeSetPieceWindow(session,sourceEvent,kind,team){const s=session.state,id=`SP${String((s.counters.setPieceWindows||0)+1).padStart(4,'0')}`;s.counters.setPieceWindows=(s.counters.setPieceWindows||0)+1;return{id,type:'SET_PIECE_2D_WINDOW',sceneId:id,atSecond:s.second,sourceEventId:sourceEvent.id,reason:`SET_PIECE_${kind}`,setPiece:{kind,team,lane:s.ball.lane,progress:s.ball.progress},heroPlayerId:heroId(session),heroRole:session.opts.heroRole||'CM',heroTeam:session.opts.heroTeam||'HOME',protagonistPerformance:deep(session.protagonistPerformance),stateSnapshot:{second:s.second,score:{...s.score},possession:team,zone:s.zone,phase:s.phase,danger:s.danger,ball:{...s.ball,team},structure:deep(s.structure),spatial:spatialSnapshot(s)},preContext:causalContext(s,8),futureOutcomePrecomputed:false,choicePrecomputed:false};}
+function makeNonHeroShotWindow(session,team,shooter,quality){const s=session.state,id=`NS${String((s.counters.nonHeroShotWindows||0)+1).padStart(4,'0')}`;s.counters.nonHeroShotWindows=(s.counters.nonHeroShotWindows||0)+1;return{id,type:'NON_HERO_SHOT_2D_WINDOW',sceneId:id,atSecond:s.second,sourceEventId:null,reason:'NON_HERO_SHOT',shot:{team,shooterId:shooter,quality,fromZone:s.zone},heroPlayerId:heroId(session),heroRole:session.opts.heroRole||'CM',heroTeam:session.opts.heroTeam||'HOME',protagonistPerformance:deep(session.protagonistPerformance),stateSnapshot:{second:s.second,score:{...s.score},possession:team,zone:s.zone,phase:s.phase,danger:Math.max(s.danger,quality),ball:{...s.ball,team,ownerId:shooter},structure:deep(s.structure),spatial:spatialSnapshot(s)},preContext:causalContext(s,8),futureOutcomePrecomputed:false,choicePrecomputed:false};}
+function makeFinalWindow(session){const s=session.state,id='FINAL-WINDOW';return{id,type:'FINAL_2D_WINDOW',sceneId:id,atSecond:s.second,sourceEventId:null,reason:'FINAL_WHISTLE_WINDOW',heroPlayerId:heroId(session),heroRole:session.opts.heroRole||'CM',heroTeam:session.opts.heroTeam||'HOME',protagonistPerformance:deep(session.protagonistPerformance),stateSnapshot:{second:s.second,score:{...s.score},possession:s.possession,zone:s.zone,phase:s.phase,danger:s.danger,ball:{...s.ball},structure:deep(s.structure),spatial:spatialSnapshot(s)},preContext:causalContext(s,8),futureOutcomePrecomputed:false,choicePrecomputed:false};}
+function maybeHeroWindow(session,e){const s=session.state,ht=session.opts.heroTeam||'HOME',role=session.opts.heroRole||'CM',hid=heroId(session),age=s.second-session.lastHeroWindowAt,actorInvolved=e.detail?.actorId===hid,targetInvolved=e.detail?.targetId===hid,heroInvolved=actorInvolved||targetInvolved,urgentHero=heroInvolved&&s.danger>=.80&&['DANGEROUS_PASS','BOX_ENTRY','TURNOVER_DANGER'].includes(e.kind),roleGap=role==='ST'?105:role==='CM'?72:role==='CB'?80:110,minGap=urgentHero?(role==='ST'?55:42):roleGap;if(age<minGap||session.durationSeconds-s.second<15)return null;let reason=null;
+ if(s.possession===ht){
+   if(role==='ST'&&['FINAL_THIRD','BOX'].includes(s.zone)&&heroInvolved){const direct=['DANGEROUS_PASS','BOX_ENTRY'].includes(e.kind),actorThreat=actorInvolved&&(direct||(e.kind==='PROGRESS'&&s.zone==='BOX'&&s.danger>=.68)),targetThreat=targetInvolved&&direct&&s.danger>=.50;if(actorThreat||targetThreat)reason='ATTACKING_INVOLVEMENT';}
+   else if(role==='CM'&&['PROGRESSION','FINAL_THIRD'].includes(s.phase)&&heroInvolved)reason='MIDFIELD_INVOLVEMENT';
+   else if(role==='CB'&&s.phase==='BUILD_UP'&&heroInvolved)reason='BUILDUP_INVOLVEMENT';
+ }
+ else if(role==='CM'&&e.kind.startsWith('TURNOVER')&&s.danger>=.66&&s.ball.lane==='CENTER')reason='DEFENSIVE_TRANSITION';
+ else if(role==='CB'&&e.kind.startsWith('TURNOVER')&&s.danger>=.58&&['FINAL_THIRD','BOX'].includes(s.zone))reason='DEFENSIVE_TRANSITION';
+ else if(role==='CB'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.72&&['DANGEROUS_PASS','BOX_ENTRY','PROGRESS'].includes(e.kind)){const hp=s.spatial?.players?.[hid],bp=s.spatial?.ball,db=hp&&bp?Math.hypot(hp.x-bp.x,hp.y-bp.y):99,active=hp&&((hp.intentKind==='MARK'&&hp.intentTargetId)||hp.intentKind==='PRESS'||(hp.intentKind==='COVER'&&db<=11));if(active&&(s.zone==='BOX'||e.kind==='DANGEROUS_PASS'||s.danger>=.82))reason='DEFENSIVE_INVOLVEMENT';}
+ else if(role==='GK'&&s.possession!==ht&&['FINAL_THIRD','BOX'].includes(s.zone)&&s.danger>=.60&&['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(e.kind))reason='GK_GOALKEEPING';
+ if(!reason)return null;const coherence=selectionSpatialCoherence(s,ht,role);if(!coherence.ok){session.state.counters.spatialCoherenceWindowSkips=(session.state.counters.spatialCoherenceWindowSkips||0)+1;return null;}return makeWindow(session,e,reason);}
+function doAction(session,policy={},prePromotion=null){const s=session.state,team=s.possession,opp=other(team),tempo=s.teams[team].intent.tempo/100,direct=s.teams[team].intent.directness/100,press=s.teams[opp].intent.press/100;s.counters.actions++;
+ if(!policy.suppressWindows&&s.second-session.lastSetPieceAt>95&&s.ball.progress>.28&&s.ball.progress<.88&&nextRandom(session)<(.0045+press*.0055)){const fouled=pickActor(session,team,s,'FOUL'),fe=addEvent(session,'FOUL',team,{actorId:fouled,actorRole:roleOf(fouled),fouledByTeam:opp,progress:s.ball.progress,lane:s.ball.lane}),fk=addEvent(session,'FREE_KICK',team,{actorId:fouled,actorRole:roleOf(fouled),fromFoul:fe.id,progress:s.ball.progress,lane:s.ball.lane});session.lastSetPieceAt=s.second;return makeSetPieceWindow(session,fk,'FREE_KICK',team);}
+ const baseTurnover=clamp(.075+press*.08+s.danger*.035,.025,.30);if(nextRandom(session)<baseTurnover){s.counters.turnovers++;const prev=s.ball.progress;s.possession=opp;s.ball.team=opp;s.ball.progress=clamp(1-prev+(nextRandom(session)-.5)*.08,.08,.92);s.phase='TRANSITION';s.zone=zoneFromProgress(s.ball.progress);s.danger=clamp(.22+Math.abs(prev-.5)*.55+nextRandom(session)*.18,0,1);const actor=pickActor(session,opp,s,'TURNOVER');s.ball.ownerId=actor;const e=addEvent(session,s.danger>.55?'TURNOVER_DANGER':'TURNOVER',opp,{actorId:actor,actorRole:roleOf(actor),wonFrom:team,progress:s.ball.progress,danger:s.danger});const w=policy.suppressWindows?null:maybeHeroWindow(session,e);if(w)return(w.reason==='ATTACKING_INVOLVEMENT'?promoteFromStepStart(session,prePromotion,e,w.reason):w);return null;}
+ if(nextRandom(session)<.14)s.ball.lane=pick(session,['LEFT','CENTER','RIGHT']);let delta=.018+tempo*.025+(nextRandom(session)-.4)*.025,kind='RECYCLE';if(nextRandom(session)<.18+direct*.34){delta+=.08+direct*.08;kind='PROGRESS';}if(nextRandom(session)<.09+direct*.12){delta+=.11;kind='DANGEROUS_PASS';}s.ball.progress=clamp(s.ball.progress+delta,.06,.99);s.zone=zoneFromProgress(s.ball.progress);s.phase=phaseFromProgress(s.ball.progress);s.danger=clamp((s.ball.progress-.5)*1.2+(kind==='DANGEROUS_PASS'?.18:0)+nextRandom(session)*.16,.05,.95);if(s.zone==='FINAL_THIRD'&&kind==='PROGRESS')kind='BOX_ENTRY';const actor=pickActor(session,team,s,kind),target=['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(kind)?pickTarget(session,team,s,actor):null;s.ball.ownerId=target||actor;const e=addEvent(session,kind,team,{actorId:actor,actorRole:roleOf(actor),targetId:target,targetRole:target?roleOf(target):null,progress:s.ball.progress,lane:s.ball.lane,danger:s.danger});const w=policy.suppressWindows?null:maybeHeroWindow(session,e);if(w)return(w.reason==='ATTACKING_INVOLVEMENT'?promoteFromStepStart(session,prePromotion,e,w.reason):w);
+ // A non-hero shot is never resolved in low resolution. V0.6 computes the real outcome; UI only replays it when it becomes a goal.
+ // V0.4 opened this bridge only after progress>.84, so almost every sampled scene began at the box.
+ // Keep the strong close-range window, but also allow a rarer final-third shot *opportunity* when the live attack has
+ // actually produced a dangerous/progressive action. This changes only when high-res authority is consulted; it does
+ // not choose the shot, target, save, or goal in low resolution.
+ const closeShotWindow=s.ball.progress>.84?(.04+s.danger*.07):0,finalThirdBase=kind==='DANGEROUS_PASS'?.420:kind==='BOX_ENTRY'?.330:kind==='PROGRESS'?.150:0,finalThirdProgress=clamp((s.ball.progress-.72)/.16,0,1),finalThirdDanger=clamp((s.danger-.48)/.47,0,1),finalThirdShotWindow=(s.ball.progress>=.72&&s.ball.progress<.88&&s.danger>=.48&&finalThirdBase>0)?finalThirdBase*(.55+finalThirdProgress*.30+finalThirdDanger*.25)*(s.ball.lane==='CENTER'?1:.78):0,shotWindowChance=Math.max(closeShotWindow,finalThirdShotWindow);
+ if(!policy.suppressWindows&&shotWindowChance>0&&nextRandom(session)<shotWindowChance){const q=clamp(.12+s.danger*.56+Math.max(0,s.ball.progress-.70)*.35+(nextRandom(session)-.5)*.20,.05,.95),priorOwner=s.ball.ownerId,shooter=pickActor(session,team,s,'SHOT');if(shooter===heroId(session)){s.ball.ownerId=priorOwner;const trigger={id:`HERO-FINISH-${String((s.counters.heroFinishingWindows||0)+1).padStart(4,'0')}`,t:s.second,kind:'HERO_FINISHING_WINDOW'};s.counters.heroFinishingWindows=(s.counters.heroFinishingWindows||0)+1;s.danger=Math.max(s.danger,q);return promoteFromStepStart(session,prePromotion,trigger,'ATTACKING_INVOLVEMENT');}s.ball.ownerId=shooter;s.danger=Math.max(s.danger,q);return makeNonHeroShotWindow(session,team,shooter,q);}
+ return null;}
+function syncBoundarySnapshotFromState(boundary,state){
+ if(!boundary?.stateSnapshot)return boundary;boundary.atSecond=state.second;boundary.stateSnapshot.second=state.second;boundary.stateSnapshot.score={...state.score};boundary.stateSnapshot.possession=state.possession;boundary.stateSnapshot.zone=state.zone;boundary.stateSnapshot.phase=state.phase;boundary.stateSnapshot.danger=state.danger;boundary.stateSnapshot.ball={...state.ball};boundary.stateSnapshot.structure=deep(state.structure);boundary.stateSnapshot.spatial=spatialSnapshot(state);return boundary;
+}
+function advanceUntilBoundary(session,policy={}){if(session.status==='FINISHED')return{status:'FINISHED',boundary:null,state:session.state};if(session.status==='PAUSED')return{status:'PAUSED',boundary:session.boundary,state:session.state};let n=0,max=policy.maxActions||20000,finalAt=Math.max(0,session.durationSeconds-5);if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}while(session.state.second<session.durationSeconds&&n++<max){if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.state.second=finalAt;session.state.minute=session.state.second/60;session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}const fineStep=session.state.second<Number(session.fineStepUntil||-999);const prePromotion=capturePromotionState(session);session._promotionHistory=session._promotionHistory||[];session._promotionHistory.push(prePromotion);if(session._promotionHistory.length>16)session._promotionHistory.shift();let dt=fineStep?Math.floor(2+nextRandom(session)*3):Math.floor(session.stepMin+nextRandom(session)*(session.stepMax-session.stepMin+1));if(!session.finalWindowDone&&session.state.second<finalAt&&session.state.second+dt>finalAt)dt=finalAt-session.state.second;session.state.second=Math.min(session.durationSeconds,session.state.second+dt);session.state.minute=session.state.second/60;updateStructure(session);const integ=structureIntegrity(session.state);if(!integ.ok)addEvent(session,'STRUCTURE_INTEGRITY_FAIL','SYSTEM',{issues:integ.issues});if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}const b=doAction(session,policy,prePromotion);if(!b?.rewoundFromCalculatedHistory)advanceSpatial(session,dt);if(b){syncBoundarySnapshotFromState(b,session.state);session.status='PAUSED';session.boundary=b;return{status:'PAUSED',boundary:b,state:session.state,actionsAdvanced:n};}}
+ if(session.state.second>=session.durationSeconds){session.status='FINISHED';session.boundary={type:'MATCH_END',atSecond:session.state.second};return{status:'FINISHED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}throw new Error('advance safety limit exceeded');}
+function localProgress(team,x){return clamp(team==='HOME'?x/105:(105-x)/105,.02,.98);}function localY(team,y){return team==='HOME'?y:68-y;}function laneFor(team,y){const ly=localY(team,y);return ly<25?'LEFT':ly>43?'RIGHT':'CENTER';}
+function deriveStructure(snapshot,team){const ps=snapshot.players.filter(p=>p.team===team),dir=team==='HOME'?1:-1,local=p=>({x:team==='HOME'?p.x:105-p.x,y:localY(team,p.y)}),out=ps.filter(p=>p.role!=='GK'),xs=out.map(p=>local(p).x),ys=out.map(p=>local(p).y),backs=out.filter(p=>['CB','FB'].includes(p.role)).map(p=>local(p).x),cms=out.filter(p=>p.role==='CM').map(p=>local(p).x);return{midfieldOccupancy:Math.max(1,cms.filter(x=>x>22&&x<78).length),backLineOccupancy:Math.max(2,backs.filter(x=>x<68).length),width:clamp(Math.max(...ys)-Math.min(...ys),30,75),lineHeight:clamp(backs.reduce((a,b)=>a+b,0)/Math.max(1,backs.length),22,80),transitionDebt:clamp(snapshot.phase==='TRANSITION'?.65:.18,0,1)};}
+function highResEventFrame(handback,eventT){const rows=[...(handback.episodeFrames||[]),...(handback.postFrames||[])].filter(f=>f&&Number.isFinite(Number(f.time))&&f.ball&&f.score&&Array.isArray(f.players));if(!rows.length)return handback.snapshot||null;rows.sort((a,b)=>Number(a.time)-Number(b.time));let best=rows[0],bestD=Math.abs(Number(best.time)-eventT);for(const f of rows){const d=Math.abs(Number(f.time)-eventT);if(d<bestD-.0001||(Math.abs(d-bestD)<.0001&&Number(f.time)<=eventT)){best=f;bestD=d;}}return best;}
+function highResEventContext(handback,e,fallbackTeam,fallbackState){const f=highResEventFrame(handback,Number(e.t));if(!f)return{zone:fallbackState.zone,phase:fallbackState.phase,context:{possession:fallbackTeam,danger:fallbackState.danger,ball:{...fallbackState.ball},structure:deep(fallbackState.structure)},score:{...fallbackState.score}};const possession=f.possession||e.team||fallbackTeam,progress=localProgress(possession,Number(f.ball.x)||0),ball={team:possession,lane:laneFor(possession,Number(f.ball.y)||34),progress,ownerId:f.ball.ownerId||null},zone=zoneFromProgress(progress),phase=phaseFromProgress(progress),danger=clamp((progress-.5)*1.15+(e.type==='GOAL'?.25:0),.05,.95),structure={HOME:deriveStructure(f,'HOME'),AWAY:deriveStructure(f,'AWAY')};return{zone,phase,context:{possession,danger,ball,structure},score:{...(f.score||fallbackState.score)}};}
+function resumeFromHighRes(session,handback){if(session.status!=='PAUSED'||!['PROTAGONIST_2D_WINDOW','SET_PIECE_2D_WINDOW','NON_HERO_SHOT_2D_WINDOW','FINAL_2D_WINDOW'].includes(session.boundary?.type))throw new Error('session not waiting for high-res handback');const boundaryType=session.boundary?.type;const finalWindow=boundaryType==='FINAL_2D_WINDOW';const snap=handback.snapshot,team=snap.possession||session.state.possession,owner=snap.ball.ownerId||null,progress=localProgress(team,snap.ball.x);session.state.second=Number(snap.time);session.state.minute=session.state.second/60;session.state.score={...snap.score};session.state.possession=team;session.state.ball={team,lane:laneFor(team,snap.ball.y),progress,ownerId:owner};session.state.zone=zoneFromProgress(progress);session.state.phase=phaseFromProgress(progress);session.state.danger=clamp((progress-.5)*1.15+(handback.result?.code==='GOAL'?.25:0),.05,.95);session.state.structure.HOME=deriveStructure(snap,'HOME');session.state.structure.AWAY=deriveStructure(snap,'AWAY');session.state.teams.HOME.score=snap.score.HOME;session.state.teams.AWAY.score=snap.score.AWAY;session.state.spatial={atSecond:session.state.second,source:'V06_HANDOFF_EXACT',lastBallProgress:progress,lastPossession:team,players:Object.fromEntries((snap.players||[]).map(p=>{const kind=V2REF?V2REF.taskToIntent(p.tacticalTask||p.action):'SHAPE',min=kind==='RUN'?3.0:kind==='MARK'?2.6:kind==='COVER'?2.4:kind==='PRESS'?1.2:2.0,max=kind==='RUN'||kind==='MARK'?5.5:kind==='COVER'?5.0:kind==='PRESS'?2.8:kind==='SUPPORT'?4.5:4.0;return[p.id,{id:p.id,team:p.team||teamOfPlayer(p.id),slot:p.slot||slotOf(p.id),role:p.role||roleOf(p.id),x:Number(p.x),y:Number(p.y),vx:Number(p.vx||0),vy:Number(p.vy||0),intentKind:kind,intentTargetId:p.markTargetId||null,intentTargetX:Number(p.tx??p.x),intentTargetY:Number(p.ty??p.y),intentSince:session.state.second,intentMinUntil:session.state.second+min,intentMaxUntil:session.state.second+max,intentScore:.75,sourceTask:p.tacticalTask||p.action||null,lastPossession:team}]})),ball:{x:Number(snap.ball?.x||0),y:Number(snap.ball?.y||0),ownerId:snap.ball?.ownerId||null}};
+ const mapped=(handback.actualEvents||[]).map((e,i)=>{const causal=highResEventContext(handback,e,team,session.state);return{id:`HR-${session.highResHistory.length+1}-${i+1}`,t:Number(e.t),minute:Number((e.t/60).toFixed(2)),kind:`HIGH_RES_${e.type}`,team:e.team||null,zone:causal.zone,phase:causal.phase,detail:{text:e.text||'',sourceType:e.type,actorId:e.actorId||null,targetId:e.targetId||null,score:causal.score,causalFrame:true},context:causal.context};});for(const e of mapped){session.state.resolvedEvents.push(e);session.state.chain.push(e);if(session.state.chain.length>12)session.state.chain.shift();}if(handback.state?.performance)session.protagonistPerformance=deep(handback.state.performance);const fs=handback.snapshot?.telemetry?.focusStats;if(fs){for(const k of Object.keys(session.protagonistMatchStats))session.protagonistMatchStats[k]+=Number(fs[k]||0);}if(handback.hadChoice)session.state.counters.highResChoices++;session.state.lastHighRes={sceneId:session.boundary.sceneId,hadChoice:!!handback.hadChoice,result:deep(handback.result||null),atSecond:session.state.second};session.highResHistory.push(deep({boundary:session.boundary,handback:{hadChoice:!!handback.hadChoice,result:handback.result||null,atSecond:session.state.second}}));session.handledBoundaryIds.push(session.boundary.id);if(finalWindow)session.finalWindowDone=true;if(!finalWindow){const volatileLead=boundaryType==='SET_PIECE_2D_WINDOW'?18:boundaryType==='NON_HERO_SHOT_2D_WINDOW'?8:12;session.fineStepUntil=Math.max(Number(session.fineStepUntil||-999),session.state.second+volatileLead);}session._promotionHistory=[];session.boundary=null;session.status='RUNNING';session.resumeCount++;return session;}
+function snapshot(session){const out=deep(session);delete out._promotionHistory;return out;}function futureEventCount(session){return session.status==='PAUSED'?session.state.resolvedEvents.filter(e=>e.t>session.boundary.atSecond).length:0;}
+return{createSession,createDeveloperScenario,advanceUntilBoundary,resumeFromHighRes,snapshot,structureIntegrity,futureEventCount,roleOf,zoneFromProgress,phaseFromProgress};
+});

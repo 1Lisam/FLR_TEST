@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "FLR_CANDIDATE_QA_RESULT_1.0",
+  "version": "V0.5.4-R26-TRANSPORT-DIAGNOSTIC",
+  "candidateBranch": "r26-transport-verify",
+  "baselineRef": "a9dce0dd11fc0f5bc2789dde28b90c133d51db8d",
+  "baselineSha": "a9dce0dd11fc0f5bc2789dde28b90c133d51db8d",
+  "candidateSha": "e7c92e51c8564286a4c73eefbff60d707fa13ebc",
+  "workflowStatus": "FAIL",
+  "validationExitCode": 1,
+  "failures": [
+    "apply script failed: .flr/r26_apply_transport.py",
+    "validation exit 1"
+  ],
+  "changedFiles": [],
+  "allowedChangedFiles": [
+    "index.html",
+    "step71_hybrid_v06_ui.js",
+    "live_hybrid_session_v02.js",
+    "runtime/continuous_match_core.js",
+    "runtime/hybrid_spatial_intent_v2.js",
+    "runtime/tactical_movement.js"
+  ],
+  "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "baseline": null,
+  "validation": {
+    "parseError": "validation: Expecting value: line 1 column 1 (char 0)",
+    "raw": ""
+  },
+  "applyLog": [
+    {
+      "script": ".flr/r26_apply_transport.py",
+      "exitCode": 128,
+      "stdout": "R26_TRANSPORT bytes=59930 sha256=57173035dab6f1338dbf022b4e6bbdedaed7073cd881cd615a43e1fd8cdb65a1\nCMD git apply --check /home/runner/work/FLR_TEST/FLR_TEST/qa-work/.r26-transport.patch\nSTDOUT \nSTDERR error: corrupt patch at /home/runner/work/FLR_TEST/FLR_TEST/qa-work/.r26-transport.patch:140\n\n",
+      "stderr": ""
+    }
+  ],
+  "validationStderr": "node:fs:440\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\n                   ^\n\nError: ENOENT: no such file or directory, open '/home/runner/work/FLR_TEST/FLR_TEST/qa-work/runtime/defensive_responsibility_core.js'\n    at Object.readFileSync (node:fs:440:20)\n    at read (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/r26_transport_validate.js:3:28)\n    at Object.<anonymous> (/home/runner/work/FLR_TEST/FLR_TEST/candidate/.flr/r26_transport_validate.js:8:11)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '/home/runner/work/FLR_TEST/FLR_TEST/qa-work/runtime/defensive_responsibility_core.js'\n}\n\nNode.js v22.23.2\n"
+}
