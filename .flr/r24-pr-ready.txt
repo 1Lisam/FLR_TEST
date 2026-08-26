@@ -1,4 +1,0 @@
-R24 READY
-base=2209f47eab0baf1d260ac94e9f87373f982ca782
-head=161b74ee519d7b746f9bf3b652901a21c392e499
-files=index.html,live_hybrid_session_v02.js,runtime/hybrid_spatial_intent_v2.js,runtime/tactical_movement.js,step71_hybrid_v06_ui.js
