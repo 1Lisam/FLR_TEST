@@ -1,0 +1,1 @@
+R25 user-test branch was built from R23 accepted baseline and verified against local ALL_R25_QA_PASS artifacts. This transient note will be removed before deployment if PR mergeability requires no extra marker.
