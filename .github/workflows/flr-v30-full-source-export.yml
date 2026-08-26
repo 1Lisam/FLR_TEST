@@ -1,0 +1,30 @@
+name: FLR V30 Full Source Export
+
+on:
+  push:
+    branches: [r23-r22-report-fixes]
+    paths:
+      - '.github/workflows/flr-v30-full-source-export.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: r23-r22-report-fixes
+      - name: Prepare full R23 deployment tree
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/R23_PRODUCTION_FULL
+          rsync -a --exclude='.git' --exclude='.github/workflows/flr-v30-full-source-export.yml' ./ /tmp/R23_PRODUCTION_FULL/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flr-v30-r23-full-source-${{ github.run_id }}
+          path: /tmp/R23_PRODUCTION_FULL
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 2
