@@ -1,0 +1,115 @@
+name: FLR R23 Report Regression
+on:
+  push:
+    branches: [r23-r22-report-fixes]
+    paths:
+      - '.github/workflows/flr-r23-regression.yml'
+permissions:
+  contents: write
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: r23-r22-report-fixes
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run same-seed R23 regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const path=require('path');
+          const H=require('./live_hybrid_session_v02.js');
+          const A=require('./live_v06_scene_authority_browser.js');
+          const C=require('./runtime/action_candidate_engine.js');
+          const E=require('./runtime/continuous_match_core.js');
+          const runtimeDir=path.join(process.cwd(),'runtime');
+          const local=(team,p)=>team==='HOME'?{x:p.x,y:p.y}:{x:105-p.x,y:68-p.y};
+          const angleDiff=(a,b)=>{let d=(a-b)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return Math.abs(d)};
+          const mk=(key,seed)=>H.createDeveloperScenario({key,seed});
+          const high=d=>A.seedMatch(d.boundary,{runtimeDir,seed:`R23-QA-${d.seed}`,explicitHeroChoiceRequired:true});
+          const player=(m,id)=>m.players.find(p=>p.id===id);
+          const fail=(msg)=>{throw new Error(msg)};
+          const report={};
+
+          // QA1: exact reported FORMATION_CONTINUITY seed.
+          {
+            const seed='DEV-RECENT-1787734109353-14',d=mk('FORMATION_CONTINUITY',seed),s=d.boundary.stateSnapshot,sp=s.spatial?.players;
+            if(!sp)fail('QA1 no spatial state');
+            const st=local('HOME',sp['H-ST']),lw=local('HOME',sp['H-LW']),rw=local('HOME',sp['H-RW']),cmx=['H-LCM','H-CM','H-RCM'].map(id=>local('HOME',sp[id]).x),cmAvg=cmx.reduce((a,b)=>a+b,0)/cmx.length;
+            const backs=['A-LB','A-LCB','A-RCB','A-RB'].map(id=>local('HOME',sp[id]).x),oppLine=backs.reduce((a,b)=>a+b,0)/backs.length,wingMax=Math.max(lw.x,rw.x),wingAvg=(lw.x+rw.x)/2;
+            const transition=s.phase==='TRANSITION';
+            const contextOK=transition||st.x>=68||(wingMax<=st.x+9&&wingAvg<=64&&oppLine>=65);
+            const isolated=!transition&&st.x<68&&Math.abs(st.x-cmAvg)<5&&wingAvg>68;
+            if(!contextOK||isolated)fail(`QA1 isolated ST context remains: ST=${st.x.toFixed(2)} CM=${cmAvg.toFixed(2)} wings=${wingAvg.toFixed(2)} oppLine=${oppLine.toFixed(2)} phase=${s.phase}`);
+            const hi=high(d),ast=player(hi.state.m,'A-ST'),speed=Math.hypot(ast.vx,ast.vy),want=Math.atan2(ast.vy,ast.vx),facingErr=speed>.35?angleDiff(ast.bodyAngle,want):0;
+            if(speed>.35&&facingErr>.08)fail(`QA1 A-ST facing seam error ${facingErr}`);
+            report.QA1={at:s.second,phase:s.phase,stX:st.x,cmAvg,wingAvg,oppLine,contextOK,isolated,aST:{x:ast.x,y:ast.y,vx:ast.vx,vy:ast.vy,speed,bodyAngle:ast.bodyAngle,facingErr},awayFront:['A-LW','A-ST','A-RW'].map(id=>{const p=sp[id];return{id,x:p.x,y:p.y,vx:p.vx,vy:p.vy}})};
+          }
+
+          // QA2: exact reported full-back scenario, observe inside/goal-side over 5 seconds.
+          {
+            const d=mk('DEFENSIVE_ROLE_STABILITY','DEV-RECENT-1787734197888-15'),hi=high(d),m=hi.state.m;
+            const pairs=[['A-RB','H-LW'],['A-LB','H-RW']];
+            const stats=Object.fromEntries(pairs.map(([df,at])=>[df,{samples:0,inside:0,goal:0,minInsideMargin:99,maxOutside:0,tasks:new Set()}]));
+            for(let i=0;i<100;i++){
+              E.step(m,0.05);
+              for(const [df,at] of pairs){const d0=player(m,df),a0=player(m,at),dl=local('AWAY',d0),al=local('AWAY',a0),z=stats[df];z.samples++;z.tasks.add(d0.tacticalTask);const insideMargin=Math.abs(al.y-34)-Math.abs(dl.y-34);if(insideMargin>=-0.05)z.inside++;else z.maxOutside=Math.max(z.maxOutside,-insideMargin);if(dl.x<=al.x+.20)z.goal++;z.minInsideMargin=Math.min(z.minInsideMargin,insideMargin);}
+            }
+            for(const z of Object.values(stats))z.tasks=[...z.tasks];
+            report.QA2=stats;
+          }
+
+          // QA3: exact CB-mark stability seed, observe task/target churn for 9 seconds.
+          {
+            const d=mk('MARK_TARGET_STABILITY','DEV-RECENT-1787734342252-19'),hi=high(d),m=hi.state.m,ids=['A-LCB','A-RCB'];
+            const stats=Object.fromEntries(ids.map(id=>[id,{taskChanges:0,markChanges:0,lastTask:player(m,id).tacticalTask,lastMark:player(m,id).markTargetId,maxLatFromST:0,tasks:new Set([player(m,id).tacticalTask])}]));
+            for(let i=0;i<180;i++){
+              E.step(m,0.05);const st=player(m,'H-ST');
+              for(const id of ids){const p=player(m,id),z=stats[id];if(p.tacticalTask!==z.lastTask){z.taskChanges++;z.lastTask=p.tacticalTask;z.tasks.add(p.tacticalTask)}if((p.markTargetId||null)!==(z.lastMark||null)){z.markChanges++;z.lastMark=p.markTargetId||null}z.maxLatFromST=Math.max(z.maxLatFromST,Math.abs(p.y-st.y));}
+            }
+            for(const z of Object.values(stats))z.tasks=[...z.tasks];
+            report.QA3=stats;
+          }
+
+          // QA4: exact shot seed plus pure candidate and execution guards.
+          {
+            const d=mk('ST_SHOT_VISIBILITY','DEV-RECENT-1787734444350-28'),hi=high(d),q=hi.P.inspect(hi.state),ids=(q?.options||[]).map(x=>x.id||x.choice||x.key).filter(Boolean);
+            const hp=player(hi.state.m,'H-ST'),hl=local('HOME',hp);
+            if(hl.x>=91.2&&ids.includes('CARRY'))fail(`QA4 exact shot scene still exposes CARRY at x=${hl.x}`);
+            const cNear=C.generate({role:'ST',localX:92.75,wide:false,pressure:2,space:2,held:.5,shot:{inBox:true,dGoal:12,centrality:0,openWindow:true,blockers:0,oneVOne:true},pass:{}}).map(x=>x.id);
+            const cControl=C.generate({role:'ST',localX:90,wide:false,pressure:2,space:4,held:.5,shot:{inBox:true,dGoal:15,centrality:2,openWindow:false,blockers:1,oneVOne:false},pass:{}}).map(x=>x.id);
+            if(cNear.includes('CARRY'))fail('QA4 pure near-goal candidate still exposes CARRY');
+            if(!cControl.includes('CARRY'))fail('QA4 control context incorrectly removed CARRY');
+            const exec=[];
+            for(const [team,id,x] of [['HOME','H-ST',92.75],['AWAY','A-ST',12.25]]){
+              const m=E.createMatch(`R23-CARRY-${team}`),B=E.choiceActionBridge(),p=B.playerById(m,id);p.x=x;p.y=34;p.tx=x;p.ty=34;p.vx=p.vy=0;B.setControlled(m,p,true);const before=local(team,p).x;B.executeCarry(m,p,{userCommitted:true});const after=local(team,{x:p.tx,y:p.ty}).x;if(after<before-1e-6)fail(`QA4 ${team} carry target moved backward ${before}->${after}`);exec.push({team,before,after});
+            }
+            report.QA4={exactScene:{x:hl.x,options:ids},pureNear:cNear,pureControl:cControl,execution:exec};
+          }
+
+          // QA5 preservation: short carry scenario must not create sustained backward owner motion.
+          {
+            const d=mk('CARRY_CONTINUITY','DEV-RECENT-1787734397122-26'),hi=high(d),m=hi.state.m;let backwards=0,samples=0,stops=0,prevSpeed=null;
+            for(let i=0;i<80;i++){E.step(m,0.05);const owner=player(m,m.ball.ownerId);if(!owner||owner.team!=='HOME')continue;const vx=owner.vx;samples++;if(vx<-.15)backwards++;const sp=Math.hypot(owner.vx,owner.vy);if(prevSpeed!=null&&prevSpeed>2.0&&sp<.25)stops++;prevSpeed=sp;}
+            if(backwards>Math.max(2,Math.floor(samples*.08)))fail(`QA5 carry preservation excessive backwards ${backwards}/${samples}`);
+            report.QA5={samples,backwards,hardStops:stops};
+          }
+
+          console.log('R23_REPORT_REGRESSION',JSON.stringify(report,null,2));
+          console.log('R23_HARD_ASSERTS: PASS');
+          NODE
+      - name: Remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/flr-r23-regression.yml
+          git config user.name 'FLR R23 QA Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'chore: remove temporary R23 regression workflow'
+          git push origin HEAD:r23-r22-report-fixes
