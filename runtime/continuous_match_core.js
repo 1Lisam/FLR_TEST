@@ -1424,8 +1424,8 @@ function executeCarry(m,owner,opts={}){
     // shoulder lateral component instead of pushing several metres closer to goal.
     const angleTouch=!!owner.openShotAngleCarry;owner.openShotAngleCarry=false;
     const lateral=side*(angleTouch?0.82:(pressure<2.2?1.48:1.12))+centralPull;
-    const forward=angleTouch?0.18:(l.x<90.5?Math.min(2.10,stride):l.x>92.0?-0.45:0.65);
-    tx=clamp(l.x+forward,87.5,94.0);ty=clamp(l.y+lateral,15,53);
+    const forward=angleTouch?0.18:(l.x<90.5?Math.min(2.10,stride):l.x>92.0?0:0.65);
+    tx=Math.max(l.x,clamp(l.x+forward,87.5,96.2));ty=clamp(l.y+lateral,15,53);
   }else{
     const trueWide=['WF','FB'].includes(owner.role)&&Math.min(l.y,68-l.y)<=15.5&&l.x>=80;
     if(trueWide){
