@@ -1,13 +1,27 @@
 {
   "schemaVersion": "FLR_CANDIDATE_QA_REQUEST_1.0",
-  "version": "V0.5.4-DEFENCE-NORMALIZATION-R13",
-  "candidateBranch": "test/v054-defense-normalization",
-  "baselineRef": "8965e9eb026d317be95db14bf8e80a135e6aef56",
-  "applyScripts": [".flr/v054_defense_normalization_apply_bundle.py"],
-  "validationScript": ".flr/v054_defense_normalization_validation_r13.js",
-  "baselineScript": ".flr/v054_baseline_stats.js",
-  "changedFiles": ["runtime/tactical_movement.js","runtime/hybrid_spatial_intent_v2.js","runtime/continuous_match_core.js","runtime/protagonist_match_controller.js","live_hybrid_session_v02.js","live_v06_scene_authority_browser.js"],
-  "syntaxChecks": ["runtime/tactical_movement.js","runtime/hybrid_spatial_intent_v2.js","runtime/continuous_match_core.js","runtime/protagonist_match_controller.js","live_hybrid_session_v02.js","live_v06_scene_authority_browser.js"],
-  "resultDir": ".flr/qa-results/V0.5.4-DEFENCE-NORMALIZATION-R13",
-  "runNonce": "2026-08-24T23:34+09:00-r13-integrated"
+  "version": "V0.5.4-R26-TRANSPORT-VERIFY",
+  "candidateBranch": "r26-transport-verify",
+  "baselineRef": "a9dce0dd11fc0f5bc2789dde28b90c133d51db8d",
+  "applyScripts": [".flr/r26_apply_transport.py"],
+  "validationScript": ".flr/r26_transport_validate.js",
+  "changedFiles": [
+    "index.html",
+    "step71_hybrid_v06_ui.js",
+    "live_hybrid_session_v02.js",
+    "runtime/continuous_match_core.js",
+    "runtime/defensive_responsibility_core.js",
+    "runtime/hybrid_spatial_intent_v2.js",
+    "runtime/tactical_movement.js"
+  ],
+  "syntaxChecks": [
+    "step71_hybrid_v06_ui.js",
+    "live_hybrid_session_v02.js",
+    "runtime/continuous_match_core.js",
+    "runtime/defensive_responsibility_core.js",
+    "runtime/hybrid_spatial_intent_v2.js",
+    "runtime/tactical_movement.js"
+  ],
+  "resultDir": ".flr/qa-results/V0.5.4-R26-TRANSPORT-VERIFY",
+  "runNonce": "2026-08-27T08:18+09:00-r26-transport-integrity"
 }
