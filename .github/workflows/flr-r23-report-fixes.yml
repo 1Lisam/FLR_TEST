@@ -1,0 +1,139 @@
+name: FLR R23 Report Fixes
+
+on:
+  push:
+    branches: [r23-r22-report-fixes]
+    paths:
+      - '.github/workflows/flr-r23-report-fixes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: r23-r22-report-fixes
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply focused R23 fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path, old, new, count=1):
+              p=Path(path); s=p.read_text(encoding='utf-8'); n=s.count(old)
+              if n != count:
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {n}: {old[:120]!r}')
+              p.write_text(s.replace(old,new),encoding='utf-8')
+
+          # 1) ST context: judge the striker's actual spatial position, not abstract target progress.
+          replace_exact('live_hybrid_session_v02.js',
+              "if(!sp||receiveLocalX>=62||state.phase==='TRANSITION')return true;",
+              "if(!sp||receiveLocalX>=68||state.phase==='TRANSITION')return true;")
+          replace_exact('live_hybrid_session_v02.js',
+              "pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,targetLocalX));",
+              "pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,team==='HOME'?sp[id].x:105-sp[id].x));")
+          replace_exact('live_hybrid_session_v02.js',
+              "pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,targetX));",
+              "pool=pool.filter(id=>roleOf(id)!=='ST'||strikerReceiveContextOK(state,team,team==='HOME'?sp[id].x:105-sp[id].x));")
+
+          # 1b) Out-of-possession ST/WF recover against the actual ball location during Hybrid time.
+          replace_exact('runtime/hybrid_spatial_intent_v2.js',
+              "    return{kind:'RECOVER',target:base,targetId:null,score:.56};",
+              "    if(['ST','WF'].includes(p.role)){const ballWorld=state.spatial?.ball||abstractBallWorld(state),bl=local(p.team,ballWorld.x,ballWorld.y),slotY=p.slot==='LW'?14:p.slot==='RW'?54:34,recoverX=clamp(bl.x+(p.role==='ST'?21:18),44,66),recoverLocal={x:recoverX,y:clamp(slotY+(bl.y-slotY)*(p.role==='ST'?.16:.10),6,62)},raw=world(p.team,recoverLocal.x,recoverLocal.y);return{kind:'RECOVER',target:capAround(base,raw,18),targetId:null,score:.66};}\n    return{kind:'RECOVER',target:base,targetId:null,score:.56};")
+
+          # 2) Full-back wide tracking: remain on the inside shoulder instead of blending outward to the nominal FB lane.
+          replace_exact('runtime/tactical_movement.js',
+              "    const gap=retreating?3.85:2.85,rawX=wl.x-gap,tx=clamp(retreating?Math.min(rawX,base.x+1.5):rawX,6,42),ty=clamp(lerp(wl.y,base.y,retreating?.30:.14),5,63),w=localToWorld(team,tx,ty);",
+              "    const gap=retreating?3.85:2.85,rawX=wl.x-gap,tx=clamp(retreating?Math.min(rawX,base.x+1.5):rawX,6,42),insideGap=retreating?1.15:.90,insideDir=wl.y<34?1:wl.y>34?-1:0,ty=clamp(wl.y+insideDir*insideGap,5,63),w=localToWorld(team,tx,ty);")
+
+          # 3) CB/FB responsibility stability: an ordinary pass is not a possession emergency.
+          replace_exact('runtime/tactical_movement.js',
+              "  const state=m._defenceMotionStability[team]||(m._defenceMotionStability[team]={players:{},ownerId:owner.id});",
+              "  const state=m._defenceMotionStability[team]||(m._defenceMotionStability[team]={players:{},ownerId:owner.id,possession:m.possession});")
+          replace_exact('runtime/tactical_movement.js',
+              "  const ownerChanged=state.ownerId!==owner.id;\n  if(ownerChanged){state.ownerId=owner.id;for(const q of Object.values(state.players||{})){q.minUntil=m.time+.16;q.laneUntil=m.time;q.lastLateralFlipAt=-99;}}",
+              "  const ownerChanged=state.ownerId!==owner.id,possessionChanged=state.possession!==m.possession;\n  if(ownerChanged){state.ownerId=owner.id;if(possessionChanged){for(const q of Object.values(state.players||{})){q.minUntil=m.time+.16;q.laneUntil=m.time;q.lastLateralFlipAt=-99;}}else{for(const q of Object.values(state.players||{}))q.laneUntil=Math.min(Number(q.laneUntil||m.time),m.time+.18);}}state.possession=m.possession;")
+          replace_exact('runtime/tactical_movement.js',
+              "    const semanticEmergency=ownerChanged||emergencyPress||emergencyWide||emergencyBox;\n    const hardMotionEmergency=ownerChanged||emergencyBox;",
+              "    const semanticEmergency=possessionChanged||emergencyPress||emergencyWide||emergencyBox;\n    const hardMotionEmergency=possessionChanged||emergencyBox;")
+          replace_exact('runtime/tactical_movement.js',
+              "function defensiveResponsibilityHold(family){return family==='PRESS'?.48:family==='WIDE_TRACK'?1.35:family==='MARK'?1.32:family==='COVER'?1.18:1.05;}",
+              "function defensiveResponsibilityHold(family){return family==='PRESS'?.48:family==='WIDE_TRACK'?1.55:family==='MARK'?1.55:family==='COVER'?1.45:1.15;}")
+
+          # 4) Goal-mouth CARRY: hide a central 'forward' option when there is no meaningful forward room.
+          replace_exact('runtime/action_candidate_engine.js',
+              "  out.push(c('CARRY',carry,'space_and_pressure',{space,pressure,clearRunway}));",
+              "  const centralNoForwardRoom=inBox&&!wide&&x>=91.2&&(shot.dGoal||99)<=14.5;if(!centralNoForwardRoom)out.push(c('CARRY',carry,'space_and_pressure',{space,pressure,clearRunway}));")
+
+          # 4b) Execution safety: a CARRY target may never move backward in local attacking X.
+          replace_exact('runtime/continuous_match_core.js',
+              "      const evade=pressure<4?(m.r()-0.5)*2.4:(m.r()-0.5)*1.0;tx=clamp(l.x+stride,4,91.5);ty=clamp(l.y+laneBias+evade,4,64);",
+              "      const evade=pressure<4?(m.r()-0.5)*2.4:(m.r()-0.5)*1.0;tx=Math.max(l.x,clamp(l.x+stride,4,96.2));ty=clamp(l.y+laneBias+evade,4,64);")
+          replace_exact('runtime/continuous_match_core.js',
+              "  const nx=clamp(l.x+dx/n*ext,87.5,94.2),ny=clamp(l.y+dy/n*ext,15,53),w=localToWorld(owner.team,nx,ny);",
+              "  const nx=Math.max(l.x,clamp(l.x+dx/n*ext,87.5,96.2)),ny=clamp(l.y+dy/n*ext,15,53),w=localToWorld(owner.team,nx,ny);")
+          replace_exact('runtime/continuous_match_core.js',
+              "if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?dx/n:1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,clamp(l.x+ux*step,4,96.2),clamp(l.y+uy*step,4,64));",
+              "if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?Math.max(0,dx/n):1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,Math.max(l.x,clamp(l.x+ux*step,4,96.2)),clamp(l.y+uy*step,4,64));")
+          PY
+      - name: Syntax and structural checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check live_hybrid_session_v02.js
+          node --check runtime/hybrid_spatial_intent_v2.js
+          node --check runtime/tactical_movement.js
+          node --check runtime/action_candidate_engine.js
+          node --check runtime/continuous_match_core.js
+          python - <<'PY'
+          from pathlib import Path
+          checks={
+            'live_hybrid_session_v02.js':['receiveLocalX>=68',"sp[id].x:105-sp[id].x"],
+            'runtime/hybrid_spatial_intent_v2.js':['recoverX=clamp','capAround(base,raw,18)'],
+            'runtime/tactical_movement.js':['insideGap=retreating?1.15:.90','possessionChanged=state.possession!==m.possession',"family==='MARK'?1.55"],
+            'runtime/action_candidate_engine.js':['centralNoForwardRoom'],
+            'runtime/continuous_match_core.js':['tx=Math.max(l.x,clamp(l.x+stride,4,96.2))','ux=n>0.18?Math.max(0,dx/n):1']
+          }
+          for f,needles in checks.items():
+              s=Path(f).read_text(encoding='utf-8')
+              for n in needles:
+                  assert n in s,(f,n)
+          print('R23_STRUCTURAL_CHECK: PASS')
+          PY
+      - name: Short runtime smoke and API inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const H=require('./live_hybrid_session_v02.js');
+          const E=require('./runtime/continuous_match_core.js');
+          console.log('HYBRID_API',Object.keys(H).sort().join(','));
+          console.log('CORE_API',Object.keys(E).filter(k=>/create|step|snapshot/i.test(k)).sort().join(','));
+          const m=E.createMatch('R23-SMOKE-01');
+          for(let i=0;i<600;i++)E.step(m,0.05);
+          const s=E.snapshot(m);
+          if(!s||!Array.isArray(s.players)||s.players.length!==22)throw new Error('short smoke snapshot invalid');
+          if(!Number.isFinite(s.time)||s.time<29.9)throw new Error('short smoke time invalid');
+          console.log('R23_SHORT_CORE_SMOKE: PASS',s.time,s.phase,s.score.HOME,s.score.AWAY);
+          NODE
+      - name: Commit candidate source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/flr-r23-report-fixes.yml
+          git config user.name 'FLR R23 Candidate Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          echo 'Changed files:'
+          git diff --cached --name-only
+          git commit -m 'candidate: R23 R22 report spatial and marking fixes'
+          git push origin HEAD:r23-r22-report-fixes
