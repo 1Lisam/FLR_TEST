@@ -272,11 +272,20 @@ function candidateIntent(state,players,p,assignments,now){
     const wideCoverTarget=assignments.wideCoverByDefender?.[p.id];
     if(wideCoverTarget){const threat=players[wideCoverTarget];if(threat)return{kind:'MARK',target:markRelationTarget(state,p,threat),targetId:threat.id,score:.93};}
     const markerEntry=Object.entries(assignments.coverByMarker).find(([,cover])=>cover===p.id);
-    if(markerEntry){const marker=players[markerEntry[0]],threat=players[marker?.intentTargetId],goalX=p.team==='HOME'?0:105;if(threat){const dx=goalX-threat.x,dy=34-threat.y,dg=Math.max(.01,Math.hypot(dx,dy)),side=p.slot==='LCB'?-1:p.slot==='RCB'?1:0,raw={x:threat.x+dx/dg*4.8,y:threat.y+dy/dg*4.8+side*1.25};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}const raw={x:marker.x+(goalX-marker.x)*.16,y:marker.y+(34-marker.y)*.32};return{kind:'COVER',target:capAround(base,raw,10),targetId:marker.id,score:.87};}
+    if(markerEntry){const marker=players[markerEntry[0]],threat=players[marker?.intentTargetId],goalX=p.team==='HOME'?0:105;if(threat){const dx=goalX-threat.x,dy=34-threat.y,dg=Math.max(.01,Math.hypot(dx,dy)),side=p.slot==='LCB'?-1:p.slot==='RCB'?1:0,raw={x:threat.x+dx/dg*5.4,y:threat.y+dy/dg*5.4+side*3.6};return{kind:'COVER',target:capAround(base,raw,12),targetId:threat.id,score:.89};}const raw={x:marker.x+(goalX-marker.x)*.20,y:marker.y+(34-marker.y)*.22+(p.slot==='LCB'?-3.2:p.slot==='RCB'?3.2:0)};return{kind:'COVER',target:capAround(base,raw,12),targetId:null,score:.87};}
     if(['CB','FB','CM'].includes(p.role)){
       const goalX=p.team==='HOME'?0:105,blend=p.role==='CM'?.08:.12;return{kind:'COVER',target:{x:base.x+(goalX-base.x)*blend,y:base.y+(34-base.y)*.08},targetId:null,score:.61};
     }
-    if(['ST','WF'].includes(p.role)){const ballWorld=state.spatial?.ball||abstractBallWorld(state),bl=local(p.team,ballWorld.x,ballWorld.y),slotY=p.slot==='LW'?14:p.slot==='RW'?54:34,recoverX=clamp(bl.x+(p.role==='ST'?21:18),44,66),recoverLocal={x:recoverX,y:clamp(slotY+(bl.y-slotY)*(p.role==='ST'?.16:.10),6,62)},raw=world(p.team,recoverLocal.x,recoverLocal.y);return{kind:'RECOVER',target:capAround(base,raw,18),targetId:null,score:.66};}
+    if(['ST','WF'].includes(p.role)){const ballWorld=state.spatial?.ball||abstractBallWorld(state),bl=local(p.team,ballWorld.x,ballWorld.y),slotY=p.slot==='LW'?14:p.slot==='RW'?54:34;
+      // R24: when the same-side full-back already owns the opponent winger, our winger should
+      // not collapse onto the same defensive lane. Keep him one line higher as an outlet/second-
+      // ball screen unless transition or the ball itself enters that flank.
+      let protectedByFb=false;
+      if(p.role==='WF'&&state.phase!=='TRANSITION'){
+        const oppPrefix=other(p.team)==='HOME'?'H':'A',threatId=`${oppPrefix}-${p.slot==='LW'?'RW':'LW'}`,markerId=assignments.markerByThreat?.[threatId],marker=players[markerId],threat=players[threatId];
+        protectedByFb=!!(marker&&marker.role==='FB'&&threat&&dist(marker,threat)<=10.5&&state.ball.ownerId!==threatId);
+      }
+      const extra=protectedByFb?25:(p.role==='ST'?21:18),recoverX=clamp(bl.x+extra,44,protectedByFb?74:66),lateralBlend=protectedByFb?.04:(p.role==='ST'?.16:.10),recoverLocal={x:recoverX,y:clamp(slotY+(bl.y-slotY)*lateralBlend,6,62)},raw=world(p.team,recoverLocal.x,recoverLocal.y);return{kind:'RECOVER',target:capAround(base,raw,protectedByFb?14:18),targetId:null,score:protectedByFb?.72:.66};}
     return{kind:'RECOVER',target:base,targetId:null,score:.56};
   }
 
@@ -288,11 +297,12 @@ function candidateIntent(state,players,p,assignments,now){
     // abstractBallWorld() could pull a deep-box owner 8-10m backwards even while progress said
     // the attack had advanced. Keep the owner tethered to the actual progress coordinate and
     // only use lane as the lateral reference. This moves a live body; it does not resolve an action.
-    const pr=clamp(Number(state.ball.progress||.5),.03,.97),deepForward=['ST','WF'].includes(p.role)&&pr>=.80;
-    // Keep the narrow R20 fix on deep forwards, where the report exposed an 8-10m backwards
-    // pull. Midfield/build-up carriers retain the established R19 spatial behaviour so this
-    // correction cannot reshape unrelated defensive ecology.
-    let ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state);const latestKind=state.chain?.at(-1)?.kind,progressiveTransfer=['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(latestKind);if(progressiveTransfer){const cur=local(p.team,p.x,p.y),rl=local(p.team,ref.x,ref.y);if(rl.x<cur.x)ref=world(p.team,cur.x,rl.y);}
+    const pr=clamp(Number(state.ball.progress||.5),.03,.97),forwardFinalThird=['ST','WF'].includes(p.role)&&pr>=.62&&['FINAL_THIRD','CHANCE'].includes(state.phase);
+    // R24: once a forward is the actual ball owner in the final third, the live body/ball must
+    // track the attack's real longitudinal progress. The old >=.80 threshold left a striker at
+    // x65 while the attack had already advanced to x72. This still moves physically through the
+    // normal steering model; it does not snap the player or manufacture a choice scene.
+    let ref=forwardFinalThird?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state);const latestKind=state.chain?.at(-1)?.kind,progressiveTransfer=['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(latestKind);if(progressiveTransfer){const cur=local(p.team,p.x,p.y),rl=local(p.team,ref.x,ref.y);if(rl.x<cur.x)ref=world(p.team,cur.x,rl.y);}
     const target=capAround({x:p.x,y:p.y},ref,12);return{kind:'SUPPORT',target,targetId:null,score:.95};
   }
   const backlineIntent=(p.role==='CB'||p.role==='FB')?possessionBacklineIntent(state,players,p,owner):null;
@@ -377,7 +387,14 @@ function updateIntents(state,players,now){
     // must not keep executing that old run after becoming the carrier; doing so can drag the
     // physical ball several metres beyond the abstract match progress before a 2D window.
     const ownerControlSwitch=p.id===state.ball.ownerId&&p.intentKind!==cand.kind;
-    if(releaseOldPress||releaseOldMark||ownerControlSwitch||shouldSwitch(p,cand,now,changed)){
+    const assignedThreatId=Object.entries(ass[p.team].markerByThreat||{}).find(([,did])=>did===p.id)?.[0]||null;
+    const primaryCbResponsibility=p.role==='CB'&&assignedThreatId&&(p.intentKind!=='MARK'||p.intentTargetId!==assignedThreatId);
+    const assignedCoverMarkerId=Object.entries(ass[p.team].coverByMarker||{}).find(([,cid])=>cid===p.id)?.[0]||null;
+    const coverThreatId=assignedCoverMarkerId?players[assignedCoverMarkerId]?.intentTargetId:null;
+    const secondaryCbResponsibility=p.role==='CB'&&assignedCoverMarkerId&&p.id!==ass[p.team].press&&(p.intentKind!=='COVER'||(coverThreatId&&p.intentTargetId!==coverThreatId));
+    // R24: persistence must never freeze an obsolete CB partnership. One CB accepts the ST
+    // shoulder, the partner accepts cover immediately; stale COVER/COVER is not a valid state.
+    if(releaseOldPress||releaseOldMark||ownerControlSwitch||primaryCbResponsibility||secondaryCbResponsibility||shouldSwitch(p,cand,now,changed)){
       p.intentKind=cand.kind;p.intentTargetId=cand.targetId||null;p.intentTargetX=cand.target.x;p.intentTargetY=cand.target.y;
       p.intentSince=now;p.intentMinUntil=now+minIntentDuration(cand.kind);p.intentMaxUntil=now+maxIntentDuration(cand.kind);p.intentScore=cand.score;p.sourceTask=`HYBRID_${cand.kind}`;switches++;
     }else if(p.intentKind===cand.kind){
