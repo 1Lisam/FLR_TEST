@@ -1,6 +1,6 @@
 {
-  "schemaVersion":"FLR_HF3_CANDIDATE_BUILD_REQUEST_1.0",
-  "requestedAt":"2026-08-24T15:35:00+09:00",
-  "branch":"test/v053-hf3-role-stability",
-  "purpose":"Apply structural role stability, carrier freeze, offside involvement timing, and bug-reporter repo-path fixes on isolated HF3 branch"
+  "schemaVersion":"FLR_R26_SOURCE_EXPORT_REQUEST_1.0",
+  "requestedAt":"2026-08-27T08:31:00+09:00",
+  "purpose":"Export exact current main source snapshot after R26 transport corruption was detected; audit/recovery only, no gameplay mutation",
+  "runNonce":"r26-source-recovery-20260827-0831"
 }
