@@ -1,0 +1,72 @@
+ed=true;button.textContent=endpoint?'버그 등록 중…':'등록 서버 확인 중…';}
+-  try{if(!endpoint)throw new Error('BUG_REPORT_ENDPOINT_MISSING');const rid=`umt053h3-${crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}`,reportBundle=attachJson?makeBugReportBundle(d,{reportId:rid,description:desc,category:cat,priority:prio}):null,payload={reportId:rid,build:'USER-MATCH-TEST-V0.5.4-R25',step:78,category:cat,priority:Number(prio),description:desc,summary:snap,debug:reportBundle,client:{userAgent:navigator.userAgent,href:location.href}},r=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error(j.error||`HTTP ${r.status}`);closeBugModal();const scope=attachJson?`현재 상황${reportBundle?.previousSituation?' + 직전 상황':''} 저장됨`:'경기 상황 JSON 미첨부',issueOk=j.issueCreated!==false,msg=issueOk?`버그 등록 완료 · ${j.reportId||rid} · ${scope} · GitHub 로그인 불필요`:`JSON 저장 완료 · ${j.reportId||rid} · GitHub 이슈 자동 생성 실패(리포트 ID 보존됨)`;$('heroPlayback').textContent=msg;pushLiveFeed(msg,'scene');return;}
+-  catch(err){console.warn('FLR anonymous bug report failed',err);const rid=`umt053h3-fallback-${Date.now()}`,reportBundle=attachJson?makeBugReportBundle(d,{reportId:rid,description:desc,category:cat,priority:prio}):null,u=bugFallbackUrl(desc,cat,prio,snap,reportBundle);$('heroPlayback').textContent=attachJson?'자동 등록 실패 · 현재/직전 상황 JSON을 클립보드에 복사했습니다.':'자동 등록 실패 · 설명만 GitHub 등록 화면으로 전달합니다.';window.open(u,'_blank','noopener');}
++  try{if(!endpoint)throw new Error('BUG_REPORT_ENDPOINT_MISSING');const rid=`umt054r26-${crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}`,reportBundle=attachJson?makeBugReportBundle(d,{reportId:rid,description:desc,category:cat,priority:prio}):null,payload={reportId:rid,build:'USER-MATCH-TEST-V0.5.4-R26',step:78,category:cat,priority:Number(prio),description:desc,summary:snap,debug:reportBundle,client:{userAgent:navigator.userAgent,href:location.href}},r=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error(j.error||`HTTP ${r.status}`);closeBugModal();const scope=attachJson?`현재 상황${reportBundle?.previousSituation?' + 직전 상황':''} 저장됨`:'경기 상황 JSON 미첨부',issueOk=j.issueCreated!==false,msg=issueOk?`버그 등록 완료 · ${j.reportId||rid} · ${scope} · GitHub 로그인 불필요`:`JSON 저장 완료 · ${j.reportId||rid} · GitHub 이슈 자동 생성 실패(리포트 ID 보존됨)`;$('heroPlayback').textContent=msg;pushLiveFeed(msg,'scene');return;}
++  catch(err){console.warn('FLR anonymous bug report failed',err);const rid=`umt054r26-fallback-${Date.now()}`,reportBundle=attachJson?makeBugReportBundle(d,{reportId:rid,description:desc,category:cat,priority:prio}):null,u=bugFallbackUrl(desc,cat,prio,snap,reportBundle);$('heroPlayback').textContent=attachJson?'자동 등록 실패 · 현재/직전 상황 JSON을 클립보드에 복사했습니다.':'자동 등록 실패 · 설명만 GitHub 등록 화면으로 전달합니다.';window.open(u,'_blank,'noopener');}
+   finally{if(button){button.disabled=false;button.textContent='버그 등록';}}
+ }
+ function loop(ts){const real=Math.min(.08,(ts-last)/1000);last=ts;if(phase==='PRE_REPLAY'&&replayList.length)processReplay(real);else if(phase==='RESULT_PLAYBACK'&&session)processResult(real);else if(phase==='EPISODE_CONTINUATION'&&session)processEpisodeContinuation(real);requestAnimationFrame(loop)}
+--- live_hybrid_session_v02.js
++++ live_hybrid_session_v02.js
+@@ -232,7 +232,7 @@
+   // seed has physically established the relation being tested. This advances the real Hybrid
+   // locomotion in short beats; it never teleports the marker or manufactures a scene layout.
+   if(key==='DEFENSIVE_ROLE_STABILITY'||key==='MARK_TARGET_STABILITY'){
+-   let elapsed=0;while(elapsed<7.0){s.second+=.5;s.minute=s.second/60;advanceSpatial(session,.5);elapsed+=.5;const rb=s.spatial?.players?.['A-RB'],lw=s.spatial?.players?.['H-LW'];if(elapsed>=2.0&&rb&&lw&&rb.intentKind==='MARK'&&rb.intentTargetId==='H-LW'7&&rb.x-lw.x>.15&&rb.y-lw.y>.35&&Math.hypot(rb.x-lw.x,rb.y-lw.y)<3.2)break;}
++   let elapsed=0;while(elapsed<7.0){s.second+=.5;s.minute=s.second/60;advanceSpatial(session,.5);elapsed+=.5;const rb=s.spatial?.players?.['A-RB'],lw=s.spatial?.players?.['H-LW'];if(elapsed>=2.0&&rb&&lw&&rb.intentKind==='MARK'&&rb.intentTargetId==='H-LW'&&rb.x-lw.x>.15&&rb.y-lw.y>.35&&Math.hypot(rb.x-lw.x,rb.y-lw.y)<3.2&&selectionSpatialCoherence(s,'HOME','ST').ok)break;}
+   }else{s.second+=1.0;s.minute=s.second/60;advanceSpatial(session,1.0);}
+  }
+  if(key==='ST_SHOT_VISIBILITY'){
+@@ -255,15 +255,44 @@
+ function heroId(session){const t=session.opts.heroTeam||'HOME',r=session.opts.heroRole||'CM',p=t==='HOME'?'H':'A';return session.opts.heroPlayerId||`${p}-${r==='ST'?'ST':r==='CB'?'LCB':r==='GK'?'GK':'CM'}`;}
+ function selectionSpatialCoherence(state,heroTeam='HOME',heroRole='CM'){
+  const sp=state.spatial?.players;if(!sp)return{ok:true,reasons:[]};
+- const reasons=[],poss=state.possession,px=poss==='HOME'?'H':'A',lx=p=>poss==='HOME'?p.x:105-p.x,speed=p=>Math.hypot(Number(p?.vx||0),Number(p?.vy||0));
++ const reasons=[],poss=state.possession,px=poss==='HOME'?'H':'A',op=poss==='HOME'?'A':'H',lx=p=>poss==='HOME'?p.x:105-p.x,speed=p=>Math.hypot(Number(p?.vx||0),Number(p?.vy||0)),d=(a,b)=>Math.hypot(Number(a?.x||0)-Number(b?.x||0),Number(a?.y||0)-Number(b?.y||0));
+  if(state.phase!=='TRANSITION'){
+   const owner=sp[state.ball.ownerId],ownerX=owner?lx(owner):Number(state.ball.progress||.5)*105,backs=['LB','LCB','RCB','RB'].map(slot=>sp[`${px}-${slot}`]).filter(Boolean),backMean=backs.length?backs.reduce((a,p)=>a+lx(p),0)/backs.length:ownerX;
+   if(ownerX>=62&&ownerX-backMean>47)reasons.push('BACKLINE_TEMPORALLY_DETACHED');
+   const late=backs.filter(p=>['SUPPORT','COVER'].includes(p.intentKind)&&speed(p)>4.5&&Math.hypot(Number(p.intentTargetX??p.x)-p.x,Number(p.intentTargetY??p.y)-p.y)<6.0);
+   if(ownerX>=58&&late.length)reasons.push('BACKLINE_LATE_CATCHUP_RUSH');
++
++  // R26 rest-defence: in settled possession both centre-backs must stay own-goal-side of
++  // the deepest live counter outlet. A neat line in front of the opponent forwards is not coherent.
++  const counter=Object.values(sp).filter(p=>p.team!==poss&&['ST','WF'].includes(p.role)),cbs=['LCB','RCB'].map(slot=>sp[`${px}-${slot}`]).filter(Boolean);
++  if(ownerX>=58&&counter.length&&cbs.length){const deepest=Math.min(...counter.map(lx));if(cbs.some(p=>lx(p)>deepest+.8))reasons.push('REST_DEFENCE_COUNTER_WRONG_SIDE');}
++
++  const st=sp[`${px}-ST`],oppMids=['LCM','CM','RCM'].map(slot=>sp[`${op}-${slot}`]).filter(Boolean),oppBacks=['LB','LCB','RCB','RB'].map(slot=>sp[`${op}-${slot}`]).filter(Boolean);
++  if(st&&oppMids.length&&oppBacks.length&&['FINAL_THIRD','CHANCE'].includes(state.phase)){
++    const midMean=oppMids.reduce((a,p)=>a+lx(p),0)/oppMids.length,backSorted=oppBacks.map(lx).sort((a,b)=>a-b),backLine=backSorted[Math.max(0,backSorted.length-2)];
++    if(lx(st)<Math.min(backLine-1.5,midMean)-1.5)reasons.push('STRIKER_BEHIND_OPPONENT_MIDFIELD');
++  }
++
++  // R26 role bands: the 8 must not occupy the centre-back band, or the exact same lane as
++  // the winger, in a settled final-third picture.
++  if(['FINAL_THIRD','CHANCE'].includes(state.phase))for(const [side,cbSlot,cmSlot,wfSlot] of [['L','LCB','LCM','LW'],['R','RCB','RCM','RW']]){
++    const cb=sp[`${px}-${cbSlot}`],cm=sp[`${px}-${cmSlot}`],wf=sp[`${px}-${wfSlot}`];
++    if(cb&&cm&&lx(cm)-lx(cb)<12&&Math.abs(cm.y-cb.y)<8.5)reasons.push(`${side}_CB_8_ROLE_BAND_COLLAPSE`);
++    if(cm&&wf&&Math.abs(lx(cm)-lx(wf))<8&&Math.abs(cm.y-wf.y)<6.5)reasons.push(`${side}_8_WINGER_LANE_STACK`);
++  }
++  const pivot=sp[`${px}-CM`],l8=sp[`${px}-LCM`],r8=sp[`${px}-RCM`];if(pivot&&['FINAL_THIRD','CHANCE'].includes(state.phase)){for(const e of[l8,r8].filter(Boolean))if(lx(e)<lx(pivot)+3.0)reasons.push(`${e.slot}_BEHIND_PIVOT_BAND`);}
++
++  // Outside the box, a choice scene should not open on a seven-body pile-up unless the match
++  // is explicitly in transition. The engine still computes the sequence; this only rejects an
++  // incoherent decision boundary while movement constraints disperse secondary roles.
++  const bw=state.spatial?.ball||owner,ballX=bw?lx(bw):ownerX;if(bw&&ballX<88.5){const crowded=Object.values(sp).filter(p=>p.role!=='GK'&&d(p,bw)<6.0).length;if(crowded>=6)reasons.push('OUTSIDE_BOX_EXCESSIVE_CONGESTION');}
++
++  // A defending winger can press in midfield but should not arrive as a de-facto full-back.
++  const defTeam=poss==='HOME'?'AWAY':'HOME',defLocalX=p=>defTeam==='HOME'?p.x:105-p.x;for(const wf of Object.values(sp).filter(p=>p.team===defTeam&&p.role==='WF'))if(defLocalX(wf)<23&&['PRESS','MARK'].includes(wf.intentKind))reasons.push('WINGER_DEFENSIVE_DEPTH_OVERREACH');
++
+   if(heroTeam===poss&&heroRole==='ST'){
+-   const st=sp[`${px}-ST`],lw=sp[`${px}-LW`],rw=sp[`${px}-RW`];
+-   if(st&&lw&&rw){const sx=lx(st),wingAvg=(lx(lw)+lx(rw))/2,wingMax=Math.max(lx(lw),lx(rw));if(sx<68&&wingAvg-sx>9){const opp=poss==='HOME'?'A':'H',oppBacks=['LB','LCB','RCB','RB'].map(slot=>sp[`${opp}-${slot}`]).filter(Boolean),oppLine=oppBacks.length?oppBacks.reduce((a,p)=>a+lx(p),0)/oppBacks.length:0,wholeCounterPicture=wingMax<=sx+11&&wingAvg<=64&&oppLine>=65;if(!wholeCounterPicture)reasons.push('ISOLATED_STRIKER_MIDFIELD');}}
++   const lw=sp[`${px}-LW`],rw=sp[`${px}-RW`];
++   if(st&&lw&&rw){const sx=lx(st),wingAvg=(lx(lw)+lx(rw))/2,wingMax=Math.max(lx(lw),lx(rw));if(sx<68&&wingAvg-sx>9){const oppLine=oppBacks.length?oppBacks.reduce((a,p)=>a+lx(p),0)/oppBacks.length:0,wholeCounterPicture=wingMax<=sx+11&&wingAvg<=64&&oppLine>=65;if(!wholeCounterPicture)reasons.push('ISOLATED_STRIKER_MIDFIELD');}}
+   }
+  }
+  return{ok:reasons.length===0,reasons};
+@@ -301,7 +330,14 @@
+ function syncBoundarySnapshotFromState(boundary,state){
+  if(!boundary?.stateSnapshot)return boundary;boundary.atSecond=state.second;boundary.stateSnapshot.second=state.second;boundary.stateSnapshot.score={...state.score};boundary.stateSnapshot.possession=state.possession;boundary.stateSnapshot.zone=state.zone;boundary.stateSnapshot.phase=state.phase;boundary.stateSnapshot.danger=state.danger;boundary.stateSnapshot.ball={...state.ball};boundary.stateSnapshot.structure=deep(state.structure);boundary.stateSnapshot.spatial=spatialSnapshot(state);return boundary;
+ }
+-function advanceUntilBoundary(session,policy={}){if(session.status==='FINISHED')return{status:'FINISHED',boundary:null,state:session.state};if(session.status==='PAUSED')return{status:'PAUSED',boundary:session.boundary,state:session.state};let n=0,max=policy.maxActions||20000,finalAt=Math.max(0,session.durationSeconds-5);if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}while(session.state.second<session.durationSeconds&&n++<max){if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.state.second=finalAt;session.state.minute=session.state.second/60;session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}const fineStep=session.state.second<Number(session.fineStepUntil||-999);const prePromotion=capturePromotionState(session);session._promotionHistory=session._promotionHistory||[];session._promotionHistory.push(prePromotion);if(session._promotionHistory.length>16)session._promotionHistory.shift();let dt=fineStep?Math.floor(2+nextRandom(sessio

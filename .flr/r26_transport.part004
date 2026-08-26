@@ -1,0 +1,80 @@
+n)*3):Math.floor(session.stepMin+nextRandom(session)*(session.stepMax-session.stepMin+1));if(!session.finalWindowDone&&session.state.second<finalAt&&session.state.second+dt>finalAt)dt=finalAt-session.state.second;session.state.second=Math.min(session.durationSeconds,session.state.second+dt);session.state.minute=session.state.second/60;updateStructure(session);const integ=structureIntegrity(session.state);if(!integ.ok)addEvent(session,'STRUCTURE_INTEGRITY_FAIL','SYSTEM',{issues:integ.issues});if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}const b=doAction(session,policy,prePromotion);if(!b?.rewoundFromCalculatedHistory)advanceSpatial(session,dt);if(b){syncBoundarySnapshotFromState(b,session.state);session.status='PAUSED';session.boundary=b;return{status:'PAUSED',boundary:b,state:session.state,actionsAdvanced:n};}}
++function advanceUntilBoundary(session,policy={}){if(session.status==='FINISHED')return{status:'FINISHED',boundary:null,state:session.state};if(session.status==='PAUSED')return{status:'PAUSED',boundary:session.boundary,state:session.state};let n=0,max=policy.maxActions||20000,finalAt=Math.max(0,session.durationSeconds-5);if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}while(session.state.second<session.durationSeconds&&n++<max){if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.state.second=finalAt;session.state.minute=session.state.second/60;session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}const fineStep=session.state.second<Number(session.fineStepUntil||-999);const prePromotion=capturePromotionState(session);session._promotionHistory=session._promotionHistory||[];session._promotionHistory.push(prePromotion);if(session._promotionHistory.length>16)session._promotionHistory.shift();let dt=fineStep?Math.floor(2+nextRandom(session)*3):Math.floor(session.stepMin+nextRandom(session)*(session.stepMax-session.stepMin+1));if(!session.finalWindowDone&&session.state.second<finalAt&&session.state.second+dt>finalAt)dt=finalAt-session.state.second;session.state.second=Math.min(session.durationSeconds,session.state.second+dt);session.state.minute=session.state.second/60;updateStructure(session);const integ=structureIntegrity(session.state);if(!integ.ok)addEvent(session,'STRUCTURE_INTEGRITY_FAIL','SYSTEM',{issues:integ.issues});if(!session.finalWindowDone&&session.state.second>=finalAt-.001){session.status='PAUSED';session.boundary=makeFinalWindow(session);return{status:'PAUSED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}const b=doAction(session,policy,prePromotion);if(!b?.rewoundFromCalculatedHistory)advanceSpatial(session,dt);if(b&&!b.rewoundFromCalculatedHistory&&['PROTAGONIST_2D_WINDOW','NON_HERO_SHOT_2D_WINDOW'].includes(b.type)){
+   // The user sees the state *after* this step's spatial advance. R25/R26 originally checked
+   // direct CM/CB/GK windows before advanceSpatial(), then overwrote the boundary snapshot with
+   // the post-advance state. A window could therefore pass QA and still open on a bad shape.
+   // Gate the exact final display state, not the earlier abstract trigger state.
+   const coherence=selectionSpatialCoherence(session.state,session.opts.heroTeam||'HOME',session.opts.heroRole||'CM');
+  if(!coherence.ok){session.state.counters.spatialCoherenceWindowSkips=(session.state.counters.spatialCoherenceWindowSkips||0)+1;if(b.type==='NON_HERO_SHOT_2D_WINDOW')session.state.counters.nonHeroShotCoherenceSkips=(session.state.counters.nonHeroShotCoherenceSkips||0)+1;else session.state.counters.postAdvanceHeroCoherenceSkips=(session.state.counters.postAdvanceHeroCoherenceSkips||0)+1;continue;}
++}if(b){syncBoundarySnapshotFromState(b,session.state);session.status='PAUSED';session.boundary=b;return{status:'PAUSED',boundary:b,state:session.state,actionsAdvanced:n};}}
+ if(session.state.second>=session.durationSeconds){session.status='FINISHED';session.boundary={type:'MATCH_END',atSecond:session.state.second};return{status:'FINISHED',boundary:session.boundary,state:session.state,actionsAdvanced:n};}throw new Error('advance safety limit exceeded');}
+function localProgress(team,x){return clamp(team==='HOME'?x/105:(105-x)/105,.02,.98);}function localY(team,y){return team==='HOME'?y:68-y;}function laneFor(team,y){const ly=localY(team,y);return ly<25?'LEFT':ly>43?'RIGHT':'CENTER';}
+function deriveStructure(snapshot,team){const ps=snapshot.players.filter(p=>p.team===team),dir=team==='HOME'?1:-1,local=p=>({x:team==='HOME'?p.x:105-p.x,y:localY(team,p.y)}),out=ps.filter(p=>p.role!=='GK'),xs=out.map(p=>local(p).x),ys=out.map(p=>local(p).y),backs=out.filter(p=>['CB','FB'].includes(p.role)).map(p=>local(p).x),cms=out.filter(p=>p.role==='CM').map(p=>local(p).x);return{midfieldOccupancy:Math.max(1,cms.filter(x=>x>22&&x<78).length),backLineOccupancy:Math.max(2,backs.filter(x=>x<68).length),width:clamp(Math.max(...ys)-Math.min(...ys),30,75),lineHeight:clamp(backs.reduce((a,b)=>a+b,0)/Math.max(1,backs.length),22,80),transitionDebt:clamp(snapshot.phase==='TRANSITION'?.65:.18,0,1)};}
+--- runtime/continuous_match_core.js
++++ runtime/continuous_match_core.js
+@@ -187,7 +187,11 @@
+  const extra=Math.max(0,target-visible);m.time+=extra;m.stats.compressedDeadClock=(m.stats.compressedDeadClock||0)+extra;m.stats.compressedDeadClockByKind=m.stats.compressedDeadClockByKind||{};m.stats.compressedDeadClockByKind[kind]=(m.stats.compressedDeadClockByKind[kind]||0)+extra;return extra;
+}
+function startGoalCelebration(m,scoringTeam){
+-  consumeCompressedDeadClock(m,'GOAL');
+  // R26 presentation/clock separation: do NOT advance the match clock by the hidden 25s in
+  // the same physics tick that crosses the goal line. R25 recorded a frame at 123.2s and the
+  // next one at 148.3s, so interpolation made the final 2.4m of the shot crawl for 25 seconds.
+  // Keep the visible celebration continuous; consume the hidden dead clock only when kickoff
+  // becomes ready, after the goal scene has had a clean terminal frame.
+  const kickoffTeam=other(scoringTeam),scorer=playerById(m,m.ball.lastTouchPlayer)||outfield(m,scoringTeam).sort((a,b)=>dist(a,m.ball)-dist(b,m.ball))[0];
+  for(const p of m.players)clearOpenPlayIntentForGoal(m,p);
+  m.activeDuel=null;m.transitionUntil=0;m.ballOwner=null;m.possession=kickoffTeam;
+@@ -205,7 +209,7 @@
+    const t=kickoffSetupTarget(p,kickoffTeam);p.tx=t.x;p.ty=t.y;p.action='RETURN_FOR_KICKOFF';p.tacticalTask='RETURN_FOR_KICKOFF';p.sprint=dist(p,t)>7;
+}
+m.goalCelebration={scoringTeam,kickoffTeam,scorerId:scorer?.id||null,joinerIds:joiners,startedAt:m.time};
+-m.restart={kind:'KICKOFF',team:kickoffTeam,until:m.time+5.0};m.phase='GOAL_CELEBRATION';m.nextShape=m.restart.until;
++m.restart={kind:'KICKOFF,team:kickoffTeam,until:m.time+5.0,pendingCompressedDeadClock:'GOAL'};m.phase='GOAL_CELEBRATION';m.nextShape=m.restart.until;
+}
+function updateGoalCelebrationTargets(m){
+  const c=m.goalCelebration;if(!c)return;
+@@ -473,6 +477,10 @@
+   // Front players can recover into a block, but a default HOLD_BLOCK must not look like a
+   // centre-back-style emergency sprint through midfield. Explicit press/chase tasks are untouched.
+   if(['ST','WF'].includes(p.role)&&p.tacticalTask==='HOLD_BLOCK')vmax=Math.min(vmax,4.20);
++  // R26: after an advanced full-back releases the ball, reconnect as a controlled recovery
++  // rather than a 20m full-speed snap back to a formation target. Emergency chase tasks are
++   // intentionally excluded from this cap.
++  if(p.role==='FB'&&['REST_BALANCE','OUTSIDE_SUPPORT','FULLBACK_BALANCD_SUPPORT','FULLBACK_RECYCLE_SUPPORT'].includes(p.tacticalTask))vmax=Math.min(vmax,3.75);
+    if(p.role==='GK'&&p.tacticalTask==='GK_SAVE_SET'){const gkMove=(abilityValue(m,p,'reaction')+abilityValue(m,p,'agility'))/2;vmax=clamp(5.85+(gkMove-60)*0.032,5.25,7.05);}
+   const pathFacing=Math.atan2(n.y,n.x),markFacing=controlledMarker&&!realTurnAndRun&&markedGap<=7.5?Math.atan2(markedPlayer.y-p.y,markedPlayer.x-p.x):null,explicitFacing=Number.isFinite(markFacing)?markFacing:(Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing),beforeFacing=Number.isFinite(p.bodyAngle)?p.bodyAngle:pathFacing,lowSpeed=Math.hypot(p.vx||0,p.vy||0);
+   // R16 feedback: a forward standing on a sub-metre micro-target must not spin through a
+@@ -2038,7 +2046,7 @@
+  }
+ if(!updateDeadBallReturn(m,r))return false;
+ const approachStage=['RUN_UP','APPROACH'].includes(r.stage),ready=approachStage?true:(r.kind==='KICKOFF'?m.time>=r.until:(RESTARTS&&typeof RESTARTS.isReady==='function'?RESTARTS.isReady(m):m.time>=r.until));if(!ready)return false;
+-  if(r.kind==='KICKOFF'){if(m.ball.mode==='DEAD'||!m.ball.ownerId)placeKickoff(m,r.team);const owner=playerById(m,m.ball.ownerId);if(owner)owner.nextThink=m.time+(owner.role==='GK'?0.70:1.10);m.kickoffBuildUntil=m.time+5.5;m.phase='OPEN_PLAY';m.restart=null;return true;}
++  if(r.kind==='KICKOFF'){if(r.pendingCompressedDeadClock){const kind=r.pendingCompressedDeadClock;r.pendingCompressedDeadClock=null;consumeCompressedDeadClock(m,kind);}if(m.ball.mode==='DEAD'||!m.ball.ownerId)placeKickoff(m,r.team);const owner=playerById(m,m.ball.ownerId);if(owner)owner.nextThink=m.time+(owner.role==='GK'?0.70:1.10);m.kickoffBuildUntil=m.time+5.5;m.phase='OPEN_PLAY';m.restart=null;return true;}
+  if(r.kind==='THROW_IN'){
+    const plan=RESTARTS&&typeof RESTARTS.chooseThrowPlan==='function'?RESTARTS.chooseThrowPlan(m):null;
+    const thrower=plan?playerById(m,plan.throwerId):outfield(m,r.team).sort((a,b)=>dist(a,{x:r.x,y:r.y})-dist(b,{x:r.x,y:r.y}))[0];
+--- runtime/defensive_responsibility_core.js
++++ runtime/defensive_responsibility_core.js
+@@ -26,7 +26,10 @@
+    let first=null;
+    if(owner.role==='ST'&&central&&ownerL.x<=43){first=chooseClosest(cbs,owner)?.p||null;}
+    else if(!central||owner.role==='WF'||owner.role==='FB'){
+-     const sideFb=chooseClosest(fbs,owner,p=>sideOfSlot(p.slot)===side),sideCm=chooseClosest(cms,owner,p=>sideOfSlot(p.slot)===side||p.slot==='CM'),sideWf=chooseClosest(wfs,owner,p=>sideOfSlot(p.slot)===side);
+     const sideFb=chooseClosest(fbs,owner,p=>sideOfSlot(p.slot)===side),sideCM=chooseClosest(cms,owner,p=>sideOfSlot(p.slot)===side||p.slot==='CM'),sideWf=ownerL.x>=32?chooseClosest(wfs,owner,p=>sideOfSlot(p.slot)===side):null;
+     // R26: a winger may start the press in midfield, but once the carrier enters the defending
+     // third the responsibility must hand off to a midfielder/full-back. Otherwise the winger
+     // follows a full-back all the way into his own box and abandons the counter outlet lane.
+     if(sideFb&&sideFb.d<=16.5)first=sideFb.p;else if(sideCM&&sideCM.d<=17.5)first=sideCM.p;else if(sideWf*&sideWf.d<=18.5)first=sideWf.p;else first=(sideFb||sideCM||sideWf)?.p||null;
+   }else{
+     const cm=chooseClosest(cms,owner),fb=chooseClosest(fbs,owner),cb=chooseClosest(cbs,owner);
+--- runtime/hybrid_spatial_intent_v2.js
++++ runtime/hybrid_spatial_intent_v2.js
+@@ -247,14 +247,23 @@
+  if(p.role==='CB'){
+    const carrierGap=clamp(19.5+debt*7.5+Math.abs(ol.y-34)*.035,18,29),connectedX=ol.x-carrierGap;
+    const liveThreatX=laneThreat?.l.x??outletX,contextX=connectedX*.60+liveThreatX*.24+outletX*.16+lineBias;
+-    const projectedX=cur.x+localVx*.70,targetX=clamp(projectedX+clamp(contextX-projectedX,-8.5,9.0),8,Math.max(12,ol.x-7));
+    const projectedX=cur.x+localVx*.70;let targetX=clamp(projectedX+clamp(contextX-projectedX,-8.5,9.0),8,Math.max(12,ol.x-7));
+    // R26 rest-defence invariant: the possession CB must remain own-goal-side of the
+   // deepest live ST/WF counter outlet. R26
