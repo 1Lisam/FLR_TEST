@@ -30,3 +30,4 @@ jobs:
           path: /tmp/r24-source
           include-hidden-files: true
           if-no-files-found: error
+# trigger: 2026-08-26T16:10Z
