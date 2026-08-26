@@ -276,6 +276,7 @@ function candidateIntent(state,players,p,assignments,now){
     if(['CB','FB','CM'].includes(p.role)){
       const goalX=p.team==='HOME'?0:105,blend=p.role==='CM'?.08:.12;return{kind:'COVER',target:{x:base.x+(goalX-base.x)*blend,y:base.y+(34-base.y)*.08},targetId:null,score:.61};
     }
+    if(['ST','WF'].includes(p.role)){const ballWorld=state.spatial?.ball||abstractBallWorld(state),bl=local(p.team,ballWorld.x,ballWorld.y),slotY=p.slot==='LW'?14:p.slot==='RW'?54:34,recoverX=clamp(bl.x+(p.role==='ST'?21:18),44,66),recoverLocal={x:recoverX,y:clamp(slotY+(bl.y-slotY)*(p.role==='ST'?.16:.10),6,62)},raw=world(p.team,recoverLocal.x,recoverLocal.y);return{kind:'RECOVER',target:capAround(base,raw,18),targetId:null,score:.66};}
     return{kind:'RECOVER',target:base,targetId:null,score:.56};
   }
 
@@ -291,8 +292,8 @@ function candidateIntent(state,players,p,assignments,now){
     // Keep the narrow R20 fix on deep forwards, where the report exposed an 8-10m backwards
     // pull. Midfield/build-up carriers retain the established R19 spatial behaviour so this
     // correction cannot reshape unrelated defensive ecology.
-    const ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state),target=capAround({x:p.x,y:p.y},ref,12);
-    return{kind:'SUPPORT',target,targetId:null,score:.95};
+    let ref=deepForward?world(p.team,pr*105,state.ball.lane==='LEFT'?18:state.ball.lane==='RIGHT'?50:34):abstractBallWorld(state);const latestKind=state.chain?.at(-1)?.kind,progressiveTransfer=['PROGRESS','DANGEROUS_PASS','BOX_ENTRY'].includes(latestKind);if(progressiveTransfer){const cur=local(p.team,p.x,p.y),rl=local(p.team,ref.x,ref.y);if(rl.x<cur.x)ref=world(p.team,cur.x,rl.y);}
+    const target=capAround({x:p.x,y:p.y},ref,12);return{kind:'SUPPORT',target,targetId:null,score:.95};
   }
   const backlineIntent=(p.role==='CB'||p.role==='FB')?possessionBacklineIntent(state,players,p,owner):null;
   if(backlineIntent)return backlineIntent;

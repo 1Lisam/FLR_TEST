@@ -1424,8 +1424,8 @@ function executeCarry(m,owner,opts={}){
     // shoulder lateral component instead of pushing several metres closer to goal.
     const angleTouch=!!owner.openShotAngleCarry;owner.openShotAngleCarry=false;
     const lateral=side*(angleTouch?0.82:(pressure<2.2?1.48:1.12))+centralPull;
-    const forward=angleTouch?0.18:(l.x<90.5?Math.min(2.10,stride):l.x>92.0?-0.45:0.65);
-    tx=clamp(l.x+forward,87.5,94.0);ty=clamp(l.y+lateral,15,53);
+    const forward=angleTouch?0.18:(l.x<90.5?Math.min(2.10,stride):l.x>92.0?0:0.65);
+    tx=Math.max(l.x,clamp(l.x+forward,87.5,96.2));ty=clamp(l.y+lateral,15,53);
   }else{
     const trueWide=['WF','FB'].includes(owner.role)&&Math.min(l.y,68-l.y)<=15.5&&l.x>=80;
     if(trueWide){
@@ -1433,7 +1433,7 @@ function executeCarry(m,owner,opts={}){
       // by-line. The old 91.5m cap made classic flank dribbles physically impossible.
       const evade=(m.r()-0.5)*(pressure<4?0.9:0.45);tx=clamp(l.x+stride,4,98.8);ty=clamp(l.y+evade,3.5,64.5);
     }else{
-      const evade=pressure<4?(m.r()-0.5)*2.4:(m.r()-0.5)*1.0;tx=clamp(l.x+stride,4,91.5);ty=clamp(l.y+laneBias+evade,4,64);
+      const evade=pressure<4?(m.r()-0.5)*2.4:(m.r()-0.5)*1.0;tx=Math.max(l.x,clamp(l.x+stride,4,96.2));ty=clamp(l.y+laneBias+evade,4,64);
     }
   }
   const w=localToWorld(owner.team,tx,ty);
@@ -1452,7 +1452,7 @@ function extendCommittedBoxCarry(m,owner){
   const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),side=owner.boxCarrySide||1;
   let dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy);if(n<0.12){dx=1.0;dy=side*0.42;n=Math.hypot(dx,dy);}
   const ext=Math.min(0.90,Math.max(0.48,(owner.boxCarryCommittedUntil-m.time)*1.45));
-  const nx=clamp(l.x+dx/n*ext,87.5,94.2),ny=clamp(l.y+dy/n*ext,15,53),w=localToWorld(owner.team,nx,ny);
+  const nx=Math.max(l.x,clamp(l.x+dx/n*ext,87.5,96.2)),ny=clamp(l.y+dy/n*ext,15,53),w=localToWorld(owner.team,nx,ny);
   owner.tx=w.x;owner.ty=w.y;m.stats.boxCarryExtensions=(m.stats.boxCarryExtensions||0)+1;return true;
 }
 function executeTakeOn(m,owner,opp){
@@ -1493,7 +1493,7 @@ function ownerThink(m,owner){
   if(userControl&&userControl.playerId===owner.id&&userControl.controllerOwned){
     if(userControl.mode==='CARRY'&&m.time<Number(userControl.until||0)-0.05){
       const remain=dist(owner,{x:owner.tx,y:owner.ty});
-      if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?dx/n:1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,clamp(l.x+ux*step,4,96.2),clamp(l.y+uy*step,4,64));owner.tx=w.x;owner.ty=w.y;owner.action=inOppPenaltyArea(owner.team,owner.x,owner.y)?'COMMITTED_BOX_CARRY':'CARRY_FORWARD';owner.tacticalTask=owner.action;owner.sprint=!inOppPenaltyArea(owner.team,owner.x,owner.y)&&step>2.4;m.stats.userCarryIntentExtensions=(m.stats.userCarryIntentExtensions||0)+1;}
+      if(remain<0.72){const l=worldToLocal(owner.team,owner.x,owner.y),tl=worldToLocal(owner.team,owner.tx,owner.ty),dx=tl.x-l.x,dy=tl.y-l.y,n=Math.hypot(dx,dy),ux=n>0.18?Math.max(0,dx/n):1,uy=n>0.18?dy/n:0,step=clamp((Number(userControl.until)-m.time)*2.25,1.15,3.2),w=localToWorld(owner.team,Math.max(l.x,clamp(l.x+ux*step,4,96.2)),clamp(l.y+uy*step,4,64));owner.tx=w.x;owner.ty=w.y;owner.action=inOppPenaltyArea(owner.team,owner.x,owner.y)?'COMMITTED_BOX_CARRY':'CARRY_FORWARD';owner.tacticalTask=owner.action;owner.sprint=!inOppPenaltyArea(owner.team,owner.x,owner.y)&&step>2.4;m.stats.userCarryIntentExtensions=(m.stats.userCarryIntentExtensions||0)+1;}
     }
     return;
   }

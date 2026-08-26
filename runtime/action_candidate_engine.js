@@ -25,7 +25,7 @@ function generate(ctx){
     let entryPenalty=1.15;if(pressure<1.5)entryPenalty+=1.35;else if(pressure<2.2)entryPenalty+=0.75;if(space<2.0)entryPenalty+=0.80;else if(space<4.5)entryPenalty+=0.35;carry-=entryPenalty;
   }
   if(inBox&&(ctx.boxCarryChain||0)>=1)carry-=Math.min(3.2,0.95*(ctx.boxCarryChain||0)+((ctx.boxCarryChain||0)>=2?0.65:0));
-  out.push(c('CARRY',carry,'space_and_pressure',{space,pressure,clearRunway}));
+  const centralNoForwardRoom=inBox&&!wide&&x>=91.2&&(shot.dGoal||99)<=14.5;if(!centralNoForwardRoom)out.push(c('CARRY',carry,'space_and_pressure',{space,pressure,clearRunway}));
   if(takeOn){
     const adv=clamp(takeOn.skillAdvantage??0,-35,35),behind=clamp(takeOn.spaceBehind||0,0,12),dd=clamp(takeOn.defenderDistance||2.5,0.8,5.5);
     let s=1.95+behind*0.060+adv*0.022+(role==='WF'?0.42:role==='ST'?0.18:0.05)+(wide?0.22:0)+(x>62?0.12:0);

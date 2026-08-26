@@ -1024,9 +1024,11 @@ function enforceFullbackWideRunnerResponsibility(m,team,owner){
   const lock=m._defenceRoleLocks?.[team]||{},attackers=outfield(m,other(team)).filter(a=>a.role==='WF'),pr=profile(m,team),ball=worldToLocal(team,m.ball.x,m.ball.y);
   const nominalCbLine=['LCB','RCB'].map(slot=>defendingBlockAnchors(pr,ball.x,ball.y,slot,'CB').x).reduce((a,b)=>a+b,0)/2,onsideFloor=Math.min(ball.x,nominalCbLine);
   for(const fb of outfield(m,team).filter(p=>p.role==='FB')){
-    if(fb.id===lock.pressId)continue;
     const sg=sideSign(fb.slot),wf=attackers.map(a=>({a,l:worldToLocal(team,a.x,a.y)})).filter(o=>(o.l.y<34?-1:1)===sg&&o.l.x<=52).sort((a,b)=>a.l.x-b.l.x)[0];
     if(!wf)continue;
+    // A full-back may press the actual wide carrier, but must not abandon a live same-side winger
+    // merely because the generic press lock briefly nominated him against another ball carrier.
+    if(fb.id===lock.pressId&&owner.id===wf.a.id)continue;
     const wl=wf.l,releaseSame=fb.wideReleaseTargetId===wf.a.id&&(fb.wideReleaseHoldUntil||0)>m.time,clearlyOnside=m.ball.mode!=='CONTROLLED'||wl.x>=onsideFloor+.45;
     // R19: hysteresis at the offside/back-line boundary. Once the FB has handed an offside
     // runner back to the line, do not reacquire the same runner on the very next 0.25s shape
@@ -1038,7 +1040,7 @@ function enforceFullbackWideRunnerResponsibility(m,team,owner){
     // R20: a full-back tracks the threat, not the attacker's exact coordinates. When the winger
     // retreats or pauses, keep a 3-4m goal-side cushion and reconnect to the zone instead of
     // being dragged backwards into bumper-car contact. A fresh forward run still closes the gap.
-    const gap=retreating?3.85:2.85,rawX=wl.x-gap,tx=clamp(retreating?Math.min(rawX,base.x+1.5):rawX,6,42),ty=clamp(lerp(wl.y,base.y,retreating?.30:.14),5,63),w=localToWorld(team,tx,ty);
+    const gap=retreating?3.85:2.85,rawX=wl.x-gap,tx=clamp(retreating?Math.min(rawX,base.x+1.5):rawX,6,42),insideGap=retreating?1.15:.90,insideDir=wl.y<34?1:wl.y>34?-1:0,ty=clamp(wl.y+insideDir*insideGap,5,63),w=localToWorld(team,tx,ty);
     fb.tx=w.x;fb.ty=w.y;fb.markTargetId=wf.a.id;fb.action=fb.tacticalTask='WIDE_RUN_TRACK';fb.sprint=dist(fb,wf.a)>(retreating?5.0:4.2)||dist(fb,w)>2.8;
     fb.wideTrackTargetId=wf.a.id;fb.wideTrackHoldUntil=Math.max(Number(fb.wideTrackHoldUntil||0),m.time+.72);
   }
@@ -1186,29 +1188,29 @@ function defenceRoleFamily(p,lock){
   if(p.id===lock?.coverId||/COVER|SCREEN|TUCK|REST_DEFENCE|BLOCK/.test(t))return'COVER';
   return'SHAPE';
 }
-function defensiveResponsibilityHold(family){return family==='PRESS'?.48:family==='WIDE_TRACK'?1.35:family==='MARK'?1.32:family==='COVER'?1.18:1.05;}
+function defensiveResponsibilityHold(family){return family==='PRESS'?.48:family==='WIDE_TRACK'?1.55:family==='MARK'?1.55:family==='COVER'?1.45:1.15;}
 function stabilizeDefensiveResponsibilities(m,team,owner){
   if(!owner||owner.team===team||!['CONTROLLED','FLIGHT'].includes(m.ball.mode))return;
   m._defenceMotionStability=m._defenceMotionStability||{};
-  const state=m._defenceMotionStability[team]||(m._defenceMotionStability[team]={players:{},ownerId:owner.id});
-  const ownerChanged=state.ownerId!==owner.id;
-  if(ownerChanged){state.ownerId=owner.id;for(const q of Object.values(state.players||{})){q.minUntil=m.time+.16;q.laneUntil=m.time;q.lastLateralFlipAt=-99;}}
+  const state=m._defenceMotionStability[team]||(m._defenceMotionStability[team]={players:{},ownerId:owner.id,possession:m.possession});
+  const ownerChanged=state.ownerId!==owner.id,possessionChanged=state.possession!==m.possession;
+  if(ownerChanged){state.ownerId=owner.id;if(possessionChanged){for(const q of Object.values(state.players||{})){q.minUntil=m.time+.16;q.laneUntil=m.time;q.lastLateralFlipAt=-99;}}else{for(const q of Object.values(state.players||{}))q.laneUntil=Math.min(Number(q.laneUntil||m.time),m.time+.18);}}state.possession=m.possession;
   const lock=m._defenceRoleLocks?.[team]||{},ball=worldToLocal(team,m.ball.x,m.ball.y),controlled=m.ball.mode==='CONTROLLED';
   for(const p of outfield(m,team).filter(q=>['CB','FB','CM'].includes(q.role))){
     const family=defenceRoleFamily(p,lock),prev=state.players[p.id],mark=playerById(m,p.markTargetId),markLocal=mark?worldToLocal(team,mark.x,mark.y):null;
     const emergencyPress=controlled&&(p.id===lock.pressId||family==='PRESS'&&dist(p,owner)<=3.2);
     const emergencyWide=family==='WIDE_TRACK'&&markLocal&&markLocal.x<=52;
     const emergencyBox=controlled&&ball.x<=19&&['CB','FB'].includes(p.role)&&dist(p,owner)<=5.0;
-    const semanticEmergency=ownerChanged||emergencyPress||emergencyWide||emergencyBox;
-    const hardMotionEmergency=ownerChanged||emergencyBox;
+    const semanticEmergency=possessionChanged||emergencyPress||emergencyWide||emergencyBox;
+    const hardMotionEmergency=possessionChanged||emergencyBox;
     const fastMotion=!hardMotionEmergency&&(emergencyPress||emergencyWide);
     const proposed={family,task:p.tacticalTask,action:p.action,markTargetId:p.markTargetId||null,tx:Number(p.tx),ty:Number(p.ty)};
     if(prev){
       const oldMark=playerById(m,prev.markTargetId),oldMarkGap=oldMark?dist(p,oldMark):99;
       const oldMarkRelevant=!!oldMark&&oldMark.team!==team&&oldMarkGap<=14.5;
-      const familyChanged=prev.family!==family,markChanged=prev.markTargetId!==proposed.markTargetId;
+      const familyChanged=prev.family!==family,markChanged=prev.markTargetId!==proposed.markTargetId,taskChanged=prev.task!==proposed.task;
       const holdActive=m.time<Number(prev.minUntil||0);
-      if(holdActive&&!semanticEmergency&&(familyChanged||(markChanged&&oldMarkRelevant))){p.tacticalTask=prev.task;p.action=prev.action;p.markTargetId=prev.markTargetId||null;}
+      if(holdActive&&!semanticEmergency&&(familyChanged||(markChanged&&oldMarkRelevant)||(p.role==='CB'&&taskChanged))){p.tacticalTask=prev.task;p.action=prev.action;p.markTargetId=prev.markTargetId||null;}
       const finalFamily=defenceRoleFamily(p,lock),finalMark=p.markTargetId||null,semanticChanged=prev.family!==finalFamily||prev.markTargetId!==finalMark;
       if(semanticChanged){prev.minUntil=m.time+defensiveResponsibilityHold(finalFamily);prev.since=m.time;prev.laneUntil=m.time;}
       const xAlpha=hardMotionEmergency?.82:fastMotion?.68:.46;p.tx=lerp(Number(prev.tx),Number(p.tx),xAlpha);
