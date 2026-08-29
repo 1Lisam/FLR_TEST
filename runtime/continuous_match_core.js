@@ -1942,10 +1942,13 @@ function resolveNpcGkShot(m,gk,prev){
     const reachAfter={x:gk.x,y:gk.y},visualGap=Math.hypot(b.x-gk.x,b.y-gk.y);
     b.npcGkResolved='PARRY_DANGER';
     const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
-    const forward=Math.max(3.8,speed*.22),central=Math.min(forward*.48,Math.max(1.2,speed*.10)),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
+    // Local GK coordinates put the defended goal line at x=0 for both teams
+    // (HOME: world +x; AWAY: world -x). Danger is therefore a short spill in
+    // local +x, back into the field, with only a modest live-context side term.
+    const forward=clamp(speed*.22,3.8,6.0),central=clamp(speed*.08,1.2,2.1),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
     m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.gkDangerParries=(m.stats.gkDangerParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
     setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
-    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6)),visualReach:{before:reachBefore,after:reachAfter,meters:Number(reach.toFixed(3)),ball:{x:b.x,y:b.y},euclideanGap:Number(visualGap.toFixed(3)),lateralGap:Number(Math.abs(b.y-gk.y).toFixed(3))}});
+    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6)),visualReach:{before:reachBefore,after:reachAfter,meters:Number(reach.toFixed(3)),ball:{x:b.x,y:b.y},euclideanGap:Number(visualGap.toFixed(3)),lateralGap:Number(Math.abs(b.y-gk.y).toFixed(3))}});
     return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,visualReach:{before:reachBefore,after:reachAfter,meters:reach,euclideanGap:visualGap,lateralGap:Math.abs(b.y-gk.y)}};
   }
   b.npcGkResolved='PARRY_SAFE';
