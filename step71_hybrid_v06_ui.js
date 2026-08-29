@@ -40,7 +40,7 @@ function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GU
 const GK_PHASE2_DEBUG_CASES={
  GK_PHASE2_PLAUSIBILITY_CATCH:{seed:'GKDBG-CATCH-1',label:'GK Phase2 · 쉬운 슛 캐칭',expected:'CATCH',distance:22,speed:18,offset:0,gk:60,handling:60,instruction:'슈팅이 실제로 날아온 뒤 쉬운 공을 안정적으로 잡는지 확인합니다.'},
  GK_PHASE2_PLAUSIBILITY_SAFE:{seed:'GKDBG-SAFE-1',label:'GK Phase2 · 측면 안전 패링',expected:'PARRY_SAFE',distance:19,speed:23,offset:3.0,gk:60,handling:50,instruction:'슈팅을 막은 뒤 공이 실제로 측면 안전지대로 빠지는지 확인합니다.'},
- GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'PH2-DANGER-05',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:19,speed:25,offset:11,gk:74,handling:40,visualStartX:83,gkX:100.5,gkY:34,replayRate:.75,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}
+ GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'PH2-DANGER-05',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:18,speed:26,offset:2.5,gk:60,handling:35,visualStartX:83,gkX:100.5,gkY:34,replayRate:.75,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}
 };
 function runGkPhase2DebugScenario(key){
  const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;
