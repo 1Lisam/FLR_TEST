@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply reviewed #42 PARRY_DANGER timing delta
+      - name: Apply reviewed PARRY_DANGER timing delta
         shell: bash
         run: |
           set -euo pipefail
@@ -24,39 +24,24 @@ jobs:
           from pathlib import Path
           p=Path('runtime/continuous_match_core.js')
           s=p.read_text()
-
-          old1="""  b.npcGkResolved=saveRoll<saveChance?'SAVE':'GOAL';
-  if(b.npcGkResolved==='GOAL')return{outcome:'GOAL',routine:false};"""
-          new1="""  const saved=saveRoll<saveChance;
-  if(!saved){b.npcGkResolved='GOAL';return{outcome:'GOAL',routine:false};}"""
+          old1="  b.npcGkResolved=saveRoll<saveChance?'SAVE':'GOAL';\n  if(b.npcGkResolved==='GOAL')return{outcome:'GOAL',routine:false};"
+          new1="  const saved=saveRoll<saveChance;\n  if(!saved){b.npcGkResolved='GOAL';return{outcome:'GOAL',routine:false};}"
           if s.count(old1)!=1:
               raise SystemExit(f'Expected one save precommit block, found {s.count(old1)}')
           s=s.replace(old1,new1,1)
-
-          marker="""  if(dangerEligible&&dangerRoll<.42){"""
+          marker="  if(dangerEligible&&dangerRoll<.42){"
           if s.count(marker)!=1:
               raise SystemExit(f'Expected one PARRY_DANGER marker, found {s.count(marker)}')
-          guard="""
-    // Presentation timing only: a wide shot can reach the longitudinal plane
-    // while still visibly clear of the keeper's body/hand area. Keep all outcome
-    // state live and uncommitted until this broad 2D envelope is reached.
-    const previousLocal=previousBall,currentLocal=localBall,segmentX=currentLocal.x-previousLocal.x,segmentY=currentLocal.y-previousLocal.y,segmentLen2=segmentX*segmentX+segmentY*segmentY,segmentU=segmentLen2>1e-9?clamp(((gkLocal.x-previousLocal.x)*segmentX+(gkLocal.y-previousLocal.y)*segmentY)/segmentLen2,0,1):1,nearX=previousLocal.x+segmentX*segmentU,nearY=previousLocal.y+segmentY*segmentU;
-    const nearContactDistance=Math.min(Math.hypot(currentLocal.x-gkLocal.x,currentLocal.y-gkLocal.y),Math.hypot(nearX-gkLocal.x,nearY-gkLocal.y));
-    // Intentionally broad visual envelope, not collision authority. The requested
-    // +2.5m retest shot reaches 2.50m lateral separation at closest approach;
-    // a tighter 1.4–1.8m circle would miss that plausible hand-side contact.
-    if(nearContactDistance>2.60)return null;"""
+          guard="\n    // Presentation timing only: a wide shot can reach the longitudinal plane\n    // while still visibly clear of the keeper's body/hand area. Keep all outcome\n    // state live and uncommitted until this broad 2D envelope is reached.\n    const previousLocal=previousBall,currentLocal=localBall,segmentX=currentLocal.x-previousLocal.x,segmentY=currentLocal.y-previousLocal.y,segmentLen2=segmentX*segmentX+segmentY*segmentY,segmentU=segmentLen2>1e-9?clamp(((gkLocal.x-previousLocal.x)*segmentX+(gkLocal.y-previousLocal.y)*segmentY)/segmentLen2,0,1):1,nearX=previousLocal.x+segmentX*segmentU,nearY=previousLocal.y+segmentY*segmentU;\n    const nearContactDistance=Math.min(Math.hypot(currentLocal.x-gkLocal.x,currentLocal.y-gkLocal.y),Math.hypot(nearX-gkLocal.x,nearY-gkLocal.y));\n    // Intentionally broad visual envelope, not collision authority. The requested\n    // +2.5m retest shot reaches 2.50m lateral separation at closest approach;\n    // a tighter 1.4–1.8m circle would miss that plausible hand-side contact.\n    if(nearContactDistance>2.60)return null;"
           s=s.replace(marker,marker+guard,1)
           p.write_text(s)
           PY
-
           node --check runtime/continuous_match_core.js
           grep -q "const saved=saveRoll<saveChance" runtime/continuous_match_core.js
           grep -q "nearContactDistance>2.60" runtime/continuous_match_core.js
           git diff --check
           changed="$(git diff --name-only)"
           test "$changed" = "runtime/continuous_match_core.js" || { echo "Unexpected changed files: $changed"; exit 1; }
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add runtime/continuous_match_core.js
