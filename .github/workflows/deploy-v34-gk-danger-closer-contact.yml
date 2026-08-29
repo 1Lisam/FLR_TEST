@@ -23,80 +23,23 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          p = Path('runtime/continuous_match_core.js')
-          s = p.read_text()
-
-          phase2_anchor = "// V34 GK Phase2 TEST_ONLY: plausibility-first NPC handling for ordinary non-chip shots."
-          if s.count(phase2_anchor) != 1:
-              raise SystemExit(f'Expected one Phase2 anchor, found {s.count(phase2_anchor)}')
-          if 'function goalkeeperParryContactStage(' in s:
-              raise SystemExit('Shared parry contact stage already present')
-
-          helpers = r'''function goalkeeperShotContactSweep(m,p,prev){
-  const a=worldToLocal(p.team,prev.x,prev.y),b=worldToLocal(p.team,m.ball.x,m.ball.y),gx=worldToLocal(p.team,p.x,p.y);
-  const vx=b.x-a.x,vy=b.y-a.y,len2=vx*vx+vy*vy,u=len2>1e-9?clamp(((gx.x-a.x)*vx+(gx.y-a.y)*vy)/len2,0,1):1;
-  const x=a.x+vx*u,y=a.y+vy*u,dt=Number(m.ball.contactDt)||Number(m.dt)||0.05;
-  const startAge=Number.isFinite(m.ball.contactPrevAge)?m.ball.contactPrevAge:(m.ball.age||0)-dt;
-  return{u,x,y,dx:Math.abs(x-gx.x),dy:Math.abs(y-gx.y),distance:Math.hypot(x-gx.x,y-gx.y),age:Math.max(0,startAge+u*dt)};
-}
-function goalkeeperParryContactStage(m,gk,prev){
-  // SAFE and DANGER share this one causal contact stage. The envelope is deliberately
-  // broad enough for a plausible hand/arm save, but it never moves the live ball and
-  // does not decide whether the save, catch, or danger roll succeeds.
-  const sweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y});
-  const gkLocal=worldToLocal(gk.team,gk.x,gk.y);
-  const contactEnvelope=clamp(2.60+(abilityValue(m,gk,'reaction')-60)*.003,2.42,2.72);
-  const gkBefore={x:gk.x,y:gk.y},reachNeed=Math.max(0,Math.abs(m.ball.y-gk.y)-1.35),presentationReach=Math.min(.90,reachNeed);
-  if(presentationReach>0){
-    const reachSide=Math.sign(m.ball.y-gk.y)||1;
-    gk.y=clamp(gk.y+reachSide*presentationReach,0.8,67.2);gk.ty=gk.y;gk.vy=0;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=false;
-    gk.bodyAngle=Math.atan2(m.ball.y-gk.y,m.ball.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
-  }
-  const contactSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y});
-  return{contactReady:contactSweep.distance<=contactEnvelope,sweep:contactSweep,contactEnvelope,gkBefore,gkAfter:{x:gk.x,y:gk.y},presentationReach,gkLocal:worldToLocal(gk.team,gk.x,gk.y)};
-}
-
-'''
-          s = s.replace(phase2_anchor, helpers + phase2_anchor, 1)
-
-          start_marker = "  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;"
-          end_marker = "  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy};"
-          start = s.find(start_marker)
-          if start < 0:
-              raise SystemExit('Could not find pre-45 dangerRoll marker')
-          end = s.find(end_marker, start)
-          if end < 0:
-              raise SystemExit('Could not find pre-45 SAFE return marker')
-          end += len(end_marker)
-
-          replacement = r'''  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
-  const contactStage=goalkeeperParryContactStage(m,gk,prev);
-  if(!contactStage.contactReady)return null;
-  if(dangerEligible&&dangerRoll<.42){
-    b.npcGkResolved='PARRY_DANGER';
-    const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
-    // Local GK coordinates put the defended goal line at x=0 for both teams
-    // (HOME: world +x; AWAY: world -x). Danger is therefore a short spill in
-    // local +x, back into the field, with only a modest live-context side term.
-    const forward=clamp(speed*.22,3.8,6.0),central=clamp(speed*.08,1.2,2.1),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
-    const ballVelocityBefore={x:b.vx,y:b.vy};
-    m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.gkDangerParries=(m.stats.gkDangerParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
-    setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
-    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null},localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6))});
-    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,sharedContactStage:contactStage};
-  }
-  b.npcGkResolved='PARRY_SAFE';
-  const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
-  const lateral=Math.max(5.2,speed*.56),outward=-Math.max(2.8,speed*.18),lvx=outward,lvy=side*lateral,wx=gk.team===HOME?lvx:-lvx,wy=gk.team===HOME?lvy:-lvy;
-  const ballVelocityBefore={x:b.vx,y:b.vy};
-  m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
-  setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
-  event(m,'PARRY_SAFE',`${subjectName(gk.name)} 슈팅을 측면 안전지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_SAFE',npcGkPhase:1,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null},localVx:lvx,localVy:lvy});
-  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy,sharedContactStage:contactStage};'''
-          s = s[:start] + replacement + s[end:]
+          import base64
+          p=Path('runtime/continuous_match_core.js')
+          s=p.read_text()
+          phase2_anchor='// V34 GK Phase2 TEST_ONLY: plausibility-first NPC handling for ordinary non-chip shots.'
+          if s.count(phase2_anchor)!=1: raise SystemExit(f'Expected one Phase2 anchor, found {s.count(phase2_anchor)}')
+          if 'function goalkeeperParryContactStage(' in s: raise SystemExit('Shared parry contact stage already present')
+          helpers=base64.b64decode('ZnVuY3Rpb24gZ29hbGtlZXBlclNob3RDb250YWN0U3dlZXAobSxwLHByZXYpewogIGNvbnN0IGE9d29ybGRUb0xvY2FsKHAudGVhbSxwcmV2LngscHJldi55KSxiPXdvcmxkVG9Mb2NhbChwLnRlYW0sbS5iYWxsLngsbS5iYWxsLnkpLGd4PXdvcmxkVG9Mb2NhbChwLnRlYW0scC54LHAueSk7CiAgY29uc3Qgdng9Yi54LWEueCx2eT1iLnktYS55LGxlbjI9dngqdngrdnkqdnksdT1sZW4yPjFlLTk/Y2xhbXAoKChneC54LWEueCkqdngrKGd4LnktYS55KSp2eSkvbGVuMiwwLDEpOjE7CiAgY29uc3QgeD1hLngrdngqdSx5PWEueSt2eSp1LGR0PU51bWJlcihtLmJhbGwuY29udGFjdER0KXx8TnVtYmVyKG0uZHQpfHwwLjA1OwogIGNvbnN0IHN0YXJ0QWdlPU51bWJlci5pc0Zpbml0ZShtLmJhbGwuY29udGFjdFByZXZBZ2UpP20uYmFsbC5jb250YWN0UHJldkFnZToobS5iYWxsLmFnZXx8MCktZHQ7CiAgcmV0dXJue3UseCx5LGR4Ok1hdGguYWJzKHgtZ3gueCksZHk6TWF0aC5hYnMoeS1neC55KSxkaXN0YW5jZTpNYXRoLmh5cG90KHgtZ3gueCx5LWd4LnkpLGFnZTpNYXRoLm1heCgwLHN0YXJ0QWdlK3UqZHQpfTsKfQpmdW5jdGlvbiBnb2Fsa2VlcGVyUGFycnlDb250YWN0U3RhZ2UobSxnayxwcmV2KXsKICAvLyBTQUZFIGFuZCBEQU5HRVIgc2hhcmUgdGhpcyBvbmUgY2F1c2FsIGNvbnRhY3Qgc3RhZ2UuIFRoZSBlbnZlbG9wZSBpcyBkZWxpYmVyYXRlbHkKICAvLyBicm9hZCBlbm91Z2ggZm9yIGEgcGxhdXNpYmxlIGhhbmQvYXJtIHNhdmUsIGJ1dCBpdCBuZXZlciBtb3ZlcyB0aGUgbGl2ZSBiYWxsIGFuZAogIC8vIGRvZXMgbm90IGRlY2lkZSB3aGV0aGVyIHRoZSBzYXZlLCBjYXRjaCwgb3IgZGFuZ2VyIHJvbGwgc3VjY2VlZHMuCiAgY29uc3Qgc3dlZXA9Z29hbGtlZXBlclNob3RDb250YWN0U3dlZXAobSxnayxwcmV2fHx7eDptLmJhbGwueCx5Om0uYmFsbC55fSk7CiAgY29uc3QgZ2tMb2NhbD13b3JsZFRvTG9jYWwoZ2sudGVhbSxnay54LGdrLnkpOwogIGNvbnN0IGNvbnRhY3RFbnZlbG9wZT1jbGFtcCgyLjYwKyhhYmlsaXR5VmFsdWUobSxnaywncmVhY3Rpb24nKS02MCkqLjAwMywyLjQyLDIuNzIpOwogIGNvbnN0IGdrQmVmb3JlPXt4OmdrLngseTpnay55fSxyZWFjaE5lZWQ9TWF0aC5tYXgoMCxNYXRoLmFicyhtLmJhbGwueS1nay55KS0xLjM1KSxwcmVzZW50YXRpb25SZWFjaD1NYXRoLm1pbiguOTAscmVhY2hOZWVkKTsKICBpZihwcmVzZW50YXRpb25SZWFjaD4wKXsKICAgIGNvbnN0IHJlYWNoU2lkZT1NYXRoLnNpZ24obS5iYWxsLnktZ2sueSl8fDE7CiAgICBnay55PWNsYW1wKGdrLnkrcmVhY2hTaWRlKnByZXNlbnRhdGlvblJlYWNoLDAuOCw2Ny4yKTtnay50eT1nay55O2drLnZ5PTA7Z2suYWN0aW9uPSdHS19TQVZFX1JFQUNIJztnay50YWN0aWNhbFRhc2s9J0dLX1NBVkVfUkVBQ0gnO2drLnNwcmludD1mYWxzZTsKICAgIGdrLmJvZHlBbmdsZT1NYXRoLmF0YW4yKG0uYmFsbC55LWdrLnksbS5iYWxsLngtZ2sueCk7Z2suZmFjZVRhcmdldEFuZ2xlPWdrLmJvZHlBbmdsZTsKICB9CiAgY29uc3QgY29udGFjdFN3ZWVwPWdvYWxrZWVwZXJTaG90Q29udGFjdFN3ZWVwKG0sZ2sscHJldnx8e3g6bS5iYWxsLngseTptLmJhbGwueX0pOwogIHJldHVybntjb250YWN0UmVhZHk6Y29udGFjdFN3ZWVwLmRpc3RhbmNlPD1jb250YWN0RW52ZWxvcGUsc3dlZXA6Y29udGFjdFN3ZWVwLGNvbnRhY3RFbnZlbG9wZSxna0JlZm9yZSxna0FmdGVyOnt4OmdrLngseTpnay55fSxwcmVzZW50YXRpb25SZWFjaCxna0xvY2FsOndvcmxkVG9Mb2NhbChnay50ZWFtLGdrLngsZ2sueSl9Owp9Cgo=').decode()
+          s=s.replace(phase2_anchor,helpers+phase2_anchor,1)
+          start_marker="  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;"
+          end_marker="  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy};"
+          start=s.find(start_marker); end=s.find(end_marker,start)
+          if start<0 or end<0: raise SystemExit('Could not find pre-45 parry block markers')
+          end+=len(end_marker)
+          replacement=base64.b64decode('ICBjb25zdCBkYW5nZXJSb2xsPWRhbmdlckVsaWdpYmxlPyhoYXNoMzIoYCR7a2V5fXxQQVJSWV9EQU5HRVJgKSUxMDAwMDAwKS8xMDAwMDAwOjE7CiAgY29uc3QgY29udGFjdFN0YWdlPWdvYWxrZWVwZXJQYXJyeUNvbnRhY3RTdGFnZShtLGdrLHByZXYpOwogIGlmKCFjb250YWN0U3RhZ2UuY29udGFjdFJlYWR5KXJldHVybiBudWxsOwogIGlmKGRhbmdlckVsaWdpYmxlJiZkYW5nZXJSb2xsPC40Mil7CiAgICBiLm5wY0drUmVzb2x2ZWQ9J1BBUlJZX0RBTkdFUic7CiAgICBjb25zdCBpbmNvbWluZ0xvY2FsPXdvcmxkVG9Mb2NhbChnay50ZWFtLHByZXY/Lng/P2IueCxwcmV2Py55Pz9iLnkpLHNpZGU9TWF0aC5hYnMoYi55LWluY29taW5nTG9jYWwueSk+MC4wOD9NYXRoLnNpZ24oYi55LWluY29taW5nTG9jYWwueSk6KG9mZnNldD4wP01hdGguc2lnbihOdW1iZXIoYi5zaG90VGFyZ2V0WSktMzQpOihsb2NhbEJhbGwueTwzND8tMToxKSk7CiAgICAvLyBMb2NhbCBHSyBjb29yZGluYXRlcyBwdXQgdGhlIGRlZmVuZGVkIGdvYWwgbGluZSBhdCB4PTAgZm9yIGJvdGggdGVhbXMKICAgIC8vIChIT01FOiB3b3JsZCAreDsgQVdBWTogd29ybGQgLXgpLiBEYW5nZXIgaXMgdGhlcmVmb3JlIGEgc2hvcnQgc3BpbGwgaW4KICAgIC8vIGxvY2FsICt4LCBiYWNrIGludG8gdGhlIGZpZWxkLCB3aXRoIG9ubHkgYSBtb2Rlc3QgbGl2ZS1jb250ZXh0IHNpZGUgdGVybS4KICAgIGNvbnN0IGZvcndhcmQ9Y2xhbXAoc3BlZWQqLjIyLDMuOCw2LjApLGNlbnRyYWw9Y2xhbXAoc3BlZWQqLjA4LDEuMiwyLjEpLHd4PWdrLnRlYW09PT1IT01FP2ZvcndhcmQ6LWZvcndhcmQsd3k9Z2sudGVhbT09PUhPTUU/c2lkZSpjZW50cmFsOi1zaWRlKmNlbnRyYWw7CiAgICBjb25zdCBiYWxsVmVsb2NpdHlCZWZvcmU9e3g6Yi52eCx5OmIudnl9OwogICAgbS5zdGF0cy5zYXZlcz0obS5zdGF0cy5zYXZlc3x8MCkrMTttLnN0YXRzLmdrUGFycmllcz0obS5zdGF0cy5na1BhcnJpZXN8fDApKzE7bS5zdGF0cy5na0RhbmdlclBhcnJpZXM9KG0uc3RhdHMuZ2tEYW5nZXJQYXJyaWVzfHwwKSsxO20uc3RhdHMubG9vc2VCYWxscz0obS5zdGF0cy5sb29zZUJhbGxzfHwwKSsxOwogICAgc2V0TG9vc2UobSxiLngsYi55LHd4LHd5LGdrLnRlYW0sZ2suaWQpO20uYmFsbC5ub0NhcHR1cmVJZHM9W2drLmlkXTttLmJhbGwubm9DYXB0dXJlVW50aWw9LjMwO2drLm5leHRUaGluaz1tLnRpbWUrLjU1OwogICAgZXZlbnQobSwnUEFSUllfREFOR0VSJyxgJHtzdWJqZWN0TmFtZShnay5uYW1lKX0g7IqI7YyF7J2EIOykkeyVmSDslZ4g7JyE7ZeY7KeA64yA66GcIOyzkOuDiOyKteuLiOuLpC5gLHtucGNHa091dGNvbWU6J1BBUlJZX0RBTkdFUicsbnBjR2tQaGFzZToyLHNoYXJlZENvbnRhY3RTdGFnZTp7cmVhZHk6Y29udGFjdFN0YWdlLmNvbnRhY3RSZWFkeSxjb250YWN0R2FwOk51bWJlcihjb250YWN0U3RhZ2Uuc3dlZXAuZGlzdGFuY2UudG9GaXhlZCgzKSksZW52ZWxvcGU6TnVtYmVyKGNvbnRhY3RTdGFnZS5jb250YWN0RW52ZWxvcGUudG9GaXhlZCgzKSkscHJldmlvdXM6e3g6cHJldj8ueD8/Yi54LHk6cHJldj8ueT8/Yi55fSxjdXJyZW50Ont4OmIueCx5OmIueX0sZ2tCZWZvcmU6Y29udGFjdFN0YWdlLmdrQmVmb3JlLGdrQWZ0ZXI6Y29udGFjdFN0YWdlLmdrQWZ0ZXIscHJlc2VudGF0aW9uUmVhY2g6Y29udGFjdFN0YWdlLnByZXNlbnRhdGlvblJlYWNofSxiYWxsVmVsb2NpdHlCZWZvcmUsYmFsbFZlbG9jaXR5QWZ0ZXI6e3g6bS5iYWxsLnZ4LHk6bS5iYWxsLnZ5fSxiYWxsU3RhdGU6e21vZGU6bS5iYWxsLm1vZGUsb3duZXJJZDptLmJhbGwub3duZXJJZHx8bnVsbCxpbnRlbmRlZFJlY2VpdmVySWQ6bS5iYWxsLmludGVuZGVkUmVjZWl2ZXJJZHx8bnVsbH0sbG9jYWxWeDpmb3J3YXJkLGxvY2FsVnk6c2lkZSpjZW50cmFsLGRhbmdlckJhbmQ6TnVtYmVyKGRhbmdlckJhbmQudG9GaXhlZCgzKSksZGFuZ2VyUm9sbDpOdW1iZXIoZGFuZ2VyUm9sbC50b0ZpeGVkKDYpKX0pOwogICAgcmV0dXJue291dGNvbWU6J1BBUlJZX0RBTkdFUicscm91dGluZTpmYWxzZSxsb2NhbFZ4OmZvcndhcmQsbG9jYWxWeTpzaWRlKmNlbnRyYWwsZGFuZ2VyQmFuZCxkYW5nZXJSb2xsLHNoYXJlZENvbnRhY3RTdGFnZTpjb250YWN0U3RhZ2V9OwogIH0KICBiLm5wY0drUmVzb2x2ZWQ9J1BBUlJZX1NBRkUnOwogIGNvbnN0IGluY29taW5nTG9jYWw9d29ybGRUb0xvY2FsKGdrLnRlYW0scHJldj8ueD8/Yi54LHByZXY/Lnk/P2IueSksc2lkZT1NYXRoLmFicyhiLnktaW5jb21pbmdMb2NhbC55KT4wLjA4P01hdGguc2lnbihiLnktaW5jb21pbmdMb2NhbC55KToob2Zmc2V0PjA/TWF0aC5zaWduKE51bWJlcihiLnNob3RUYXJnZXRZKS0zNCk6KGxvY2FsQmFsbC55PDM0Py0xOjEpKTsKICBjb25zdCBsYXRlcmFsPU1hdGgubWF4KDUuMixzcGVlZCouNTYpLG91dHdhcmQ9LU1hdGgubWF4KDIuOCxzcGVlZCouMTgpLGx2eD1vdXR3YXJkLGx2eT1zaWRlKmxhdGVyYWwsd3g9Z2sudGVhbT09PUhPTUU/bHZ4Oi1sdngsd3k9Z2sudGVhbT09PUhPTUU/bHZ5Oi1sdnk7CiAgY29uc3QgYmFsbFZlbG9jaXR5QmVmb3JlPXt4OmIudngseTpiLnZ5fTsKICBtLnN0YXRzLnNhdmVzPShtLnN0YXRzLnNhdmVzfHwwKSsxO20uc3RhdHMuZ2tQYXJyaWVzPShtLnN0YXRzLmdrUGFycmllc3x8MCkrMTttLnN0YXRzLmxvb3NlQmFsbHM9KG0uc3RhdHMubG9vc2VCYWxsc3x8MCkrMTsKICBzZXRMb29zZShtLGIueCxiLnksd3gsd3ksZ2sudGVhbSxnay5pZCk7bS5iYWxsLm5vQ2FwdHVyZUlkcz1bZ2suaWRdO20uYmFsbC5ub0NhcHR1cmVVbnRpbD0uMzA7Z2submV4dFRoaW5rPW0udGltZSsuNTU7CiAgZXZlbnQobSwnUEFSUllfU0FGRScsYCR7c3ViamVjdE5hbWUoZ2submFtZSl9IOyKiO2MheydhCDsuKHrqbQg7JWI7KCE7KeA64yA66GcIOyzkOuDiOyKteuLiOuLpC5gLHtucGNHa091dGNvbWU6J1BBUlJZX1NBRkUnLG5wY0drUGhhc2U6MSxzaGFyZWRDb250YWN0U3RhZ2U6e3JlYWR5OmNvbnRhY3RTdGFnZS5jb250YWN0UmVhZHksY29udGFjdEdhcDpOdW1iZXIoY29udGFjdFN0YWdlLnN3ZWVwLmRpc3RhbmNlLnRvRml4ZWQoMykpLGVudmVsb3BlOk51bWJlcihjb250YWN0U3RhZ2UuY29udGFjdEVudmVsb3BlLnRvRml4ZWQoMykpLHByZXZpb3VzOnt4OnByZXY/Lng/P2IueCx5OnByZXY/Lnk/P2IueX0sY3VycmVudDp7eDpiLngseTpiLnl9LGdrQmVmb3JlOmNvbnRhY3RTdGFnZS5na0JlZm9yZSxna0FmdGVyOmNvbnRhY3RTdGFnZS5na0FmdGVyLHByZXNlbnRhdGlvblJlYWNoOmNvbnRhY3RTdGFnZS5wcmVzZW50YXRpb25SZWFjaH0sYmFsbFZlbG9jaXR5QmVmb3JlLGJhbGxWZWxvY2l0eUFmdGVyOnt4Om0uYmFsbC52eCx5Om0uYmFsbC52eX0sYmFsbFN0YXRlOnttb2RlOm0uYmFsbC5tb2RlLG93bmVySWQ6bS5iYWxsLm93bmVySWR8fG51bGwsaW50ZW5kZWRSZWNlaXZlcklkOm0uYmFsbC5pbnRlbmRlZFJlY2VpdmVySWR8fG51bGx9LGxvY2FsVng6bHZ4LGxvY2FsVnk6bHZ5fSk7CiAgcmV0dXJue291dGNvbWU6J1BBUlJZX1NBRkUnLHJvdXRpbmU6ZmFsc2UsbG9jYWxWeDpsdngsbG9jYWxWeTpsdnksc2hhcmVkQ29udGFjdFN0YWdlOmNvbnRhY3RTdGFnZX07').decode()
+          s=s[:start]+replacement+s[end:]
           p.write_text(s)
           PY
-
           node --check runtime/continuous_match_core.js
           test "$(grep -c "function goalkeeperParryContactStage" runtime/continuous_match_core.js)" = "1"
           test "$(grep -c "const contactStage=goalkeeperParryContactStage" runtime/continuous_match_core.js)" = "1"
@@ -109,7 +52,6 @@ function goalkeeperParryContactStage(m,gk,prev){
           git diff --check
           changed="$(git diff --name-only)"
           test "$changed" = "runtime/continuous_match_core.js" || { echo "Unexpected changed files: $changed"; exit 1; }
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add runtime/continuous_match_core.js
