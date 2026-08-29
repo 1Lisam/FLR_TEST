@@ -1,0 +1,88 @@
+name: Repair V34 GK debug visual replay
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-v34-gk-debug-visual.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore known-good debug UI and apply bounded visual replay fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          GOOD=a7fea789456d5e13a8559b5858b45896d82b0d16
+          git checkout "$GOOD" -- step71_hybrid_v06_ui.js
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('step71_hybrid_v06_ui.js')
+          s=p.read_text()
+          old="developerSeedByKey={};const STEP=.10,REPLAY_SPEED=2;"
+          new="developerSeedByKey={};const STEP=.10,REPLAY_SPEED=2;let replayRate=REPLAY_SPEED;"
+          assert old in s
+          s=s.replace(old,new,1)
+
+          old="function startReplay(frames,ret='CHOICE',title='다시보기'){if(!frames?.length){if(ret==='HISTORY')restoreLatestAfterReplay();else if(ret==='CHOICE')showPending();else showResult();return}clearAutoAdvance();clearTimeout(sceneNoticeTimer);const notice=$('heroSceneNotice');if(notice){notice.hidden=true;notice.classList.remove('end-countdown');}if(ret==='HISTORY')replayResumePhase=phase;const latest=$('heroReturnLatest');if(latest)latest.hidden=ret!=='HISTORY';replayList=frames;replayCursor=0;replayReturn=ret;phase='PRE_REPLAY';ensurePitchChoice()?.hide();$('heroChoicePanel').hidden=true;$('heroResultPanel').hidden=true;const dur=(frames.at(-1).time-frames[0].time).toFixed(1);$('heroPlayback').textContent=`${title} · ${dur}초 · 2×`;draw(frames[0]);renderMeta(frames[0]);last=performance.now()}\nfunction processReplay(real){replayCursor+=real*REPLAY_SPEED;"
+          new="function startReplay(frames,ret='CHOICE',title='다시보기',speed=REPLAY_SPEED){if(!frames?.length){if(ret==='HISTORY')restoreLatestAfterReplay();else if(ret==='CHOICE')showPending();else showResult();return}clearAutoAdvance();clearTimeout(sceneNoticeTimer);const notice=$('heroSceneNotice');if(notice){notice.hidden=true;notice.classList.remove('end-countdown');}if(ret==='HISTORY')replayResumePhase=phase;const latest=$('heroReturnLatest');if(latest)latest.hidden=ret!=='HISTORY';replayList=frames;replayCursor=0;replayReturn=ret;replayRate=Math.max(.5,Number(speed)||REPLAY_SPEED);phase='PRE_REPLAY';ensurePitchChoice()?.hide();$('heroChoicePanel').hidden=true;$('heroResultPanel').hidden=true;const dur=(frames.at(-1).time-frames[0].time).toFixed(1);$('heroPlayback').textContent=`${title} · ${dur}초 · ${replayRate}×`;draw(frames[0]);renderMeta(frames[0]);last=performance.now()}\nfunction processReplay(real){replayCursor+=real*replayRate;"
+          assert old in s
+          s=s.replace(old,new,1)
+
+          old="function finishDeveloperVisual(){const done=developerScenarioActive;developerScenarioActive=null;phase='IDLE';clearOffsideReview();if(done){$('heroPlayback').textContent=`강제 검증 완료 · ${done.label}`;if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent=`검증 완료: ${done.label} · seed=${done.seed}`;"
+          new="function finishDeveloperVisual(){const done=developerScenarioActive;developerScenarioActive=null;phase='IDLE';clearOffsideReview();if(done){$('heroPlayback').textContent=`강제 검증 완료 · ${done.label}`;if($('heroRecentFixStatus')&&!String(done.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_'))$('heroRecentFixStatus').textContent=`검증 완료: ${done.label} · seed=${done.seed}`;"
+          assert old in s
+          s=s.replace(old,new,1)
+
+          start=s.index("const GK_PHASE2_DEBUG_CASES={")
+          end=s.index("function clearAutoAdvance()",start)
+          block="""const GK_PHASE2_DEBUG_CASES={
+           GK_PHASE2_PLAUSIBILITY_CATCH:{seed:'GKDBG-CATCH-1',label:'GK Phase2 · 쉬운 슛 캐칭',expected:'CATCH',distance:22,speed:18,offset:0,gk:60,handling:60,instruction:'슈팅이 실제로 날아온 뒤 쉬운 공을 안정적으로 잡는지 확인합니다.'},
+           GK_PHASE2_PLAUSIBILITY_SAFE:{seed:'GKDBG-SAFE-1',label:'GK Phase2 · 측면 안전 패링',expected:'PARRY_SAFE',distance:19,speed:23,offset:3.0,gk:60,handling:50,instruction:'슈팅을 막은 뒤 공이 실제로 측면 안전지대로 빠지는지 확인합니다.'},
+           GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'GKDBG-DANGER-5',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:14,speed:27,offset:2.0,gk:42,handling:55,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}
+          };
+          function runGkPhase2DebugScenario(key){
+           const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;
+           clearAutoAdvance();clearTimeout(sceneNoticeTimer);clearOffsideReview();ensurePitchChoice()?.hide();focusPitch();
+           const m=E.createMatch(c.seed,{dt:.05}),B=E.choiceActionBridge();m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};
+           const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];if(!st||!gk){if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent='GK 강제 검증 준비 실패 · 필요한 ST/GK를 찾지 못했습니다.';return true;}
+           for(const p of m.players){p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;if(p.role!=='GK'){p.x=70+(p.slot.includes('L')?0:1);p.y=p.slot.includes('L')?7:p.slot.includes('R')?61:54;p.tx=p.x;p.ty=p.y;}}
+           const shotX=105-c.distance;Object.assign(st,{x:shotX,y:34,tx:shotX,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
+           const gkY=34+(c.offset?Math.sign(c.offset)*Math.min(1.8,Math.abs(c.offset)*.45):0);Object.assign(gk,{x:99.5,y:gkY,tx:99.5,ty:gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+           m.playerAbilityProfiles[gk.id]={reaction:c.gk,gk_positioning:c.gk,diving:c.gk,handling:c.handling};
+           B.setControlled(m,st,true);const frames=[deep(E.snapshot(m))];
+           B.executeShot(m,st,'DEV_GK_PHASE2',{releaseNow:true,decisionOrientation:{turningRequired:false,backToGoal:false,facingAlignment:1,bodyAngleDiff:0}});
+           const tx=105,ty=34+c.offset,dx=tx-m.ball.x,dy=ty-m.ball.y,n=Math.hypot(dx,dy)||1;Object.assign(m.ball,{kind:'SHOT',mode:'FLIGHT',ownerId:null,z:.08,vx:dx/n*c.speed,vy:dy/n*c.speed,vz:0,age:0,originX:shotX,originY:34,targetX:tx,targetY:ty,shotTargetY:ty,shotTeam:'HOME',lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',onTarget:true,shotDistance:c.distance,shotOneVOne:false,shotClearKeeperChance:false,airborne:false,strikeStyle:'POWER',arcProfile:null,npcGkResolved:null});m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';frames.push(deep(E.snapshot(m)));
+           let outcomeEvent=null,tail=0;for(let i=0;i<100;i++){E.step(m,.05);frames.push(deep(E.snapshot(m)));if(!outcomeEvent)outcomeEvent=[...(m.events||[])].reverse().find(e=>e?.npcGkOutcome);if(outcomeEvent){tail++;const need=outcomeEvent.npcGkOutcome==='CATCH'?12:30;if(tail>=need)break;}}
+           const actual=outcomeEvent?.npcGkOutcome||null;developerScenarioActive={key,label:c.label,instruction:c.instruction,seed:c.seed};developerScenarioLast={key,label:c.label,instruction:c.instruction,seed:c.seed,highResSeed:c.seed,frames:deep(frames),debug:null};latestIntegratedDebug=null;session=null;opened=null;activeBoundary=null;beforeHybrid=null;world=null;selectedStepResults=[];phase='SEARCHING';
+           $('heroPlayer').value='H-ST';if($('heroRecentFixSelect'))$('heroRecentFixSelect').value=key;renderRecentFixGuide();$('heroPlayback').textContent=`개발자 강제 검증 · ${c.label}`;$('heroState').textContent='V34 GK Phase2 TEST_ONLY · 슈팅부터 실제 resolver 재생';
+           const status=actual===c.expected?`이번 검증: ${c.label} · 실제 결과 ${actual} · ${c.instruction}`:`강제 검증 불일치 · 기대 ${c.expected} / 실제 ${actual||'NONE'} · 이 장면은 정상 판정에 사용하지 마세요.`;if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent=status;
+           $('heroEventLog').innerHTML+=`<div class="major-match-event"><strong>GK Phase2 강제 검증 · ${c.label}</strong> · 기대 ${c.expected} / 실제 ${actual||'NONE'}<br><small>TEST_ONLY 고정 QA seed=${c.seed} · 슈팅 시작 → GK 처리 → 후속 공 움직임까지 runtime 직접 실행</small></div>`;$('heroDebugSummary').textContent=`DEV ${key}\nseed=${c.seed}\nexpected=${c.expected}\nactual=${actual||'NONE'}\nvisualReplay=SHOT_TO_GK_OUTCOME\nTEST_ONLY=true`;if($('heroRecentFixReplay'))$('heroRecentFixReplay').disabled=!frames.length;
+           if(actual!==c.expected){developerScenarioActive=null;phase='IDLE';draw(frames.at(-1));renderMeta(frames.at(-1));return true;}startReplay(frames,'DEV_SCENARIO',`${c.label} · 슈팅부터 강제 재현`,1);return true;
+          }
+          """
+          s=s[:start]+block+s[end:]
+
+          old="function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;focusPitch();startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`);}"
+          new="function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;focusPitch();const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_');startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,gk?1:REPLAY_SPEED);}"
+          assert old in s
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check step71_hybrid_v06_ui.js
+          grep -q "visualReplay=SHOT_TO_GK_OUTCOME" step71_hybrid_v06_ui.js
+          grep -q "GKDBG-SAFE-1" step71_hybrid_v06_ui.js
+          grep -q "GKDBG-DANGER-5" step71_hybrid_v06_ui.js
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add step71_hybrid_v06_ui.js
+          git commit -m "Repair GK Phase2 visual forced replay (TEST_ONLY)"
+          git push origin HEAD:main
