@@ -40,7 +40,7 @@ function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GU
 const GK_PHASE2_DEBUG_CASES={
  GK_PHASE2_PLAUSIBILITY_CATCH:{seed:'GKDBG-CATCH-1',label:'GK Phase2 · 쉬운 슛 캐칭',expected:'CATCH',distance:22,speed:18,offset:0,gk:60,handling:60,instruction:'슈팅이 실제로 날아온 뒤 쉬운 공을 안정적으로 잡는지 확인합니다.'},
  GK_PHASE2_PLAUSIBILITY_SAFE:{seed:'GKDBG-SAFE-1',label:'GK Phase2 · 측면 안전 패링',expected:'PARRY_SAFE',distance:19,speed:23,offset:3.0,gk:60,handling:50,instruction:'슈팅을 막은 뒤 공이 실제로 측면 안전지대로 빠지는지 확인합니다.'},
- GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'GKDBG-DANGER-5',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:14,speed:27,offset:2.0,gk:42,handling:55,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}
+ GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'PH2-DANGER-05',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:19,speed:25,offset:11,gk:74,handling:40,visualStartX:83,gkX:100.5,gkY:34,replayRate:.75,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}
 };
 function runGkPhase2DebugScenario(key){
  const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;
@@ -48,8 +48,8 @@ function runGkPhase2DebugScenario(key){
  const m=E.createMatch(c.seed,{dt:.05}),B=E.choiceActionBridge();m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};
  const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];if(!st||!gk){if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent='GK 강제 검증 준비 실패 · 필요한 ST/GK를 찾지 못했습니다.';return true;}
  for(const p of m.players){p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;if(p.role!=='GK'){p.x=70+(p.slot.includes('L')?0:1);p.y=p.slot.includes('L')?7:p.slot.includes('R')?61:54;p.tx=p.x;p.ty=p.y;}}
- const shotX=105-c.distance;Object.assign(st,{x:shotX,y:34,tx:shotX,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
- const gkY=34+(c.offset?Math.sign(c.offset)*Math.min(1.8,Math.abs(c.offset)*.45):0);Object.assign(gk,{x:99.5,y:gkY,tx:99.5,ty:gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+ const shotX=c.visualStartX??(105-c.distance);Object.assign(st,{x:shotX,y:34,tx:shotX,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
+ const gkY=c.gkY??(34+(c.offset?Math.sign(c.offset)*Math.min(1.8,Math.abs(c.offset)*.45):0));Object.assign(gk,{x:c.gkX??99.5,y:gkY,tx:99.5,ty:gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
  m.playerAbilityProfiles[gk.id]={reaction:c.gk,gk_positioning:c.gk,diving:c.gk,handling:c.handling};
  B.setControlled(m,st,true);const frames=[deep(E.snapshot(m))];
  B.executeShot(m,st,'DEV_GK_PHASE2',{releaseNow:true,decisionOrientation:{turningRequired:false,backToGoal:false,facingAlignment:1,bodyAngleDiff:0}});
@@ -64,7 +64,7 @@ expected=${c.expected}
 actual=${actual||'NONE'}
 visualReplay=SHOT_TO_GK_OUTCOME
 TEST_ONLY=true`;if($('heroRecentFixReplay'))$('heroRecentFixReplay').disabled=!frames.length;
- if(actual!==c.expected){developerScenarioActive=null;phase='IDLE';draw(frames.at(-1));renderMeta(frames.at(-1));return true;}startReplay(frames,'DEV_SCENARIO',`${c.label} · 슈팅부터 강제 재현`,1);return true;
+ if(actual!==c.expected){developerScenarioActive=null;phase='IDLE';draw(frames.at(-1));renderMeta(frames.at(-1));return true;}startReplay(frames,'DEV_SCENARIO',`${c.label} · 슈팅부터 강제 재현`,c.replayRate||1);return true;
 }
 function clearAutoAdvance(){clearTimeout(autoAdvanceTimer);clearInterval(autoAdvanceInterval);autoAdvanceTimer=autoAdvanceInterval=null;const x=$('heroAutoNext');if(x)x.textContent='';const n=$('heroSceneNotice');if(n?.classList.contains('end-countdown')){n.hidden=true;n.classList.remove('end-countdown');}}
 function periodMinute(t){const sec=Math.max(0,Number(t)||0),m=Math.floor(sec/60)+1;return sec<2700?`전반 ${Math.min(45,m)}분`:`후반 ${Math.max(1,Math.min(45,m-45))}분`;}
@@ -174,7 +174,7 @@ function runRecentFixScenario(key=selectedRecentFixKey(),opts={}){
  if(!['PASS_FLIGHT_WIDE_TRACK','OFFSIDE_INVOLVEMENT','ST_SHOT_VISIBILITY'].includes(d.key)){runDeveloperVisualScenario(d);return;}
  const held=handleSearchBoundary({status:'PAUSED',boundary:d.boundary,state:d.session.state});if(!held&&developerScenarioActive){finishDeveloperVisual();}
 }
-function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;focusPitch();const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_');startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,gk?1:REPLAY_SPEED);}
+function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;focusPitch();const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_'),danger=developerScenarioLast.key==='GK_PHASE2_PLAUSIBILITY_DANGER';startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,danger?.75:gk?1:REPLAY_SPEED);}
 function selectRandomRecentFix(){const keys=DEV_RECENT_VISIBLE_KEYS,key=keys[Math.floor(Math.random()*keys.length)],sel=$('heroRecentFixSelect');if(sel)sel.value=key;renderRecentFixGuide();if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent=`랜덤 선택: ${DEV_RECENT_GUIDES[key].label} · 내용을 확인한 뒤 강제 검증을 시작하세요.`;}
 
 function download(obj,name){const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),500)}
