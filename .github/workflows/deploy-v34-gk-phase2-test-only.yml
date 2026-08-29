@@ -1,0 +1,43 @@
+name: Deploy V34 GK Phase2 TEST_ONLY
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-v34-gk-phase2-test-only.yml'
+      - '.flr/deploy/v34_gk_phase2_runtime.gz.b64'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply exact Phase2 runtime payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          PAYLOAD=.flr/deploy/v34_gk_phase2_runtime.gz.b64
+          if [ ! -f "$PAYLOAD" ]; then
+            echo "Payload not present yet; bootstrap workflow commit only."
+            exit 0
+          fi
+          base64 -d "$PAYLOAD" > /tmp/v34_gk_phase2_runtime.gz
+          gzip -dc /tmp/v34_gk_phase2_runtime.gz > runtime/continuous_match_core.js
+          ACTUAL="$(sha256sum runtime/continuous_match_core.js | awk '{print $1}')"
+          EXPECTED="ba4c37c8d4739e3d3a97398ac9e07189a4f7a1971df1fc972dff9a46766b3178"
+          echo "Runtime SHA-256: $ACTUAL"
+          test "$ACTUAL" = "$EXPECTED"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/continuous_match_core.js
+          if git diff --cached --quiet; then
+            echo "Runtime already matches Phase2 candidate."
+            exit 0
+          fi
+          git commit -m "Deploy V34 GK Phase2 test build (TEST_ONLY)"
+          git push origin HEAD:main
