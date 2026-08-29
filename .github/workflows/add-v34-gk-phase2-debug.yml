@@ -38,13 +38,14 @@ jobs:
           grep -q "function resolveNpcGkShot" runtime/continuous_match_core.js
           git apply --check "$PATCH"
           git apply "$PATCH"
-          node --check live_hybrid_session_v02.js
           node --check step71_hybrid_v06_ui.js
           grep -q 'GK_PHASE2_PLAUSIBILITY' index.html
-          grep -q 'GK_PHASE2_PLAUSIBILITY' live_hybrid_session_v02.js
           grep -q 'GK_PHASE2_PLAUSIBILITY' step71_hybrid_v06_ui.js
+          grep -q 'GKDBG-PARRY_SAFE-2' step71_hybrid_v06_ui.js
+          grep -q 'GKDBG-PARRY_DANGER-69' step71_hybrid_v06_ui.js
+          git diff --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html live_hybrid_session_v02.js step71_hybrid_v06_ui.js
+          git add index.html step71_hybrid_v06_ui.js
           git commit -m "Add GK Phase2 forced debug verification (TEST_ONLY)"
           git push origin HEAD:main
