@@ -1,0 +1,49 @@
+name: Deploy V34 GK near-interaction timing fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-v34-gk-near-timing-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply exact Phase2 near-GK timing patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('runtime/continuous_match_core.js')
+          s=p.read_text()
+          replacements=[
+            ("  if(localBall.x>12.5)return null;", "  // Resolve only when the live shot reaches a broad near-GK interaction plane.\n  // The previous/current segment makes the gate tolerant of fast 0.05s steps;\n  // this is timing continuity, not collision or save-success authority.\n  const previousBall=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),gkLocal=worldToLocal(gk.team,gk.x,gk.y),interactionPlane=gkLocal.x+2.2,behindTolerance=.75;\n  const crossedInteractionPlane=previousBall.x>interactionPlane&&localBall.x<=interactionPlane;\n  const alreadyInInteractionZone=localBall.x<=interactionPlane&&localBall.x>=gkLocal.x-behindTolerance;\n  if(!crossedInteractionPlane&&!alreadyInInteractionZone)return null;"),
+            ("function captureLooseOrFlight(m){", "function captureLooseOrFlight(m,contactPrev){"),
+            ("    const phase2=resolveNpcGkShot(m,gk,null);", "    const phase2=resolveNpcGkShot(m,gk,contactPrev);"),
+            ("  captureLooseOrFlight(m);", "  captureLooseOrFlight(m,prev);")
+          ]
+          for old,new in replacements:
+              c=s.count(old)
+              if c!=1:
+                  raise SystemExit(f'expected exactly one match for {old!r}, got {c}')
+              s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check runtime/continuous_match_core.js
+          grep -q 'interactionPlane=gkLocal.x+2.2' runtime/continuous_match_core.js
+          grep -q 'resolveNpcGkShot(m,gk,contactPrev)' runtime/continuous_match_core.js
+          grep -q 'captureLooseOrFlight(m,prev)' runtime/continuous_match_core.js
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/continuous_match_core.js
+          git commit -m "Deploy V34 GK near-interaction timing fix (TEST_ONLY)"
+          git push origin HEAD:main
