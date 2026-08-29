@@ -1912,8 +1912,8 @@ function resolveNpcGkShot(m,gk,prev){
   const difficulty=clamp((speed-18)*1.35+Math.max(0,offset-4)*0.75+Math.max(0,22-distance)*0.55+(height>0.35?1.5:0),-4,15);
   const contest=(abilityValue(m,gk,'reaction')*.38+abilityValue(m,gk,'gk_positioning')*.34+abilityValue(m,gk,'diving')*.28)-60;
   const saveChance=clamp(.52+contest*.007-difficulty*.020,.14,.86),saveRoll=(hash32(`${key}|CONTEST`)%1000000)/1000000;
-  b.npcGkResolved=saveRoll<saveChance?'SAVE':'GOAL';
-  if(b.npcGkResolved==='GOAL')return{outcome:'GOAL',routine:false};
+  const saved=saveRoll<saveChance;
+  if(!saved){b.npcGkResolved='GOAL';return{outcome:'GOAL',routine:false};}
   const handling=abilityValue(m,gk,'handling'),catchChance=clamp(.56+(handling-60)*.008-Math.max(0,speed-20)*.018-offset*.006,.24,.88),catchRoll=(hash32(`${key}|HANDLING`)%1000000)/1000000;
   if(catchRoll<catchChance){b.npcGkResolved='CATCH';m.stats.saves=(m.stats.saves||0)+1;m.stats.gkCatches=(m.stats.gkCatches||0)+1;setControlled(m,gk);gk.nextThink=m.time+0.75;event(m,'SAVE',`${subjectName(gk.name)} 슈팅을 안정적으로 잡아냈습니다.`,{npcGkOutcome:'CATCH',npcGkPhase:1});return{outcome:'CATCH',routine:false};}
   // Failed catches normally go sideways. Only genuinely awkward saves may spill centrally.
@@ -1921,6 +1921,15 @@ function resolveNpcGkShot(m,gk,prev){
   const dangerEligible=dangerBand>=4.8;
   const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
   if(dangerEligible&&dangerRoll<.42){
+    // Presentation timing only: a wide shot can reach the longitudinal plane
+    // while still visibly clear of the keeper's body/hand area. Keep all outcome
+    // state live and uncommitted until this broad 2D envelope is reached.
+    const previousLocal=previousBall,currentLocal=localBall,segmentX=currentLocal.x-previousLocal.x,segmentY=currentLocal.y-previousLocal.y,segmentLen2=segmentX*segmentX+segmentY*segmentY,segmentU=segmentLen2>1e-9?clamp(((gkLocal.x-previousLocal.x)*segmentX+(gkLocal.y-previousLocal.y)*segmentY)/segmentLen2,0,1):1,nearX=previousLocal.x+segmentX*segmentU,nearY=previousLocal.y+segmentY*segmentU;
+    const nearContactDistance=Math.min(Math.hypot(currentLocal.x-gkLocal.x,currentLocal.y-gkLocal.y),Math.hypot(nearX-gkLocal.x,nearY-gkLocal.y));
+    // Intentionally broad visual envelope, not collision authority. The requested
+    // +2.5m retest shot reaches 2.50m lateral separation at closest approach;
+    // a tighter 1.4–1.8m circle would miss that plausible hand-side contact.
+    if(nearContactDistance>2.60)return null;
     b.npcGkResolved='PARRY_DANGER';
     const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
     const forward=Math.max(3.8,speed*.22),central=Math.min(forward*.48,Math.max(1.2,speed*.10)),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
