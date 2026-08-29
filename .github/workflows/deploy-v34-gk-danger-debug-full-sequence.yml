@@ -1,0 +1,52 @@
+name: Deploy V34 GK danger debug full sequence
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-v34-gk-danger-debug-full-sequence.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply TEST_ONLY GK #6 visual sequence patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('step71_hybrid_v06_ui.js')
+          s=p.read_text()
+          reps=[
+          ("GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'GKDBG-DANGER-5',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:14,speed:27,offset:2.0,gk:42,handling:55,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}",
+           "GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'PH2-DANGER-05',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:19,speed:25,offset:11,gk:74,handling:40,visualStartX:83,gkX:100.5,gkY:34,replayRate:.75,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}"),
+          ("const shotX=105-c.distance;Object.assign(st,{x:shotX", "const shotX=c.visualStartX??(105-c.distance);Object.assign(st,{x:shotX"),
+          ("const gkY=34+(c.offset?Math.sign(c.offset)*Math.min(1.8,Math.abs(c.offset)*.45):0);Object.assign(gk,{x:99.5,y:gkY", "const gkY=c.gkY??(34+(c.offset?Math.sign(c.offset)*Math.min(1.8,Math.abs(c.offset)*.45):0));Object.assign(gk,{x:c.gkX??99.5,y:gkY"),
+          ("startReplay(frames,'DEV_SCENARIO',`${c.label} · 슈팅부터 강제 재현`,1);return true;", "startReplay(frames,'DEV_SCENARIO',`${c.label} · 슈팅부터 강제 재현`,c.replayRate||1);return true;"),
+          ("const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_');startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,gk?1:REPLAY_SPEED);", "const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_'),danger=developerScenarioLast.key==='GK_PHASE2_PLAUSIBILITY_DANGER';startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,danger?.75:gk?1:REPLAY_SPEED);")
+          ]
+          for old,new in reps:
+              n=s.count(old)
+              if n!=1:
+                  raise SystemExit(f'Expected exactly one match, found {n}: {old[:100]}')
+              s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check step71_hybrid_v06_ui.js
+          grep -q "seed:'PH2-DANGER-05'" step71_hybrid_v06_ui.js
+          grep -q "replayRate:.75" step71_hybrid_v06_ui.js
+          grep -q "visualStartX:83" step71_hybrid_v06_ui.js
+          git diff --check
+          git diff -- runtime/continuous_match_core.js | grep -q '^$' || { echo 'Gameplay runtime changed unexpectedly'; exit 1; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add step71_hybrid_v06_ui.js
+          git commit -m "Show full GK danger-parry debug sequence (TEST_ONLY)"
+          git push origin HEAD:main
