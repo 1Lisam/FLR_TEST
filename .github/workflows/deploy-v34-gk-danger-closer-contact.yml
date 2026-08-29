@@ -1,4 +1,4 @@
-name: Deploy V34 GK danger forward rebound semantics
+name: Deploy V34 GK shared parry contact stage
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply reviewed issue 44 forward rebound semantics
+      - name: Apply reviewed issue 45 shared parry contact stage
         shell: bash
         run: |
           set -euo pipefail
@@ -25,27 +25,93 @@ jobs:
           from pathlib import Path
           p = Path('runtime/continuous_match_core.js')
           s = p.read_text()
-          old_vector = "    const forward=Math.max(3.8,speed*.22),central=Math.min(forward*.48,Math.max(1.2,speed*.10)),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;"
-          new_vector = "    // Local GK coordinates put the defended goal line at x=0 for both teams\n    // (HOME: world +x; AWAY: world -x). Danger is therefore a short spill in\n    // local +x, back into the field, with only a modest live-context side term.\n    const forward=clamp(speed*.22,3.8,6.0),central=clamp(speed*.08,1.2,2.1),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;"
-          if s.count(old_vector) != 1:
-              raise SystemExit(f'Expected one pre-44 danger vector, found {s.count(old_vector)}')
-          s = s.replace(old_vector, new_vector, 1)
-          old_text = "`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`"
-          new_text = "`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`"
-          if s.count(old_text) != 1:
-              raise SystemExit(f'Expected one pre-44 danger event wording, found {s.count(old_text)}')
-          s = s.replace(old_text, new_text, 1)
+
+          phase2_anchor = "// V34 GK Phase2 TEST_ONLY: plausibility-first NPC handling for ordinary non-chip shots."
+          if s.count(phase2_anchor) != 1:
+              raise SystemExit(f'Expected one Phase2 anchor, found {s.count(phase2_anchor)}')
+          if 'function goalkeeperParryContactStage(' in s:
+              raise SystemExit('Shared parry contact stage already present')
+
+          helpers = r'''function goalkeeperShotContactSweep(m,p,prev){
+  const a=worldToLocal(p.team,prev.x,prev.y),b=worldToLocal(p.team,m.ball.x,m.ball.y),gx=worldToLocal(p.team,p.x,p.y);
+  const vx=b.x-a.x,vy=b.y-a.y,len2=vx*vx+vy*vy,u=len2>1e-9?clamp(((gx.x-a.x)*vx+(gx.y-a.y)*vy)/len2,0,1):1;
+  const x=a.x+vx*u,y=a.y+vy*u,dt=Number(m.ball.contactDt)||Number(m.dt)||0.05;
+  const startAge=Number.isFinite(m.ball.contactPrevAge)?m.ball.contactPrevAge:(m.ball.age||0)-dt;
+  return{u,x,y,dx:Math.abs(x-gx.x),dy:Math.abs(y-gx.y),distance:Math.hypot(x-gx.x,y-gx.y),age:Math.max(0,startAge+u*dt)};
+}
+function goalkeeperParryContactStage(m,gk,prev){
+  // SAFE and DANGER share this one causal contact stage. The envelope is deliberately
+  // broad enough for a plausible hand/arm save, but it never moves the live ball and
+  // does not decide whether the save, catch, or danger roll succeeds.
+  const sweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y});
+  const gkLocal=worldToLocal(gk.team,gk.x,gk.y);
+  const contactEnvelope=clamp(2.60+(abilityValue(m,gk,'reaction')-60)*.003,2.42,2.72);
+  const gkBefore={x:gk.x,y:gk.y},reachNeed=Math.max(0,Math.abs(m.ball.y-gk.y)-1.35),presentationReach=Math.min(.90,reachNeed);
+  if(presentationReach>0){
+    const reachSide=Math.sign(m.ball.y-gk.y)||1;
+    gk.y=clamp(gk.y+reachSide*presentationReach,0.8,67.2);gk.ty=gk.y;gk.vy=0;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=false;
+    gk.bodyAngle=Math.atan2(m.ball.y-gk.y,m.ball.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
+  }
+  const contactSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y});
+  return{contactReady:contactSweep.distance<=contactEnvelope,sweep:contactSweep,contactEnvelope,gkBefore,gkAfter:{x:gk.x,y:gk.y},presentationReach,gkLocal:worldToLocal(gk.team,gk.x,gk.y)};
+}
+
+'''
+          s = s.replace(phase2_anchor, helpers + phase2_anchor, 1)
+
+          start_marker = "  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;"
+          end_marker = "  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy};"
+          start = s.find(start_marker)
+          if start < 0:
+              raise SystemExit('Could not find pre-45 dangerRoll marker')
+          end = s.find(end_marker, start)
+          if end < 0:
+              raise SystemExit('Could not find pre-45 SAFE return marker')
+          end += len(end_marker)
+
+          replacement = r'''  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
+  const contactStage=goalkeeperParryContactStage(m,gk,prev);
+  if(!contactStage.contactReady)return null;
+  if(dangerEligible&&dangerRoll<.42){
+    b.npcGkResolved='PARRY_DANGER';
+    const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
+    // Local GK coordinates put the defended goal line at x=0 for both teams
+    // (HOME: world +x; AWAY: world -x). Danger is therefore a short spill in
+    // local +x, back into the field, with only a modest live-context side term.
+    const forward=clamp(speed*.22,3.8,6.0),central=clamp(speed*.08,1.2,2.1),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
+    const ballVelocityBefore={x:b.vx,y:b.vy};
+    m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.gkDangerParries=(m.stats.gkDangerParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
+    setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
+    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null},localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6))});
+    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,sharedContactStage:contactStage};
+  }
+  b.npcGkResolved='PARRY_SAFE';
+  const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
+  const lateral=Math.max(5.2,speed*.56),outward=-Math.max(2.8,speed*.18),lvx=outward,lvy=side*lateral,wx=gk.team===HOME?lvx:-lvx,wy=gk.team===HOME?lvy:-lvy;
+  const ballVelocityBefore={x:b.vx,y:b.vy};
+  m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
+  setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
+  event(m,'PARRY_SAFE',`${subjectName(gk.name)} 슈팅을 측면 안전지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_SAFE',npcGkPhase:1,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null},localVx:lvx,localVy:lvy});
+  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy,sharedContactStage:contactStage};'''
+          s = s[:start] + replacement + s[end:]
           p.write_text(s)
           PY
+
           node --check runtime/continuous_match_core.js
+          test "$(grep -c "function goalkeeperParryContactStage" runtime/continuous_match_core.js)" = "1"
+          test "$(grep -c "const contactStage=goalkeeperParryContactStage" runtime/continuous_match_core.js)" = "1"
+          test "$(grep -c "nearContactDistance" runtime/continuous_match_core.js || true)" = "0"
+          test "$(grep -c "reachBefore" runtime/continuous_match_core.js || true)" = "0"
+          grep -q "PARRY_SAFE.*sharedContactStage" runtime/continuous_match_core.js
+          grep -q "PARRY_DANGER.*sharedContactStage" runtime/continuous_match_core.js
+          grep -q "const lateral=Math.max(5.2,speed\*.56),outward=-Math.max(2.8,speed\*.18)" runtime/continuous_match_core.js
           grep -q "const forward=clamp(speed\*.22,3.8,6.0),central=clamp(speed\*.08,1.2,2.1)" runtime/continuous_match_core.js
-          grep -q "중앙 앞 위험지대로 쳐냈습니다" runtime/continuous_match_core.js
-          grep -q "gk.action='GK_SAVE_REACH'" runtime/continuous_match_core.js
           git diff --check
           changed="$(git diff --name-only)"
           test "$changed" = "runtime/continuous_match_core.js" || { echo "Unexpected changed files: $changed"; exit 1; }
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add runtime/continuous_match_core.js
-          git commit -m "Make GK danger parry rebound forward (TEST_ONLY)"
+          git commit -m "Unify GK safe-danger parry contact stage (TEST_ONLY)"
           git push origin HEAD:main
