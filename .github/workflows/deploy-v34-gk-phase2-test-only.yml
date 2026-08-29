@@ -21,9 +21,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          CURRENT="$(sha256sum runtime/continuous_match_core.js | awk '{print $1}')"
+          echo "Current FLR_TEST runtime SHA-256: $CURRENT"
           PAYLOAD=.flr/deploy/v34_gk_phase2_runtime.gz.b64
           if [ ! -f "$PAYLOAD" ]; then
-            echo "Payload not present yet; bootstrap workflow commit only."
+            echo "Payload not present yet; inspection run only."
             exit 0
           fi
           base64 -d "$PAYLOAD" > /tmp/v34_gk_phase2_runtime.gz
