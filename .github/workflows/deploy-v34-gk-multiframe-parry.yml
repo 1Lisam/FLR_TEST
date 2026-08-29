@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply reviewed FLR_DEV issue 46
+      - name: Apply reviewed FLR_DEV issue 46 to FLR_TEST wiring
         shell: bash
         run: |
           set -euo pipefail
@@ -25,65 +25,60 @@ jobs:
           from pathlib import Path
           p=Path('runtime/continuous_match_core.js')
           s=p.read_text()
+
+          # 1) Same #46 shared multi-frame contact helper.
           a=s.index("function goalkeeperParryContactStage(m,gk,prev){")
           b=s.index("\n\n// V34 GK Phase2 TEST_ONLY:",a)
           if "const contactEnvelope=clamp(2.60+" not in s[a:b]:
               raise SystemExit('expected issue45 helper')
           helper="""function goalkeeperParryContactStage(m,gk,prev){
-            // SAFE and DANGER share this one causal contact stage. The broad envelope may only
-            // start the approach; it is not authority to change the live ball. The final gate is
-            // deliberately tighter and the keeper reaches it through normal dt-based integration.
-            const approachStartEnvelope=clamp(3.40+(abilityValue(m,gk,'reaction')-60)*.003,3.20,3.60),finalContactThreshold=1.60;
-            const initialSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y}),gkBefore={x:gk.x,y:gk.y};
-            let reach=m.ball.gkParryReach||null;
-            if(!reach&&initialSweep.distance<=approachStartEnvelope&&initialSweep.distance>finalContactThreshold){
-              const maxDisplacement=.90,delta=clamp(m.ball.y-gk.y,-maxDisplacement,maxDisplacement),targetY=clamp(gk.y+delta,0.8,67.2);
-              reach={startedAt:m.time,startX:gk.x,startY:gk.y,targetX:gk.x,targetY,displacement:Math.abs(targetY-gk.y),approachStartGap:initialSweep.distance,side:Math.sign(delta)||1};
-              m.ball.gkParryReach=reach;
-              // Give the existing integrator an accelerated, bounded first reach impulse.
-              // Position still changes only in movePlayers(dt); this is not a pose snap.
-              gk.vy=reach.side*Math.max(Math.abs(gk.vy||0),8.0);
-            }
-            if(reach){
-              // This is a movement target only: no future SAFE/DANGER label is stored here.
-              gk.tx=reach.targetX;gk.ty=reach.targetY;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=true;
-              gk.bodyAngle=Math.atan2(m.ball.y-gk.y,m.ball.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
-            }
-            const contactSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y}),contactReady=contactSweep.distance<=finalContactThreshold;
-            return{contactReady,sweep:contactSweep,contactEnvelope:finalContactThreshold,approachStartEnvelope,gkBefore,gkAfter:{x:gk.x,y:gk.y},reachDisplacement:reach?.displacement||0,reachState:reach?{startedAt:reach.startedAt,targetY:reach.targetY}:null,presentationReach:0,gkLocal:worldToLocal(gk.team,gk.x,gk.y)};
-          }"""
-          helper='\n'.join(line[10:] if line.startswith('          ') else line for line in helper.splitlines())
+  // SAFE and DANGER share this one causal contact stage. The broad envelope may only
+  // start the approach; it is not authority to change the live ball. The final gate is
+  // deliberately tighter and the keeper reaches it through normal dt-based integration.
+  const approachStartEnvelope=clamp(3.40+(abilityValue(m,gk,'reaction')-60)*.003,3.20,3.60),finalContactThreshold=1.60;
+  const initialSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y}),gkBefore={x:gk.x,y:gk.y};
+  let reach=m.ball.gkParryReach||null;
+  if(!reach&&initialSweep.distance<=approachStartEnvelope&&initialSweep.distance>finalContactThreshold){
+    const maxDisplacement=.90,delta=clamp(m.ball.y-gk.y,-maxDisplacement,maxDisplacement),targetY=clamp(gk.y+delta,0.8,67.2);
+    reach={startedAt:m.time,startX:gk.x,startY:gk.y,targetX:gk.x,targetY,displacement:Math.abs(targetY-gk.y),approachStartGap:initialSweep.distance,side:Math.sign(delta)||1};
+    m.ball.gkParryReach=reach;
+    // Position changes only through movePlayers(dt); this is not a pose snap.
+    gk.vy=reach.side*Math.max(Math.abs(gk.vy||0),8.0);
+  }
+  if(reach){
+    gk.tx=reach.targetX;gk.ty=reach.targetY;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=true;
+    gk.bodyAngle=Math.atan2(m.ball.y-gk.y,m.ball.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
+  }
+  const contactSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y}),contactReady=contactSweep.distance<=finalContactThreshold;
+  return{contactReady,sweep:contactSweep,contactEnvelope:finalContactThreshold,approachStartEnvelope,gkBefore,gkAfter:{x:gk.x,y:gk.y},reachDisplacement:reach?.displacement||0,reachState:reach?{startedAt:reach.startedAt,targetY:reach.targetY}:null,presentationReach:0,gkLocal:worldToLocal(gk.team,gk.x,gk.y)};
+}"""
           s=s[:a]+helper+s[b:]
 
-          ua=s.index("function updateGoalkeeperShotResponse(m){")
-          ub=s.index("\nfunction beginSetPieceLive",ua)
-          if "gkParryReach" in s[ua:ub]:
-              raise SystemExit('updateGoalkeeperShotResponse already contains issue46 reach')
-          update_fn="""function updateGoalkeeperShotResponse(m){
-            if(m.ball.mode!=='FLIGHT'||m.ball.kind!=='SHOT'||m.ball.shotTargetY==null)return false;
-            const defending=other(m.ball.shotTeam||m.ball.lastTouchTeam),gk=teamPlayers(m,defending).find(p=>p.role==='GK');if(!gk)return false;
-            const react=goalkeeperShotReaction(m,gk);
-            if(!react.reacted){gk.action='GK_REACT_WAIT';gk.tacticalTask='GK_REACT_WAIT';gk.sprint=false;return false;}
-            if(m.ball.gkParryReach){
-              gk.tx=m.ball.gkParryReach.targetX;gk.ty=m.ball.gkParryReach.targetY;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=true;return true;
-            }
-            const defBall=worldToLocal(gk.team,m.ball.x,m.ball.y),ideal=worldToLocal(gk.team,oppGoalX(other(gk.team)),m.ball.shotTargetY).y;
-            const w=localToWorld(gk.team,clamp(2.0+defBall.x*0.01,1.8,4.0),clamp(ideal,30.2,37.8));
-            gk.tx=w.x;gk.ty=w.y;gk.action='GK_SAVE_SET';gk.tacticalTask='GK_SAVE_SET';gk.sprint=true;return true;
-          }"""
-          update_fn='\n'.join(line[10:] if line.startswith('          ') else line for line in update_fn.splitlines())
-          s=s[:ua]+update_fn+s[ub:]
+          # 2) FLR_TEST uses assignShape rather than FLR_DEV updateGoalkeeperShotResponse.
+          # Preserve the same pending reach target whenever shape refreshes during the shot.
+          old="""    if(p.role==='GK'){
+      const goalDepth=clamp(5.4+defProgress*0.025,5.2,8.3);lx=goalDepth;ly=lerp(34,defLocalBall.y,0.16);action='GK_SET';
+      if(m.ball.mode==='LOOSE'&&inPenaltyArea(p.team,m.ball.x,m.ball.y)&&dist(p,m.ball)<10){const b=worldToLocal(p.team,m.ball.x,m.ball.y);lx=b.x;ly=b.y;action='GK_RUSH';sprint=true;}
+      if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.shotTargetY!=null){const ideal=worldToLocal(p.team,oppGoalX(other(p.team)),m.ball.shotTargetY).y;lx=clamp(2.0+defProgress*0.01,1.8,4.0);ly=clamp(ideal,30.2,37.8);action='GK_SAVE_SET';sprint=true;}
+    }"""
+          new="""    if(p.role==='GK'){
+      const goalDepth=clamp(5.4+defProgress*0.025,5.2,8.3);lx=goalDepth;ly=lerp(34,defLocalBall.y,0.16);action='GK_SET';
+      if(m.ball.mode==='LOOSE'&&inPenaltyArea(p.team,m.ball.x,m.ball.y)&&dist(p,m.ball)<10){const b=worldToLocal(p.team,m.ball.x,m.ball.y);lx=b.x;ly=b.y;action='GK_RUSH';sprint=true;}
+      if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.gkParryReach){const r=worldToLocal(p.team,m.ball.gkParryReach.targetX,m.ball.gkParryReach.targetY);lx=r.x;ly=r.y;action='GK_SAVE_REACH';sprint=true;}
+      else if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.shotTargetY!=null){const ideal=worldToLocal(p.team,oppGoalX(other(p.team)),m.ball.shotTargetY).y;lx=clamp(2.0+defProgress*0.01,1.8,4.0);ly=clamp(ideal,30.2,37.8);action='GK_SAVE_SET';sprint=true;}
+    }"""
+          if s.count(old)!=1: raise SystemExit(f'assignShape GK anchor {s.count(old)}')
+          s=s.replace(old,new,1)
 
+          # 3) Start parry approach earlier, while preserving routine-CATCH timing.
           old="""  const previousBall=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),gkLocal=worldToLocal(gk.team,gk.x,gk.y),interactionPlane=gkLocal.x+2.2,behindTolerance=.75;
-            const crossedInteractionPlane=previousBall.x>interactionPlane&&localBall.x<=interactionPlane;
-            const alreadyInInteractionZone=localBall.x<=interactionPlane&&localBall.x>=gkLocal.x-behindTolerance;
-            if(!crossedInteractionPlane&&!alreadyInInteractionZone)return null;"""
-          old='\n'.join(line[10:] if line.startswith('          ') else line for line in old.splitlines())
+  const crossedInteractionPlane=previousBall.x>interactionPlane&&localBall.x<=interactionPlane;
+  const alreadyInInteractionZone=localBall.x<=interactionPlane&&localBall.x>=gkLocal.x-behindTolerance;
+  if(!crossedInteractionPlane&&!alreadyInInteractionZone)return null;"""
           new="""  const previousBall=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),gkLocal=worldToLocal(gk.team,gk.x,gk.y),approachPlane=gkLocal.x+4.2,legacyResolvePlane=gkLocal.x+2.2,behindTolerance=1.20;
-            const crossedApproachPlane=previousBall.x>approachPlane&&localBall.x<=approachPlane;
-            const alreadyInApproachZone=localBall.x<=approachPlane&&localBall.x>=gkLocal.x-behindTolerance;
-            if(!crossedApproachPlane&&!alreadyInApproachZone)return null;"""
-          new='\n'.join(line[10:] if line.startswith('          ') else line for line in new.splitlines())
+  const crossedApproachPlane=previousBall.x>approachPlane&&localBall.x<=approachPlane;
+  const alreadyInApproachZone=localBall.x<=approachPlane&&localBall.x>=gkLocal.x-behindTolerance;
+  if(!crossedApproachPlane&&!alreadyInApproachZone)return null;"""
           if s.count(old)!=1: raise SystemExit(f'interaction anchor {s.count(old)}')
           s=s.replace(old,new,1)
 
@@ -92,26 +87,42 @@ jobs:
           if s.count(old)!=1: raise SystemExit(f'routine anchor {s.count(old)}')
           s=s.replace(old,new,1)
 
-          old="  // Failed catches normally go sideways. Only genuinely awkward saves may spill centrally.\n  const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);\n  const dangerEligible=dangerBand>=4.8;\n  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;\n  const contactStage=goalkeeperParryContactStage(m,gk,prev);\n  if(!contactStage.contactReady)return null;"
-          new="  const contactStage=goalkeeperParryContactStage(m,gk,prev);\n  if(!contactStage.contactReady)return null;\n  const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);\n  const dangerEligible=dangerBand>=4.8;\n  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;"
+          # 4) Branch SAFE/DANGER only after final live contact.
+          old="""  // Failed catches normally go sideways. Only genuinely awkward saves may spill centrally.
+  const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);
+  const dangerEligible=dangerBand>=4.8;
+  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
+  const contactStage=goalkeeperParryContactStage(m,gk,prev);
+  if(!contactStage.contactReady)return null;"""
+          new="""  const contactStage=goalkeeperParryContactStage(m,gk,prev);
+  if(!contactStage.contactReady)return null;
+  const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);
+  const dangerEligible=dangerBand>=4.8;
+  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;"""
           if s.count(old)!=1: raise SystemExit(f'danger anchor {s.count(old)}')
           s=s.replace(old,new,1)
-
           if s.count("    b.npcGkResolved='PARRY_DANGER';")!=1: raise SystemExit('danger assign')
           s=s.replace("    b.npcGkResolved='PARRY_DANGER';","    b.npcGkResolved='PARRY_DANGER';b.gkParryReach=null;",1)
           if s.count("  b.npcGkResolved='PARRY_SAFE';")!=1: raise SystemExit('safe assign')
           s=s.replace("  b.npcGkResolved='PARRY_SAFE';","  b.npcGkResolved='PARRY_SAFE';b.gkParryReach=null;",1)
 
-          old="    if(isShot&&p.role==='GK'){\n      const saveSet=(p.action==='GK_SAVE_SET'||p.tacticalTask==='GK_SAVE_SET');"
-          new="    if(isShot&&p.role==='GK'){\n      if(m.ball.gkParryReach&&shotSweep.distance>1.45)continue;\n      const saveSet=(p.action==='GK_SAVE_SET'||p.tacticalTask==='GK_SAVE_SET');"
-          if s.count(old)!=1: raise SystemExit(f'capture anchor {s.count(old)}')
+          # 5) Do not let FLR_TEST's generic GK capture resolve a pending reach early.
+          old="""    const d=dist(p,m.ball),base=(isShot&&p.role==='GK'?shotSaveRadius:(CONTROL_RADIUS[p.role]||1.05)),recv=intended?(flightKind==='CROSS'?0.20:0.72):0,opp=opponentPass?(flightKind==='CROSS'?0.14:-0.08):0,matePenalty=otherMate?-0.22:0,r=base+recv+opp+matePenalty+(m.ball.mode==='LOOSE'?0.25:0);
+    if(d>r)continue;"""
+          new="""    const shotSweep=isShot&&p.role==='GK'?goalkeeperShotContactSweep(m,p,contactPrev||{x:m.ball.x,y:m.ball.y}):null;
+    if(isShot&&p.role==='GK'&&m.ball.gkParryReach&&shotSweep.distance>1.45)continue;
+    const d=isShot&&p.role==='GK'?Math.min(dist(p,m.ball),shotSweep.distance):dist(p,m.ball),base=(isShot&&p.role==='GK'?shotSaveRadius:(CONTROL_RADIUS[p.role]||1.05)),recv=intended?(flightKind==='CROSS'?0.20:0.72):0,opp=opponentPass?(flightKind==='CROSS'?0.14:-0.08):0,matePenalty=otherMate?-0.22:0,r=base+recv+opp+matePenalty+(m.ball.mode==='LOOSE'?0.25:0);
+    if(d>r)continue;"""
+          if s.count(old)!=1: raise SystemExit(f'generic GK capture anchor {s.count(old)}')
           s=s.replace(old,new,1)
+
           p.write_text(s)
           PY
+
           node --check runtime/continuous_match_core.js
           grep -q "finalContactThreshold=1.60" runtime/continuous_match_core.js
           grep -q "approachStartEnvelope=clamp(3.40" runtime/continuous_match_core.js
-          grep -q "gkParryReach.targetY" runtime/continuous_match_core.js
+          grep -q "action='GK_SAVE_REACH'" runtime/continuous_match_core.js
           grep -q "shotSweep.distance>1.45" runtime/continuous_match_core.js
           test "$(grep -c "presentationReach=Math.min(.90" runtime/continuous_match_core.js || true)" = "0"
           git diff --check
