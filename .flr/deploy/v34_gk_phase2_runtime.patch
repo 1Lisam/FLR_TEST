@@ -1,0 +1,70 @@
+diff --git a/runtime/continuous_match_core.js b/runtime/continuous_match_core.js
+index d52076c..3b7feca 100644
+--- a/runtime/continuous_match_core.js
++++ b/runtime/continuous_match_core.js
+@@ -1886,6 +1886,52 @@ function tryNpcOneTouchPass(m,p,flightKind,sourceId,passTeam,incomingSpeed){
+   executePass(m,p,targetOpt.p,'PASS',{...targetOpt,running:false},'NPC_ONE_TOUCH');p.lastDecision='NPC_ONE_TOUCH_PASS';m.stats.npcOneTouchPasses=(m.stats.npcOneTouchPasses||0)+1;m.npcOneTouchChainUntil=m.time+.72;return true;
+ }
+ 
++// V34 GK Phase2 TEST_ONLY: plausibility-first NPC handling for ordinary non-chip shots.
++// Exact trajectory remains live for context/presentation, but centimeter body intersection is
++// not the primary save-success authority for these eligible NPC goalkeeper situations.
++function resolveNpcGkShot(m,gk,prev){
++  const b=m.ball;
++  if(!gk||gk.role!=='GK'||b.mode!=='FLIGHT'||b.kind!=='SHOT'||b.npcGkResolved)return null;
++  if(b.shotTargetY==null||b.onTarget===false||b.strikeStyle==='CHIP'||b.arcProfile==='CHIP_LOB'||b.airborne||Number(b.z||0)>0.65)return null;
++  // Keep high-ball/chip/1v1/rush cases on the existing test-build paths.
++  if(b.shotOneVOne||b.shotClearKeeperChance||gk.action==='GK_RUSH'||gk.tacticalTask==='GK_RUSH')return null;
++  const localBall=worldToLocal(gk.team,b.x,b.y);
++  if(localBall.x>12.5)return null;
++  const distance=Number.isFinite(b.shotDistance)?b.shotDistance:(Number.isFinite(b.originX)&&Number.isFinite(b.originY)?Math.hypot(oppGoalX(b.shotTeam)-b.originX,34-b.originY):Math.hypot(oppGoalX(b.shotTeam)-b.x,34-b.y));
++  const speed=Math.hypot(b.vx||0,b.vy||0),offset=Math.abs(Number(b.shotTargetY)-34),height=Number(b.z||0);
++  const setState=gk.action==='GK_SAVE_SET'||gk.tacticalTask==='GK_SAVE_SET'||gk.action==='GK_REACT_WAIT'||gk.tacticalTask==='GK_REACT_WAIT';
++  const routine=distance>=18&&speed<=20.5&&offset<=5.5&&height<=0.65&&setState;
++  const key=`${m.seed}|NPC_GK_PHASE1|${b.lastTouchPlayer||'-'}|${Number(b.originX||0).toFixed(2)}|${Number(b.originY||0).toFixed(2)}|${gk.id}`;
++  if(routine){b.npcGkResolved='CATCH';m.stats.saves=(m.stats.saves||0)+1;m.stats.gkCatches=(m.stats.gkCatches||0)+1;setControlled(m,gk);gk.nextThink=m.time+0.75;event(m,'SAVE',`${subjectName(gk.name)} 루틴 슈팅을 안정적으로 잡아냈습니다.`,{npcGkOutcome:'CATCH',npcGkPhase:1});return{outcome:'CATCH',routine:true};}
++  const difficulty=clamp((speed-18)*1.35+Math.max(0,offset-4)*0.75+Math.max(0,22-distance)*0.55+(height>0.35?1.5:0),-4,15);
++  const contest=(abilityValue(m,gk,'reaction')*.38+abilityValue(m,gk,'gk_positioning')*.34+abilityValue(m,gk,'diving')*.28)-60;
++  const saveChance=clamp(.52+contest*.007-difficulty*.020,.14,.86),saveRoll=(hash32(`${key}|CONTEST`)%1000000)/1000000;
++  b.npcGkResolved=saveRoll<saveChance?'SAVE':'GOAL';
++  if(b.npcGkResolved==='GOAL')return{outcome:'GOAL',routine:false};
++  const handling=abilityValue(m,gk,'handling'),catchChance=clamp(.56+(handling-60)*.008-Math.max(0,speed-20)*.018-offset*.006,.24,.88),catchRoll=(hash32(`${key}|HANDLING`)%1000000)/1000000;
++  if(catchRoll<catchChance){b.npcGkResolved='CATCH';m.stats.saves=(m.stats.saves||0)+1;m.stats.gkCatches=(m.stats.gkCatches||0)+1;setControlled(m,gk);gk.nextThink=m.time+0.75;event(m,'SAVE',`${subjectName(gk.name)} 슈팅을 안정적으로 잡아냈습니다.`,{npcGkOutcome:'CATCH',npcGkPhase:1});return{outcome:'CATCH',routine:false};}
++  // Failed catches normally go sideways. Only genuinely awkward saves may spill centrally.
++  const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);
++  const dangerEligible=dangerBand>=4.8;
++  const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
++  if(dangerEligible&&dangerRoll<.42){
++    b.npcGkResolved='PARRY_DANGER';
++    const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
++    const forward=Math.max(3.8,speed*.22),central=Math.min(forward*.48,Math.max(1.2,speed*.10)),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
++    m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.gkDangerParries=(m.stats.gkDangerParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
++    setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
++    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6))});
++    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll};
++  }
++  b.npcGkResolved='PARRY_SAFE';
++  const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
++  const lateral=Math.max(5.2,speed*.56),outward=-Math.max(2.8,speed*.18),lvx=outward,lvy=side*lateral,wx=gk.team===HOME?lvx:-lvx,wy=gk.team===HOME?lvy:-lvy;
++  m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
++  setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
++  event(m,'PARRY_SAFE',`${subjectName(gk.name)} 슈팅을 측면 안전지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_SAFE',npcGkPhase:1,localVx:lvx,localVy:lvy});
++  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy};
++}
++
+ function callFrozenOffsideOnReceiverInvolvement(m,p,reason='TOUCH'){
+   // Law 11 position is frozen at release. If that frozen-offside intended receiver is the
+   // player who actually reaches/touches the pass, the offence must be enforced before any
+@@ -1905,6 +1951,12 @@ function captureLooseOrFlight(m){
+   // the block outcome. Do not let a nearby player magnetically collect it before it exits.
+   if(m.ball.mode==='FLIGHT'&&m.ball.kind==='DEFLECTION_OUT')return;
+   const isShot=m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT',flightKind=m.ball.kind,passFlight=['PASS','LONG_PASS','THROUGH','CUTBACK','CROSS'].includes(flightKind),restartFlight=['THROW_IN','GOAL_KICK'].includes(flightKind),transferFlight=passFlight||restartFlight,speed=Math.hypot(m.ball.vx||0,m.ball.vy||0),td=m.ball.targetX==null?99:Math.hypot(m.ball.x-m.ball.targetX,m.ball.y-m.ball.targetY),candidates=[];
++  if(isShot){
++    const defending=other(m.ball.shotTeam||m.ball.lastTouchTeam),gk=teamPlayers(m,defending).find(p=>p.role==='GK');
++    const phase2=resolveNpcGkShot(m,gk,null);
++    if(phase2)return;
++    if(m.ball.npcGkResolved)return;
++  }
+   for(const p of m.players){
+     if(m.ball.mode==='FLIGHT'&&m.ball.lastTouchPlayer===p.id&&m.ball.age<0.28)continue;
+     if(Array.isArray(m.ball.noCaptureIds)&&m.ball.age<(m.ball.noCaptureUntil||0)&&m.ball.noCaptureIds.includes(p.id))continue;
