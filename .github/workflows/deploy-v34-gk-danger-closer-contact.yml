@@ -1,4 +1,4 @@
-name: Deploy V34 GK danger closer-contact visual reach
+name: Deploy V34 GK danger forward rebound semantics
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply reviewed issue 43 presentation-only keeper reach
+      - name: Apply reviewed issue 44 forward rebound semantics
         shell: bash
         run: |
           set -euo pipefail
@@ -26,23 +26,27 @@ jobs:
           p = Path('runtime/continuous_match_core.js')
           s = p.read_text()
 
-          anchor = """    if(nearContactDistance>2.60)return null;\n    b.npcGkResolved='PARRY_DANGER';"""
-          replacement = """    if(nearContactDistance>2.60)return null;\n    // Presentation-only reach for the dangerous spill: the live resolver has already\n    // decided this disposition at the current state, so no result is cached or released\n    // later. Move only the rendered keeper toward the incoming ball's lateral line, by\n    // at most 0.90m, before changing the ball vector. The incoming ball is not moved.\n    const reachBefore={x:gk.x,y:gk.y},reachNeed=Math.max(0,Math.abs(b.y-gk.y)-1.35),reach=Math.min(.90,reachNeed),reachSide=Math.sign(b.y-gk.y)||1;\n    if(reach>0){\n      gk.y=clamp(gk.y+reachSide*reach,0.8,67.2);gk.ty=gk.y;gk.vy=0;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=false;\n      gk.bodyAngle=Math.atan2(b.y-gk.y,b.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;\n    }\n    const reachAfter={x:gk.x,y:gk.y},visualGap=Math.hypot(b.x-gk.x,b.y-gk.y);\n    b.npcGkResolved='PARRY_DANGER';"""
-          if s.count(anchor) != 1:
-              raise SystemExit(f'Expected one issue-42 anchor, found {s.count(anchor)}')
-          s = s.replace(anchor, replacement, 1)
+          old_vector = """    const forward=Math.max(3.8,speed*.22),central=Math.min(forward*.48,Math.max(1.2,speed*.10)),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;"""
+          new_vector = """    // Local GK coordinates put the defended goal line at x=0 for both teams
+    // (HOME: world +x; AWAY: world -x). Danger is therefore a short spill in
+    // local +x, back into the field, with only a modest live-context side term.
+    const forward=clamp(speed*.22,3.8,6.0),central=clamp(speed*.08,1.2,2.1),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;"""
+          if s.count(old_vector) != 1:
+              raise SystemExit(f'Expected one pre-44 danger vector, found {s.count(old_vector)}')
+          s = s.replace(old_vector, new_vector, 1)
 
-          old_event = """    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6))});\n    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll};"""
-          new_event = """    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6)),visualReach:{before:reachBefore,after:reachAfter,meters:Number(reach.toFixed(3)),ball:{x:b.x,y:b.y},euclideanGap:Number(visualGap.toFixed(3)),lateralGap:Number(Math.abs(b.y-gk.y).toFixed(3))}});\n    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,visualReach:{before:reachBefore,after:reachAfter,meters:reach,euclideanGap:visualGap,lateralGap:Math.abs(b.y-gk.y)}};"""
-          if s.count(old_event) != 1:
-              raise SystemExit(f'Expected one old danger event block, found {s.count(old_event)}')
-          s = s.replace(old_event, new_event, 1)
+          old_text = "`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`"
+          new_text = "`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`"
+          if s.count(old_text) != 1:
+              raise SystemExit(f'Expected one pre-44 danger event wording, found {s.count(old_text)}')
+          s = s.replace(old_text, new_text, 1)
           p.write_text(s)
           PY
 
           node --check runtime/continuous_match_core.js
+          grep -q "const forward=clamp(speed\*.22,3.8,6.0),central=clamp(speed\*.08,1.2,2.1)" runtime/continuous_match_core.js
+          grep -q "중앙 앞 위험지대로 쳐냈습니다" runtime/continuous_match_core.js
           grep -q "gk.action='GK_SAVE_REACH'" runtime/continuous_match_core.js
-          grep -q "reach=Math.min(.90,reachNeed)" runtime/continuous_match_core.js
           git diff --check
           changed="$(git diff --name-only)"
           test "$changed" = "runtime/continuous_match_core.js" || { echo "Unexpected changed files: $changed"; exit 1; }
@@ -50,5 +54,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add runtime/continuous_match_core.js
-          git commit -m "Add GK danger-parry visual reach (TEST_ONLY)"
+          git commit -m "Make GK danger parry rebound forward (TEST_ONLY)"
           git push origin HEAD:main
