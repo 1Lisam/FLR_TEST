@@ -1930,13 +1930,23 @@ function resolveNpcGkShot(m,gk,prev){
     // +2.5m retest shot reaches 2.50m lateral separation at closest approach;
     // a tighter 1.4–1.8m circle would miss that plausible hand-side contact.
     if(nearContactDistance>2.60)return null;
+    // Presentation-only reach for the dangerous spill: the live resolver has already
+    // decided this disposition at the current state, so no result is cached or released
+    // later. Move only the rendered keeper toward the incoming ball's lateral line, by
+    // at most 0.90m, before changing the ball vector. The incoming ball is not moved.
+    const reachBefore={x:gk.x,y:gk.y},reachNeed=Math.max(0,Math.abs(b.y-gk.y)-1.35),reach=Math.min(.90,reachNeed),reachSide=Math.sign(b.y-gk.y)||1;
+    if(reach>0){
+      gk.y=clamp(gk.y+reachSide*reach,0.8,67.2);gk.ty=gk.y;gk.vy=0;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=false;
+      gk.bodyAngle=Math.atan2(b.y-gk.y,b.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
+    }
+    const reachAfter={x:gk.x,y:gk.y},visualGap=Math.hypot(b.x-gk.x,b.y-gk.y);
     b.npcGkResolved='PARRY_DANGER';
     const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
     const forward=Math.max(3.8,speed*.22),central=Math.min(forward*.48,Math.max(1.2,speed*.10)),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
     m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.gkDangerParries=(m.stats.gkDangerParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
     setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
-    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6))});
-    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll};
+    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 쪽으로 불안하게 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6)),visualReach:{before:reachBefore,after:reachAfter,meters:Number(reach.toFixed(3)),ball:{x:b.x,y:b.y},euclideanGap:Number(visualGap.toFixed(3)),lateralGap:Number(Math.abs(b.y-gk.y).toFixed(3))}});
+    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,visualReach:{before:reachBefore,after:reachAfter,meters:reach,euclideanGap:visualGap,lateralGap:Math.abs(b.y-gk.y)}};
   }
   b.npcGkResolved='PARRY_SAFE';
   const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
