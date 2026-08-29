@@ -29,11 +29,44 @@ const DEV_RECENT_GUIDES={
  PASS_FLIGHT_WIDE_TRACK:{label:'패스 비행 중 풀백 측면 추적',watch:'측면 전진 패스를 선택한 뒤 공이 비행하는 동안 담당 풀백이 침투자를 놓고 멈추거나 중앙으로 풀리는지 봅니다.',normal:'정상: 공 소유자가 사라지는 FLIGHT 순간에도 intended receiver를 위협으로 이어 받아 추적합니다.'},
  STRIKER_RUN_LANE:{label:'ST 침투 레인 연속성',watch:'측면 전개 중 ST가 중앙·니어·파포스트 목표를 너무 자주 바꾸며 좌우 왕복하는지 봅니다.',normal:'정상: 공격 의도는 잠깐 유지되고, 실제 전개 변화가 있을 때만 새 레인으로 전환합니다.'},
  CARRIER_SHIELD_FLOW:{label:'공격수 멈칫 반복 방지',watch:'ST가 공을 지킨 뒤 같은 자리에서 SHIELD_SCAN/멈춤을 반복하는지 봅니다.',normal:'정상: 짧게 스캔한 뒤 패스·드리블·보호 등 다음 실제 판단으로 이어집니다.'},
+ GK_PHASE2_PLAUSIBILITY_CATCH:{label:'GK Phase2 · 쉬운 슛 캐칭',watch:'멀리서 비교적 느리고 중앙으로 오는 명백히 쉬운 슛을 골키퍼가 괜히 펀칭하거나 옆으로 쳐내지 않는지 봅니다.',normal:'정상: 준비된 골키퍼가 공을 안정적으로 CATCH하고 소유권을 확보합니다. 이 항목은 TEST_ONLY 고정 상황에서 실제 Phase2 resolver를 실행합니다.'},
+ GK_PHASE2_PLAUSIBILITY_SAFE:{label:'GK Phase2 · 측면 안전 패링',watch:'잡기에는 까다로운 슛을 막았을 때 공이 골문 중앙 앞으로 떨어지지 않고 측면·바깥쪽으로 빠지는지 봅니다.',normal:'정상: PARRY_SAFE 후 공이 측면 안전지대로 빠집니다. 선방 이후 소유권은 미리 정하지 않습니다.'},
+ GK_PHASE2_PLAUSIBILITY_DANGER:{label:'GK Phase2 · 위험한 세컨드볼',watch:'강하고 가까운 어려운 슛에서 가끔 완전히 처리하지 못해 공이 전방·중앙으로 흘러 실제 세컨드볼이 되는지 봅니다.',normal:'정상: PARRY_DANGER 후 LOOSE BALL이 실제로 계속 움직입니다. 누가 세컨드볼을 차지할지는 선결정하지 않습니다.'},
  OFFSIDE_INVOLVEMENT:{label:'오프사이드 실제 관여 시점',watch:'오프사이드 위치는 패스가 출발한 순간 기준인지, 판정 연출은 실제 공 관여 시점에 나타나는지 봅니다.',normal:'정상: 위치 판정 기준은 release 순간에 고정되고, 휘슬은 실제 관여가 확인될 때 표시됩니다.'}
 };
-const DEV_RECENT_VISIBLE_KEYS=['FORMATION_CONTINUITY','DEFENSIVE_ROLE_STABILITY','MARK_TARGET_STABILITY','CARRY_CONTINUITY','ST_SHOT_VISIBILITY'];
+const DEV_RECENT_VISIBLE_KEYS=['DEFENSIVE_ROLE_STABILITY','MARK_TARGET_STABILITY','FORMATION_CONTINUITY','GK_PHASE2_PLAUSIBILITY_CATCH','GK_PHASE2_PLAUSIBILITY_SAFE','GK_PHASE2_PLAUSIBILITY_DANGER'];
 function selectedRecentFixKey(){const sel=$('heroRecentFixSelect');return sel?.value||'FORMATION_CONTINUITY';}
 function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GUIDES[key]||DEV_RECENT_GUIDES.FORMATION_CONTINUITY,box=$('heroRecentFixGuide');if(box)box.innerHTML=`<strong>${g.label}</strong><br><span>무엇을 볼지: ${g.watch}</span><br><span class="muted">${g.normal}</span>`;}
+const GK_PHASE2_DEBUG_CASES={
+ GK_PHASE2_PLAUSIBILITY_CATCH:{seed:'GKDBG-CATCH-1',label:'GK Phase2 · 쉬운 슛 캐칭',expected:'CATCH',distance:22,speed:18,offset:0,gk:60,handling:60,instruction:'쉬운 정면 슛을 안정적으로 잡는지 확인합니다.'},
+ GK_PHASE2_PLAUSIBILITY_SAFE:{seed:'GKDBG-PARRY_SAFE-2',label:'GK Phase2 · 측면 안전 패링',expected:'PARRY_SAFE',distance:19,speed:23,offset:3.0,gk:60,handling:50,instruction:'잡기 까다로운 슛을 막은 뒤 공을 측면 안전지대로 보내는지 확인합니다.'},
+ GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'GKDBG-PARRY_DANGER-69',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:14,speed:27,offset:2.0,gk:42,handling:55,instruction:'어려운 슛을 완전히 처리하지 못한 공이 전방·중앙 LOOSE BALL로 이어지는지 확인합니다.'}
+};
+function runGkPhase2DebugScenario(key){
+ const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;
+ clearAutoAdvance();clearTimeout(sceneNoticeTimer);clearOffsideReview();ensurePitchChoice()?.hide();focusPitch();
+ const m=E.createMatch(c.seed,{dt:.05});m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};
+ const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];if(!st||!gk){if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent='GK 강제 검증 준비 실패 · 필요한 ST/GK를 찾지 못했습니다.';return true;}
+ for(const p of m.players){p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;if(p.role!=='GK'){p.x=70+(p.slot.includes('L')?0:1);p.y=p.slot.includes('L')?7:p.slot.includes('R')?61:54;p.tx=p.x;p.ty=p.y;}}
+ Object.assign(st,{x:83,y:34,tx:83,ty:34,bodyAngle:0,faceTargetAngle:0});
+ const gkY=34+(c.offset?Math.sign(c.offset)*Math.min(2.2,Math.abs(c.offset)*.68):0);
+ Object.assign(gk,{x:100.5,y:gkY,tx:100.5,ty:gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+ m.playerAbilityProfiles[gk.id]={reaction:c.gk,gk_positioning:c.gk,diving:c.gk,handling:c.handling};
+ Object.assign(m.ball,{mode:'FLIGHT',kind:'SHOT',ownerId:null,x:98.5,y:34+c.offset,z:.08,vx:c.speed,vy:0,vz:0,age:0,originX:83,originY:34,targetX:105,targetY:34+c.offset,shotTargetY:34+c.offset,shotTeam:'HOME',lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',onTarget:true,shotDistance:c.distance,shotOneVOne:false,shotClearKeeperChance:false,airborne:false,strikeStyle:'POWER',arcProfile:null});
+ m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';
+ const frames=[deep(E.snapshot(m))];let outcomeEvent=null,tail=0;
+ for(let i=0;i<24;i++){E.step(m,.05);frames.push(deep(E.snapshot(m)));if(!outcomeEvent)outcomeEvent=[...(m.events||[])].reverse().find(e=>e?.npcGkOutcome);if(outcomeEvent){tail++;if(tail>=7)break;}}
+ const actual=outcomeEvent?.npcGkOutcome||null;
+ developerScenarioActive={key,label:c.label,instruction:c.instruction,seed:c.seed};developerScenarioLast={key,label:c.label,instruction:c.instruction,seed:c.seed,highResSeed:c.seed,frames:deep(frames),debug:null};latestIntegratedDebug=null;session=null;opened=null;activeBoundary=null;beforeHybrid=null;world=null;selectedStepResults=[];phase='SEARCHING';
+ $('heroPlayer').value='H-ST';if($('heroRecentFixSelect'))$('heroRecentFixSelect').value=key;renderRecentFixGuide();
+ $('heroPlayback').textContent=`개발자 강제 검증 · ${c.label}`;$('heroState').textContent='V34 GK Phase2 TEST_ONLY · 실제 resolver 실행';
+ const status=actual===c.expected?`이번 검증: ${c.label} · 실제 결과 ${actual} · ${c.instruction}`:`강제 검증 불일치 · 기대 ${c.expected} / 실제 ${actual||'NONE'} · 이 장면은 정상 판정에 사용하지 마세요.`;
+ if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent=status;
+ $('heroEventLog').innerHTML+=`<div class="major-match-event"><strong>GK Phase2 강제 검증 · ${c.label}</strong> · 기대 ${c.expected} / 실제 ${actual||'NONE'}<br><small>TEST_ONLY 고정 QA seed=${c.seed} · 결과는 runtime이 현재 상태에서 직접 계산</small></div>`;
+ $('heroDebugSummary').textContent=`DEV ${key}\nseed=${c.seed}\nexpected=${c.expected}\nactual=${actual||'NONE'}\nTEST_ONLY=true`;if($('heroRecentFixReplay'))$('heroRecentFixReplay').disabled=!frames.length;
+ if(actual!==c.expected){developerScenarioActive=null;phase='IDLE';draw(frames.at(-1));renderMeta(frames.at(-1));return true;}
+ startReplay(frames,'DEV_SCENARIO',`${c.label} · 강제 재현`);return true;
+}
 function clearAutoAdvance(){clearTimeout(autoAdvanceTimer);clearInterval(autoAdvanceInterval);autoAdvanceTimer=autoAdvanceInterval=null;const x=$('heroAutoNext');if(x)x.textContent='';const n=$('heroSceneNotice');if(n?.classList.contains('end-countdown')){n.hidden=true;n.classList.remove('end-countdown');}}
 function periodMinute(t){const sec=Math.max(0,Number(t)||0),m=Math.floor(sec/60)+1;return sec<2700?`전반 ${Math.min(45,m)}분`:`후반 ${Math.max(1,Math.min(45,m-45))}분`;}
 function pushLiveFeed(text,kind=''){const box=$('heroLiveFeed');if(!box||!text)return;const row=document.createElement('div');row.className=`live-feed-row ${kind}`.trim();row.textContent=text;box.appendChild(row);while(box.children.length>3)box.removeChild(box.firstChild);}
@@ -133,6 +166,7 @@ function runDeveloperVisualScenario(d){
 }
 function runRecentFixScenario(key=selectedRecentFixKey(),opts={}){
  clearAutoAdvance();clearTimeout(sceneNoticeTimer);clearOffsideReview();ensurePitchChoice()?.hide();focusPitch();
+ if(GK_PHASE2_DEBUG_CASES[key]){runGkPhase2DebugScenario(key);return;}
  const forceNew=opts.newSeed===true,devSeed=forceNew||!developerSeedByKey[key]?`DEV-RECENT-${Date.now()}-${trial++}`:developerSeedByKey[key],d=H.createDeveloperScenario({seed:devSeed,key});developerSeedByKey[key]=d.seed;developerScenarioActive={key:d.key,label:d.label,instruction:d.instruction,seed:d.seed};
  if($('heroRecentFixSelect'))$('heroRecentFixSelect').value=d.key;renderRecentFixGuide();
  $('heroPlayer').value=d.boundary.heroPlayerId;world=d.session;session=null;opened=null;activeBoundary=null;beforeHybrid=null;selectedStepResults=[];phase='SEARCHING';
