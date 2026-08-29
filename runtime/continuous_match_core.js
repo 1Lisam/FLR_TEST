@@ -1896,7 +1896,13 @@ function resolveNpcGkShot(m,gk,prev){
   // Keep high-ball/chip/1v1/rush cases on the existing test-build paths.
   if(b.shotOneVOne||b.shotClearKeeperChance||gk.action==='GK_RUSH'||gk.tacticalTask==='GK_RUSH')return null;
   const localBall=worldToLocal(gk.team,b.x,b.y);
-  if(localBall.x>12.5)return null;
+  // Resolve only when the live shot reaches a broad near-GK interaction plane.
+  // The previous/current segment makes the gate tolerant of fast 0.05s steps;
+  // this is timing continuity, not collision or save-success authority.
+  const previousBall=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),gkLocal=worldToLocal(gk.team,gk.x,gk.y),interactionPlane=gkLocal.x+2.2,behindTolerance=.75;
+  const crossedInteractionPlane=previousBall.x>interactionPlane&&localBall.x<=interactionPlane;
+  const alreadyInInteractionZone=localBall.x<=interactionPlane&&localBall.x>=gkLocal.x-behindTolerance;
+  if(!crossedInteractionPlane&&!alreadyInInteractionZone)return null;
   const distance=Number.isFinite(b.shotDistance)?b.shotDistance:(Number.isFinite(b.originX)&&Number.isFinite(b.originY)?Math.hypot(oppGoalX(b.shotTeam)-b.originX,34-b.originY):Math.hypot(oppGoalX(b.shotTeam)-b.x,34-b.y));
   const speed=Math.hypot(b.vx||0,b.vy||0),offset=Math.abs(Number(b.shotTargetY)-34),height=Number(b.z||0);
   const setState=gk.action==='GK_SAVE_SET'||gk.tacticalTask==='GK_SAVE_SET'||gk.action==='GK_REACT_WAIT'||gk.tacticalTask==='GK_REACT_WAIT';
@@ -1945,7 +1951,7 @@ function callFrozenOffsideOnReceiverInvolvement(m,p,reason='TOUCH'){
   event(m,'OFFSIDE',`${subjectName(p.name)} 오프사이드 위치에 있었습니다.`,{actorId:p.id,team:p.team,releaseFrozen:true,involvementGap:Number(involvementGap.toFixed(3)),flightAge:Number(flightAge.toFixed(3)),involvementType:reason});
   startDeadRestart(m,'OFFSIDE',other(p.team),p.x,p.y);return true;
 }
-function captureLooseOrFlight(m){
+function captureLooseOrFlight(m,contactPrev){
   if(!['LOOSE','FLIGHT'].includes(m.ball.mode))return;
   // A committed shot deflection headed over the goal-line is the visible continuation of
   // the block outcome. Do not let a nearby player magnetically collect it before it exits.
@@ -1953,7 +1959,7 @@ function captureLooseOrFlight(m){
   const isShot=m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT',flightKind=m.ball.kind,passFlight=['PASS','LONG_PASS','THROUGH','CUTBACK','CROSS'].includes(flightKind),restartFlight=['THROW_IN','GOAL_KICK'].includes(flightKind),transferFlight=passFlight||restartFlight,speed=Math.hypot(m.ball.vx||0,m.ball.vy||0),td=m.ball.targetX==null?99:Math.hypot(m.ball.x-m.ball.targetX,m.ball.y-m.ball.targetY),candidates=[];
   if(isShot){
     const defending=other(m.ball.shotTeam||m.ball.lastTouchTeam),gk=teamPlayers(m,defending).find(p=>p.role==='GK');
-    const phase2=resolveNpcGkShot(m,gk,null);
+    const phase2=resolveNpcGkShot(m,gk,contactPrev);
     if(phase2)return;
     if(m.ball.npcGkResolved)return;
   }
@@ -2173,7 +2179,7 @@ function updateBall(m,dt){
   if(resolveCrossLanding(m))return;
   if(resolveLongPassAerialContest(m))return;
   if(resolveGoalKickAerialContest(m))return;
-  captureLooseOrFlight(m);
+  captureLooseOrFlight(m,prev);
   if(m.ball.mode==='FLIGHT'&&m.ball.kind!=='SHOT'){
     const td=m.ball.targetX==null?99:Math.hypot(m.ball.x-m.ball.targetX,m.ball.y-m.ball.targetY),targetOutside=Number.isFinite(m.ball.targetX)&&Number.isFinite(m.ball.targetY)&&(m.ball.targetX<0||m.ball.targetX>105||m.ball.targetY<0||m.ball.targetY>68),preserveBoundaryContinuity=!!m.ball.receiverIntentLock&&targetOutside;
     // A qualifying pressured-wide long pass whose physical strike target is already outside the
