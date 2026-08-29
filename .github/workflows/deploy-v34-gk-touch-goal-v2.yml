@@ -1,0 +1,115 @@
+name: Deploy V34 GK TOUCH_GOAL visual test v2
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/deploy-v34-gk-touch-goal-v2.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply issue 51 TOUCH_GOAL TEST_ONLY v2
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('runtime/continuous_match_core.js');s=p.read_text()
+          danger="  const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);\n"
+          gate="  const contactStage=goalkeeperParryContactStage(m,gk,prev);\n  if(!contactStage.contactReady)return null;\n"+danger
+          if s.count(gate)!=1: raise SystemExit(f'live contact gate count={s.count(gate)}')
+          lines=[
+            "  // TEST_ONLY issue #51: insufficient glove touch resolved only at live contact.",
+            "  // The normal later goal-line crossing remains the sole scorer.",
+            "  {",
+            "    const incomingLocal={x:gk.team===HOME?(b.vx||0):-(b.vx||0),y:gk.team===HOME?(b.vy||0):-(b.vy||0)},",
+            "      touchEligible=incomingLocal.x<0&&speed>=16&&speed<=28&&offset<=3.5&&dangerBand>=2.0&&dangerBand<4.8,",
+            "      touchRoll=(hash32(`${key}|TOUCH_GOAL_CONTACT`)%1000000)/1000000,",
+            "      touchChance=touchEligible?clamp(.34+(dangerBand-2.0)*.045+(speed-16)*.012,.34,.58):0;",
+            "    if(touchEligible&&touchRoll<touchChance){",
+            "      const incomingUnit=norm(incomingLocal.x,incomingLocal.y),gloveSign=(hash32(`${key}|TOUCH_GOAL_GLOVE_DEFLECTION`)&1)?1:-1,",
+            "        deflection=clamp(.22+speed*.012,.22,.56),postLocalSpeed=clamp(speed*.52,7.0,14.0),",
+            "        postLocalVx=postLocalSpeed*incomingUnit.x,postLocalVy=postLocalSpeed*(incomingUnit.y*.94)+gloveSign*deflection,",
+            "        postWorld=gk.team===HOME?{x:postLocalVx,y:postLocalVy}:{x:-postLocalVx,y:-postLocalVy},ballVelocityBefore={x:b.vx,y:b.vy};",
+            "      b.npcGkResolved='TOUCH_GOAL';b.gkParryReach=null;b.noCaptureIds=[gk.id];b.noCaptureUntil=.70;b.vx=postWorld.x;b.vy=postWorld.y;",
+            "      gk.action='GK_SAVE_RECOVER';gk.tacticalTask='GK_SAVE_RECOVER';gk.sprint=false;gk.tx=gk.x;gk.ty=gk.y;gk.nextThink=m.time+.55;",
+            "      event(m,'TOUCH_GOAL',`${subjectName(gk.name)} 장갑에 맞고 공이 골문 쪽으로 흘러갑니다.`,{npcGkOutcome:'TOUCH_GOAL',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),approachStartEnvelope:contactStage.approachStartEnvelope,reachDisplacement:contactStage.reachDisplacement,reachState:contactStage.reachState,previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},preSpeed:speed,postSpeed:Math.hypot(b.vx,b.vy),localVelocityBefore:{x:incomingLocal.x,y:incomingLocal.y},localVelocityAfter:{x:postLocalVx,y:postLocalVy},gloveDeflection:gloveSign*deflection,ballState:{mode:b.mode,kind:b.kind,ownerId:b.ownerId||null,intendedReceiverId:b.intendedReceiverId||null},scoreAtContact:{HOME:m.score.HOME,AWAY:m.score.AWAY},goalsAtContact:m.stats.goals,touchRoll:Number(touchRoll.toFixed(6)),touchChance:Number(touchChance.toFixed(6)),touchBand:Number(dangerBand.toFixed(3))});",
+            "      return{outcome:'TOUCH_GOAL',routine:false,sharedContactStage:contactStage,ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},touchRoll,touchChance};",
+            "    }",
+            "  }",
+          ]
+          touch='\n'.join(lines)+'\n'
+          s=s.replace(danger,danger+touch,1);p.write_text(s)
+
+          p=Path('step71_hybrid_v06_ui.js');s=p.read_text()
+          reps=[
+            (" GK_PHASE2_PLAUSIBILITY_DANGER:{label:'GK Phase2 · 위험한 세컨드볼',watch:'강하고 가까운 어려운 슛에서 가끔 완전히 처리하지 못해 공이 전방·중앙으로 흘러 실제 세컨드볼이 되는지 봅니다.',normal:'정상: PARRY_DANGER 후 LOOSE BALL이 실제로 계속 움직입니다. 누가 세컨드볼을 차지할지는 선결정하지 않습니다.'},\n OFFSIDE_INVOLVEMENT:"," GK_PHASE2_PLAUSIBILITY_DANGER:{label:'GK Phase2 · 위험한 세컨드볼',watch:'강하고 가까운 어려운 슛에서 가끔 완전히 처리하지 못해 공이 전방·중앙으로 흘러 실제 세컨드볼이 되는지 봅니다.',normal:'정상: PARRY_DANGER 후 LOOSE BALL이 실제로 계속 움직입니다. 누가 세컨드볼을 차지할지는 선결정하지 않습니다.'},\n GK_PHASE2_PLAUSIBILITY_TOUCH_GOAL:{label:'GK Phase2 · 장갑 맞고 실점',watch:'슈팅이 골키퍼에게 닿기도 전에 꺾이거나, 닿은 순간 바로 득점 처리되는지 봅니다.',normal:'정상: 실제 GK 접촉 뒤 공 속도와 방향이 조금 변하고도 FLIGHT 상태로 계속 움직이며, 이후 실제 골라인을 넘어야 GOAL이 됩니다.'},\n OFFSIDE_INVOLVEMENT:"),
+            ("const DEV_RECENT_VISIBLE_KEYS=['DEFENSIVE_ROLE_STABILITY','MARK_TARGET_STABILITY','FORMATION_CONTINUITY','GK_PHASE2_PLAUSIBILITY_CATCH','GK_PHASE2_PLAUSIBILITY_SAFE','GK_PHASE2_PLAUSIBILITY_DANGER'];","const DEV_RECENT_VISIBLE_KEYS=['DEFENSIVE_ROLE_STABILITY','MARK_TARGET_STABILITY','FORMATION_CONTINUITY','GK_PHASE2_PLAUSIBILITY_CATCH','GK_PHASE2_PLAUSIBILITY_SAFE','GK_PHASE2_PLAUSIBILITY_DANGER','GK_PHASE2_PLAUSIBILITY_TOUCH_GOAL'];"),
+            (" GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'PH2-DANGER-05',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:18,speed:26,offset:2.5,gk:60,handling:35,visualStartX:83,gkX:100.5,gkY:34,replayRate:.75,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'}\n};"," GK_PHASE2_PLAUSIBILITY_DANGER:{seed:'PH2-DANGER-05',label:'GK Phase2 · 위험한 세컨드볼',expected:'PARRY_DANGER',distance:18,speed:26,offset:2.5,gk:60,handling:35,visualStartX:83,gkX:100.5,gkY:34,replayRate:.75,instruction:'어려운 슛을 쳐낸 뒤 공이 실제 전방·중앙 세컨드볼로 계속 움직이는지 확인합니다.'},\n GK_PHASE2_PLAUSIBILITY_TOUCH_GOAL:{seed:'TOUCH-GOAL-013',label:'GK Phase2 · 장갑 맞고 실점',expected:'TOUCH_GOAL',distance:18,speed:24,offset:2,gk:40,handling:40,replayRate:.75,instruction:'실제 접촉 뒤 공이 느려지고 조금 꺾인 채 살아서 움직인 다음, 나중에 골라인을 넘어 득점하는지 확인합니다.'}\n};"),
+            ("function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;focusPitch();const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_'),danger=developerScenarioLast.key==='GK_PHASE2_PLAUSIBILITY_DANGER';startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,danger?.75:gk?1:REPLAY_SPEED);}","function replayRecentFixScenario(){if(!developerScenarioLast?.frames?.length)return;focusPitch();const gk=String(developerScenarioLast.key||'').startsWith('GK_PHASE2_PLAUSIBILITY_'),slow=['GK_PHASE2_PLAUSIBILITY_DANGER','GK_PHASE2_PLAUSIBILITY_TOUCH_GOAL'].includes(developerScenarioLast.key);startReplay(developerScenarioLast.frames,'DEV_SCENARIO',`${developerScenarioLast.label} · 현재 검증 다시보기`,slow?.75:gk?1:REPLAY_SPEED);}")
+          ]
+          for old,new in reps:
+            if s.count(old)!=1: raise SystemExit(f'UI anchor count={s.count(old)}')
+            s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('index.html');s=p.read_text()
+          reps=[
+            ('최근 핵심 장면 검증 · 6개 항목','최근 핵심 장면 검증 · 7개 항목'),
+            ('<b>4~6번은 V34 GK Phase2 TEST_ONLY</b> 강제 장면입니다. 4번은 쉬운 정면 슛 캐칭, 5번은 측면 안전 패링, 6번은 어려운 슛 뒤 위험한 전방 세컨드볼을 실제 resolver로 재현합니다.','<b>4~7번은 V34 GK Phase2 TEST_ONLY</b> 강제 장면입니다. 4번은 쉬운 정면 슛 캐칭, 5번은 측면 안전 패링, 6번은 어려운 슛 뒤 위험한 전방 세컨드볼, 7번은 실제 장갑 접촉 뒤에도 공이 살아서 골라인을 넘어가는 TOUCH_GOAL을 실제 resolver로 재현합니다.'),
+            ('<select id="heroRecentFixSelect" size="6"','<select id="heroRecentFixSelect" size="7"'),
+            ('<option value="GK_PHASE2_PLAUSIBILITY_DANGER">6. GK Phase2 · 위험한 세컨드볼</option></select>','<option value="GK_PHASE2_PLAUSIBILITY_DANGER">6. GK Phase2 · 위험한 세컨드볼</option><option value="GK_PHASE2_PLAUSIBILITY_TOUCH_GOAL">7. GK Phase2 · 장갑 맞고 실점</option></select>')
+          ]
+          for old,new in reps:
+            if s.count(old)!=1: raise SystemExit(f'index anchor count={s.count(old)}')
+            s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+
+          node --check runtime/continuous_match_core.js
+          node --check step71_hybrid_v06_ui.js
+          grep -q "npcGkResolved='TOUCH_GOAL'" runtime/continuous_match_core.js
+          grep -q "TOUCH-GOAL-013" step71_hybrid_v06_ui.js
+          grep -q '7. GK Phase2 · 장갑 맞고 실점' index.html
+
+          node - <<'NODE'
+          const E=require('./runtime/continuous_match_core.js'),B=E.choiceActionBridge();
+          function run(c){
+            const m=E.createMatch(c.seed,{dt:.05});m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};
+            const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];
+            for(const p of m.players){p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;if(p.role!=='GK'){p.x=70+(p.slot.includes('L')?0:1);p.y=p.slot.includes('L')?7:p.slot.includes('R')?61:54;p.tx=p.x;p.ty=p.y;}}
+            const shotX=c.visualStartX??(105-c.distance);Object.assign(st,{x:shotX,y:34,tx:shotX,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
+            const gkY=c.gkY??(34+(c.offset?Math.sign(c.offset)*Math.min(1.8,Math.abs(c.offset)*.45):0));Object.assign(gk,{x:c.gkX??99.5,y:gkY,tx:c.gkX??99.5,ty:gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+            m.playerAbilityProfiles[gk.id]={reaction:c.gk,gk_positioning:c.gk,diving:c.gk,handling:c.handling};
+            B.setControlled(m,st,true);B.executeShot(m,st,'DEV_GK_PHASE2',{releaseNow:true,decisionOrientation:{turningRequired:false,backToGoal:false,facingAlignment:1,bodyAngleDiff:0}});
+            const tx=105,ty=34+c.offset,dx=tx-m.ball.x,dy=ty-m.ball.y,n=Math.hypot(dx,dy)||1;Object.assign(m.ball,{kind:'SHOT',mode:'FLIGHT',ownerId:null,z:.08,vx:dx/n*c.speed,vy:dy/n*c.speed,vz:0,age:0,originX:shotX,originY:34,targetX:tx,targetY:ty,shotTargetY:ty,shotTeam:'HOME',lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',onTarget:true,shotDistance:c.distance,shotOneVOne:false,shotClearKeeperChance:false,airborne:false,strikeStyle:'POWER',arcProfile:null,npcGkResolved:null});m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';
+            let outcome=null,touch=null,goal=null;
+            for(let i=0;i<140;i++){E.step(m,.05);if(!outcome)outcome=[...m.events].reverse().find(e=>e&&e.npcGkOutcome)||null;if(!touch){const e=[...m.events].reverse().find(e=>e&&e.type==='TOUCH_GOAL');if(e)touch={t:e.t,score:{...m.score},mode:m.ball.mode,kind:m.ball.kind};}if(!goal){const e=[...m.events].reverse().find(e=>e&&e.type==='GOAL');if(e)goal={t:e.t,score:{...m.score}};}if(goal||((outcome?.npcGkOutcome||null)!=='TOUCH_GOAL'&&outcome))break;}
+            return{outcome:outcome?.npcGkOutcome||null,touch,goal,score:m.score};
+          }
+          const cases=[
+            ['#4',{seed:'GKDBG-CATCH-1',expected:'CATCH',distance:22,speed:18,offset:0,gk:60,handling:60}],
+            ['#5',{seed:'GKDBG-SAFE-1',expected:'PARRY_SAFE',distance:19,speed:23,offset:3,gk:60,handling:50}],
+            ['#6',{seed:'PH2-DANGER-05',expected:'PARRY_DANGER',distance:18,speed:26,offset:2.5,gk:60,handling:35,visualStartX:83,gkX:100.5,gkY:34}],
+            ['#7',{seed:'TOUCH-GOAL-013',expected:'TOUCH_GOAL',distance:18,speed:24,offset:2,gk:40,handling:40}]
+          ];
+          let bad=false;
+          for(const [id,c] of cases){const r=run(c);console.log(id,c.expected,JSON.stringify(r));if(r.outcome!==c.expected)bad=true;if(id==='#7'&&(!r.touch||!r.goal||r.touch.score.HOME!==0||r.touch.score.AWAY!==0||r.touch.mode!=='FLIGHT'||r.touch.kind!=='SHOT'||!(r.goal.t>r.touch.t)||r.goal.score.HOME!==1))bad=true;}
+          if(bad)process.exit(1);
+          NODE
+
+          git diff --check
+          test "$(git diff --name-only)" = $'index.html\nruntime/continuous_match_core.js\nstep71_hybrid_v06_ui.js'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html runtime/continuous_match_core.js step71_hybrid_v06_ui.js
+          git commit -m "Deploy GK TOUCH_GOAL visual test (TEST_ONLY)"
+          git push origin HEAD:main
