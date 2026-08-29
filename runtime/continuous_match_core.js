@@ -1886,6 +1886,30 @@ function tryNpcOneTouchPass(m,p,flightKind,sourceId,passTeam,incomingSpeed){
   executePass(m,p,targetOpt.p,'PASS',{...targetOpt,running:false},'NPC_ONE_TOUCH');p.lastDecision='NPC_ONE_TOUCH_PASS';m.stats.npcOneTouchPasses=(m.stats.npcOneTouchPasses||0)+1;m.npcOneTouchChainUntil=m.time+.72;return true;
 }
 
+function goalkeeperShotContactSweep(m,p,prev){
+  const a=worldToLocal(p.team,prev.x,prev.y),b=worldToLocal(p.team,m.ball.x,m.ball.y),gx=worldToLocal(p.team,p.x,p.y);
+  const vx=b.x-a.x,vy=b.y-a.y,len2=vx*vx+vy*vy,u=len2>1e-9?clamp(((gx.x-a.x)*vx+(gx.y-a.y)*vy)/len2,0,1):1;
+  const x=a.x+vx*u,y=a.y+vy*u,dt=Number(m.ball.contactDt)||Number(m.dt)||0.05;
+  const startAge=Number.isFinite(m.ball.contactPrevAge)?m.ball.contactPrevAge:(m.ball.age||0)-dt;
+  return{u,x,y,dx:Math.abs(x-gx.x),dy:Math.abs(y-gx.y),distance:Math.hypot(x-gx.x,y-gx.y),age:Math.max(0,startAge+u*dt)};
+}
+function goalkeeperParryContactStage(m,gk,prev){
+  // SAFE and DANGER share this one causal contact stage. The envelope is deliberately
+  // broad enough for a plausible hand/arm save, but it never moves the live ball and
+  // does not decide whether the save, catch, or danger roll succeeds.
+  const sweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y});
+  const gkLocal=worldToLocal(gk.team,gk.x,gk.y);
+  const contactEnvelope=clamp(2.60+(abilityValue(m,gk,'reaction')-60)*.003,2.42,2.72);
+  const gkBefore={x:gk.x,y:gk.y},reachNeed=Math.max(0,Math.abs(m.ball.y-gk.y)-1.35),presentationReach=Math.min(.90,reachNeed);
+  if(presentationReach>0){
+    const reachSide=Math.sign(m.ball.y-gk.y)||1;
+    gk.y=clamp(gk.y+reachSide*presentationReach,0.8,67.2);gk.ty=gk.y;gk.vy=0;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=false;
+    gk.bodyAngle=Math.atan2(m.ball.y-gk.y,m.ball.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
+  }
+  const contactSweep=goalkeeperShotContactSweep(m,gk,prev||{x:m.ball.x,y:m.ball.y});
+  return{contactReady:contactSweep.distance<=contactEnvelope,sweep:contactSweep,contactEnvelope,gkBefore,gkAfter:{x:gk.x,y:gk.y},presentationReach,gkLocal:worldToLocal(gk.team,gk.x,gk.y)};
+}
+
 // V34 GK Phase2 TEST_ONLY: plausibility-first NPC handling for ordinary non-chip shots.
 // Exact trajectory remains live for context/presentation, but centimeter body intersection is
 // not the primary save-success authority for these eligible NPC goalkeeper situations.
@@ -1920,44 +1944,29 @@ function resolveNpcGkShot(m,gk,prev){
   const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);
   const dangerEligible=dangerBand>=4.8;
   const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
+  const contactStage=goalkeeperParryContactStage(m,gk,prev);
+  if(!contactStage.contactReady)return null;
   if(dangerEligible&&dangerRoll<.42){
-    // Presentation timing only: a wide shot can reach the longitudinal plane
-    // while still visibly clear of the keeper's body/hand area. Keep all outcome
-    // state live and uncommitted until this broad 2D envelope is reached.
-    const previousLocal=previousBall,currentLocal=localBall,segmentX=currentLocal.x-previousLocal.x,segmentY=currentLocal.y-previousLocal.y,segmentLen2=segmentX*segmentX+segmentY*segmentY,segmentU=segmentLen2>1e-9?clamp(((gkLocal.x-previousLocal.x)*segmentX+(gkLocal.y-previousLocal.y)*segmentY)/segmentLen2,0,1):1,nearX=previousLocal.x+segmentX*segmentU,nearY=previousLocal.y+segmentY*segmentU;
-    const nearContactDistance=Math.min(Math.hypot(currentLocal.x-gkLocal.x,currentLocal.y-gkLocal.y),Math.hypot(nearX-gkLocal.x,nearY-gkLocal.y));
-    // Intentionally broad visual envelope, not collision authority. The requested
-    // +2.5m retest shot reaches 2.50m lateral separation at closest approach;
-    // a tighter 1.4–1.8m circle would miss that plausible hand-side contact.
-    if(nearContactDistance>2.60)return null;
-    // Presentation-only reach for the dangerous spill: the live resolver has already
-    // decided this disposition at the current state, so no result is cached or released
-    // later. Move only the rendered keeper toward the incoming ball's lateral line, by
-    // at most 0.90m, before changing the ball vector. The incoming ball is not moved.
-    const reachBefore={x:gk.x,y:gk.y},reachNeed=Math.max(0,Math.abs(b.y-gk.y)-1.35),reach=Math.min(.90,reachNeed),reachSide=Math.sign(b.y-gk.y)||1;
-    if(reach>0){
-      gk.y=clamp(gk.y+reachSide*reach,0.8,67.2);gk.ty=gk.y;gk.vy=0;gk.action='GK_SAVE_REACH';gk.tacticalTask='GK_SAVE_REACH';gk.sprint=false;
-      gk.bodyAngle=Math.atan2(b.y-gk.y,b.x-gk.x);gk.faceTargetAngle=gk.bodyAngle;
-    }
-    const reachAfter={x:gk.x,y:gk.y},visualGap=Math.hypot(b.x-gk.x,b.y-gk.y);
     b.npcGkResolved='PARRY_DANGER';
     const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
     // Local GK coordinates put the defended goal line at x=0 for both teams
     // (HOME: world +x; AWAY: world -x). Danger is therefore a short spill in
     // local +x, back into the field, with only a modest live-context side term.
     const forward=clamp(speed*.22,3.8,6.0),central=clamp(speed*.08,1.2,2.1),wx=gk.team===HOME?forward:-forward,wy=gk.team===HOME?side*central:-side*central;
+    const ballVelocityBefore={x:b.vx,y:b.vy};
     m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.gkDangerParries=(m.stats.gkDangerParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
     setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
-    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6)),visualReach:{before:reachBefore,after:reachAfter,meters:Number(reach.toFixed(3)),ball:{x:b.x,y:b.y},euclideanGap:Number(visualGap.toFixed(3)),lateralGap:Number(Math.abs(b.y-gk.y).toFixed(3))}});
-    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,visualReach:{before:reachBefore,after:reachAfter,meters:reach,euclideanGap:visualGap,lateralGap:Math.abs(b.y-gk.y)}};
+    event(m,'PARRY_DANGER',`${subjectName(gk.name)} 슈팅을 중앙 앞 위험지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_DANGER',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null},localVx:forward,localVy:side*central,dangerBand:Number(dangerBand.toFixed(3)),dangerRoll:Number(dangerRoll.toFixed(6))});
+    return{outcome:'PARRY_DANGER',routine:false,localVx:forward,localVy:side*central,dangerBand,dangerRoll,sharedContactStage:contactStage};
   }
   b.npcGkResolved='PARRY_SAFE';
   const incomingLocal=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),side=Math.abs(b.y-incomingLocal.y)>0.08?Math.sign(b.y-incomingLocal.y):(offset>0?Math.sign(Number(b.shotTargetY)-34):(localBall.y<34?-1:1));
   const lateral=Math.max(5.2,speed*.56),outward=-Math.max(2.8,speed*.18),lvx=outward,lvy=side*lateral,wx=gk.team===HOME?lvx:-lvx,wy=gk.team===HOME?lvy:-lvy;
+  const ballVelocityBefore={x:b.vx,y:b.vy};
   m.stats.saves=(m.stats.saves||0)+1;m.stats.gkParries=(m.stats.gkParries||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;
   setLoose(m,b.x,b.y,wx,wy,gk.team,gk.id);m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;gk.nextThink=m.time+.55;
-  event(m,'PARRY_SAFE',`${subjectName(gk.name)} 슈팅을 측면 안전지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_SAFE',npcGkPhase:1,localVx:lvx,localVy:lvy});
-  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy};
+  event(m,'PARRY_SAFE',`${subjectName(gk.name)} 슈팅을 측면 안전지대로 쳐냈습니다.`,{npcGkOutcome:'PARRY_SAFE',npcGkPhase:1,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null},localVx:lvx,localVy:lvy});
+  return{outcome:'PARRY_SAFE',routine:false,localVx:lvx,localVy:lvy,sharedContactStage:contactStage};
 }
 
 function callFrozenOffsideOnReceiverInvolvement(m,p,reason='TOUCH'){
