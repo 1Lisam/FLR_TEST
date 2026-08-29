@@ -1,0 +1,50 @@
+name: Add V34 GK Phase2 debug forced verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-v34-gk-phase2-debug.yml'
+      - '.flr/deploy/v34_gk_phase2_debug.patch'
+
+permissions:
+  contents: write
+
+jobs:
+  update-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Export current debug UI sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: flr-v34-gk-phase2-debug-sources
+          path: |
+            index.html
+            live_hybrid_session_v02.js
+            step71_hybrid_v06_ui.js
+          if-no-files-found: error
+      - name: Apply exact debug patch when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATCH=.flr/deploy/v34_gk_phase2_debug.patch
+          if [ ! -f "$PATCH" ]; then
+            echo "Patch not present yet; export-only run."
+            exit 0
+          fi
+          grep -q "function resolveNpcGkShot" runtime/continuous_match_core.js
+          git apply --check "$PATCH"
+          git apply "$PATCH"
+          node --check live_hybrid_session_v02.js
+          node --check step71_hybrid_v06_ui.js
+          grep -q 'GK_PHASE2_PLAUSIBILITY' index.html
+          grep -q 'GK_PHASE2_PLAUSIBILITY' live_hybrid_session_v02.js
+          grep -q 'GK_PHASE2_PLAUSIBILITY' step71_hybrid_v06_ui.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html live_hybrid_session_v02.js step71_hybrid_v06_ui.js
+          git commit -m "Add GK Phase2 forced debug verification (TEST_ONLY)"
+          git push origin HEAD:main
