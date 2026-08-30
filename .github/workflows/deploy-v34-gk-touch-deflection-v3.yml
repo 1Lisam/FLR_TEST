@@ -1,0 +1,47 @@
+name: Deploy V34 GK touch deflection visual fixtures v3
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/deploy-v34-gk-touch-deflection-v3.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply public-adapted issue56 with validated left fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('.github/workflows/deploy-v34-gk-touch-deflection-v1.yml').read_text()
+          marker='        run: |\n'
+          body=src.split(marker,1)[1]
+          lines=[]
+          for line in body.splitlines():
+              if line.startswith('          '): lines.append(line[10:])
+              elif not line.strip(): lines.append('')
+              else: raise SystemExit(f'unexpected v1 indentation: {line[:40]}')
+          script='\n'.join(lines)+'\n'
+          a=script.index('# Issue #56 auxiliary live-contact protections.')
+          b=script.index('# UI: replace one old touch-goal fixture',a)
+          public_adapt='''# Public FLR_TEST already carries the #46 sweep/gkParryReach contact protection.\nold="  const prev={x:m.ball.x,y:m.ball.y};m.ball.age=(m.ball.age||0)+dt;"\nnew="  const prev={x:m.ball.x,y:m.ball.y};m.ball.contactPrevAge=m.ball.age||0;m.ball.contactDt=dt;m.ball.age=(m.ball.age||0)+dt;"\nif old in s: s=s.replace(old,new,1)\nelif new not in s: raise SystemExit('contact dt anchor missing')\np.write_text(s)\n\n'''
+          script=script[:a]+public_adapt+script[b:]
+          old_ui="distance:18,speed:24,offset:-.55,gk:40,handling:40"
+          new_ui="distance:19,speed:24,offset:-.55,gk:40,handling:40"
+          if script.count(old_ui)!=1: raise SystemExit(f'left UI fixture count={script.count(old_ui)}')
+          script=script.replace(old_ui,new_ui,1)
+          old_qa="{id:'A-LEFT-GOAL',seed:'TOUCH-GOAL-013',offset:-.55,gkY:34,speed:24,distance:18,terminal:'GOAL'}"
+          new_qa="{id:'A-LEFT-GOAL',seed:'TOUCH-GOAL-013',offset:-.55,gkY:34,speed:24,distance:19,terminal:'GOAL'}"
+          if script.count(old_qa)!=1: raise SystemExit(f'left QA fixture count={script.count(old_qa)}')
+          script=script.replace(old_qa,new_qa,1)
+          Path('/tmp/deploy_touch_deflection_v3.sh').write_text(script)
+          PY
+          bash /tmp/deploy_touch_deflection_v3.sh
