@@ -38,7 +38,7 @@ const DEV_RECENT_GUIDES={
  GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{label:'GK Phase2 · 근거리 러시 블록',watch:'근거리 1대1 슈팅에서 GK가 선방 반경만 넓힌 것처럼 순간이동하지 않고 실제로 앞으로 달려 나온 뒤 공과 가까워져 막는지 봅니다.',normal:'정상: GK_RUSH_START 뒤 여러 실제 프레임 동안 전진하고, 근접 접촉에서 RUSH_BLOCK이 발생한 뒤 공은 주인 없는 LOOSE BALL로 다시 살아 움직입니다.'},
  OFFSIDE_INVOLVEMENT:{label:'오프사이드 실제 관여 시점',watch:'오프사이드 위치는 패스가 출발한 순간 기준인지, 판정 연출은 실제 공 관여 시점에 나타나는지 봅니다.',normal:'정상: 위치 판정 기준은 release 순간에 고정되고, 휘슬은 실제 관여가 확인될 때 표시됩니다.'}
 };
-const DEV_RECENT_VISIBLE_KEYS=['DEFENSIVE_ROLE_STABILITY','MARK_TARGET_STABILITY','FORMATION_CONTINUITY','GK_PHASE2_PLAUSIBILITY_CATCH','GK_PHASE2_PLAUSIBILITY_SAFE','GK_PHASE2_PLAUSIBILITY_DANGER','GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL','GK_PHASE2_PLAUSIBILITY_TOUCH_RIGHT_GOAL','GK_PHASE2_PLAUSIBILITY_TOUCH_CORNER','GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK'];
+const DEV_RECENT_VISIBLE_KEYS=['GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK'];
 function selectedRecentFixKey(){const sel=$('heroRecentFixSelect');return sel?.value||'FORMATION_CONTINUITY';}
 function renderRecentFixGuide(){const key=selectedRecentFixKey(),g=DEV_RECENT_GUIDES[key]||DEV_RECENT_GUIDES.FORMATION_CONTINUITY,box=$('heroRecentFixGuide');if(box)box.innerHTML=`<strong>${g.label}</strong><br><span>무엇을 볼지: ${g.watch}</span><br><span class="muted">${g.normal}</span>`;}
 const GK_PHASE2_DEBUG_CASES={
