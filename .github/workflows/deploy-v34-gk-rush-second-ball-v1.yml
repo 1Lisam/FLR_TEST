@@ -1,0 +1,110 @@
+name: deploy-v34-gk-rush-second-ball-v1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-v34-gk-rush-second-ball-v1.yml']
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch #71 second-ball continuation and gate public visual
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          rp=Path('runtime/continuous_match_core.js')
+          s=rp.read_text()
+
+          old="""      setLoose(m,b.x,b.y,postWorld.x,postWorld.y,gk.team,gk.id);m.ball.shotSourcePlayerId=sourceId;m.ball.npcGkResolved='RUSH_BLOCK';m.ball.rushBlock={contactAt:m.time,contactGap:gap,keeperId:gk.id};m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;"""
+          new="""      const recoveryWindow=.78;\n      setLoose(m,b.x,b.y,postWorld.x,postWorld.y,gk.team,gk.id);m.ball.shotSourcePlayerId=sourceId;m.ball.npcGkResolved='RUSH_BLOCK';m.ball.rushBlock={contactAt:m.time,contactGap:gap,keeperId:gk.id,recoveryUntil:m.time+recoveryWindow};m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=recoveryWindow;"""
+          if s.count(old)!=1: raise SystemExit(f'RUSH_BLOCK recovery anchor count={s.count(old)}')
+          s=s.replace(old,new,1)
+
+          old="""    if(Array.isArray(m.ball.noCaptureIds)&&m.ball.age<(m.ball.noCaptureUntil||0)&&m.ball.noCaptureIds.includes(p.id))continue;"""
+          new="""    if(Array.isArray(m.ball.noCaptureIds)&&m.ball.age<(m.ball.noCaptureUntil||0)&&m.ball.noCaptureIds.includes(p.id))continue;\n    if(m.ball.mode==='LOOSE'&&m.ball.rushBlock&&p.id===m.ball.rushBlock.keeperId&&m.ball.age<(m.ball.rushBlock.recoveryUntil-m.ball.rushBlock.contactAt))continue;"""
+          if s.count(old)!=1: raise SystemExit(f'capture guard anchor count={s.count(old)}')
+          s=s.replace(old,new,1)
+
+          old="""    const nearest=teamPlayers(m,team).map(p=>({p,d:dist(p,m.ball)})).sort((a,b)=>a.d-b.d)[0];if(!nearest)continue;const p=nearest.p;p.tx=m.ball.x;p.ty=m.ball.y;p.action=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.sprint=true;"""
+          new="""    const rushKeeperId=m.ball.rushBlock?.keeperId,keeperProtected=!!rushKeeperId&&m.ball.age<(m.ball.rushBlock.recoveryUntil-m.ball.rushBlock.contactAt);\n    let candidates=teamPlayers(m,team).filter(p=>!(keeperProtected&&p.id===rushKeeperId));\n    if(keeperProtected&&team===m.ball.lastTouchTeam)candidates=candidates.filter(p=>p.role!=='GK');\n    const nearest=candidates.map(p=>({p,d:dist(p,m.ball)})).sort((a,b)=>a.d-b.d)[0];if(!nearest)continue;const p=nearest.p;p.tx=m.ball.x;p.ty=m.ball.y;p.action=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.tacticalTask=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.sprint=true;"""
+          if s.count(old)!=1: raise SystemExit(f'loose chaser anchor count={s.count(old)}')
+          s=s.replace(old,new,1)
+          rp.write_text(s)
+
+          up=Path('step71_hybrid_v06_ui.js')
+          u=up.read_text()
+          old=""" GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{label:'GK Phase2 · 근거리 러시 블록',watch:'근거리 1대1 슈팅에서 GK가 선방 반경만 넓힌 것처럼 순간이동하지 않고 실제로 앞으로 달려 나온 뒤 공과 가까워져 막는지 봅니다.',normal:'정상: GK_RUSH_START 뒤 여러 실제 프레임 동안 전진하고, 근접 접촉에서 RUSH_BLOCK이 발생한 뒤 공은 주인 없는 LOOSE BALL로 다시 살아 움직입니다.'},"""
+          new=""" GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{label:'GK Phase2 · 근거리 러시 블록',watch:'GK가 실제로 전진해 블록한 뒤 튕겨 나온 공에 공격 ST와 수비 1차 회수자가 즉시 반응하는지, 다른 수비수는 커버를 유지하는지 봅니다.',normal:'정상: RUSH_BLOCK 뒤 공은 잠시 주인 없는 LOOSE BALL로 살아 있고 ST와 적절한 수비 1명이 세컨드볼에 반응합니다. 블록한 GK가 즉시 자동 재포획하지는 않지만 실제로 다시 먼저 도달하면 이후 자연스럽게 잡을 수 있습니다.'},"""
+          if u.count(old)!=1: raise SystemExit(f'guide anchor count={u.count(old)}')
+          u=u.replace(old,new,1)
+          old=""" GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{seed:'V34-RUSH-15M-20',label:'GK Phase2 · 근거리 러시 블록',expected:'RUSH_BLOCK',rushFixture:true,replayRate:.60,instruction:'GK가 골라인 쪽에서 실제로 앞으로 달려 나옴 → 근접한 순간 슈팅을 블록 → 공이 다시 LOOSE BALL로 튀어나가는지 확인합니다.'}"""
+          new=""" GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{seed:'V34-RUSH-15M-20',label:'GK Phase2 · 근거리 러시 블록',expected:'RUSH_BLOCK',rushFixture:true,replayRate:.60,instruction:'GK 전진 → 근접 블록 → LOOSE 세컨드볼 → ST와 수비 1차 회수자가 공에 반응하고 다른 수비는 커버를 유지하는지 확인합니다.'}"""
+          if u.count(old)!=1: raise SystemExit(f'fixture text anchor count={u.count(old)}')
+          u=u.replace(old,new,1)
+
+          if 'function runGkRushBlockDebugScenario(key)' not in u:
+            anchor="""function runGkPhase2DebugScenario(key){\n const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;"""
+            special="""function runGkRushBlockDebugScenario(key){\n const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;clearAutoAdvance();clearTimeout(sceneNoticeTimer);clearOffsideReview();ensurePitchChoice()?.hide();focusPitch();\n const m=E.createMatch(c.seed,{dt:.05});m.time=0;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=99999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};m.v34TestOnlyVisualFixture=true;\n const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];if(!st||!gk)return true;for(const p of m.players){p.hasBall=false;p.nextThink=99999;p.vx=p.vy=0;}\n Object.assign(st,{x:88,y:34,tx:88,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:99999});Object.assign(gk,{x:101,y:34,tx:101,ty:34,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:99999});\n m.playerAbilityProfiles={'A-GK':{handling:45,reaction:60,gk_positioning:60,agility:60,diving:60},'H-ST':{finishing:75}};m.ball={mode:'FLIGHT',kind:'SHOT',x:90,y:34,z:0,vx:20,vy:0,vz:0,ownerId:null,intendedReceiverId:null,lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',shotTeam:'HOME',shotTargetY:34,shotDistance:15,originX:90,originY:34,targetX:105,targetY:34,shotOneVOne:true,shotClearKeeperChance:true,onTarget:true,airborne:false,age:.4};m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';\n const frames=[deep(E.snapshot(m))];let rushStart=null,block=null,tail=0,stChaseAt=null,defChaseAt=null,gkControlAt=null;for(let i=0;i<100;i++){E.step(m,.05);frames.push(deep(E.snapshot(m)));if(!rushStart)rushStart=(m.events||[]).find(e=>e?.type==='GK_RUSH_START')||null;if(!block)block=(m.events||[]).find(e=>e?.type==='RUSH_BLOCK')||null;if(block){tail++;if(st.action==='CHASE_LOOSE'&&stChaseAt==null)stChaseAt=m.time;const def=m.players.filter(p=>p.team==='AWAY'&&p.role!=='GK'&&p.action==='CHASE_LOOSE')[0];if(def&&defChaseAt==null)defChaseAt=m.time;if(m.ball.mode==='CONTROLLED'&&m.ball.ownerId==='A-GK'&&gkControlAt==null)gkControlAt=m.time;if(tail>=36)break;}if(!['FLIGHT','LOOSE','CONTROLLED'].includes(m.ball.mode)&&!block)break;}\n const actual=block?.npcGkOutcome||null;developerScenarioActive={key,label:c.label,instruction:c.instruction,seed:c.seed};developerScenarioLast={key,label:c.label,instruction:c.instruction,seed:c.seed,highResSeed:c.seed,frames:deep(frames),debug:null};latestIntegratedDebug=null;session=null;opened=null;activeBoundary=null;beforeHybrid=null;world=null;selectedStepResults=[];phase='SEARCHING';$('heroPlayer').value='H-ST';if($('heroRecentFixSelect'))$('heroRecentFixSelect').value=key;renderRecentFixGuide();$('heroPlayback').textContent=`개발자 강제 검증 · ${c.label}`;$('heroState').textContent='V34 GK RUSH_BLOCK TEST_ONLY · 블록 후 세컨드볼 경쟁까지';const status=actual===c.expected?`이번 검증: ${c.label} · 실제 결과 ${actual} · ${c.instruction}`:`강제 검증 불일치 · 기대 ${c.expected} / 실제 ${actual||'NONE'}`;if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent=status;$('heroEventLog').innerHTML+=`<div class=\"major-match-event\"><strong>GK RUSH_BLOCK 강제 검증 · ${c.label}</strong> · 기대 ${c.expected} / 실제 ${actual||'NONE'}<br><small>TEST_ONLY seed=${c.seed} · GK 전진 → 블록 → ST/수비 세컨드볼 반응</small></div>`;$('heroDebugSummary').textContent=`DEV ${key}\\nseed=${c.seed}\\nexpected=${c.expected}\\nactual=${actual||'NONE'}\\nrushStart=${rushStart?.t??'-'}\\nblockAt=${block?.t??'-'}\\nstChaseAt=${stChaseAt??'-'}\\ndefChaseAt=${defChaseAt??'-'}\\ngkControlAt=${gkControlAt??'-'}\\nfuturePrecomputed=false`;if($('heroRecentFixReplay'))$('heroRecentFixReplay').disabled=!frames.length;if(actual!==c.expected){developerScenarioActive=null;phase='IDLE';draw(frames.at(-1));renderMeta(frames.at(-1));return true;}startReplay(frames,'DEV_SCENARIO',`${c.label} · 러시와 세컨드볼 재현`,c.replayRate||1);return true;\n}\nfunction runGkPhase2DebugScenario(key){\n const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;\n if(c.rushFixture)return runGkRushBlockDebugScenario(key);"""
+            if u.count(anchor)!=1: raise SystemExit(f'runGkPhase2 anchor count={u.count(anchor)}')
+            u=u.replace(anchor,special,1)
+          else:
+            # Ensure existing generic entry delegates the rush fixture if an old special function is already present.
+            anchor="""function runGkPhase2DebugScenario(key){\n const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;"""
+            if anchor in u and 'if(c.rushFixture)return runGkRushBlockDebugScenario(key);' not in u:
+              u=u.replace(anchor,anchor+"\n if(c.rushFixture)return runGkRushBlockDebugScenario(key);",1)
+          up.write_text(u)
+          PY
+
+          node --check runtime/continuous_match_core.js
+          node --check step71_hybrid_v06_ui.js
+          git diff --check
+
+          node <<'NODE'
+          const E=require('./runtime/continuous_match_core.js');
+          function setup(){
+            const m=E.createMatch('V34-RUSH-15M-20',{dt:.05});m.time=0;m.phase='OPEN_PLAY';m.restart=null;m.nextShape=99999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={'A-GK':{handling:45,reaction:60,gk_positioning:60,agility:60,diving:60},'H-ST':{finishing:75}};
+            const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];for(const p of m.players){p.nextThink=99999;p.vx=p.vy=0;p.hasBall=false;}Object.assign(st,{x:88,y:34,tx:88,ty:34,bodyAngle:0,faceTargetAngle:0});Object.assign(gk,{x:101,y:34,tx:101,ty:34,vx:0,vy:0,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:99999});m.ball={mode:'FLIGHT',kind:'SHOT',x:90,y:34,z:0,vx:20,vy:0,vz:0,ownerId:null,intendedReceiverId:null,lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',shotTeam:'HOME',shotTargetY:34,shotDistance:15,originX:90,originY:34,targetX:105,targetY:34,shotOneVOne:true,shotClearKeeperChance:true,onTarget:true,airborne:false,age:.4};m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';return{m,st,gk};
+          }
+          const {m,st,gk}=setup();let start=null,block=null,startX=null,blockX=null,stChaseAt=null,defChase=null,coverOk=false,gkEarlyControl=false,looseFrom=null,looseTo=null;
+          for(let i=0;i<60;i++){
+            E.step(m,.05);
+            if(!start){start=(m.events||[]).find(e=>e.type==='GK_RUSH_START')||null;if(start)startX=gk.x;}
+            if(!block){block=(m.events||[]).find(e=>e.type==='RUSH_BLOCK')||null;if(block){blockX=gk.x;looseFrom=m.time;}}
+            if(block){
+              if(m.ball.mode==='LOOSE')looseTo=m.time;
+              if(st.action==='CHASE_LOOSE'&&stChaseAt==null)stChaseAt=m.time;
+              const chasers=m.players.filter(p=>p.team==='AWAY'&&p.role!=='GK'&&p.action==='CHASE_LOOSE');
+              if(chasers.length&&defChase==null)defChase={id:chasers[0].id,t:m.time};
+              const cbs=m.players.filter(p=>p.team==='AWAY'&&p.role==='CB');
+              if(chasers.length&&cbs.some(p=>p.id!==chasers[0].id&&p.action!=='CHASE_LOOSE'))coverOk=true;
+              const elapsed=m.time-block.t;
+              if(elapsed<.78&&m.ball.mode==='CONTROLLED'&&m.ball.ownerId==='A-GK')gkEarlyControl=true;
+              if(elapsed>=1.20)break;
+            }
+          }
+          const advance=(startX!=null&&blockX!=null)?startX-blockX:0,looseBeat=(looseFrom!=null&&looseTo!=null)?looseTo-looseFrom:0;
+          const corePass=!!start&&!!block&&block.npcGkOutcome==='RUSH_BLOCK'&&advance>=1.0&&block.contact?.gap<=1.18;
+          const secondBallPass=looseBeat>=.60&&stChaseAt!=null&&defChase!=null&&coverOk&&!gkEarlyControl;
+          if(!corePass||!secondBallPass){console.log(JSON.stringify({verdict:'FAIL_PUBLIC_SECOND_BALL',corePass,secondBallPass,advance,looseBeat,stChaseAt,defChase,coverOk,gkEarlyControl,block,ball:{mode:m.ball.mode,owner:m.ball.ownerId,age:m.ball.age},st:{action:st.action,x:st.x},gk:{x:gk.x,action:gk.action}},null,2));process.exit(1);}
+
+          // After the recovery window, normal geometry-based GK recapture must still be possible.
+          m.ball.mode='LOOSE';m.ball.kind='LOOSE';m.ball.x=gk.x;m.ball.y=gk.y;m.ball.z=0;m.ball.vx=0;m.ball.vy=0;m.ball.ownerId=null;m.ball.intendedReceiverId=null;m.ball.age=.82;m.ball.noCaptureUntil=.78;
+          for(const p of m.players){if(p.id!==gk.id){p.x=50;p.y=p.team==='HOME'?5:63;p.tx=p.x;p.ty=p.y;}}
+          E.step(m,.05);
+          const naturalRecapture=m.ball.mode==='CONTROLLED'&&m.ball.ownerId==='A-GK';
+          if(!naturalRecapture){console.log(JSON.stringify({verdict:'FAIL_NATURAL_GK_RECAPTURE',mode:m.ball.mode,owner:m.ball.ownerId,age:m.ball.age,gk:{x:gk.x,y:gk.y}},null,2));process.exit(1);}
+          console.log(JSON.stringify({verdict:'PASS_FOR_USER_VISUAL_RETEST',advance,contactGap:block.contact?.gap,looseBeat,stChaseAt,defChase,coverOk,gkEarlyControl,naturalRecapture},null,2));
+          NODE
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add runtime/continuous_match_core.js step71_hybrid_v06_ui.js
+          git diff --cached --quiet && { echo 'no deploy changes'; exit 1; }
+          git commit -m 'Fix GK RUSH_BLOCK second-ball reactions (TEST_ONLY)'
+          git push origin HEAD:main
