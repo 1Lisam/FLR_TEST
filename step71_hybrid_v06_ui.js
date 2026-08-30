@@ -35,7 +35,7 @@ const DEV_RECENT_GUIDES={
  GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL:{label:'GK Phase2 · 장갑 굴절 좌측 실점',watch:'실제 장갑 접촉 뒤 공이 왼쪽으로 굴절하고도 살아서 골문 안으로 들어가는지 봅니다.',normal:'정상: TOUCH_DEFLECT/TOUCH_CONTINUE 후 FLIGHT/SHOT이 유지되고 나중 실제 골라인 통과가 GOAL을 만듭니다.'},
  GK_PHASE2_PLAUSIBILITY_TOUCH_RIGHT_GOAL:{label:'GK Phase2 · 장갑 굴절 우측 실점',watch:'반대 방향 접촉에서는 공이 오른쪽으로 굴절하고도 살아서 골문 안으로 들어가는지 봅니다.',normal:'정상: 접촉 위치에 따른 반대 방향 굴절 뒤 나중 골라인 통과로 GOAL이 됩니다.'},
  GK_PHASE2_PLAUSIBILITY_TOUCH_CORNER:{label:'GK Phase2 · 장갑 굴절 코너',watch:'더 큰 장갑 굴절 뒤 공이 포스트 바깥 골라인으로 나가 실제 코너킥이 되는지 봅니다.',normal:'정상: 접촉 순간 코너를 예약하지 않고 GK 마지막 터치가 기록된 살아 있는 공이 골라인 밖을 통과한 뒤 CORNER가 됩니다.'},
- GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{label:'GK Phase2 · 근거리 러시 블록',watch:'근거리 1대1 슈팅에서 GK가 선방 반경만 넓힌 것처럼 순간이동하지 않고 실제로 앞으로 달려 나온 뒤 공과 가까워져 막는지 봅니다.',normal:'정상: GK_RUSH_START 뒤 여러 실제 프레임 동안 전진하고, 근접 접촉에서 RUSH_BLOCK이 발생한 뒤 공은 주인 없는 LOOSE BALL로 다시 살아 움직입니다.'},
+ GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{label:'GK Phase2 · 근거리 러시 블록',watch:'GK가 실제로 전진해 블록한 뒤 튕겨 나온 공에 공격 ST와 수비 1차 회수자가 즉시 반응하는지, 다른 수비수는 커버를 유지하는지 봅니다.',normal:'정상: RUSH_BLOCK 뒤 공은 잠시 주인 없는 LOOSE BALL로 살아 있고 ST와 적절한 수비 1명이 세컨드볼에 반응합니다. 블록한 GK가 즉시 자동 재포획하지는 않지만 실제로 다시 먼저 도달하면 이후 자연스럽게 잡을 수 있습니다.'},
  OFFSIDE_INVOLVEMENT:{label:'오프사이드 실제 관여 시점',watch:'오프사이드 위치는 패스가 출발한 순간 기준인지, 판정 연출은 실제 공 관여 시점에 나타나는지 봅니다.',normal:'정상: 위치 판정 기준은 release 순간에 고정되고, 휘슬은 실제 관여가 확인될 때 표시됩니다.'}
 };
 const DEV_RECENT_VISIBLE_KEYS=['GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK'];
@@ -48,10 +48,11 @@ const GK_PHASE2_DEBUG_CASES={
  GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL:{seed:'SEARCH--0.75-34-24',label:'GK Phase2 · 장갑 굴절 좌측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:24,offset:-1.7,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:32.3,straightShot:true,replayRate:.75,instruction:'장갑 접촉 뒤 왼쪽 굴절 → 공이 계속 살아서 이동 → 실제 골라인 통과 뒤 GOAL인지 확인합니다.'},
  GK_PHASE2_PLAUSIBILITY_TOUCH_RIGHT_GOAL:{seed:'SEARCH-1.5-34-23',label:'GK Phase2 · 장갑 굴절 우측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:23,offset:1.5,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:35.5,straightShot:true,replayRate:.75,instruction:'장갑 접촉 뒤 오른쪽 굴절 → 공이 계속 살아서 이동 → 실제 골라인 통과 뒤 GOAL인지 확인합니다.'},
  GK_PHASE2_PLAUSIBILITY_TOUCH_CORNER:{seed:'TOUCH-GOAL-013',label:'GK Phase2 · 장갑 굴절 코너',expected:'TOUCH_CONTINUE',expectedTerminal:'CORNER',distance:19,speed:23,offset:2.5,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34.5,exactTouchFixture:true,ballStartX:83,ballStartY:36.5,straightShot:true,replayRate:.75,instruction:'장갑 접촉 뒤 큰 측면 굴절 → 포스트 바깥 골라인 통과 → GK 마지막 터치에 의해 CORNER인지 확인합니다.'},
- GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{seed:'V34-RUSH-15M-20',label:'GK Phase2 · 근거리 러시 블록',expected:'RUSH_BLOCK',rushFixture:true,replayRate:.60,instruction:'GK가 골라인 쪽에서 실제로 앞으로 달려 나옴 → 근접한 순간 슈팅을 블록 → 공이 다시 LOOSE BALL로 튀어나가는지 확인합니다.'}
+ GK_PHASE2_PLAUSIBILITY_RUSH_BLOCK:{seed:'V34-RUSH-15M-20',label:'GK Phase2 · 근거리 러시 블록',expected:'RUSH_BLOCK',rushFixture:true,replayRate:.60,instruction:'GK 전진 → 근접 블록 → LOOSE 세컨드볼 → ST와 수비 1차 회수자가 공에 반응하고 다른 수비는 커버를 유지하는지 확인합니다.'}
 };
 function runGkPhase2DebugScenario(key){
  const c=GK_PHASE2_DEBUG_CASES[key];if(!c)return false;
+ if(c.rushFixture)return runGkRushBlockDebugScenario(key);
  clearAutoAdvance();clearTimeout(sceneNoticeTimer);clearOffsideReview();ensurePitchChoice()?.hide();focusPitch();
  const m=E.createMatch(c.seed,{dt:.05}),B=E.choiceActionBridge();m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};m.v34TestOnlyVisualFixture=!!c.exactTouchFixture;
  const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];if(!st||!gk){if($('heroRecentFixStatus'))$('heroRecentFixStatus').textContent='GK 강제 검증 준비 실패 · 필요한 ST/GK를 찾지 못했습니다.';return true;}

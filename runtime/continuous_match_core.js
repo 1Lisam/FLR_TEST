@@ -1941,7 +1941,8 @@ function resolveNpcGkShot(m,gk,prev){
       const incomingLocal={x:gk.team===HOME?(b.vx||0):-(b.vx||0),y:gk.team===HOME?(b.vy||0):-(b.vy||0)},incomingSpeed=Math.hypot(incomingLocal.x,incomingLocal.y),unit=norm(incomingLocal.x,incomingLocal.y),contactOffset=sweep.y-keeperLocal.y,
         postLocalSpeed=clamp(incomingSpeed*.48,7.0,13.0),postLocalVx=postLocalSpeed*Math.max(0.72,-unit.x),postLocalVy=clamp(incomingLocal.y*.20+contactOffset*2.4,-4.2,4.2),postWorld=gk.team===HOME?{x:postLocalVx,y:postLocalVy}:{x:-postLocalVx,y:-postLocalVy},before={x:b.vx,y:b.vy},sourceId=b.shotSourcePlayerId||b.lastTouchPlayer,rushMeta=b.gkRush;
       b.shotSourcePlayerId=sourceId;b.npcGkResolved='RUSH_BLOCK';b.gkRush.stage='BLOCKED';b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;m.lastTouchTeam=gk.team;m.lastTouchPlayer=gk.id;
-      setLoose(m,b.x,b.y,postWorld.x,postWorld.y,gk.team,gk.id);m.ball.shotSourcePlayerId=sourceId;m.ball.npcGkResolved='RUSH_BLOCK';m.ball.rushBlock={contactAt:m.time,contactGap:gap,keeperId:gk.id};m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;
+      const recoveryWindow=.78;
+      setLoose(m,b.x,b.y,postWorld.x,postWorld.y,gk.team,gk.id);m.ball.shotSourcePlayerId=sourceId;m.ball.npcGkResolved='RUSH_BLOCK';m.ball.rushBlock={contactAt:m.time,contactGap:gap,keeperId:gk.id,recoveryUntil:m.time+recoveryWindow};m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=recoveryWindow;
       m.stats.blocks=(m.stats.blocks||0)+1;m.stats.shotBlocks=(m.stats.shotBlocks||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;gk.action='GK_SAVE_RECOVER';gk.tacticalTask='GK_SAVE_RECOVER';gk.sprint=false;gk.nextThink=m.time+.55;
       event(m,'RUSH_BLOCK',`${subjectName(gk.name)} 달려 나와 몸으로 슈팅을 막았습니다.`,{npcGkOutcome:'RUSH_BLOCK',shotSourcePlayerId:sourceId,contact:{time:m.time,gap:Number(gap.toFixed(3)),keeperBefore:{x:rushMeta?.startX??gk.x,y:rushMeta?.startY??gk.y},keeperAtContact:{x:gk.x,y:gk.y},ballAtContact:{x:b.x,y:b.y},velocityBefore:before,velocityAfter:postWorld},liveContinuation:true});
       return{outcome:'RUSH_BLOCK',gap,sweep};
@@ -2048,6 +2049,7 @@ function captureLooseOrFlight(m,contactPrev){
   for(const p of m.players){
     if(m.ball.mode==='FLIGHT'&&m.ball.lastTouchPlayer===p.id&&m.ball.age<0.28)continue;
     if(Array.isArray(m.ball.noCaptureIds)&&m.ball.age<(m.ball.noCaptureUntil||0)&&m.ball.noCaptureIds.includes(p.id))continue;
+    if(m.ball.mode==='LOOSE'&&m.ball.rushBlock&&p.id===m.ball.rushBlock.keeperId&&m.ball.age<(m.ball.rushBlock.recoveryUntil-m.ball.rushBlock.contactAt))continue;
     const intended=m.ball.intendedReceiverId===p.id,opponentPass=transferFlight&&m.ball.lastTouchTeam!==p.team,otherMate=transferFlight&&m.ball.lastTouchTeam===p.team&&!intended;
     // Mid-flight opponent interceptions are handled by the segment lane check. General capture is only allowed near the receiving zone / after the ball slows.
     if(opponentPass&&(m.ball.age<0.28||(speed>12.5&&td>3.2)))continue;
@@ -2291,7 +2293,10 @@ function updateBall(m,dt){
 function updateLooseChasers(m){
   if(m.ball.mode!=='LOOSE')return;
   for(const team of [HOME,AWAY]){
-    const nearest=teamPlayers(m,team).map(p=>({p,d:dist(p,m.ball)})).sort((a,b)=>a.d-b.d)[0];if(!nearest)continue;const p=nearest.p;p.tx=m.ball.x;p.ty=m.ball.y;p.action=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.sprint=true;
+    const rushKeeperId=m.ball.rushBlock?.keeperId,keeperProtected=!!rushKeeperId&&m.ball.age<(m.ball.rushBlock.recoveryUntil-m.ball.rushBlock.contactAt);
+    let candidates=teamPlayers(m,team).filter(p=>!(keeperProtected&&p.id===rushKeeperId));
+    if(keeperProtected&&team===m.ball.lastTouchTeam)candidates=candidates.filter(p=>p.role!=='GK');
+    const nearest=candidates.map(p=>({p,d:dist(p,m.ball)})).sort((a,b)=>a.d-b.d)[0];if(!nearest)continue;const p=nearest.p;p.tx=m.ball.x;p.ty=m.ball.y;p.action=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.tacticalTask=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.sprint=true;
   }
 }
 function maybeOffside(m){
