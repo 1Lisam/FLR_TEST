@@ -1,0 +1,42 @@
+name: deploy-v34-gk-rush-block-visual-v2
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-v34-gk-rush-block-visual-v2.yml']
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Add public GK rush target adaptation then reuse v1 gated deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('runtime/tactical_movement.js')
+          s=p.read_text()
+          old="""function updateGoalkeeperShotReaction(m,p){\n  if(!m||!p||p.role!=='GK'||m.ball.mode!=='FLIGHT'||m.ball.kind!=='SHOT'||p.team===m.ball.shotTeam)return false;\n  const pl=worldToLocal(p.team,p.x,p.y),bls=worldToLocal(p.team,m.ball.x,m.ball.y);"""
+          new="""function updateGoalkeeperShotReaction(m,p){\n  if(!m||!p||p.role!=='GK'||m.ball.mode!=='FLIGHT'||m.ball.kind!=='SHOT'||p.team===m.ball.shotTeam)return false;\n  // V34 public adaptation: while the live core has an active RUSH_BLOCK approach, keep that\n  // already-created live target through the per-tick tactical GK refresh instead of resetting\n  // the keeper to GK_SAVE_SET before movePlayers(). No outcome is chosen here.\n  if(m.ball.gkRush&&m.ball.gkRush.gkId===p.id){\n    applyTarget(p,m.ball.gkRush.targetLocalX,m.ball.gkRush.targetLocalY,'GK_RUSH_BLOCK',true,m);\n    p.faceTargetAngle=Math.atan2((m.ball.y||34)-p.y,(m.ball.x||52.5)-p.x);\n    return true;\n  }\n  const pl=worldToLocal(p.team,p.x,p.y),bls=worldToLocal(p.team,m.ball.x,m.ball.y);"""
+          if s.count(old)!=1: raise SystemExit(f'tactical GK reaction anchor count={s.count(old)}')
+          p.write_text(s.replace(old,new,1))
+
+          # Reuse the already-reviewed v1 gated patch/QA body, but include tactical_movement.js
+          # in the eventual gameplay commit. This avoids duplicating the long bounded QA script.
+          wf=Path('.github/workflows/deploy-v34-gk-rush-block-visual.yml').read_text()
+          marker='        run: |\n'
+          if wf.count(marker)!=1: raise SystemExit('v1 run block marker mismatch')
+          block=wf.split(marker,1)[1]
+          rows=[]
+          for line in block.splitlines():
+            rows.append(line[10:] if line.startswith('          ') else line)
+          script='\n'.join(rows)+'\n'
+          script=script.replace('git add runtime/continuous_match_core.js step71_hybrid_v06_ui.js','git add runtime/continuous_match_core.js runtime/tactical_movement.js step71_hybrid_v06_ui.js')
+          Path('/tmp/v34_rush_v1_body.sh').write_text(script)
+          PY
+          node --check runtime/tactical_movement.js
+          bash /tmp/v34_rush_v1_body.sh
