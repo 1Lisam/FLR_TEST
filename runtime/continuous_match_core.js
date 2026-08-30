@@ -1949,24 +1949,25 @@ function resolveNpcGkShot(m,gk,prev){
   const contactStage=goalkeeperParryContactStage(m,gk,prev);
   if(!contactStage.contactReady)return null;
   const dangerBand=(speed-22)*.65+Math.max(0,20-distance)*.75+Math.max(0,offset-5)*.40+Math.max(0,60-handling)*.12+(setState?.8:0);
-  // TEST_ONLY issue #51: insufficient glove touch resolved only at live contact.
-  // The normal later goal-line crossing remains the sole scorer.
-  {
-    const incomingLocal={x:gk.team===HOME?(b.vx||0):-(b.vx||0),y:gk.team===HOME?(b.vy||0):-(b.vy||0)},
-      touchEligible=incomingLocal.x<0&&speed>=16&&speed<=28&&offset<=3.5&&dangerBand>=2.0&&dangerBand<4.8,
-      touchRoll=(hash32(`${key}|TOUCH_GOAL_CONTACT`)%1000000)/1000000,
-      touchChance=touchEligible?clamp(.34+(dangerBand-2.0)*.045+(speed-16)*.012,.34,.58):0;
-    if(touchEligible&&touchRoll<touchChance){
-      const incomingUnit=norm(incomingLocal.x,incomingLocal.y),gloveSign=(hash32(`${key}|TOUCH_GOAL_GLOVE_DEFLECTION`)&1)?1:-1,
-        deflection=clamp(.22+speed*.012,.22,.56),postLocalSpeed=clamp(speed*.52,7.0,14.0),
-        postLocalVx=postLocalSpeed*incomingUnit.x,postLocalVy=postLocalSpeed*(incomingUnit.y*.94)+gloveSign*deflection,
-        postWorld=gk.team===HOME?{x:postLocalVx,y:postLocalVy}:{x:-postLocalVx,y:-postLocalVy},ballVelocityBefore={x:b.vx,y:b.vy};
-      b.npcGkResolved='TOUCH_GOAL';b.gkParryReach=null;b.noCaptureIds=[gk.id];b.noCaptureUntil=.70;b.vx=postWorld.x;b.vy=postWorld.y;
-      gk.action='GK_SAVE_RECOVER';gk.tacticalTask='GK_SAVE_RECOVER';gk.sprint=false;gk.tx=gk.x;gk.ty=gk.y;gk.nextThink=m.time+.55;
-      event(m,'TOUCH_GOAL',`${subjectName(gk.name)} 장갑에 맞고 공이 골문 쪽으로 흘러갑니다.`,{npcGkOutcome:'TOUCH_GOAL',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),approachStartEnvelope:contactStage.approachStartEnvelope,reachDisplacement:contactStage.reachDisplacement,reachState:contactStage.reachState,previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},preSpeed:speed,postSpeed:Math.hypot(b.vx,b.vy),localVelocityBefore:{x:incomingLocal.x,y:incomingLocal.y},localVelocityAfter:{x:postLocalVx,y:postLocalVy},gloveDeflection:gloveSign*deflection,ballState:{mode:b.mode,kind:b.kind,ownerId:b.ownerId||null,intendedReceiverId:b.intendedReceiverId||null},scoreAtContact:{HOME:m.score.HOME,AWAY:m.score.AWAY},goalsAtContact:m.stats.goals,touchRoll:Number(touchRoll.toFixed(6)),touchChance:Number(touchChance.toFixed(6)),touchBand:Number(dangerBand.toFixed(3))});
-      return{outcome:'TOUCH_GOAL',routine:false,sharedContactStage:contactStage,ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},touchRoll,touchChance};
-    }
+  // TEST_ONLY issue #56: neutral live glove deflection. No future GOAL/CORNER is cached here.
+{
+  const incomingLocal={x:gk.team===HOME?(b.vx||0):-(b.vx||0),y:gk.team===HOME?(b.vy||0):-(b.vy||0)},
+    touchEligible=incomingLocal.x<0&&speed>=16&&speed<=28&&offset<=3.5&&dangerBand>=2.0&&dangerBand<4.8,
+    touchRoll=(hash32(`${key}|TOUCH_DEFLECT_CONTACT`)%1000000)/1000000,
+    touchChance=touchEligible?clamp(.34+(dangerBand-2.0)*.045+(speed-16)*.012,.34,.58):0;
+  if(touchEligible&&touchRoll<touchChance){
+    const incomingUnit=norm(incomingLocal.x,incomingLocal.y),contactLocal={x:contactStage.sweep.x,y:contactStage.sweep.y},gkLocal=worldToLocal(gk.team,gk.x,gk.y),
+      contactOffset=contactLocal.y-gkLocal.y,noise=(((hash32(`${key}|TOUCH_DEFLECT_NOISE`)%10001)/10000)-.5)*.28,
+      lateralImpulse=clamp(contactOffset*3.2+incomingUnit.y*speed*.10+noise,-3.8,3.8),
+      postLocalSpeed=clamp(speed*.52,7.0,14.0),postLocalVx=postLocalSpeed*incomingUnit.x,
+      postLocalVy=postLocalSpeed*(incomingUnit.y*.94)+lateralImpulse,
+      postWorld=gk.team===HOME?{x:postLocalVx,y:postLocalVy}:{x:-postLocalVx,y:-postLocalVy},ballVelocityBefore={x:b.vx,y:b.vy};
+    b.npcGkResolved='TOUCH_CONTINUE';b.gkParryReach=null;b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;m.lastTouchTeam=gk.team;m.lastTouchPlayer=gk.id;b.noCaptureIds=[gk.id];b.noCaptureUntil=.70;b.vx=postWorld.x;b.vy=postWorld.y;
+    gk.action='GK_SAVE_RECOVER';gk.tacticalTask='GK_SAVE_RECOVER';gk.sprint=false;gk.tx=gk.x;gk.ty=gk.y;gk.nextThink=m.time+.55;
+    event(m,'TOUCH_DEFLECT',`${subjectName(gk.name)} 장갑에 맞고 공의 궤도가 바뀌어 계속 살아 있습니다.`,{npcGkOutcome:'TOUCH_CONTINUE',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),approachStartEnvelope:contactStage.approachStartEnvelope,reachDisplacement:contactStage.reachDisplacement,reachState:contactStage.reachState,previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},preSpeed:speed,postSpeed:Math.hypot(b.vx,b.vy),localVelocityBefore:{x:incomingLocal.x,y:incomingLocal.y},localVelocityAfter:{x:postLocalVx,y:postLocalVy},contactOffset:Number(contactOffset.toFixed(3)),lateralImpulse:Number(lateralImpulse.toFixed(3)),ballState:{mode:b.mode,kind:b.kind,ownerId:b.ownerId||null,intendedReceiverId:b.intendedReceiverId||null,lastTouchTeam:b.lastTouchTeam,lastTouchPlayer:b.lastTouchPlayer},scoreAtContact:{HOME:m.score.HOME,AWAY:m.score.AWAY},goalsAtContact:m.stats.goals,touchRoll:Number(touchRoll.toFixed(6)),touchChance:Number(touchChance.toFixed(6)),touchBand:Number(dangerBand.toFixed(3))});
+    return{outcome:'TOUCH_CONTINUE',routine:false,sharedContactStage:contactStage,ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},touchRoll,touchChance};
   }
+}
   const dangerEligible=dangerBand>=4.8;
   const dangerRoll=dangerEligible?(hash32(`${key}|PARRY_DANGER`)%1000000)/1000000:1;
   if(dangerEligible&&dangerRoll<.42){
@@ -2212,7 +2213,7 @@ function updateBall(m,dt){
     const p=playerById(m,m.ball.ownerId);if(!p){m.ball.mode='LOOSE';return;}m.ballOwner=p.id;const tx=p.x+dir(p.team)*0.42,ty=p.y;if((m.ball.attachBlend||0)>0){const dx=tx-m.ball.x,dy=ty-m.ball.y,d=Math.hypot(dx,dy),step=Math.min(d,9*dt);if(d>0.001){m.ball.x+=dx/d*step;m.ball.y+=dy/d*step;}m.ball.attachBlend=Math.max(0,m.ball.attachBlend-dt);}else{m.ball.x=tx;m.ball.y=ty;}m.ball.z=0;return;
   }
   if(m.ball.mode==='DEAD')return;
-  const prev={x:m.ball.x,y:m.ball.y};m.ball.age=(m.ball.age||0)+dt;
+  const prev={x:m.ball.x,y:m.ball.y};m.ball.contactPrevAge=m.ball.age||0;m.ball.contactDt=dt;m.ball.age=(m.ball.age||0)+dt;
   m.ball.x+=m.ball.vx*dt;m.ball.y+=m.ball.vy*dt;
   if(m.ball.mode==='FLIGHT'){
     if(m.ball.airborne){
