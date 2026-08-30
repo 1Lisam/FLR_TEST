@@ -1,0 +1,112 @@
+name: Deploy GK visual truth V64 TEST_ONLY
+on:
+  push:
+    paths:
+      - '.github/workflows/deploy_gk_visual_truth_v64_public.yml'
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # Runtime: TEST_ONLY visual clock starts on the current match time and then advances by physics dt.
+          p=Path('runtime/continuous_match_core.js')
+          s=p.read_text()
+          old="if(m.completed)return m;dt=clamp(Number(dt)||m.dt,0.02,0.15);m.time+=dt;"
+          new="if(m.completed)return m;dt=clamp(Number(dt)||m.dt,0.02,0.15);if(m.v34TestOnlyVisualFixture)m.visualReplayTime=Number.isFinite(m.visualReplayTime)?m.visualReplayTime+dt:m.time+dt;m.time+=dt;"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('step visual clock anchor missing')
+          old="return{time:m.time,score:{...m.score},phase:phaseName(m),possession:m.possession,ball:{...m.ball}"
+          new="return{time:m.time,...(m.v34TestOnlyVisualFixture?{visualTime:Number.isFinite(m.visualReplayTime)?m.visualReplayTime:m.time}:{}),score:{...m.score},phase:phaseName(m),possession:m.possession,ball:{...m.ball}"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('snapshot visualTime anchor missing')
+          p.write_text(s)
+
+          # Public debug UI: use the #64 clear-left fixture; preserve #8 exactly; replay on visual time when supplied.
+          p=Path('step71_hybrid_v06_ui.js')
+          s=p.read_text()
+          old="GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL:{seed:'SEARCH--0.75-34-24',label:'GK Phase2 · 장갑 굴절 좌측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:24,offset:-.75,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:33.25,straightShot:true,replayRate:.75"
+          new="GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL:{seed:'SEARCH--0.75-34-24',label:'GK Phase2 · 장갑 굴절 좌측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:24,offset:-1.5,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:32.5,straightShot:true,replayRate:.75"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('left fixture anchor missing')
+
+          old="function startReplay(frames,ret='CHOICE',title='다시보기',speed=REPLAY_SPEED){if(!frames?.length)"
+          new="function replayTime(frame){return Number.isFinite(frame?.replayTime)?frame.replayTime:Number.isFinite(frame?.visualTime)?frame.visualTime:frame?.time||0}\nfunction startReplay(frames,ret='CHOICE',title='다시보기',speed=REPLAY_SPEED){if(!frames?.length)"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('startReplay helper anchor missing')
+          old="const dur=(frames.at(-1).time-frames[0].time).toFixed(1);"
+          new="const dur=(replayTime(frames.at(-1))-replayTime(frames[0])).toFixed(1);"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('replay duration anchor missing')
+          old="function processReplay(real){replayCursor+=real*replayRate;const start=replayList[0].time,end=replayList.at(-1).time,target=Math.min(end,start+replayCursor);let i=0;while(i<replayList.length-1&&replayList[i+1].time<=target)i++;const a=replayList[i],b=replayList[Math.min(i+1,replayList.length-1)],t=Math.min(1,Math.max(0,(target-a.time)/Math.max(.001,b.time-a.time)));"
+          new="function processReplay(real){replayCursor+=real*replayRate;const start=replayTime(replayList[0]),end=replayTime(replayList.at(-1)),target=Math.min(end,start+replayCursor);let i=0;while(i<replayList.length-1&&replayTime(replayList[i+1])<=target)i++;const a=replayList[i],b=replayList[Math.min(i+1,replayList.length-1)],t=Math.min(1,Math.max(0,(target-replayTime(a))/Math.max(.001,replayTime(b)-replayTime(a))));"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('processReplay anchor missing')
+          p.write_text(s)
+          PY
+
+          node --check runtime/continuous_match_core.js
+          node --check step71_hybrid_v06_ui.js
+
+          node - <<'NODE'
+          const fs=require('fs'),E=require('./runtime/continuous_match_core.js'),B=E.choiceActionBridge();
+          function setup(c){
+            const m=E.createMatch(c.seed,{dt:.05});m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};m.v34TestOnlyVisualFixture=true;
+            const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];
+            for(const p of m.players){p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;if(p.role!=='GK'){p.x=70;p.y=7;p.tx=70;p.ty=7;}}
+            Object.assign(st,{x:83,y:34,tx:83,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
+            Object.assign(gk,{x:100.5,y:c.gkY,tx:100.5,ty:c.gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+            m.playerAbilityProfiles[gk.id]={reaction:40,gk_positioning:40,diving:40,handling:40};
+            B.setControlled(m,st,true);B.executeShot(m,st,'TOUCH_DEFLECT_FORCED',{releaseNow:true,decisionOrientation:{turningRequired:false,backToGoal:false,facingAlignment:1,bodyAngleDiff:0}});
+            const ty=34+c.offset;Object.assign(m.ball,{kind:'SHOT',mode:'FLIGHT',ownerId:null,x:83,y:ty,z:.08,vx:c.speed,vy:0,vz:0,age:0,originX:83,originY:34,targetX:105,targetY:ty,shotTargetY:ty,shotTeam:'HOME',lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',onTarget:true,shotDistance:c.distance,shotOneVOne:false,shotClearKeeperChance:false,airborne:false,strikeStyle:'POWER',arcProfile:null,npcGkResolved:null});m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';return m;
+          }
+          function run(c){
+            const m=setup(c),frames=[E.snapshot(m)];let touch=null,terminal=null,maxX=105,postTerminal=0;
+            for(let i=0;i<180;i++){E.step(m,.05);const snap=E.snapshot(m);frames.push(snap);maxX=Math.max(maxX,Number(snap.ball.x)||0);if(!touch)touch=[...m.events].reverse().find(e=>e?.type==='TOUCH_DEFLECT')||null;if(!terminal)terminal=[...m.events].reverse().find(e=>e?.type==='GOAL'||e?.type==='CORNER')||null;if(terminal&&++postTerminal>=20)break;}
+            return{m,frames,touch,terminal,maxX};
+          }
+          const left=run({seed:'SEARCH--0.75-34-24',offset:-1.5,gkY:34,speed:24,distance:19});
+          const right=run({seed:'SEARCH-1.5-34-23',offset:1.5,gkY:34,speed:23,distance:19});
+          const corner=run({seed:'TOUCH-GOAL-013',offset:2.5,gkY:34.5,speed:23,distance:19});
+          const lt=left.terminal,rt=right.terminal,ct=corner.terminal;
+          const visual=corner.frames.map(f=>f.visualTime);const monotonic=visual.every((v,i)=>Number.isFinite(v)&&(i===0||Math.abs((v-visual[i-1])-.05)<1e-6));
+          const follow=corner.frames.filter(f=>f.ball?.outFollowThrough);
+          const ui=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          const rightExact=ui.includes("seed:'SEARCH-1.5-34-23',label:'GK Phase2 · 장갑 굴절 우측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:23,offset:1.5");
+          const ordinary=E.createMatch('ordinary',{dt:.05}),ordinarySnap=E.snapshot(ordinary);
+          console.log('LEFT',JSON.stringify({type:lt?.type,cross:lt?.crossing,text:lt?.text,actor:lt?.actorId,touch:left.touch?.npcGkOutcome}));
+          console.log('RIGHT',JSON.stringify({type:rt?.type,cross:rt?.crossing,text:rt?.text,actor:rt?.actorId,touch:right.touch?.npcGkOutcome}));
+          console.log('CORNER',JSON.stringify({type:ct?.type,cross:ct?.crossing,maxX:corner.maxX,frames:corner.frames.length,visualFirst:visual[0],visualLast:visual.at(-1),followFrames:follow.length}));
+          const ok=left.touch?.npcGkOutcome==='TOUCH_CONTINUE'&&lt?.type==='GOAL'&&lt?.crossing?.y>=31&&lt?.crossing?.y<=32&&lt?.actorId==='H-ST'&&String(lt?.text||'').includes('왼쪽')&&right.touch?.npcGkOutcome==='TOUCH_CONTINUE'&&rt?.type==='GOAL'&&rt?.crossing?.y>35&&rt?.actorId==='H-ST'&&rightExact&&corner.touch?.npcGkOutcome==='TOUCH_CONTINUE'&&ct?.type==='CORNER'&&corner.maxX>106&&monotonic&&visual.at(-1)>visual[0]&&!('visualTime' in ordinarySnap)&&ui.includes('function replayTime(frame)');
+          if(!ok)process.exit(1);
+          NODE
+
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add runtime/continuous_match_core.js step71_hybrid_v06_ui.js
+          git diff --cached --quiet && { echo 'no gameplay changes'; exit 1; }
+          git commit -m 'Fix GK left visual and corner replay timeline (TEST_ONLY)'
+          git push origin HEAD:main
