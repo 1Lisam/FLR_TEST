@@ -1,0 +1,48 @@
+name: Deploy V34 GK touch deflection visual fixtures v2
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/deploy-v34-gk-touch-deflection-v2.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reuse v1 deploy with public-runtime adaptation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('.github/workflows/deploy-v34-gk-touch-deflection-v1.yml').read_text()
+          marker='        run: |\n'
+          if src.count(marker)!=1: raise SystemExit('v1 run block marker mismatch')
+          body=src.split(marker,1)[1]
+          lines=[]
+          for line in body.splitlines():
+              if line.startswith('          '): lines.append(line[10:])
+              elif not line.strip(): lines.append('')
+              else: raise SystemExit(f'unexpected v1 indentation: {line[:40]}')
+          script='\n'.join(lines)+'\n'
+          a=script.index('# Issue #56 auxiliary live-contact protections.')
+          b=script.index('# UI: replace one old touch-goal fixture',a)
+          public_adapt='''# Public FLR_TEST already has the #46 sweep/gkParryReach capture protection.
+          # Add only the issue #56 contact-time bookkeeping used by goalkeeperShotContactSweep.
+          old="  const prev={x:m.ball.x,y:m.ball.y};m.ball.age=(m.ball.age||0)+dt;"
+          new="  const prev={x:m.ball.x,y:m.ball.y};m.ball.contactPrevAge=m.ball.age||0;m.ball.contactDt=dt;m.ball.age=(m.ball.age||0)+dt;"
+          if old in s: s=s.replace(old,new,1)
+          elif new not in s: raise SystemExit('contact dt anchor missing')
+          p.write_text(s)
+
+          '''
+          script=script[:a]+public_adapt+script[b:]
+          Path('/tmp/deploy_touch_deflection_v2.sh').write_text(script)
+          PY
+          bash /tmp/deploy_touch_deflection_v2.sh
