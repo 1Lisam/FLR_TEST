@@ -2076,7 +2076,7 @@ function settleGoalBallInNet(m,team,cross){
 function handleOut(m,cross){
   const last=m.ball.lastTouchTeam||m.lastTouchTeam,attackingGoal=cross.side==='GOAL_RIGHT'?HOME:AWAY;
   if((cross.side==='GOAL_LEFT'||cross.side==='GOAL_RIGHT')&&cross.y>=FIELD.GOAL_Y1&&cross.y<=FIELD.GOAL_Y2&&m.ball.kind==='SHOT'){
-    const team=m.ball.shotTeam,description=goalDescription(m,team,cross);if(m.ball.shotOneVOne)m.stats.strictOneVOneGoals=(m.stats.strictOneVOneGoals||0)+1;if(m.ball.shotClearKeeperChance)m.stats.cleanKeeperChanceGoals=(m.stats.cleanKeeperChanceGoals||0)+1;m.score[team]++;m.stats.goals++;event(m,'GOAL',`${description} ${m.score.HOME}-${m.score.AWAY}`,{actorId:m.ball.lastTouchPlayer,team});settleGoalBallInNet(m,team,cross);startGoalCelebration(m,team);return;
+    const team=m.ball.shotTeam,description=goalDescription(m,team,cross);if(m.ball.shotOneVOne)m.stats.strictOneVOneGoals=(m.stats.strictOneVOneGoals||0)+1;if(m.ball.shotClearKeeperChance)m.stats.cleanKeeperChanceGoals=(m.stats.cleanKeeperChanceGoals||0)+1;m.score[team]++;m.stats.goals++;event(m,'GOAL',`${description} ${m.score.HOME}-${m.score.AWAY}`,{actorId:m.ball.lastTouchPlayer,team,crossing:{x:cross.x,y:cross.y}});settleGoalBallInNet(m,team,cross);startGoalCelebration(m,team);return;
   }
   if(cross.side.startsWith('TOUCH')){
     const team=other(last),passKinds=new Set(['PASS','LONG_PASS','THROUGH','CUTBACK','CROSS']);
@@ -2096,9 +2096,17 @@ function startDeadRestart(m,kind,team,x,y,cross=null){const deferredOffside=kind
   // open play must not survive through the restart setup and reappear after the kick/throw.
   m._transitionWideVacancies={HOME:{},AWAY:{}};m._defenceRoleLocks={};m._markLocks={};
   let bx=x,by=y,ballReturn=null;
+  const testOnlyCornerFollowThrough=!!m.v34TestOnlyVisualFixture&&kind==='CORNER'&&cross&&(cross.side==='GOAL_LEFT'||cross.side==='GOAL_RIGHT');
   if(cross&&(kind==='CORNER'||kind==='GOAL_KICK')){
-    const outX=cross.side==='GOAL_LEFT'?-0.85:cross.side==='GOAL_RIGHT'?105.85:cross.x,outY=clamp(cross.y,0.3,67.7);bx=outX;by=outY;
-    ballReturn={phase:'OUT_HOLD',startedAt:m.time,holdUntil:m.time+0.34,returnUntil:m.time+1.08,from:{x:outX,y:outY},to:{x,y}};
+    const outX=cross.side==='GOAL_LEFT'?-0.85:cross.side==='GOAL_RIGHT'?105.85:cross.x,outY=clamp(cross.y,0.3,67.7);
+    if(testOnlyCornerFollowThrough){
+      // TEST_ONLY: boundary result already exists; preserve only the visible outside-ball continuation.
+      bx=cross.x;by=cross.y;
+      ballReturn={phase:'OUT_FOLLOW_THROUGH',startedAt:m.time,holdUntil:m.time+0.60,returnUntil:m.time+1.34,from:{x:cross.x,y:cross.y},velocity:{x:Number(m.ball.vx)||0,y:Number(m.ball.vy)||0},to:{x,y}};
+    }else{
+      bx=outX;by=outY;
+      ballReturn={phase:'OUT_HOLD',startedAt:m.time,holdUntil:m.time+0.34,returnUntil:m.time+1.08,from:{x:outX,y:outY},to:{x,y}};
+    }
   }else if(kind==='OFFSIDE'){
     const fromX=Number.isFinite(m.ball?.x)?m.ball.x:x,fromY=Number.isFinite(m.ball?.y)?m.ball.y:y;bx=fromX;by=fromY;
     // Preserve only presentation inertia. Interaction is already dead, so this cannot change
@@ -2120,6 +2128,12 @@ function startDeadRestart(m,kind,team,x,y,cross=null){const deferredOffside=kind
   }}
 function updateDeadBallReturn(m,r){
   const br=r?.ballReturn;if(!br)return true;
+  if(br.phase==='OUT_FOLLOW_THROUGH'){
+    const elapsed=Math.max(0,m.time-br.startedAt);
+    m.ball.mode='DEAD';m.ball.x=br.from.x+(br.velocity?.x||0)*elapsed;m.ball.y=br.from.y+(br.velocity?.y||0)*elapsed;m.ball.z=0;
+    if(m.time<br.holdUntil)return false;
+    br.from={x:m.ball.x,y:m.ball.y};br.startedAt=m.time;br.holdUntil=m.time;br.phase='RETURNING';
+  }
   if(br.phase==='OUT_HOLD'){if(m.time<br.holdUntil)return false;br.phase='RETURNING';}
   if(br.phase==='RETURNING'){
     const u=clamp((m.time-br.holdUntil)/Math.max(.01,br.returnUntil-br.holdUntil),0,1);
