@@ -1962,7 +1962,7 @@ function resolveNpcGkShot(m,gk,prev){
       postLocalSpeed=clamp(speed*.52,7.0,14.0),postLocalVx=postLocalSpeed*incomingUnit.x,
       postLocalVy=postLocalSpeed*(incomingUnit.y*.94)+lateralImpulse,
       postWorld=gk.team===HOME?{x:postLocalVx,y:postLocalVy}:{x:-postLocalVx,y:-postLocalVy},ballVelocityBefore={x:b.vx,y:b.vy};
-    b.npcGkResolved='TOUCH_CONTINUE';b.gkParryReach=null;b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;m.lastTouchTeam=gk.team;m.lastTouchPlayer=gk.id;b.noCaptureIds=[gk.id];b.noCaptureUntil=.70;b.vx=postWorld.x;b.vy=postWorld.y;
+    b.shotSourcePlayerId=b.lastTouchPlayer;b.npcGkResolved='TOUCH_CONTINUE';b.gkParryReach=null;b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;m.lastTouchTeam=gk.team;m.lastTouchPlayer=gk.id;b.noCaptureIds=[gk.id];b.noCaptureUntil=.70;b.vx=postWorld.x;b.vy=postWorld.y;
     gk.action='GK_SAVE_RECOVER';gk.tacticalTask='GK_SAVE_RECOVER';gk.sprint=false;gk.tx=gk.x;gk.ty=gk.y;gk.nextThink=m.time+.55;
     event(m,'TOUCH_DEFLECT',`${subjectName(gk.name)} 장갑에 맞고 공의 궤도가 바뀌어 계속 살아 있습니다.`,{npcGkOutcome:'TOUCH_CONTINUE',npcGkPhase:2,sharedContactStage:{ready:contactStage.contactReady,contactGap:Number(contactStage.sweep.distance.toFixed(3)),envelope:Number(contactStage.contactEnvelope.toFixed(3)),approachStartEnvelope:contactStage.approachStartEnvelope,reachDisplacement:contactStage.reachDisplacement,reachState:contactStage.reachState,previous:{x:prev?.x??b.x,y:prev?.y??b.y},current:{x:b.x,y:b.y},gkBefore:contactStage.gkBefore,gkAfter:contactStage.gkAfter,presentationReach:contactStage.presentationReach},ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},preSpeed:speed,postSpeed:Math.hypot(b.vx,b.vy),localVelocityBefore:{x:incomingLocal.x,y:incomingLocal.y},localVelocityAfter:{x:postLocalVx,y:postLocalVy},contactOffset:Number(contactOffset.toFixed(3)),lateralImpulse:Number(lateralImpulse.toFixed(3)),ballState:{mode:b.mode,kind:b.kind,ownerId:b.ownerId||null,intendedReceiverId:b.intendedReceiverId||null,lastTouchTeam:b.lastTouchTeam,lastTouchPlayer:b.lastTouchPlayer},scoreAtContact:{HOME:m.score.HOME,AWAY:m.score.AWAY},goalsAtContact:m.stats.goals,touchRoll:Number(touchRoll.toFixed(6)),touchChance:Number(touchChance.toFixed(6)),touchBand:Number(dangerBand.toFixed(3))});
     return{outcome:'TOUCH_CONTINUE',routine:false,sharedContactStage:contactStage,ballVelocityBefore,ballVelocityAfter:{x:b.vx,y:b.vy},touchRoll,touchChance};
@@ -2063,7 +2063,7 @@ function boundaryCross(prev,b){
   return null;
 }
 function goalDescription(m,team,cross){
-  const b=m.ball,scorer=playerById(m,b.lastTouchPlayer),styleMap={CURLED:'감아찬 슈팅',CHIP:'칩슛',PLACED:'정교하게 깔아 찬 슈팅',POWER:'강하게 때린 슈팅',LONG:'중거리 슈팅',HEADER:'헤더'};
+  const b=m.ball,scorer=playerById(m,b.npcGkResolved==='TOUCH_CONTINUE'&&b.shotSourcePlayerId?b.shotSourcePlayerId:b.lastTouchPlayer),styleMap={CURLED:'감아찬 슈팅',CHIP:'칩슛',PLACED:'정교하게 깔아 찬 슈팅',POWER:'강하게 때린 슈팅',LONG:'중거리 슈팅',HEADER:'헤더'};
   const style=b.deliveryMode==='AERIAL_HEADER'||b.strikeStyle==='HEADER'?'헤더':(styleMap[b.strikeStyle]||'슈팅');
   const ox=Number.isFinite(b.originX)?b.originX:(scorer?.x??b.x),oy=Number.isFinite(b.originY)?b.originY:(scorer?.y??b.y),g=team===HOME?{x:105,y:34}:{x:0,y:34},d=Math.hypot(g.x-ox,g.y-oy);
   const side=cross.y<33.0?'골문 왼쪽':cross.y>35.0?'골문 오른쪽':'골문 중앙';
@@ -2076,7 +2076,7 @@ function settleGoalBallInNet(m,team,cross){
 function handleOut(m,cross){
   const last=m.ball.lastTouchTeam||m.lastTouchTeam,attackingGoal=cross.side==='GOAL_RIGHT'?HOME:AWAY;
   if((cross.side==='GOAL_LEFT'||cross.side==='GOAL_RIGHT')&&cross.y>=FIELD.GOAL_Y1&&cross.y<=FIELD.GOAL_Y2&&m.ball.kind==='SHOT'){
-    const team=m.ball.shotTeam,description=goalDescription(m,team,cross);if(m.ball.shotOneVOne)m.stats.strictOneVOneGoals=(m.stats.strictOneVOneGoals||0)+1;if(m.ball.shotClearKeeperChance)m.stats.cleanKeeperChanceGoals=(m.stats.cleanKeeperChanceGoals||0)+1;m.score[team]++;m.stats.goals++;event(m,'GOAL',`${description} ${m.score.HOME}-${m.score.AWAY}`,{actorId:m.ball.lastTouchPlayer,team,crossing:{x:cross.x,y:cross.y}});settleGoalBallInNet(m,team,cross);startGoalCelebration(m,team);return;
+    const team=m.ball.shotTeam,description=goalDescription(m,team,cross),goalActorId=m.ball.npcGkResolved==='TOUCH_CONTINUE'&&m.ball.shotSourcePlayerId?m.ball.shotSourcePlayerId:m.ball.lastTouchPlayer;if(m.ball.shotOneVOne)m.stats.strictOneVOneGoals=(m.stats.strictOneVOneGoals||0)+1;if(m.ball.shotClearKeeperChance)m.stats.cleanKeeperChanceGoals=(m.stats.cleanKeeperChanceGoals||0)+1;m.score[team]++;m.stats.goals++;event(m,'GOAL',`${description} ${m.score.HOME}-${m.score.AWAY}`,{actorId:goalActorId,team,crossing:{x:cross.x,y:cross.y}});settleGoalBallInNet(m,team,cross);startGoalCelebration(m,team);return;
   }
   if(cross.side.startsWith('TOUCH')){
     const team=other(last),passKinds=new Set(['PASS','LONG_PASS','THROUGH','CUTBACK','CROSS']);
