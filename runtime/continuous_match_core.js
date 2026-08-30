@@ -2297,6 +2297,12 @@ function updateLooseChasers(m){
     let candidates=teamPlayers(m,team).filter(p=>!(keeperProtected&&p.id===rushKeeperId));
     if(keeperProtected&&team===m.ball.lastTouchTeam)candidates=candidates.filter(p=>p.role!=='GK');
     const nearest=candidates.map(p=>({p,d:dist(p,m.ball)})).sort((a,b)=>a.d-b.d)[0];if(!nearest)continue;const p=nearest.p;p.tx=m.ball.x;p.ty=m.ball.y;p.action=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.tacticalTask=p.role==='GK'?'GK_RUSH':'CHASE_LOOSE';p.sprint=true;
+    // A striker who just took the shot may still carry a short post-shot movement lock.
+    // Once the live rebound actually selects him as an eligible chaser, clear only
+    // stale movement/facing state and let normal CHASE_LOOSE acceleration take over.
+    if(p.role==='ST'&&p.team!==m.ball.lastTouchTeam&&p.id===m.ball.shotSourcePlayerId){
+      p.postShotHoldUntil=0;p.lockTargetUntil=0;p.nextThink=m.time;p.runUntil=0;p.runType=null;p.faceTargetAngle=null;
+    }
   }
 }
 function maybeOffside(m){
