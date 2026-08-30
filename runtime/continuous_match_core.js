@@ -2066,7 +2066,9 @@ function goalDescription(m,team,cross){
   const b=m.ball,scorer=playerById(m,b.npcGkResolved==='TOUCH_CONTINUE'&&b.shotSourcePlayerId?b.shotSourcePlayerId:b.lastTouchPlayer),styleMap={CURLED:'감아찬 슈팅',CHIP:'칩슛',PLACED:'정교하게 깔아 찬 슈팅',POWER:'강하게 때린 슈팅',LONG:'중거리 슈팅',HEADER:'헤더'};
   const style=b.deliveryMode==='AERIAL_HEADER'||b.strikeStyle==='HEADER'?'헤더':(styleMap[b.strikeStyle]||'슈팅');
   const ox=Number.isFinite(b.originX)?b.originX:(scorer?.x??b.x),oy=Number.isFinite(b.originY)?b.originY:(scorer?.y??b.y),g=team===HOME?{x:105,y:34}:{x:0,y:34},d=Math.hypot(g.x-ox,g.y-oy);
-  const side=cross.y<33.0?'골문 왼쪽':cross.y>35.0?'골문 오른쪽':'골문 중앙';
+  // 7.32m goal mouth: keep the central call broad and reserve side wording for clearly lateral crossings.
+  const GOAL_HALF_WIDTH=7.32/2,CENTRE_HALF_WIDTH=GOAL_HALF_WIDTH*0.68;
+  const side=cross.y<34-CENTRE_HALF_WIDTH?'골문 왼쪽':cross.y>34+CENTRE_HALF_WIDTH?'골문 오른쪽':'골문 중앙';
   const range=d>=20?'박스 바깥에서':d>=12?'페널티지역 앞쪽에서':'골문 가까운 곳에서';
   return `${subjectName(scorer?.name||'공격수')} ${range} 시도한 ${subjectName(style)} ${side} 골망 안으로 들어갑니다.`;
 }
