@@ -647,6 +647,14 @@ function preferredDefenceRoles(m,team,owner,ball,field,candidates){
 // goalkeeper every physics tick without moving the other 21 players or changing shot odds.
 function updateGoalkeeperShotReaction(m,p){
   if(!m||!p||p.role!=='GK'||m.ball.mode!=='FLIGHT'||m.ball.kind!=='SHOT'||p.team===m.ball.shotTeam)return false;
+  // V34 public adaptation: while the live core has an active RUSH_BLOCK approach, keep that
+  // already-created live target through the per-tick tactical GK refresh instead of resetting
+  // the keeper to GK_SAVE_SET before movePlayers(). No outcome is chosen here.
+  if(m.ball.gkRush&&m.ball.gkRush.gkId===p.id){
+    applyTarget(p,m.ball.gkRush.targetLocalX,m.ball.gkRush.targetLocalY,'GK_RUSH_BLOCK',true,m);
+    p.faceTargetAngle=Math.atan2((m.ball.y||34)-p.y,(m.ball.x||52.5)-p.x);
+    return true;
+  }
   const pl=worldToLocal(p.team,p.x,p.y),bls=worldToLocal(p.team,m.ball.x,m.ball.y);
   const vxL=p.team===HOME?(m.ball.vx||0):-(m.ball.vx||0),vyL=p.team===HOME?(m.ball.vy||0):-(m.ball.vy||0);
   const reaction=abilityVal(m,p,'reaction'),positioning=abilityVal(m,p,'gk_positioning');

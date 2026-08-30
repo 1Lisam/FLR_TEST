@@ -369,7 +369,8 @@ function assignShape(m){
     if(p.role==='GK'){
       const goalDepth=clamp(5.4+defProgress*0.025,5.2,8.3);lx=goalDepth;ly=lerp(34,defLocalBall.y,0.16);action='GK_SET';
       if(m.ball.mode==='LOOSE'&&inPenaltyArea(p.team,m.ball.x,m.ball.y)&&dist(p,m.ball)<10){const b=worldToLocal(p.team,m.ball.x,m.ball.y);lx=b.x;ly=b.y;action='GK_RUSH';sprint=true;}
-      if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.gkParryReach){const r=worldToLocal(p.team,m.ball.gkParryReach.targetX,m.ball.gkParryReach.targetY);lx=r.x;ly=r.y;action='GK_SAVE_REACH';sprint=true;}
+      if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.gkRush&&m.ball.gkRush.gkId===p.id){lx=m.ball.gkRush.targetLocalX;ly=m.ball.gkRush.targetLocalY;action='GK_RUSH_BLOCK';sprint=true;}
+      else if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.gkParryReach){const r=worldToLocal(p.team,m.ball.gkParryReach.targetX,m.ball.gkParryReach.targetY);lx=r.x;ly=r.y;action='GK_SAVE_REACH';sprint=true;}
       else if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'&&m.ball.shotTargetY!=null){const ideal=worldToLocal(p.team,oppGoalX(other(p.team)),m.ball.shotTargetY).y;lx=clamp(2.0+defProgress*0.01,1.8,4.0);ly=clamp(ideal,30.2,37.8);action='GK_SAVE_SET';sprint=true;}
     }else if(press&&p.id===press.id&&dist(p,ball)<19){
       const bx=owner?owner.x+owner.vx*0.18:ball.x,by=owner?owner.y+owner.vy*0.18:ball.y,b=worldToLocal(p.team,bx,by),ownerCarry=owner&&['CARRY_FORWARD','DRIBBLE_EVADE'].includes(owner.action),danger=defProgress<30,ownerHeld=owner?m.time-(owner.controlledSince||m.time):0,close=ownerCarry||(danger&&ownerHeld>1.8),gap=close?0.95:2.15;lx=clamp(b.x-gap,4,98);ly=b.y;action=close?'CLOSE_DOWN':'CONTAIN';sprint=dist(p,{x:bx,y:by})>3.2;
@@ -1920,7 +1921,33 @@ function resolveNpcGkShot(m,gk,prev){
   const b=m.ball;
   if(!gk||gk.role!=='GK'||b.mode!=='FLIGHT'||b.kind!=='SHOT'||b.npcGkResolved)return null;
   if(b.shotTargetY==null||b.onTarget===false||b.strikeStyle==='CHIP'||b.arcProfile==='CHIP_LOB'||b.airborne||Number(b.z||0)>0.65)return null;
-  // Keep high-ball/chip/1v1/rush cases on the existing test-build paths.
+  // V34 final GK outcome: live close-range rush block. It starts from a real live crossing,
+  // moves the keeper over subsequent physics ticks, and resolves only at near interaction.
+  {
+    const rushLocalBall=worldToLocal(gk.team,b.x,b.y),rushGkLocal=worldToLocal(gk.team,gk.x,gk.y),rushPrev=worldToLocal(gk.team,prev?.x??b.x,prev?.y??b.y),
+      rushDistance=Number.isFinite(b.shotDistance)?b.shotDistance:99,rushSpeed=Math.hypot(b.vx||0,b.vy||0),rushOffset=Math.abs(Number(b.shotTargetY)-34),
+      closeOneVOne=!!b.shotOneVOne&&rushDistance<=18.5,closeKeeperContext=rushDistance<=13.5&&rushOffset<=5.0&&rushSpeed>=17&&rushSpeed<=31;
+    if(!b.gkRush&&(closeOneVOne||closeKeeperContext)&&rushLocalBall.x>rushGkLocal.x+0.65&&rushLocalBall.x<=rushGkLocal.x+8.8&&rushPrev.x>rushGkLocal.x+8.8){
+      const targetLocalX=clamp(Math.min(rushLocalBall.x-0.70,rushGkLocal.x+4.5),rushGkLocal.x+0.55,13.5),targetLocalY=clamp(lerp(rushGkLocal.y,rushLocalBall.y,0.72),8,60),targetWorld=localToWorld(gk.team,targetLocalX,targetLocalY);
+      b.gkRush={stage:'RUSH',gkId:gk.id,startedAt:m.time,startX:gk.x,startY:gk.y,startLocalX:rushGkLocal.x,startLocalY:rushGkLocal.y,targetLocalX,targetLocalY};
+      gk.gkRushStartLocalX=rushGkLocal.x;gk.tx=targetWorld.x;gk.ty=targetWorld.y;gk.vx=dir(gk.team)*Math.max(Math.abs(gk.vx||0),4.8);gk.action='GK_RUSH_BLOCK';gk.tacticalTask='GK_RUSH_BLOCK';gk.sprint=true;
+      event(m,'GK_RUSH_START',`${subjectName(gk.name)} 가까운 슈팅에 맞서 앞으로 달려 나옵니다.`,{gkRush:{stage:'RUSH',startedAt:m.time,start:{x:gk.x,y:gk.y},target:targetWorld,ball:{x:b.x,y:b.y},shotDistance:rushDistance,shotSpeed:rushSpeed}});
+      return{outcome:'RUSH_APPROACH'};
+    }
+    if(b.gkRush&&b.gkRush.gkId===gk.id){
+      const targetWorld=localToWorld(gk.team,b.gkRush.targetLocalX,b.gkRush.targetLocalY);gk.tx=targetWorld.x;gk.ty=targetWorld.y;gk.action='GK_RUSH_BLOCK';gk.tacticalTask='GK_RUSH_BLOCK';gk.sprint=true;
+      const sweep=goalkeeperShotContactSweep(m,gk,prev||{x:b.x,y:b.y}),gap=sweep.distance,currentLocal=worldToLocal(gk.team,b.x,b.y),keeperLocal=worldToLocal(gk.team,gk.x,gk.y),nearInteraction=gap<=1.18&&currentLocal.x>=keeperLocal.x-1.25&&currentLocal.x<=keeperLocal.x+2.0;
+      if(!nearInteraction)return{outcome:'RUSH_APPROACH',sweep,gap};
+      const incomingLocal={x:gk.team===HOME?(b.vx||0):-(b.vx||0),y:gk.team===HOME?(b.vy||0):-(b.vy||0)},incomingSpeed=Math.hypot(incomingLocal.x,incomingLocal.y),unit=norm(incomingLocal.x,incomingLocal.y),contactOffset=sweep.y-keeperLocal.y,
+        postLocalSpeed=clamp(incomingSpeed*.48,7.0,13.0),postLocalVx=postLocalSpeed*Math.max(0.72,-unit.x),postLocalVy=clamp(incomingLocal.y*.20+contactOffset*2.4,-4.2,4.2),postWorld=gk.team===HOME?{x:postLocalVx,y:postLocalVy}:{x:-postLocalVx,y:-postLocalVy},before={x:b.vx,y:b.vy},sourceId=b.shotSourcePlayerId||b.lastTouchPlayer,rushMeta=b.gkRush;
+      b.shotSourcePlayerId=sourceId;b.npcGkResolved='RUSH_BLOCK';b.gkRush.stage='BLOCKED';b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;m.lastTouchTeam=gk.team;m.lastTouchPlayer=gk.id;
+      setLoose(m,b.x,b.y,postWorld.x,postWorld.y,gk.team,gk.id);m.ball.shotSourcePlayerId=sourceId;m.ball.npcGkResolved='RUSH_BLOCK';m.ball.rushBlock={contactAt:m.time,contactGap:gap,keeperId:gk.id};m.ball.noCaptureIds=[gk.id];m.ball.noCaptureUntil=.30;
+      m.stats.blocks=(m.stats.blocks||0)+1;m.stats.shotBlocks=(m.stats.shotBlocks||0)+1;m.stats.looseBalls=(m.stats.looseBalls||0)+1;gk.action='GK_SAVE_RECOVER';gk.tacticalTask='GK_SAVE_RECOVER';gk.sprint=false;gk.nextThink=m.time+.55;
+      event(m,'RUSH_BLOCK',`${subjectName(gk.name)} 달려 나와 몸으로 슈팅을 막았습니다.`,{npcGkOutcome:'RUSH_BLOCK',shotSourcePlayerId:sourceId,contact:{time:m.time,gap:Number(gap.toFixed(3)),keeperBefore:{x:rushMeta?.startX??gk.x,y:rushMeta?.startY??gk.y},keeperAtContact:{x:gk.x,y:gk.y},ballAtContact:{x:b.x,y:b.y},velocityBefore:before,velocityAfter:postWorld},liveContinuation:true});
+      return{outcome:'RUSH_BLOCK',gap,sweep};
+    }
+  }
+  // Keep other high-ball/chip/1v1/rush cases on the existing test-build paths.
   if(b.shotOneVOne||b.shotClearKeeperChance||gk.action==='GK_RUSH'||gk.tacticalTask==='GK_RUSH')return null;
   const localBall=worldToLocal(gk.team,b.x,b.y);
   // Resolve only when the live shot reaches a broad near-GK interaction plane.
