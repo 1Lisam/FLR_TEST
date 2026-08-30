@@ -1,0 +1,47 @@
+name: Deploy V34 GK side/corner visual fix v3
+
+on:
+  push:
+    paths:
+      - '.github/workflows/deploy-v34-gk-visual-side-followthrough-v3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reuse v2 patch with physics-tick QA timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('.github/workflows/deploy-v34-gk-visual-side-followthrough-v2.yml').read_text()
+          marker='        run: |\n'
+          if src.count(marker)!=1:
+              raise SystemExit('v2 run block marker mismatch')
+          body=src.split(marker,1)[1]
+          lines=[]
+          for line in body.splitlines():
+              if line.startswith('          '):
+                  lines.append(line[10:])
+              elif not line.strip():
+                  lines.append('')
+              else:
+                  raise SystemExit(f'unexpected v2 indentation: {line[:50]}')
+          script='\n'.join(lines)+'\n'
+          old1='let touch=null,terminal=null,maxOutsideX=105;for(let i=0;i<160;i++)'
+          new1='let touch=null,terminal=null,maxOutsideX=105,postTerminalTicks=0;for(let i=0;i<160;i++)'
+          old2='if(terminal&&m.time-terminal.t>.9)break;'
+          new2='if(terminal&&++postTerminalTicks>=20)break;'
+          if script.count(old1)!=1 or script.count(old2)!=1:
+              raise SystemExit(f'QA timing anchors mismatch: run={script.count(old1)} break={script.count(old2)}')
+          script=script.replace(old1,new1,1).replace(old2,new2,1)
+          Path('/tmp/deploy_gk_visual_v3.sh').write_text(script)
+          PY
+          bash /tmp/deploy_gk_visual_v3.sh
