@@ -1,0 +1,103 @@
+name: deploy-v34-gk-visual-semantics-v67-v3
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-v34-gk-visual-semantics-v67-v3.yml']
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch and validate #67 public adaptation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          rp=Path('runtime/continuous_match_core.js')
+          s=rp.read_text()
+          old="  const side=cross.y<33.0?'골문 왼쪽':cross.y>35.0?'골문 오른쪽':'골문 중앙';"
+          new="  // 7.32m goal mouth: keep the central call broad and reserve side wording for clearly lateral crossings.\n  const GOAL_HALF_WIDTH=7.32/2,CENTRE_HALF_WIDTH=GOAL_HALF_WIDTH*0.68;\n  const side=cross.y<34-CENTRE_HALF_WIDTH?'골문 왼쪽':cross.y>34+CENTRE_HALF_WIDTH?'골문 오른쪽':'골문 중앙';"
+          if s.count(old)!=1:
+              raise SystemExit(f'goal threshold anchor count={s.count(old)}')
+          rp.write_text(s.replace(old,new,1))
+
+          up=Path('step71_hybrid_v06_ui.js')
+          u=up.read_text()
+          old="GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL:{seed:'SEARCH--0.75-34-24',label:'GK Phase2 · 장갑 굴절 좌측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:24,offset:-1.5,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:32.5,straightShot:true,replayRate:.75"
+          new="GK_PHASE2_PLAUSIBILITY_TOUCH_LEFT_GOAL:{seed:'SEARCH--0.75-34-24',label:'GK Phase2 · 장갑 굴절 좌측 실점',expected:'TOUCH_CONTINUE',expectedTerminal:'GOAL',distance:19,speed:24,offset:-1.7,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:32.3,straightShot:true,replayRate:.75"
+          if u.count(old)!=1:
+              raise SystemExit(f'left fixture anchor count={u.count(old)}')
+          up.write_text(u.replace(old,new,1))
+          PY
+
+          node --check runtime/continuous_match_core.js
+          node --check step71_hybrid_v06_ui.js
+          git diff --check
+
+          node <<'NODE'
+          const E=require('./runtime/continuous_match_core.js');
+          const B=E.choiceActionBridge();
+          const c={seed:'SEARCH--0.75-34-24',distance:19,speed:24,offset:-1.7,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,ballStartX:83,ballStartY:32.3};
+          const m=E.createMatch(c.seed,{dt:.05});
+          m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};m.v34TestOnlyVisualFixture=true;
+          const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];
+          for(const p of m.players){
+            p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;
+            if(p.role!=='GK'){p.x=70;p.y=7;p.tx=70;p.ty=7;}
+          }
+          Object.assign(st,{x:83,y:34,tx:83,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
+          Object.assign(gk,{x:100.5,y:34,tx:100.5,ty:34,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+          m.playerAbilityProfiles[gk.id]={reaction:40,gk_positioning:40,diving:40,handling:40};
+          B.setControlled(m,st,true);
+          B.executeShot(m,st,'TOUCH_DEFLECT_FORCED',{releaseNow:true,decisionOrientation:{turningRequired:false,backToGoal:false,facingAlignment:1,bodyAngleDiff:0}});
+          Object.assign(m.ball,{kind:'SHOT',mode:'FLIGHT',ownerId:null,x:83,y:32.3,z:.08,vx:24,vy:0,vz:0,age:0,originX:83,originY:34,targetX:105,targetY:32.3,shotTargetY:32.3,shotTeam:'HOME',lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',onTarget:true,shotDistance:19,shotOneVOne:false,shotClearKeeperChance:false,airborne:false,strikeStyle:'POWER',arcProfile:null,npcGkResolved:null});
+          m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';
+          let outcome=null,goal=null,contact=null;
+          for(let i=0;i<180;i++){
+            const before={x:m.ball.x,y:m.ball.y,vx:m.ball.vx,vy:m.ball.vy};
+            E.step(m,.05);
+            if(!outcome){
+              const e=[...m.events].reverse().find(e=>e?.npcGkOutcome);
+              if(e){
+                outcome=e;
+                const preProjectedY=before.vx?before.y+before.vy*((105-before.x)/before.vx):before.y;
+                contact={preProjectedY,preVy:before.vy,postVy:m.ball.vy,y:m.ball.y,mode:m.ball.mode,kind:m.ball.kind,score:{...m.score},lastTouch:m.ball.lastTouchPlayer};
+              }
+            }
+            if(!goal)goal=[...m.events].reverse().find(e=>e?.type==='GOAL')||null;
+            if(goal)break;
+          }
+          const delta=goal&&contact?contact.preProjectedY-goal.crossing.y:null;
+          const checks={
+            outcome:outcome?.npcGkOutcome==='TOUCH_CONTINUE',
+            liveAtContact:contact?.mode==='FLIGHT'&&contact?.kind==='SHOT'&&contact?.score?.HOME===0,
+            gkLastTouch:contact?.lastTouch==='A-GK',
+            realDirectionChange:contact?.preVy===0&&contact?.postVy<0,
+            laterGoal:goal?.type==='GOAL',
+            clearLeft:goal?.crossing?.y>30.34&&goal?.crossing?.y<31.5112,
+            approxOneMetre:delta>=0.99,
+            leftText:goal?.text?.includes('골문 왼쪽'),
+            scorer:goal?.actorId==='H-ST'
+          };
+          const verdict=Object.values(checks).every(Boolean)?'PASS_FOR_VISUAL_RETEST':'FAIL';
+          console.log(JSON.stringify({verdict,checks,contact,crossing:goal?.crossing||null,delta,text:goal?.text||null},null,2));
+          if(verdict!=='PASS_FOR_VISUAL_RETEST')process.exit(1);
+          NODE
+
+          # v1 already proved #4/#5/#6/#8/#9 on this same source state; ensure untouched anchors remain.
+          grep -F "GK_PHASE2_PLAUSIBILITY_TOUCH_RIGHT_GOAL:{seed:'SEARCH-1.5-34-23'" step71_hybrid_v06_ui.js
+          grep -F "offset:1.5,gk:40,handling:40,visualStartX:83,gkX:100.5,gkY:34,exactTouchFixture:true,ballStartX:83,ballStartY:35.5" step71_hybrid_v06_ui.js
+          grep -F "phase:'OUT_FOLLOW_THROUGH'" runtime/continuous_match_core.js
+          grep -F "m.visualReplayTime" runtime/continuous_match_core.js
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add runtime/continuous_match_core.js step71_hybrid_v06_ui.js
+          git diff --cached --quiet && { echo 'no gameplay changes'; exit 1; }
+          git commit -m 'Deploy GK visual semantics no-stutter retest (TEST_ONLY)'
+          git push origin HEAD:main
