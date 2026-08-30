@@ -1,0 +1,101 @@
+name: Deploy V34 GK scorer attribution fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/deploy-v34-gk-scorer-attribution.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch, verify, and deploy scorer attribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('runtime/continuous_match_core.js')
+          s=p.read_text()
+
+          old="b.npcGkResolved='TOUCH_CONTINUE';b.gkParryReach=null;b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;"
+          new="b.shotSourcePlayerId=b.lastTouchPlayer;b.npcGkResolved='TOUCH_CONTINUE';b.gkParryReach=null;b.lastTouchTeam=gk.team;b.lastTouchPlayer=gk.id;"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('TOUCH_CONTINUE source anchor missing')
+
+          old="const b=m.ball,scorer=playerById(m,b.lastTouchPlayer),styleMap="
+          new="const b=m.ball,scorer=playerById(m,b.npcGkResolved==='TOUCH_CONTINUE'&&b.shotSourcePlayerId?b.shotSourcePlayerId:b.lastTouchPlayer),styleMap="
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('goalDescription scorer anchor missing')
+
+          old="const team=m.ball.shotTeam,description=goalDescription(m,team,cross);if(m.ball.shotOneVOne)"
+          new="const team=m.ball.shotTeam,description=goalDescription(m,team,cross),goalActorId=m.ball.npcGkResolved==='TOUCH_CONTINUE'&&m.ball.shotSourcePlayerId?m.ball.shotSourcePlayerId:m.ball.lastTouchPlayer;if(m.ball.shotOneVOne)"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('GOAL actor declaration anchor missing')
+
+          old="{actorId:m.ball.lastTouchPlayer,team,crossing:{x:cross.x,y:cross.y}}"
+          new="{actorId:goalActorId,team,crossing:{x:cross.x,y:cross.y}}"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('GOAL actor event anchor missing')
+
+          p.write_text(s)
+          PY
+
+          node --check runtime/continuous_match_core.js
+          node - <<'NODE'
+          const E=require('./runtime/continuous_match_core.js'),B=E.choiceActionBridge();
+          function setup(c){
+            const m=E.createMatch(c.seed,{dt:.05});m.time=100;m.restart=null;m.phase='OPEN_PLAY';m.nextShape=9999;m.events=[];m.score={HOME:0,AWAY:0};m.possession='HOME';m.playerAbilityProfiles={};m.v34TestOnlyVisualFixture=true;
+            const st=m.playersById['H-ST'],gk=m.playersById['A-GK'];
+            for(const p of m.players){p.hasBall=false;p.nextThink=9999;p.vx=p.vy=0;if(p.role!=='GK'){p.x=70;p.y=7;p.tx=70;p.ty=7;}}
+            Object.assign(st,{x:83,y:34,tx:83,ty:34,bodyAngle:0,faceTargetAngle:0,nextThink:9999});
+            Object.assign(gk,{x:100.5,y:c.gkY,tx:100.5,ty:c.gkY,vx:0,vy:0,bodyAngle:Math.PI,action:'GK_SAVE_SET',tacticalTask:'GK_SAVE_SET',nextThink:9999});
+            m.playerAbilityProfiles[gk.id]={reaction:40,gk_positioning:40,diving:40,handling:40};
+            B.setControlled(m,st,true);B.executeShot(m,st,'TOUCH_DEFLECT_FORCED',{releaseNow:true,decisionOrientation:{turningRequired:false,backToGoal:false,facingAlignment:1,bodyAngleDiff:0}});
+            const ty=34+c.offset;Object.assign(m.ball,{kind:'SHOT',mode:'FLIGHT',ownerId:null,x:83,y:ty,z:.08,vx:c.speed,vy:0,vz:0,age:0,originX:83,originY:34,targetX:105,targetY:ty,shotTargetY:ty,shotTeam:'HOME',lastTouchTeam:'HOME',lastTouchPlayer:'H-ST',onTarget:true,shotDistance:c.distance,shotOneVOne:false,shotClearKeeperChance:false,airborne:false,strikeStyle:'POWER',arcProfile:null,npcGkResolved:null});m.lastTouchTeam='HOME';m.lastTouchPlayer='H-ST';return m;
+          }
+          function run(c){
+            const m=setup(c);let touch=null,terminal=null,contactSource=null,contactLastTouch=null,postTerminalTicks=0,maxOutsideX=105;
+            for(let i=0;i<180;i++){
+              E.step(m,.05);maxOutsideX=Math.max(maxOutsideX,Number(m.ball.x)||0);
+              if(!touch){const e=[...m.events].reverse().find(e=>e?.type==='TOUCH_DEFLECT');if(e){touch=e;contactSource=m.ball.shotSourcePlayerId||null;contactLastTouch=m.ball.lastTouchPlayer||null;}}
+              if(!terminal){terminal=[...m.events].reverse().find(e=>e?.type==='GOAL'||e?.type==='CORNER')||null;}
+              if(terminal&&++postTerminalTicks>=20)break;
+            }
+            return{m,touch,terminal,contactSource,contactLastTouch,maxOutsideX};
+          }
+          const left=run({seed:'SEARCH--0.75-34-24',offset:-.75,gkY:34,speed:24,distance:19});
+          const right=run({seed:'SEARCH-1.5-34-23',offset:1.5,gkY:34,speed:23,distance:19});
+          const corner=run({seed:'TOUCH-GOAL-013',offset:2.5,gkY:34.5,speed:23,distance:19});
+          const text=e=>String(e?.text||'');
+          console.log('LEFT',JSON.stringify({source:left.contactSource,lastTouch:left.contactLastTouch,actor:left.terminal?.actorId,text:text(left.terminal),cross:left.terminal?.crossing,score:left.m.score}));
+          console.log('RIGHT',JSON.stringify({source:right.contactSource,lastTouch:right.contactLastTouch,actor:right.terminal?.actorId,text:text(right.terminal),cross:right.terminal?.crossing,score:right.m.score}));
+          console.log('CORNER',JSON.stringify({source:corner.contactSource,lastTouch:corner.contactLastTouch,terminal:corner.terminal?.type,maxOutsideX:corner.maxOutsideX,restart:corner.m.restart?.kind,score:corner.m.score}));
+          const ok=
+            left.touch?.npcGkOutcome==='TOUCH_CONTINUE'&&left.contactSource==='H-ST'&&left.contactLastTouch==='A-GK'&&left.terminal?.type==='GOAL'&&left.terminal?.actorId==='H-ST'&&text(left.terminal).includes('블루팀 ST')&&!text(left.terminal).includes('레드팀 GK')&&text(left.terminal).includes('왼쪽')&&left.terminal?.crossing?.y<33&&
+            right.touch?.npcGkOutcome==='TOUCH_CONTINUE'&&right.contactSource==='H-ST'&&right.contactLastTouch==='A-GK'&&right.terminal?.type==='GOAL'&&right.terminal?.actorId==='H-ST'&&text(right.terminal).includes('블루팀 ST')&&!text(right.terminal).includes('레드팀 GK')&&text(right.terminal).includes('오른쪽')&&right.terminal?.crossing?.y>35&&
+            corner.touch?.npcGkOutcome==='TOUCH_CONTINUE'&&corner.contactSource==='H-ST'&&corner.contactLastTouch==='A-GK'&&corner.terminal?.type==='CORNER'&&corner.m.restart?.kind==='CORNER'&&corner.maxOutsideX>106&&corner.m.score.HOME===0&&corner.m.score.AWAY===0;
+          if(!ok)process.exit(1);
+          NODE
+
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add runtime/continuous_match_core.js
+          git diff --cached --quiet && { echo 'no runtime changes'; exit 1; }
+          git commit -m 'Fix GK touch-goal scorer attribution (TEST_ONLY)'
+          git push origin HEAD:main
