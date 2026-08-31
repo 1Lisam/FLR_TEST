@@ -21,11 +21,7 @@ function passPlan(ctx={}){
   if(kind==='CUTBACK'){
     style='CUTBACK';arrival=clamp(0.54+d/58,0.60,0.92);speed=clamp(d/arrival+quality*0.8,14.2,20.5);loft=0.08;
   }else if(kind==='CROSS'){
-    if(ctx.crossVariant==='DRIVEN_LOW'){
-      style='DRIVEN_LOW_CROSS';arrival=clamp(0.48+d/58,0.64,1.02);speed=clamp(d/arrival+2.0+quality*0.9,18.0,25.8);loft=0.08;
-    }else{
-      style=ctx.sourceX>=94?'BYLINE_HIGH_CROSS':'HIGH_CROSS';arrival=clamp(0.82+d/48,0.95,1.45);speed=clamp(d/arrival+3.6+quality*1.1,18.2,25.2);loft=ctx.sourceX>=94?2.65:3.05;
-    }
+    style=ctx.sourceX>=94?'BYLINE_CROSS':'CROSS';arrival=clamp(0.82+d/48,0.95,1.45);speed=clamp(d/arrival+3.6+quality*1.1,18.2,25.2);loft=ctx.sourceX>=94?2.65:3.05;
   }else if(kind==='THROUGH'){
     if(mode==='AERIAL'){
       style='LOFTED_THROUGH';arrival=clamp(0.95+d/41,1.12,1.72);speed=clamp(d/arrival+3.0+quality,16.0,23.8);loft=1.55;
