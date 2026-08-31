@@ -36,9 +36,9 @@ function apply(m,spec={}){
     }else if(choice==='SHORT_DISTRIBUTION'){
       const op=byId(spec.targetId)||opts.find(o=>['CB','FB','CM'].includes(o.p.role)&&o.block===0&&o.d<32)||opts[0];if(!op)return finish(m,log,false,'NO_SHORT_TARGET');
       player.lastActionAt=m.time;player.lastDecision=choice;B.executePass(m,player,op.p,op.d>30?'LONG_PASS':'PASS',op);log.targetId=op.p.id;
-    }else if(choice==='LONG_DISTRIBUTION'||choice==='LOFTED_DISTRIBUTION'){
+    }else if(choice==='LONG_DISTRIBUTION'){
       const target=B.playerById(m,spec.targetId)||B.teamPlayers(m,player.team).find(p=>p.role==='ST')||B.teamPlayers(m,player.team).find(p=>p.role==='WF');if(!target)return finish(m,log,false,'NO_LONG_TARGET');
-      const op0=byId(target.id)||{p:target,d:B.dist(player,target),block:B.laneBlockers(m,player,target,B.other(player.team)).length,open:B.nearestOppDistance(m,target),forward:B.dir(player.team)*(target.x-player.x),running:false,lead:false,leadForward:0},op=choice==='LOFTED_DISTRIBUTION'?{...op0,forceAerial:true}:choice==='LONG_DISTRIBUTION'?{...op0,forceGround:true}:op0;player.lastActionAt=m.time;player.lastDecision=choice;B.executePass(m,player,target,'LONG_PASS',op);log.targetId=target.id;
+      const op=byId(target.id)||{p:target,d:B.dist(player,target),block:B.laneBlockers(m,player,target,B.other(player.team)).length,open:B.nearestOppDistance(m,target),forward:B.dir(player.team)*(target.x-player.x),running:false,lead:false,leadForward:0};player.lastActionAt=m.time;player.lastDecision=choice;B.executePass(m,player,target,'LONG_PASS',op);log.targetId=target.id;
     }else return finish(m,log,false,'UNSUPPORTED_ON_BALL_CHOICE');
     if(choice!=='CARRY'&&choice!=='DRIBBLE')m.userChoiceControl=null;
     return finish(m,log,true,'APPLIED','ON_BALL');
@@ -51,10 +51,6 @@ function apply(m,spec={}){
       if(roll<chance){B.setControlled(m,player,false);m.stats.turnovers++;m.stats.tacklesWon++;m.transitionUntil=m.time+2.2;player.nextThink=m.time+0.45;B.event(m,'TACKLE',`${player.name}이 사용자 선택 태클로 공을 빼앗았습니다.`);log.result='TACKLE_WON';}
       else if(roll<chance+0.10&&m.time-m.lastFoulAt>8){m.lastFoulAt=m.time;m.stats.fouls++;m.stats.freeKicks++;B.event(m,'FOUL',`${player.name}의 사용자 선택 태클이 파울이 됐습니다.`);B.startDeadRestart(m,'FREE_KICK',owner.team,owner.x,owner.y);log.result='FOUL';}
       else{const n=B.norm(player.x-owner.x,player.y-owner.y);B.setLoose(m,m.ball.x,m.ball.y,-n.x*(2.5+m.r()*2.5),-n.y*(2.5+m.r()*2.5),owner.team,owner.id);m.stats.looseBalls++;B.event(m,'LOOSE',`${player.name}의 태클 경합으로 공이 흘렀습니다.`);log.result='TACKLE_LOOSE';}
-    }else if(choice==='GK_HOLD_POSITION'||choice==='GK_STEP_OUT'){
-      if(player.role!=='GK')return finish(m,log,false,'GK_CHOICE_REQUIRES_GK');
-      m.userGoalkeeperPositionIntent={playerId:player.id,team:player.team,mode:choice==='GK_STEP_OUT'?'STEP_OUT':'HOLD_DEPTH',setAt:m.time,until:m.time+3.20,futureOutcomePrecomputed:false};
-      player.action=choice==='GK_STEP_OUT'?'USER_GK_STEP_OUT_INTENT':'USER_GK_HOLD_INTENT';player.tacticalTask=choice==='GK_STEP_OUT'?'GK_NARROW_ANGLE_INTENT':'GK_HOLD_DEPTH_INTENT';player.sprint=false;player.lockTargetUntil=0;player.nextChallengeAt=m.time+.55;player.pressCommitUntil=0;log.result=choice==='GK_STEP_OUT'?'GK_STEP_OUT_INTENT_ARMED':'GK_HOLD_INTENT_ARMED';
     }else if(choice==='DELAY'){
       const n=B.norm(goal.x-owner.x,goal.y-owner.y),hold=1.65;player.tx=B.clamp(owner.x+n.x*hold,1,104);player.ty=B.clamp(owner.y+n.y*hold,1,67);player.action='USER_DELAY';player.tacticalTask='CONTAIN';player.sprint=false;player.lockTargetUntil=m.time+1.45;player.nextChallengeAt=m.time+1.55;player.duelContainUntil=Math.max(player.duelContainUntil||0,m.time+1.55);player.pressCommitUntil=0;log.result='DELAY_SET';
       // The user's intent is 'delay', not 'delay for 0.7 s and then auto-engage'.
