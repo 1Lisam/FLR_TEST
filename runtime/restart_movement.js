@@ -45,6 +45,7 @@ function setupTiming(kind){
   if(kind==='CORNER')return{min:4.00,max:9.40};
   if(kind==='FREE_KICK')return{min:1.70,max:5.60};
   if(kind==='OFFSIDE')return{min:2.20,max:5.60};
+  if(kind==='PENALTY')return{min:1.60,max:4.40};
   return{min:.90,max:2.60};
 }
 function freshSetup(m){
@@ -106,33 +107,6 @@ function buildCorner(m,setup){
   for(const p of def){const q=defendSlots[p.slot]||[94,34];target(setup,p.id,opponentSlotTarget(team,p,q[0],q[1]),'CORNER_DEFENCE_SETUP',['GK','CB','FB','CM'].includes(p.role),true);}
   return setup;
 }
-function secondLastDefenderLocalX(m,setup,restartTeam,defenders){
-  const xs=[];
-  for(const p of defenders){
-    const t=setup?.targets?.[p.id];
-    const q=t?worldToLocal(restartTeam,t.x,t.y):worldToLocal(restartTeam,p.x,p.y);
-    if(Number.isFinite(q.x))xs.push(q.x);
-  }
-  xs.sort((a,b)=>b-a);
-  return xs.length>=2?xs[1]:(xs[0]??0);
-}
-function keepFreeKickAttackersOnside(m,setup,restartTeam,defenders,ballLocalX){
-  const secondLastX=secondLastDefenderLocalX(m,setup,restartTeam,defenders);
-  // Law 11: a player is not beyond the offside line while level with/behind either
-  // the ball or the second-last opponent.  Keep setup players a small distance behind
-  // that line; their later live run remains governed by the normal offside system.
-  const offsideLineX=Math.max(ballLocalX,secondLastX);
-  const safeX=clamp(offsideLineX-0.80,1,103.2);
-  for(const p of teamPlayers(m,restartTeam)){
-    if(p.id===setup.kickerId||!['ST','WF'].includes(p.role))continue;
-    const t=setup.targets[p.id];if(!t||t.task!=='FREE_KICK_ATTACK_SETUP')continue;
-    const l=worldToLocal(restartTeam,t.x,t.y);
-    if(l.x<=safeX)continue;
-    const w=localToWorld(restartTeam,safeX,l.y);
-    t.x=w.x;t.y=w.y;
-  }
-  setup.freeKickOffsideLine={secondLastX,ballLocalX,offsideLineX,safeX};
-}
 function buildFreeKick(m,setup){
   const r=m.restart,team=r.team,opp=other(team),point={x:r.x,y:r.y},attackers=teamPlayers(m,team),defenders=teamPlayers(m,opp),used=new Set();
   const kicker=nearestForTarget(outfield(m,team),point,'SET_PIECE',used);if(!kicker)return null;used.add(kicker.id);setup.kickerId=kicker.id;const lp0=worldToLocal(team,r.x,r.y),approach=localToWorld(team,Math.max(1,lp0.x-1.45),lp0.y);target(setup,kicker.id,approach,r.kind==='OFFSIDE'?'OFFSIDE_KICKER_READY':'FREE_KICK_KICKER_READY',true,true);setup.restartApproach={start:approach,ball:{x:r.x,y:r.y}};
@@ -159,7 +133,6 @@ function buildFreeKick(m,setup){
       else q=[59,p.slot==='LW'?14:p.slot==='RW'?54:34];
       target(setup,p.id,opponentSlotTarget(team,p,q[0],q[1]),'FREE_KICK_DEFENCE_SETUP',['GK','CB','FB','CM'].includes(p.role),true);
     }
-    keepFreeKickAttackersOnside(m,setup,team,defenders,lp.x);
   }else{
     for(const p of defenders){const dl=worldToLocal(team,p.x,p.y);let holdX=clamp(Math.max(lp.x+10,dl.x),35,82),holdY=p.slot==='LB'?10:p.slot==='RB'?58:p.slot==='LCB'?27:p.slot==='RCB'?41:p.slot==='LCM'?22:p.slot==='RCM'?46:34;
       if(p.role==='ST'){holdX=Math.min(holdX,54);holdY=34;}
@@ -213,11 +186,20 @@ function buildThrowIn(m,setup){
   }
   return setup;
 }
+function buildPenalty(m,setup){
+  const r=m.restart,team=r.team,opp=other(team),attackers=teamPlayers(m,team),defenders=teamPlayers(m,opp),used=new Set();
+  const spot=localToWorld(team,94,34),approach=localToWorld(team,92.9,34);
+  const kicker=nearestForTarget(outfield(m,team),spot,'SET_PIECE',used);if(!kicker)return null;used.add(kicker.id);setup.kickerId=kicker.id;target(setup,kicker.id,approach,'PENALTY_KICKER_READY',true,true);
+  for(const p of attackers){if(p.id===kicker.id)continue;let q;if(p.role==='GK')q=[6.5,34];else if(p.role==='CB'||p.role==='FB')q=[70,p.slot==='LB'?13:p.slot==='RB'?55:p.slot==='LCB'?28:40];else q=[87.0,p.slot==='LW'?22:p.slot==='RW'?46:p.slot==='LCM'?27:p.slot==='RCM'?41:34];target(setup,p.id,localSlotTarget(team,p,q[0],q[1]),'PENALTY_ATTACK_WAIT',p.role!=='GK',true);}
+  for(const p of defenders){let q;if(p.role==='GK')q=[104.1,34];else q=[87.4,p.slot==='LB'?18:p.slot==='RB'?50:p.slot==='LCB'?28:p.slot==='RCB'?40:p.slot==='LW'?22:p.slot==='RW'?46:34];target(setup,p.id,opponentSlotTarget(team,p,q[0],q[1]),p.role==='GK'?'PENALTY_GK_SET':'PENALTY_DEFENCE_WAIT',true,true);}
+  return setup;
+}
 function ensurePlan(m){
   const setup=freshSetup(m);if(!setup)return null;if(Object.keys(setup.targets).length)return setup;
   if(setup.kind==='GOAL_KICK')return buildGoalKick(m,setup);
   if(setup.kind==='CORNER')return buildCorner(m,setup);
   if(setup.kind==='FREE_KICK'||setup.kind==='OFFSIDE')return buildFreeKick(m,setup);
+  if(setup.kind==='PENALTY')return buildPenalty(m,setup);
   if(setup.kind==='THROW_IN')return buildThrowIn(m,setup);
   return setup;
 }
@@ -228,7 +210,7 @@ function readiness(m){
   const kicker=playerById(m,setup.kickerId),kickerTarget=setup.targets[setup.kickerId],kickerReady=!!(kicker&&kickerTarget&&dist(kicker,kickerTarget)<=0.95);
   let facingReady=true;if(setup.kind==='GOAL_KICK'&&kicker&&setup.goalKickPlan?.targetPoint){const a=Math.atan2(setup.goalKickPlan.targetPoint.y-kicker.y,setup.goalKickPlan.targetPoint.x-kicker.x);kicker.faceTargetAngle=a;facingReady=Math.abs(angleDiff(Number.isFinite(kicker.bodyAngle)?kicker.bodyAngle:a,a))<=0.20;}
   let readyN=0,total=0;for(const id of setup.requiredIds){const p=playerById(m,id),t=setup.targets[id];if(!p||!t)continue;total++;if(dist(p,t)<=2.65)readyN++;}
-  const ratio=total?readyN/total:1,forced=m.time>=setup.maxReadyAt,requiredRatio=setup.kind==='CORNER'?0.90:0.72,ready=kickerReady&&facingReady&&((m.time>=setup.minReadyAt&&ratio>=requiredRatio)||forced);setup.readyRatio=ratio;return{ready,ratio,kickerReady,facingReady,forced,requiredRatio,elapsed:m.time-setup.createdAt,minReadyAt:setup.minReadyAt,maxReadyAt:setup.maxReadyAt};
+  const ratio=total?readyN/total:1,forced=m.time>=setup.maxReadyAt,requiredRatio=setup.kind==='CORNER'?0.90:setup.kind==='PENALTY'?0.90:0.72,ready=kickerReady&&facingReady&&((m.time>=setup.minReadyAt&&ratio>=requiredRatio)||forced);setup.readyRatio=ratio;return{ready,ratio,kickerReady,facingReady,forced,requiredRatio,elapsed:m.time-setup.createdAt,minReadyAt:setup.minReadyAt,maxReadyAt:setup.maxReadyAt};
 }
 function isReady(m){return readiness(m).ready;}
 function kickerId(m){const s=ensurePlan(m);return s?.kickerId||null;}
