@@ -1,0 +1,2 @@
+Trigger final V0.4 historical regression after quiet QA notification policy update.
+Candidate branch: historical-closure-v04-candidate
