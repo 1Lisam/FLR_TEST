@@ -1,6 +1,6 @@
 (function(root){'use strict';
 const R=root&&root.FLRPG_RESTART_MOVEMENT;if(!R||R.__v36FreeKickWallModel)return;
-const VERSION='V36-FREE-KICK-WALL-1.2';
+const VERSION='V37-FREE-KICK-WALL-GEOMETRY-ONLY-1.0';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const dist=(a,b)=>Math.hypot(Number(a.x)-Number(b.x),Number(a.y)-Number(b.y));
 const other=t=>t==='HOME'?'AWAY':'HOME';
@@ -61,27 +61,16 @@ function keepAttackersAwayFromWall(m,setup,team,geom,wallWorld){
     if(!nearest||nd>=1.05)continue;let dx=t.x-nearest.x,dy=t.y-nearest.y,n=Math.hypot(dx,dy);if(n<.01){const ball={x:m.restart.x,y:m.restart.y};dx=ball.x-nearest.x;dy=ball.y-nearest.y;n=Math.hypot(dx,dy)||1;}const push=1.08-nd;t.x=clamp(t.x+dx/n*push,1,104);t.y=clamp(t.y+dy/n*push,1,67);t.task=`${t.task||'FREE_KICK_ATTACK_SETUP'}_WALL_CLEARANCE`;
   }
 }
-function extendSetupTiming(setup,count){
-  if(!setup||!Number.isFinite(setup.createdAt))return;const min=count>=4?2.6:count>=2?2.2:1.8,max=count>=4?8.0:count>=2?7.0:5.8;
-  setup.minReadyAt=Math.max(Number(setup.minReadyAt)||0,setup.createdAt+min);setup.maxReadyAt=Math.max(Number(setup.maxReadyAt)||0,setup.createdAt+max);
-}
 function repair(m,setup){
   const r=m?.restart;if(!r||r.kind!=='FREE_KICK'||!setup||!setup.targets)return setup;
-  const team=r.team,defTeam=other(team),lp=worldToLocal(team,r.x,r.y),count=wallCountFor(lp,r),geom=wallGeometry(m,team,count),key=planKey(r,count),wallPlayers=selectWallPlayers(m,defTeam,geom,setup,key),wallIds=new Set(wallPlayers.map(p=>p.id));extendSetupTiming(setup,count);
-  const oldRequired=new Set(setup.requiredIds||[]);setup.requiredIds=[...oldRequired].filter(id=>!m.players.some(p=>p.id===id&&p.team===defTeam));
+  const team=r.team,defTeam=other(team),lp=worldToLocal(team,r.x,r.y),count=wallCountFor(lp,r),geom=wallGeometry(m,team,count),key=planKey(r,count),wallPlayers=selectWallPlayers(m,defTeam,geom,setup,key),wallIds=new Set(wallPlayers.map(p=>p.id));
+  // This wrapper owns legal wall/GK geometry only; the template layer owns all other roles.
+  const oldRequired=new Set(setup.requiredIds||[]);setup.requiredIds=[...oldRequired].filter(id=>!m.players.some(p=>p.id===id&&p.team===defTeam&&wallIds.has(id)));
   const wallWorld=[];wallPlayers.forEach((p,i)=>{const w=localToWorld(team,geom.points[i].x,geom.points[i].y);wallWorld.push(w);setTarget(setup,p.id,w,'FREE_KICK_WALL',true,true);p.markTargetId=null;});
-  for(const p of m.players.filter(p=>p.team===defTeam)){
-    if(wallIds.has(p.id))continue;let w,task='FREE_KICK_DEFENCE_SETUP';
-    if(p.role==='GK'){w=localToWorld(team,geom.gk.x,geom.gk.y);task='FREE_KICK_GK_COMPLEMENT';}
-    else if(p.role==='CB'||p.role==='FB'){const y=p.slot==='LB'?18:p.slot==='RB'?50:p.slot==='LCB'?29:39;w=defendFromAttackLocal(team,p,96,y);task='FREE_KICK_BOX_MARK';}
-    else if(p.role==='CM'){const y=p.slot==='LCM'?23:p.slot==='RCM'?45:34;w=defendFromAttackLocal(team,p,90,y);task='FREE_KICK_SECOND_BALL_DEFENCE';}
-    else if(p.role==='ST'){w=defendFromAttackLocal(team,p,56,34);task='FREE_KICK_COUNTER_OUTLET';}
-    else {const y=p.slot==='LW'?15:p.slot==='RW'?53:34;w=defendFromAttackLocal(team,p,61,y);task='FREE_KICK_WIDE_OUTLET';}
-    setTarget(setup,p.id,w,task,['GK','CB','FB','CM'].includes(p.role),true);p.markTargetId=null;
-  }
+  const gk=m.players.find(p=>p.team===defTeam&&p.role==='GK');if(gk)setTarget(setup,gk.id,localToWorld(team,geom.gk.x,geom.gk.y),'FREE_KICK_GK_COMPLEMENT',true,true);
   keepAttackersAwayFromWall(m,setup,team,geom,wallWorld);
   const gkWorld=localToWorld(team,geom.gk.x,geom.gk.y);setup.freeKickWall={version:VERSION,planKey:key,count,defendingTeam:defTeam,ball:{x:r.x,y:r.y},distanceToGoal:Number(geom.distanceToGoal.toFixed(2)),lateral:Number(geom.lateral.toFixed(2)),wallPlayerIds:[...wallIds],wallPoints:wallWorld.map(w=>({x:Number(w.x.toFixed(3)),y:Number(w.y.toFixed(3))})),gkTarget:{x:Number(gkWorld.x.toFixed(3)),y:Number(gkWorld.y.toFixed(3))},minDistance:9.15,attackerWallClearance:count>=3?1:0,wallReady:false};
-  for(const [id,t] of Object.entries(setup.targets)){const p=m.playersById?.[id]||m.players.find(q=>q.id===id);if(!p)continue;p.tx=t.x;p.ty=t.y;p.action=t.task;p.tacticalTask=t.task;p.sprint=!!t.sprint&&Math.hypot(p.x-t.x,p.y-t.y)>2.4;}
+  for(const [id,t] of Object.entries(setup.targets)){const p=m.playersById?.[id]||m.players.find(q=>q.id===id);if(!p)continue;if(id===setup.kickerId&&r.stage==='APPROACH'){p.tx=r.x;p.ty=r.y;p.action='FREE_KICK_APPROACH';p.tacticalTask='FREE_KICK_APPROACH';p.sprint=false;continue;}p.tx=t.x;p.ty=t.y;p.action=t.task;p.tacticalTask=t.task;p.sprint=!!t.sprint&&Math.hypot(p.x-t.x,p.y-t.y)>2.4;}
   return setup;
 }
 function wallReadyState(m,setup){
@@ -96,4 +85,11 @@ if(baseReadiness)R.readiness=function(m){const out=baseReadiness(m),setup=m?.res
 if(baseIsReady)R.isReady=function(m){return baseReadiness?R.readiness(m).ready:baseIsReady(m);};
 if(debug)R.debugSummary=function(m){const d=debug(m);if(d&&m?.restart?.setup?.freeKickWall)d.freeKickWall=m.restart.setup.freeKickWall;return d;};
 R.FREE_KICK_WALL_VERSION=VERSION;R.__v36FreeKickWallModel=true;
+  function markWallRoles(setup){
+    const roles=setup?.freeKickPlan?.roles;if(!roles)return;
+    for(const id of setup.freeKickWall?.wallPlayerIds||[])roles[id]='WALL';
+  }
+  const wrappedBegin=R.begin,wrappedAssign=R.assign;
+  R.begin=function(m){const out=wrappedBegin(m);markWallRoles(out);return out;};
+  R.assign=function(m){const out=wrappedAssign(m);markWallRoles(m?.restart?.setup);return out;};
 })(typeof globalThis!=='undefined'?globalThis:this);

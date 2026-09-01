@@ -570,6 +570,15 @@ function preferredDefenceRoles(m,team,owner,ball,field,candidates){
   return{press:nearest,cover:candidates.find(c=>c.p.id!==nearest?.id)?.p||null,mode:'GENERIC'};
 }
 
+function cmSecondLineDepth(m,team,ball,p){
+  const cbLine=Math.max(...outfield(m,team).filter(q=>q.role==='CB').map(q=>worldToLocal(team,q.x,q.y).x),18);
+  const roleOffset=p.slot==='CM'?0.35:0;
+  return clamp(Math.max(ball.x+4.8,cbLine+1.6)+roleOffset,ball.x+3.6,34);
+}
+function cmScreenException(p){
+  return ['CUTBACK_TRACK','MARK_LANE_SCREEN','MIDFIELD_LANE_SCREEN','CM_RUNNER_TRACK','VACATED_DEFENDER_COVER'].includes(p.tacticalTask)||!!p.markTargetId;
+}
+
 function assignDefence(m,team,ctx){
   const pr=profile(m,team),ps=teamPlayers(m,team),ball=worldToLocal(team,m.ball.x,m.ball.y),owner=ctx.owner;
   const field=ps.filter(p=>p.role!=='GK');
@@ -714,11 +723,11 @@ function assignDefence(m,team,ctx){
         // Midfield recovery is layered behind the back four: ball-side 8 tracks the cutback lane,
         // pivot protects the central edge, far-side 8 tucks for second balls. They do not stay 8-12m upfield.
         if(p.slot==='CM'){
-          lx=clamp(ball.x+1.6,12.0,24.0);ly=lerp(34,ball.y,0.18);task='BOX_EDGE_SCREEN';
+          lx=cmSecondLineDepth(m,team,ball,p);ly=lerp(34,ball.y,0.18);task='BOX_EDGE_SCREEN';
         }else if(ss){
           lx=clamp(ball.x+2.4,12.5,25.5);ly=lerp(34+sg*7.0,ball.y,0.46);task='CUTBACK_TRACK';
         }else{
-          lx=clamp(ball.x+3.8,14.0,27.0);ly=34+sg*6.0+(ball.y-34)*0.12;task='SECOND_BALL_TUCK';
+          lx=cmSecondLineDepth(m,team,ball,p);ly=34+sg*6.0+(ball.y-34)*0.12;task='SECOND_BALL_TUCK';
         }
         sprint=Math.abs(worldToLocal(team,p.x,p.y).x-lx)>2.4||dist(p,{x:m.ball.x,y:m.ball.y})>7.5;
       }else if(p.slot==='CM'){
@@ -748,7 +757,12 @@ function enforceDefensiveLayering(m,team,owner){
     // because they still own the box line, but do not all collapse on the same ball point.
     const min=ball.x<30?(p.role==='CB'?5.8:6.8):(p.role==='CB'?6.2:7.2);
     if(d<min){if(d<.001){dy=sideSign(p.slot)||1;d=1;}const k=(min-d)/d;tx+=dx*k;ty+=dy*k;}
-    if(p.role==='CM')tx=Math.min(tx,ball.x-1.8);
+    if(p.role==='CM'&&!cmScreenException(p)){
+      // The screen contract is stronger than the generic carrier-ring separation:
+      // do not let a later helper pull every CM back onto the CB line.
+      if(['BOX_EDGE_SCREEN','SECOND_BALL_TUCK','DEEP_SCREEN','PIVOT_SCREEN_DEF'].includes(p.tacticalTask))tx=Math.max(tx,cmSecondLineDepth(m,team,ball,p));
+      else tx=Math.min(tx,ball.x-1.8);
+    }
     secondary.push({p,tx,ty,d:Math.hypot(tx-o.x,ty-o.y)});
   }
   // STEP75 defensive floor: press + cover are the two direct ball responsibilities. At most
@@ -992,6 +1006,59 @@ function preserveHybridEntryContinuity(m){
   }
 }
 
+// Loose-ball authority contract (V37): tactical movement decides which player is
+// eligible to pressure and gives everybody else a connected football responsibility.
+// The core calls this every loose-ball tick and executes only the nominated primary.
+// There is deliberately no outcome/winner selection here: capture and contests remain
+// in continuous_match_core's live physics path.
+function looseBallCandidates(m,team){
+  const rushKeeperId=m.ball.rushBlock?.keeperId,protectedKeeper=!!rushKeeperId&&m.ball.age<(m.ball.rushBlock.recoveryUntil-m.ball.rushBlock.contactAt);
+  return teamPlayers(m,team).filter(p=>{
+    if(protectedKeeper&&p.id===rushKeeperId)return false;
+    if(p.role!=='GK')return true;
+    const b=worldToLocal(team,m.ball.x,m.ball.y);
+    return b.x<18&&Math.abs(b.y-34)<23&&dist(p,m.ball)<11;
+  }).sort((a,b)=>dist(a,m.ball)-dist(b,m.ball)||String(a.id).localeCompare(String(b.id)));
+}
+function looseRoleTarget(m,p){
+  const ball=worldToLocal(p.team,m.ball.x,m.ball.y),pr=profile(m,p.team),side=sideSign(p.slot)||0;
+  if(p.role==='ST')return{lx:clamp(Math.max(56,ball.x-10),56,84),ly:clamp(lerp(34,ball.y,.22),18,50),task:'LOOSE_FORWARD_SCREEN',sprint:false};
+  if(p.role==='CM'){
+    const pivot=p.slot==='CM',gap=pivot?6.2:4.2,sideY=pivot?34:34+side*8.5;
+    return{lx:clamp(ball.x-gap,18,78),ly:clamp(lerp(sideY,ball.y,pivot?0.20:0.38),7,61),task:'LOOSE_SECOND_BALL_LANE',sprint:Math.abs(worldToLocal(p.team,p.x,p.y).x-(ball.x-gap))>5.5};
+  }
+  if(p.role==='FB'||p.role==='CB'){
+    const base=defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role);
+    return{lx:base.x,ly:base.y,task:'LOOSE_LINE_COVER',sprint:Math.abs(worldToLocal(p.team,p.x,p.y).x-base.x)>4.0};
+  }
+  if(p.role==='WF')return{lx:clamp(ball.x-5.5,30,88),ly:clamp(lerp(side?34+side*20:34,ball.y,.28),5,63),task:'LOOSE_RECEIVER_LANE',sprint:false};
+  return{lx:ball.x,ly:ball.y,task:'HOLD_SHAPE',sprint:false};
+}
+function assignLooseBallArbitration(m){
+  if(!m||m.ball?.mode!=='LOOSE')return;
+  const poss=m.possession||m.ball.lastTouchTeam||HOME,ctx={owner:null};
+  // First rebuild ordinary team shape.  The designated responder is applied last,
+  // which makes generic attack/defence assignment unable to silently erase it.
+  assignAttack(m,poss,ctx);separateRecoveringMidfieldFromStriker(m,poss);
+  assignDefence(m,other(poss),ctx);targetSeparation(m);
+  const state=m.looseBallArbitration||(m.looseBallArbitration={epoch:(m._looseBallEpoch||0),startedAt:m.time,teams:{},history:[]});
+  for(const team of [HOME,AWAY]){
+    const candidates=looseBallCandidates(m,team),primary=candidates[0]||null,prior=state.teams?.[team]?.primaryId||null;
+    for(const p of teamPlayers(m,team)){
+      if(primary&&p.id===primary.id)continue;
+      const t=looseRoleTarget(m,p);applyTarget(p,t.lx,t.ly,t.task,t.sprint,m);
+    }
+    if(primary){
+      primary.tx=m.ball.x;primary.ty=m.ball.y;primary.action=primary.role==='GK'?'GK_RUSH':'CHASE_LOOSE';primary.tacticalTask=primary.action;primary.sprint=true;
+      if(primary.role==='ST'&&primary.team!==m.ball.lastTouchTeam&&primary.id===m.ball.shotSourcePlayerId){primary.postShotHoldUntil=0;primary.lockTargetUntil=0;primary.nextThink=m.time;primary.runUntil=0;primary.runType=null;primary.faceTargetAngle=null;}
+    }
+    state.teams[team]={primaryId:primary?.id||null,secondaryId:null,budget:{primary:1,secondary:1,used:primary?1:0},updatedAt:m.time};
+    if(prior!==(primary?.id||null)){
+      const history=state.history||(state.history=[]);history.push({time:Number(m.time.toFixed(3)),team,from:prior,to:primary?.id||null,reason:prior?'NEAREST_REPLACED':'LOOSE_STARTED'});if(history.length>48)history.shift();
+    }
+  }
+}
+
 
 function assign(m){
   if(!m||m.completed)return;
@@ -1009,6 +1076,7 @@ function assign(m){
     m._markLocks={};
     m._lastTacticalPossession=poss;
   }
+  if(m.ball?.mode==='LOOSE'){assignLooseBallArbitration(m);return;}
   const owner=playerById(m,m.ball.ownerId),ctx={owner};
   assignAttack(m,poss,ctx);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);applyAerialFirstBallChallenger(m,defTeam);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);enforceWideLaneHierarchy(m,poss);preserveHybridEntryContinuity(m);
   m.tactical={
@@ -1019,5 +1087,5 @@ function assign(m){
 }
 
 function describe(team,m=null){return{...profile(m,team)};}
-return{assign,describe,PROFILES,FORMATION,phaseFromProgress};
+return{assign,assignLooseBallArbitration,describe,PROFILES,FORMATION,phaseFromProgress};
 });

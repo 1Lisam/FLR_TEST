@@ -170,7 +170,9 @@ function onBallOptions(frame){
   // not erase a physically open support teammate sitting directly behind/lateral to the
   // protagonist. This reads the live pass geometry (not a synthetic target) and exposes at
   // most one extra SAFE_PASS to feet.
-  const rawSupport=(frame?._frame?.opts||[]).filter(o=>o?.p&&o.p.role!=='GK'&&o.block===0&&o.d>=3&&o.d<=28&&o.open>=3.0&&o.forward>=-20&&o.forward<=4)
+  const supportContract=C().safePassSupportViability;
+  const isSupported=o=>!supportContract||supportContract(frame?._frame?.owner,o).ok;
+  const rawSupport=(frame?._frame?.opts||[]).filter(o=>o?.p&&o.p.role!=='GK'&&o.block===0&&o.d>=3&&o.d<=28&&o.open>=3.0&&o.forward>=-20&&o.forward<=4&&isSupported(o))
     .sort((a,b)=>(b.open-a.open)+(a.d-b.d)*.035);
   const support=rawSupport.find(o=>!out.some(x=>x.targetId===o.p.id&&x.family==='패스'));
   if(support){

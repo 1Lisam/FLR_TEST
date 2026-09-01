@@ -1,4 +1,4 @@
 (function(root){'use strict';
-if(!root||root.__FLR_V37_TEST_VISUAL_PATCH__)return;const C=root.CanvasRenderingContext2D?.prototype;if(!C||typeof C.ellipse!=='function')return;const base=C.ellipse;C.ellipse=function(x,y,rx,ry,rotation,startAngle,endAngle,counterclockwise){const ratio=Number(ry)>0?Number(rx)/Number(ry):0;if(Number(rx)>0&&Number(ry)>0&&ratio>2.15&&ratio<2.75&&Number(rx)<=42&&Number(ry)<=24){const r=Math.sqrt(Number(rx)*Number(ry));return base.call(this,x,y,r,r,rotation,startAngle,endAngle,counterclockwise);}return base.call(this,x,y,rx,ry,rotation,startAngle,endAngle,counterclockwise);};root.__FLR_V37_TEST_VISUAL_PATCH__='GK_SAVE_ICON_CIRCLE_0.1';
+if(!root||root.__FLR_V37_TEST_VISUAL_PATCH__)return;root.__FLR_V37_TEST_VISUAL_PATCH__='GK_DIVE_RENDER_NO_OVERRIDE_0.1';
 if(!root.__FLR_V37_INTERACTIVE_DOCK_LOADER__&&root.document){root.__FLR_V37_INTERACTIVE_DOCK_LOADER__=true;const s=document.createElement('script');s.src='final_match_v37_interactive_dock_patch.js';s.async=false;document.body.appendChild(s);}
 })(typeof globalThis!=='undefined'?globalThis:this);
