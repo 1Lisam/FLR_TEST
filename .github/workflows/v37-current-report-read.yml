@@ -1,0 +1,64 @@
+name: V37 Current Report Read
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v37-current-report-read.json'
+
+permissions:
+  contents: read
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Read current V37 reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, urllib.request, urllib.parse
+          base='https://flr-bug-reporter.sikarops.workers.dev'
+          since='2026-09-01T06:00:00Z'
+          url=base+'/report-list?limit=50&since='+urllib.parse.quote(since,safe=':-TZ')
+          with urllib.request.urlopen(url, timeout=30) as r:
+              data=json.load(r)
+          print('REPORT_LIST_COUNT', data.get('count'))
+          print('REPORT_LIST_BEGIN')
+          print(json.dumps(data,ensure_ascii=False,indent=2))
+          print('REPORT_LIST_END')
+          for i,rep in enumerate(data.get('reports',[]),1):
+              out={
+                'index':i,
+                'reportId':rep.get('reportId'),'createdAt':rep.get('createdAt'),'build':rep.get('build'),
+                'category':rep.get('category'),'priority':rep.get('priority'),'description':rep.get('description'),
+                'summary':rep.get('summary'),'hasDebug':rep.get('hasDebug'),'jsonUrl':rep.get('jsonUrl')
+              }
+              if rep.get('jsonUrl'):
+                  try:
+                      with urllib.request.urlopen(rep['jsonUrl'], timeout=30) as rr:
+                          dbg=json.load(rr)
+                      out['debugTopKeys']=list(dbg.keys()) if isinstance(dbg,dict) else None
+                      def slim(v,depth=0):
+                          if depth>2: return '<depth>'
+                          if isinstance(v,dict):
+                              keep={}
+                              for k,val in v.items():
+                                  lk=k.lower()
+                                  if any(t in lk for t in ('seed','scenario','boundary','choice','target','canon','future','hero','ball','score','phase','event','pending','forced','report','match','frame','entry','exit','shot','keeper','gk','cross','corner','free','setpiece','set_piece')):
+                                      keep[k]=slim(val,depth+1)
+                              return keep
+                          if isinstance(v,list):
+                              if len(v)<=20:return [slim(x,depth+1) for x in v]
+                              return [slim(x,depth+1) for x in v[:8]]+['<%d more>'%(len(v)-16)]+[slim(x,depth+1) for x in v[-8:]]
+                          if isinstance(v,str) and len(v)>600:return v[:600]+'<truncated>'
+                          return v
+                      out['debugRelevant']=slim(dbg)
+                  except Exception as e:
+                      out['debugError']=repr(e)
+              print('REPORT_DETAIL_BEGIN',i)
+              print(json.dumps(out,ensure_ascii=False,indent=2))
+              print('REPORT_DETAIL_END',i)
+          PY
