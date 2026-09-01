@@ -1,0 +1,26 @@
+(function(root){'use strict';
+const E=root&&root.FLRPG_CONTINUOUS_CORE;if(!E||E.__v37MatchFeelPatch)return;
+const VERSION='V37-MATCH-FEEL-0.2-GK-LOCK';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const worldToLocal=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
+const localToWorld=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
+const other=t=>t==='HOME'?'AWAY':'HOME';
+const value=(m,p,k)=>{const q=m?.playerAbilityProfiles?.[p?.id];return q&&Number.isFinite(q[k])?q[k]:60};
+function currentShotKeeper(m){const b=m?.ball;if(!b||b.mode!=='FLIGHT'||b.kind!=='SHOT'||!Number.isFinite(b.shotTargetY))return null;const team=other(b.shotTeam||b.lastTouchTeam),gk=(m.players||[]).find(p=>p.team===team&&p.role==='GK');return gk?{b,gk}:null;}
+function reactionDelay(m,gk){return clamp(.235-(value(m,gk,'reaction')-60)*.0015-(value(m,gk,'gk_positioning')-60)*.0005,.165,.310);}
+function createProfile(m,gk,targetY,side){gk.vx=0;gk.vy=0;gk.v37DiveProfile={startedAt:m.time,duration:.58,startX:gk.x,startY:gk.y,targetX:gk.x,targetY,side,maxSpeed:clamp(5.7+(value(m,gk,'diving')-60)*.012+(value(m,gk,'agility')-60)*.008,5.2,6.6),recoverUntil:m.time+.76};}
+function lockedTarget(m,b,gk){const intent=b.v37DiveIntent||{shotTargetY:Number(b.shotTargetY),side:Math.sign(Number(b.shotTargetY)-Number(gk.y))||1},delta=clamp(intent.shotTargetY-gk.y,-.90,.90),side=Math.sign(delta)||intent.side||1,targetY=clamp(gk.y+delta,.8,67.2);return{intent,side,targetY};}
+function prepareLockedDive(m){const shot=currentShotKeeper(m);if(!shot)return;const {b,gk}=shot;if(b.gkRush||b.onTarget===false)return;if(!b.v37DiveIntent){const side=Math.sign(Number(b.shotTargetY)-Number(gk.y))||1;b.v37DiveIntent={version:VERSION,gkId:gk.id,shotTargetY:Number(b.shotTargetY),side,createdAt:m.time};}
+  if(b.gkParryReach||Number(b.age||0)<reactionDelay(m,gk))return;const gap=Math.hypot(Number(b.x)-Number(gk.x),Number(b.y)-Number(gk.y));if(gap>5.0)return;const {intent,side,targetY}=lockedTarget(m,b,gk);
+  b.gkParryReach={startedAt:m.time,startX:gk.x,startY:gk.y,targetX:gk.x,targetY,displacement:Math.abs(targetY-gk.y),approachStartGap:gap,side,v37LockedIntent:true,v37ShotTargetY:intent.shotTargetY};createProfile(m,gk,targetY,side);
+}
+function adoptLateCoreReach(m){const shot=currentShotKeeper(m);if(!shot)return;const {b,gk}=shot,reach=b.gkParryReach;if(!reach||reach.v37LockedIntent)return;if(!b.v37DiveIntent){const side=Math.sign(Number(b.shotTargetY)-Number(gk.y))||1;b.v37DiveIntent={version:VERSION,gkId:gk.id,shotTargetY:Number(b.shotTargetY),side,createdAt:m.time};}
+  const {intent,side,targetY}=lockedTarget(m,b,gk);reach.targetX=gk.x;reach.targetY=targetY;reach.displacement=Math.abs(targetY-gk.y);reach.side=side;reach.v37LockedIntent=true;reach.v37ShotTargetY=intent.shotTargetY;reach.v37AdoptedAfterCore=true;createProfile(m,gk,targetY,side);
+}
+function applyDiveProfile(m){for(const gk of (m.players||[]).filter(p=>p.role==='GK'&&p.v37DiveProfile)){const pr=gk.v37DiveProfile,t=Math.max(0,m.time-pr.startedAt),live=m.ball?.mode==='FLIGHT'&&m.ball?.kind==='SHOT';if(!live||t>=pr.duration){const decay=live?.55:.38;gk.vx*=decay;gk.vy*=decay;if(Math.hypot(gk.vx,gk.vy)<.28){gk.vx=0;gk.vy=0;}if(!live&&m.time>=pr.recoverUntil)delete gk.v37DiveProfile;continue;}const phase=clamp(t/pr.duration,0,1),pulse=Math.sin(Math.PI*phase),dx=pr.targetX-gk.x,dy=pr.targetY-gk.y,d=Math.hypot(dx,dy),nx=d>.03?dx/d:0,ny=d>.03?dy/d:pr.side,targetSpeed=pr.maxSpeed*pulse,blend=.72;gk.vx=gk.vx*(1-blend)+nx*targetSpeed*blend;gk.vy=gk.vy*(1-blend)+ny*targetSpeed*blend;}}
+function antiSkateLooseChasers(m){if(m.ball?.mode!=='LOOSE')return;for(const p of m.players||[]){if(!['CHASE_LOOSE','GK_RUSH'].includes(String(p.tacticalTask||p.action||'')))continue;const dx=(Number(p.tx)||0)-p.x,dy=(Number(p.ty)||0)-p.y,d=Math.hypot(dx,dy),speed=Math.hypot(p.vx||0,p.vy||0);if(d<.01||speed<1.2)continue;const nx=dx/d,ny=dy/d,along=(p.vx||0)*nx+(p.vy||0)*ny,side=-(p.vx||0)*ny+(p.vy||0)*nx;if(along<-.15){p.vx*=.42;p.vy*=.42;continue;}const braking=speed*speed/(2*(p.role==='GK'?7.0:6.4));if(braking>d*.72){const newAlong=along*.64,newSide=side*.48;p.vx=nx*newAlong-ny*newSide;p.vy=ny*newAlong+nx*newSide;}}}
+function constrainPostCrossStriker(m){const c=m.v37RecentCross;if(!c||m.time>=c.until)return;if(m.possession===c.team)return;const st=(m.players||[]).find(p=>p.team===c.team&&p.role==='ST');if(!st)return;const l=worldToLocal(st.team,st.tx,st.ty);if(l.x<58){const q=localToWorld(st.team,58,l.y);st.tx=q.x;st.ty=q.y;}st.sprint=false;const speed=Math.hypot(st.vx||0,st.vy||0);if(speed>4.7){const k=4.7/speed;st.vx*=k;st.vy*=k;}}
+const baseStep=E.step.bind(E);
+E.step=function(m,dt){const beforeCross=m?.ball?.mode==='FLIGHT'&&m.ball.kind==='CROSS'?{team:m.ball.lastTouchTeam}:null;prepareLockedDive(m);applyDiveProfile(m);antiSkateLooseChasers(m);constrainPostCrossStriker(m);const out=baseStep(m,dt);adoptLateCoreReach(m);if(beforeCross&&!(m.ball?.mode==='FLIGHT'&&m.ball.kind==='CROSS'))m.v37RecentCross={team:beforeCross.team,startedAt:m.time,until:m.time+2.8};applyDiveProfile(m);constrainPostCrossStriker(m);return out;};
+E.V37_MATCH_FEEL_VERSION=VERSION;E.__v37MatchFeelPatch=true;
+})(typeof globalThis!=='undefined'?globalThis:this);

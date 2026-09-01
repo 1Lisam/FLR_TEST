@@ -1,22 +1,10 @@
 (function(root){'use strict';
-const H=root&&root.FLRPG_FINAL_MATCH_RARE_SCENARIOS;if(!H||H.__v36PresentationPatched)return;
-const originalRun=H.run.bind(H);
-function cloneFrame(f){return{...f,ball:f?.ball?{...f.ball}:f?.ball,players:Array.isArray(f?.players)?f.players.map(p=>({...p})):f?.players,events:Array.isArray(f?.events)?f.events.map(e=>({...e})):f?.events};}
-function nearestContactPlayer(frame,ball,excludeId){let best=null,bestD=Infinity;for(const p of frame?.players||[]){if(!p||p.role==='GK'||p.id===excludeId)continue;const d=Math.hypot(Number(p.x)-Number(ball.x),Number(p.y)-Number(ball.y));if(d<bestD){bestD=d;best=p;}}return best;}
-function smoothCrossContact(result){if(!result||!['CROSS_LEFT','CROSS_RIGHT'].includes(result.key)||!Array.isArray(result.frames)||result.frames.length<2)return result;
-  const frames=result.frames.map(cloneFrame);let adjusted=false,contactIndex=-1,contactPlayerId=null,contactGap=null;
-  for(let i=1;i<frames.length;i++){
-    const prev=frames[i-1],cur=frames[i];if(prev?.ball?.kind!=='CROSS'||cur?.ball?.kind==='CROSS'||!cur?.ball)continue;
-    let p=null;const changedTouch=cur.ball.lastTouchPlayer&&cur.ball.lastTouchPlayer!==prev.ball.lastTouchPlayer;
-    const pid=cur.ball.ownerId||(changedTouch?cur.ball.lastTouchPlayer:null);if(pid)p=(cur.players||[]).find(x=>x.id===pid)||null;
-    if(!p)p=nearestContactPlayer(cur,prev.ball,prev.ball.lastTouchPlayer);if(!p)break;
-    const actualX=Number(cur.ball.x),actualY=Number(cur.ball.y),targetX=Number(p.x),targetY=Number(p.y),gap=Math.hypot(targetX-actualX,targetY-actualY);contactIndex=i;contactPlayerId=p.id;contactGap=gap;
-    if(!Number.isFinite(gap)||gap<=.78)break;
-    const dx=targetX-actualX,dy=targetY-actualY,span=Math.min(4,frames.length-i);
-    for(let k=0;k<span;k++){const q=frames[i+k];if(!q?.ball)continue;const factor=span<=1?1:Math.max(0,1-k/(span-1));q.ball.x=Number(q.ball.x)+dx*factor;q.ball.y=Number(q.ball.y)+dy*factor;q.presentationOnly={...(q.presentationOnly||{}),crossContactBridge:true,sourceFrameIndex:i,contactPlayerId:p.id};}
-    adjusted=true;break;
-  }
-  return{...result,frames,presentationContact:{applied:adjusted,contactIndex,contactPlayerId,originalGap:Number.isFinite(contactGap)?Number(contactGap.toFixed(3)):null,engineOutcomeUnchanged:true,futureOutcomePrecomputed:false}};
-}
-H.run=function(key,seed,opts){return smoothCrossContact(originalRun(key,seed,opts));};H.__v36PresentationPatched=true;
+const H=root&&root.FLRPG_FINAL_MATCH_RARE_SCENARIOS;if(!H||H.__v37PresentationPatched)return;
+const originalRun=H.run.bind(H),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function cloneFrame(f){return{...f,ball:f?.ball?{...f.ball}:f?.ball,players:Array.isArray(f?.players)?f.players.map(p=>({...p})):f?.players};}
+function inspectCrossContact(result){if(!result||!['CROSS_LEFT','CROSS_RIGHT'].includes(result.key)||!Array.isArray(result.frames)||result.frames.length<2)return result;let contactIndex=-1,contactPlayerId=null,contactGap=null;for(let i=1;i<result.frames.length;i++){const prev=result.frames[i-1],cur=result.frames[i];if(prev?.ball?.kind!=='CROSS'||cur?.ball?.kind==='CROSS'||!cur?.ball)continue;const changedTouch=cur.ball.lastTouchPlayer&&cur.ball.lastTouchPlayer!==prev.ball.lastTouchPlayer,pid=cur.ball.ownerId||(changedTouch?cur.ball.lastTouchPlayer:null),p=pid?(cur.players||[]).find(x=>x.id===pid)||null:null;contactIndex=i;contactPlayerId=p?.id||pid||null;if(p)contactGap=Math.hypot(Number(p.x)-Number(cur.ball.x),Number(p.y)-Number(cur.ball.y));break;}return{...result,presentationContact:{applied:false,policy:'ENGINE_TRAJECTORY_ONLY_V37',contactIndex,contactPlayerId,observedGap:Number.isFinite(contactGap)?Number(contactGap.toFixed(3)):null,engineOutcomeUnchanged:true,futureOutcomePrecomputed:false}};}
+function lockGkDiveAim(result){if(!result||!['GK_SHOT_LONG','GK_SHOT_BOX','GK_SHOT_CLOSE'].includes(result.key)||!Array.isArray(result.frames)||!result.frames.length)return result;const frames=result.frames.map(cloneFrame);let committedSide=0,shotTargetY=null;for(const f of frames){const gk=(f.players||[]).find(p=>p.id==='H-GK'||(p.team==='HOME'&&p.role==='GK'));if(!gk||f?.ball?.kind!=='SHOT')continue;const intent=f.ball.v37DiveIntent,ty=Number.isFinite(intent?.shotTargetY)?Number(intent.shotTargetY):Number.isFinite(f.ball.shotTargetY)?Number(f.ball.shotTargetY):null;if(ty==null)continue;shotTargetY=ty;committedSide=Number(intent?.side)||Math.sign(ty-Number(gk.y))||1;break;}if(!committedSide)return{...result,frames};let applied=0;for(const f of frames){const gk=(f.players||[]).find(p=>p.id==='H-GK'||(p.team==='HOME'&&p.role==='GK')),task=String(gk?.action||gk?.tacticalTask||'');if(!gk||f?.ball?.kind!=='SHOT'||!/GK_(SAVE|RUSH_BLOCK)/.test(task))continue;gk.tx=Number(gk.x);gk.ty=clamp(Number(gk.y)+committedSide*1.0,.8,67.2);f.presentationOnly={...(f.presentationOnly||{}),gkDiveAimCommitted:true};applied++;}return{...result,frames,presentationGkAim:{applied:applied>0,frameCount:applied,shotTargetY,side:committedSide,policy:'INITIAL_SHOT_DIRECTION_ONLY_V37',engineOutcomeUnchanged:true,futureOutcomePrecomputed:false}};}
+function repair(result){return lockGkDiveAim(inspectCrossContact(result));}
+H.run=function(key,seed,opts){return repair(originalRun(key,seed,opts));};
+H.__v37PresentationPatched=true;
 })(typeof globalThis!=='undefined'?globalThis:this);
