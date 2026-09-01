@@ -1,6 +1,0 @@
-{
-  "schemaVersion": "FLR_V37_REPORT_LIST_LIVE_VERIFY_1.0",
-  "requestedAt": "2026-09-01T14:29:30+09:00",
-  "endpoint": "https://flr-bug-reporter.sikarops.workers.dev/report-list?limit=1",
-  "expected": "HTTP 200 + ok:true + reports array"
-}
