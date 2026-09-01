@@ -1,0 +1,33 @@
+name: V37 Report List Live Verify
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.flr/v37-report-list-live-verify.json'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify live report-list endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint='https://flr-bug-reporter.sikarops.workers.dev/report-list?limit=1'
+          code="$(curl --max-time 20 -sS -o /tmp/report-list.json -w '%{http_code}' "$endpoint")"
+          echo "HTTP ${code}"
+          cat /tmp/report-list.json
+          test "$code" = '200'
+          python - <<'PY'
+          import json
+          j=json.load(open('/tmp/report-list.json',encoding='utf-8'))
+          assert j.get('ok') is True, j
+          assert isinstance(j.get('reports'), list), j
+          assert isinstance(j.get('count'), int), j
+          print('PASS LIVE /report-list', j.get('count'))
+          PY
