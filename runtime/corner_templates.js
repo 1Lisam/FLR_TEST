@@ -11,6 +11,8 @@
   const profile=(m,team)=>m.managerProfiles?.[team]||{};
   const attackFamilies=['NEAR_POST_ATTACK','FAR_POST_ATTACK','CENTRAL_CROSS_RUN','SHORT_CORNER','EDGE_SECOND_BALL'];
   const defenceFamilies=['ZONAL_COMPACT','PLAYER_MARKING','HYBRID','NEAR_POST_PROTECT','COUNTER_OUTLET'];
+  const pseudoEdgeX=slot=>slot==='LCM'?82:slot==='RCM'?89:86;
+  const pseudoEdgeY=(slot,top)=>slot==='LCM'?(top?23:45):slot==='RCM'?(top?45:23):34;
   function choose(m,team,names,kind){
     const p=profile(m,team),h=hash(`${m.seed}|${m.restart?.setupStartedAt}|${team}|CORNER|${kind}`),base=h%names.length;
     const scores=names.map((name,i)=>({name,score:(i===base?1:0)+((h>>>((i%4)*7))&31)/1000}));
@@ -47,16 +49,23 @@
     rest.forEach((p,i)=>set(setup,p,world(team,z[i?'rest2':'rest1'].x,z[i?'rest2':'rest1'].y),`CORNER_REST_DEFENCE_${i+1}_HOLD`,`REST_DEFENCE_${i+1}`,false,false));
     // Every remaining attacker keeps a bounded football responsibility.  In
     // particular, unused CB/FB slots must not fall back to the old setup task.
-    for(const p of atk){if(p.role==='GK'||plan.roles[p.id])continue;const al=local(team,p.x,p.y);set(setup,p,world(team,clamp(al.x,62,76),clamp(al.y,10,58)),'CORNER_REST_DEFENCE_SUPPORT','REST_DEFENCE_SUPPORT',false,false);}
+    for(const p of atk){if(p.role==='GK'||plan.roles[p.id])continue;const al=local(team,p.x,p.y);let sx=clamp(al.x,62,76),sy=clamp(al.y,10,58),supportRole='REST_DEFENCE_SUPPORT';
+      // Support is a relational layer, not a synonym for REST_DEFENCE_2. Keep
+      // each unused player on his own channel/depth so the live update can
+      // preserve a usable counter shape.
+      if(p.role==='FB'){sy=p.slot==='LB'?14:54;sx=clamp(al.x,58,72);supportRole=`REST_DEFENCE_${p.slot}_SUPPORT`;}
+      else if(p.role==='CB'){sy=p.slot==='LCB'?26:42;sx=clamp(al.x,60,72);supportRole=`REST_DEFENCE_${p.slot}_SUPPORT`;}
+      else if(p.role==='CM'){sy=p.slot==='LCM'?29:p.slot==='RCM'?39:34;sx=clamp(al.x,64,78);supportRole=`REST_DEFENCE_${p.slot}_SUPPORT`;}
+      set(setup,p,world(team,sx,sy),'CORNER_REST_DEFENCE_SUPPORT',supportRole,false,false);}
     const danger=[near,central,far].filter(Boolean),defUsed=new Set();
     const markerMode=defenceTemplate==='PLAYER_MARKING'||defenceTemplate==='HYBRID';
     danger.slice(0,markerMode?3:1).forEach((a,i)=>{const d=nearest(defs,a,defUsed,['CB','FB','CM']);if(!d)return;const al=local(team,a.x,a.y),my=clamp(al.y+(al.y<34?.65:-.65),8,60);set(setup,d,world(team,markerMode?94:95,my),markerMode?'CORNER_MARK_HOLD':'CORNER_ZONE_HOLD',markerMode?'MARKER':'ZONE',true,false);if(markerMode)d.markTargetId=a.id;});
-    for(const d of defs.filter(p=>!defUsed.has(p.id)&&p.role!=='GK')){let role='ZONE',task='CORNER_ZONE_HOLD',x=94,y=local(team,d.x,d.y).y;if(d.role==='CM'){role='CLEARANCE_EDGE';task='CORNER_CLEARANCE_EDGE_HOLD';x=86;y=34;}if(defenceTemplate==='NEAR_POST_PROTECT'&&Math.abs(y-34)<8){role='NEAR_POST_PROTECT';task='CORNER_NEAR_POST_PROTECT_HOLD';x=96;y=top?29:39;}if(defenceTemplate==='COUNTER_OUTLET'&&d.role==='ST'){role='COUNTER_OUTLET';task='CORNER_COUNTER_OUTLET_HOLD';x=72;y=34;}set(setup,d,world(team,x,y),task,role,false,false);}
+    for(const d of defs.filter(p=>!defUsed.has(p.id)&&p.role!=='GK')){let role='ZONE',task='CORNER_ZONE_HOLD',x=94,y=local(team,d.x,d.y).y;if(d.role==='CM'){role=`CLEARANCE_EDGE_${d.slot||'CM'}`;task='CORNER_CLEARANCE_EDGE_HOLD';x=pseudoEdgeX(d.slot);y=pseudoEdgeY(d.slot,top);}if(defenceTemplate==='NEAR_POST_PROTECT'&&Math.abs(y-34)<8){role='NEAR_POST_PROTECT';task='CORNER_NEAR_POST_PROTECT_HOLD';x=96;y=top?29:39;}if(defenceTemplate==='COUNTER_OUTLET'&&d.role==='ST'){role='COUNTER_OUTLET';task='CORNER_COUNTER_OUTLET_HOLD';x=72;y=34;}set(setup,d,world(team,x,y),task,role,false,false);}
     const gk=defs.find(p=>p.role==='GK');if(gk)set(setup,gk,world(team,98,34),'CORNER_GK_SET','ZONE',true,false);
     plan.roleHistory.push({at:m.time,stage:'SETTLE',roles:{...plan.roles}});return setup;
   }
   function launch(m,setup){const p=setup?.cornerPlan;if(!p||p.launched||m.restart?.kind!=='CORNER')return setup;p.launched=true;p.stage='LAUNCH';p.launchAt=m.time;p.roleHistory.push({at:m.time,stage:'LAUNCH',roles:{...p.roles}});
-    for(const [id,role] of Object.entries(p.roles)){const q=player(m,id),t=setup.targets[id];if(!q||!t||role==='KICKER'||role==='SECOND_BALL_EDGE'||role.startsWith('REST_DEFENCE')||role==='CLEARANCE_EDGE'||role==='COUNTER_OUTLET'||role==='ZONE'||role==='NEAR_POST_PROTECT')continue;t.task=`CORNER_${role}_RUN`;t.sprint=true;q.tx=t.x;q.ty=t.y;q.action=t.task;q.tacticalTask=t.task;q.sprint=true;q.lockTargetUntil=m.time+2.8;}
+    for(const [id,role] of Object.entries(p.roles)){const q=player(m,id),t=setup.targets[id];if(!q||!t||role==='KICKER'||role==='SECOND_BALL_EDGE'||role.startsWith('REST_DEFENCE')||role.startsWith('CLEARANCE_EDGE')||role==='COUNTER_OUTLET'||role==='ZONE'||role==='NEAR_POST_PROTECT')continue;t.task=`CORNER_${role}_RUN`;t.sprint=true;q.tx=t.x;q.ty=t.y;q.action=t.task;q.tacticalTask=t.task;q.sprint=true;q.lockTargetUntil=m.time+2.8;}
     return setup;
   }
   function liveStart(m,r){const p=r?.setup?.cornerPlan;if(!p)return null;return JSON.parse(JSON.stringify(p));}
@@ -66,8 +75,9 @@
     const active=second||p.firstContestAt;for(const [id,role] of Object.entries(p.roles||{})){const q=player(m,id);if(!q)continue;let task=null,x=q.tx,y=q.ty,sprint=false;
       const bl=local(team,ball.x,ball.y);
       if(role==='SECOND_BALL_EDGE'){x=world(team,clamp(bl.x-10,72,88),clamp(bl.y<34?24:44,16,52)).x;y=world(team,clamp(bl.x-10,72,88),clamp(bl.y<34?24:44,16,52)).y;task='CORNER_SECOND_BALL_EDGE';sprint=active;}
-      else if(role.startsWith('REST_DEFENCE')){const yy=role.endsWith('1')?24:44,w=world(team,clamp(bl.x-15,64,76),yy);x=w.x;y=w.y;task=role==='REST_DEFENCE_1'?'CORNER_REST_DEFENCE_1':'CORNER_REST_DEFENCE_2';sprint=false;}
-      else if(role==='CLEARANCE_EDGE'){const w=world(team,clamp(bl.x-7,82,90),clamp(bl.y,20,48));x=w.x;y=w.y;task='CORNER_CLEARANCE_EDGE';sprint=active;}
+      else if(role==='REST_DEFENCE_1'||role==='REST_DEFENCE_2'){const yy=role.endsWith('1')?24:44,w=world(team,clamp(bl.x-15,64,76),yy);x=w.x;y=w.y;task=role==='REST_DEFENCE_1'?'CORNER_REST_DEFENCE_1':'CORNER_REST_DEFENCE_2';sprint=false;}
+      else if(role.startsWith('REST_DEFENCE_')){const slot=role.match(/(LB|RB|LCB|RCB|LCM|RCM|CM)_SUPPORT$/)?.[1],sy=slot==='LB'?14:slot==='RB'?54:slot==='LCB'?26:slot==='RCB'?42:slot==='LCM'?(bl.y<34?25:31):slot==='RCM'?(bl.y<34?37:43):34,w=world(team,clamp(bl.x-(slot?.endsWith('CM')?9:13),60,78),sy);x=w.x;y=w.y;task='CORNER_REST_DEFENCE_SUPPORT';sprint=false;}
+      else if(role.startsWith('CLEARANCE_EDGE')){const slot=role.match(/(LCM|RCM|CM)$/)?.[1],w=world(team,clamp(bl.x-(slot==='LCM'?8:slot==='RCM'?5:7),78,90),slot==='LCM'?(bl.y<34?23:45):slot==='RCM'?(bl.y<34?45:23):34);x=w.x;y=w.y;task='CORNER_CLEARANCE_EDGE';sprint=active;}
       else if(role==='COUNTER_OUTLET'){const w=world(team,68,34);x=w.x;y=w.y;task='CORNER_COUNTER_OUTLET';sprint=false;}
       else if(active&&role==='MARKER'){const w=world(team,clamp(bl.x+1.0,91,99),clamp(bl.y,10,58));x=w.x;y=w.y;task='CORNER_MARK_TRACK';sprint=true;}
       else if(active&&['NEAR_RUNNER','CENTRAL_RUNNER','FAR_RUNNER'].includes(role)){const key=role==='NEAR_RUNNER'?(p.nearSlot==='LW'?'near':'near'):role==='FAR_RUNNER'?'far':'central',zz=key==='near'?(p.nearSlot==='LW'?(bl.y<34?28:40):(bl.y<34?40:28)):key==='far'?(bl.y<34?42:26):34,w=world(team,clamp(bl.x+2,88,99),zz);x=w.x;y=w.y;task=`CORNER_${role}_BALL_RESPONSE`;sprint=true;}

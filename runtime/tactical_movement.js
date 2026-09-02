@@ -629,7 +629,12 @@ function assignDefence(m,team,ctx){
     p.markTargetId=null;
     if(p.role==='GK'){
       let lx=clamp(5.4+ball.x*0.035,5,9.0),ly=lerp(34,ball.y,0.18),task='GK_SET',sprint=false;
-      if(m.ball.mode==='LOOSE'&&ball.x<18&&Math.abs(ball.y-34)<23&&dist(p,m.ball)<11){lx=ball.x;ly=ball.y;task='GK_RUSH';sprint=true;}
+      if(m.ball.mode==='LOOSE'&&ball.x<18&&Math.abs(ball.y-34)<23&&dist(p,m.ball)<11){
+        // A corner claim is a bounded box decision: the keeper may attack the
+        // ball, but never turns a near-post recovery into an uncontrolled run
+        // past the goal mouth. The normal integrator supplies deceleration.
+        lx=clamp(ball.x,5.5,m.setPieceLive?.kind==='CORNER'?12:18);ly=clamp(ball.y,m.setPieceLive?.kind==='CORNER'?24:21,m.setPieceLive?.kind==='CORNER'?44:47);task='GK_RUSH';sprint=true;
+      }
       if(m.ball.mode==='FLIGHT'&&m.ball.kind==='SHOT'){lx=2.5;const sy=worldToLocal(p.team,p.x,m.ball.shotTargetY??34).y;ly=clamp(sy,30.2,37.8);task='GK_SAVE_SET';sprint=true;p.faceTargetAngle=Math.atan2((m.ball.y||34)-p.y,(m.ball.x||52.5)-p.x);}
       applyTarget(p,lx,ly,task,sprint,m);continue;
     }
@@ -745,7 +750,20 @@ function assignDefence(m,team,ctx){
   }
 }
 
+function enforceFullbackChannels(m,team,owner){
+  const ball=worldToLocal(team,m.ball.x,m.ball.y),opp=other(team),wide=teamPlayers(m,opp).filter(p=>p.role==='WF');
+  if(!wide.length||ball.x>78)return;
+  for(const slot of ['LB','RB']){
+    const fb=teamPlayers(m,team).find(p=>p.role==='FB'&&p.slot===slot);if(!fb)continue;
+    const sg=sideSign(slot),threat=wide.filter(p=>sideSign(p.slot)===sg||Math.abs(worldToLocal(team,p.x,p.y).y-(34+sg*25))<10).sort((a,b)=>worldToLocal(team,b.x,b.y).x-worldToLocal(team,a.x,a.y).x)[0];
+    if(!threat)continue;const tl=worldToLocal(team,threat.x,threat.y),fl=worldToLocal(team,fb.x,fb.y),sameThreat=Math.abs(tl.y-(34+sg*25))<13;
+    if(sameThreat&&tl.x>42){const x=clamp(Math.min(Math.max(ball.x+2,fl.x-2),tl.x-1.0),18,72),y=clamp(lerp(34+sg*25,tl.y,.38),8,60);applyTarget(fb,x,y,'FB_CHANNEL_HOLD',Math.abs(fl.x-x)>3,m);fb.markTargetId=threat.id;}
+    else if(!sameThreat&&ball.x<52){const x=clamp(ball.x-3,18,60),y=34+sg*18;applyTarget(fb,x,y,'FB_WEAK_SIDE_TUCK',Math.abs(fl.x-x)>3,m);fb.markTargetId=null;}
+  }
+}
+
 function enforceDefensiveLayering(m,team,owner){
+  enforceFullbackChannels(m,team,owner);
   if(!owner||owner.team===team||m.ball.mode!=='CONTROLLED')return;
   const ball=worldToLocal(team,m.ball.x,m.ball.y);if(ball.x>=48)return;
   const lock=m._defenceRoleLocks?.[team]||{},primary=new Set([lock.pressId,lock.coverId].filter(Boolean)),o=worldToLocal(team,owner.x,owner.y);
