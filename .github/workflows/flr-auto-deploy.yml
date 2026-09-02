@@ -29,65 +29,104 @@ jobs:
         with:
           ref: automation/tt-deploy
           path: _incoming
-          fetch-depth: 1
+          fetch-depth: 0
 
-      - name: Validate deploy metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f _incoming/.flr/deploy.json
-          python - <<'PY'
-          import json, pathlib, subprocess
-          m=json.loads(pathlib.Path('_incoming/.flr/deploy.json').read_text(encoding='utf-8'))
-          head=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
-          if head != m['baseCommit']:
-              raise SystemExit(f"BASE_COMMIT_MISMATCH expected={m['baseCommit']} actual={head}")
-          if m.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
-              raise SystemExit('VALIDATION_STATUS_NOT_PASS')
-          if m.get('step79Started') is not False:
-              raise SystemExit('STEP79_MUST_REMAIN_FALSE')
-          if not m.get('changedFiles'):
-              raise SystemExit('CHANGED_FILES_EMPTY')
-          if not m.get('patchSha256') and not m.get('assembledFiles'):
-              raise SystemExit('NO_DEPLOY_PAYLOAD')
-          pathlib.Path('/tmp/flr_deploy.json').write_text(json.dumps(m), encoding='utf-8')
-          print(f"Validated {m['fromBuild']} -> {m['toBuild']}")
-          PY
-
-      - name: Apply validated payload
+      - name: Validate V40 cross-repo deploy contract
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import hashlib, json, pathlib, subprocess
-          m=json.load(open('/tmp/flr_deploy.json'))
-          if m.get('patchSha256'):
-              parts=sorted(pathlib.Path('_incoming/.flr').glob('incoming.patch.part*'))
-              if not parts:
-                  raise SystemExit('PATCH_PARTS_MISSING')
-              data=b''.join(p.read_bytes() for p in parts)
-              actual=hashlib.sha256(data).hexdigest()
-              if actual != m['patchSha256']:
-                  raise SystemExit(f"PATCH_SHA_MISMATCH expected={m['patchSha256']} actual={actual}")
-              patch=pathlib.Path('/tmp/incoming.patch')
-              patch.write_bytes(data)
-              subprocess.check_call(['git','apply','--check',str(patch)])
-              subprocess.check_call(['git','apply',str(patch)])
-          for spec in m.get('assembledFiles', []):
-              dest=pathlib.Path(spec['path'])
-              parts=[pathlib.Path('_incoming')/x for x in spec['parts']]
-              missing=[str(p) for p in parts if not p.is_file()]
-              if missing:
-                  raise SystemExit('ASSEMBLED_PART_MISSING:'+','.join(missing))
-              data=b''.join(p.read_bytes() for p in parts)
-              actual=hashlib.sha256(data).hexdigest()
-              if actual != spec['sha256']:
-                  raise SystemExit(f"ASSEMBLED_SHA_MISMATCH path={dest} expected={spec['sha256']} actual={actual}")
-              dest.parent.mkdir(parents=True, exist_ok=True)
-              dest.write_bytes(data)
-              print(f"Assembled {dest} bytes={len(data)} sha256={actual}")
+          incoming=pathlib.Path('_incoming'); m=json.loads((incoming/'.flr/deploy.json').read_text(encoding='utf-8'))
+          def safe_path(raw):
+              p=pathlib.PurePosixPath(raw)
+              if not raw or p.is_absolute() or any(part in ('', '.', '..') for part in p.parts) or '\\' in raw: raise SystemExit('UNSAFE_PAYLOAD_PATH:'+str(raw))
+              return p
+          if m.get('schemaVersion')!='V40_CROSS_REPO_DEPLOY_1.0' or m.get('mode')!='cross-repo': raise SystemExit('CROSS_REPO_SCHEMA_REQUIRED')
+          head=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+          if head != m.get('targetBaseSHA') or head != m.get('baseCommit',m.get('targetBaseSHA')): raise SystemExit(f"TARGET_BASE_SHA_MISMATCH expected={m.get('targetBaseSHA')} actual={head}")
+          for k in ('sourceRepo','sourceSHA','targetRepo','targetBaseSHA','payloadManifestSha256'):
+              if not m.get(k): raise SystemExit('DEPLOY_FIELD_MISSING:'+k)
+          if m['sourceRepo']==m['targetRepo']: raise SystemExit('SOURCE_TARGET_REPO_MUST_DIFFER')
+          files=m.get('payloadManifest',{}).get('files',[])
+          if not files: raise SystemExit('PAYLOAD_MANIFEST_EMPTY')
+          canon=lambda xs: sorted(({k:x[k] for k in ('path','sha256','bytes')} for x in xs),key=lambda x:x['path'])
+          msha=lambda xs: hashlib.sha256(json.dumps(canon(xs),separators=(',',':')).encode()).hexdigest()
+          if msha(files)!=m['payloadManifestSha256']: raise SystemExit('PAYLOAD_MANIFEST_SHA_INVALID')
+          if len(files)!=len({x['path'] for x in files}): raise SystemExit('PAYLOAD_MANIFEST_DUPLICATE_PATH')
+          expected=set(x['path'] for x in files)
+          for spec in files:
+              safe_path(spec['path'])
+              p=incoming/spec['path']
+              if not p.is_file(): raise SystemExit('PAYLOAD_FILE_MISSING:'+spec['path'])
+              data=p.read_bytes()
+              if len(data)!=spec['bytes'] or hashlib.sha256(data).hexdigest()!=spec['sha256']: raise SystemExit('PAYLOAD_FILE_HASH_MISMATCH:'+spec['path'])
+          changed=set(m.get('changedFiles',[]))
+          if not changed or not changed <= expected: raise SystemExit('CHANGED_FILES_NOT_PAYLOAD_SUBSET')
+          for raw in changed: safe_path(raw)
+          for raw in m.get('removedFiles', []): safe_path(raw)
+          if changed & set(m.get('removedFiles', [])): raise SystemExit('INVALID_REMOVED_FILES')
+          actual=set(subprocess.check_output(['git','-C',str(incoming),'diff','--name-only',m['targetBaseSHA'],'--'],text=True).splitlines())
+          extra=actual-(changed|{'.flr/deploy.json'})
+          if extra: raise SystemExit('EXTRA_CHANGED_FILES:'+','.join(sorted(extra)))
+          if changed-actual: raise SystemExit('CHANGED_FILE_NOT_IN_BRANCH:'+','.join(sorted(changed-actual)))
+          if m.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
+              raise SystemExit('VALIDATION_STATUS_NOT_PASS')
+          if m.get('step79Started') is not False:
+              raise SystemExit('STEP79_MUST_REMAIN_FALSE')
+          pathlib.Path('/tmp/flr_deploy.json').write_text(json.dumps(m), encoding='utf-8')
+          print('Validated cross-repo payload',m['sourceRepo'],m['sourceSHA'],'->',m['targetRepo'],head)
           PY
-          rm -rf _incoming
+
+      - name: Apply validated payload to main checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, pathlib, shutil
+
+          incoming=pathlib.Path('_incoming').resolve()
+          target=pathlib.Path('.').resolve()
+          m=json.loads(pathlib.Path('/tmp/flr_deploy.json').read_text(encoding='utf-8'))
+          manifest={x['path']:x for x in m['payloadManifest']['files']}
+
+          def safe_path(raw):
+              p=pathlib.PurePosixPath(raw)
+              if not raw or p.is_absolute() or any(part in ('', '.', '..') for part in p.parts) or '\\' in raw:
+                  raise SystemExit('UNSAFE_PAYLOAD_PATH:'+str(raw))
+              return pathlib.Path(*p.parts)
+
+          changed=m.get('changedFiles', [])
+          if len(changed) != len(set(changed)):
+              raise SystemExit('DUPLICATE_CHANGED_FILE')
+          if any(p not in manifest for p in changed):
+              raise SystemExit('CHANGED_FILE_NOT_IN_VALIDATED_MANIFEST')
+          removed=m.get('removedFiles', [])
+          if len(removed) != len(set(removed)) or set(changed) & set(removed):
+              raise SystemExit('INVALID_REMOVED_FILES')
+
+          for raw in changed:
+              rel=safe_path(raw)
+              src=incoming / rel
+              dst=target / rel
+              spec=manifest[raw]
+              if not src.is_file():
+                  raise SystemExit('PAYLOAD_FILE_MISSING:'+raw)
+              data=src.read_bytes()
+              if len(data) != spec['bytes'] or hashlib.sha256(data).hexdigest() != spec['sha256']:
+                  raise SystemExit('PAYLOAD_FILE_HASH_MISMATCH:'+raw)
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(src, dst)
+
+          for raw in removed:
+              rel=safe_path(raw)
+              dst=target / rel
+              if dst.exists():
+                  if not dst.is_file():
+                      raise SystemExit('REMOVED_PATH_NOT_FILE:'+raw)
+                  dst.unlink()
+          print('Applied validated payload files:', len(changed), 'removed:', len(removed))
+          PY
 
       - name: Syntax check changed JavaScript
         shell: bash
@@ -108,6 +147,41 @@ jobs:
               fi
             fi
           done < /tmp/flr_changed_files
+
+      - name: Verify applied payload before commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, pathlib
+
+          target=pathlib.Path('.').resolve()
+          m=json.loads(pathlib.Path('/tmp/flr_deploy.json').read_text(encoding='utf-8'))
+          manifest={x['path']:x for x in m['payloadManifest']['files']}
+          changed=m.get('changedFiles', [])
+          if len(changed) != len(set(changed)) or any(p not in manifest for p in changed):
+              raise SystemExit('CHANGED_FILE_MANIFEST_SET_INVALID')
+          for raw in changed:
+              if raw not in manifest:
+                  raise SystemExit('CHANGED_FILE_NOT_IN_VALIDATED_MANIFEST:'+raw)
+              rel=pathlib.PurePosixPath(raw)
+              if rel.is_absolute() or any(part in ('', '.', '..') for part in rel.parts) or '\\' in raw:
+                  raise SystemExit('UNSAFE_PAYLOAD_PATH:'+raw)
+              p=target / pathlib.Path(*rel.parts)
+              if not p.is_file():
+                  raise SystemExit('APPLIED_FILE_MISSING:'+raw)
+              data=p.read_bytes(); spec=manifest[raw]
+              if len(data) != spec['bytes'] or hashlib.sha256(data).hexdigest() != spec['sha256']:
+                  raise SystemExit('APPLIED_FILE_HASH_MISMATCH:'+raw)
+          for raw in m.get('removedFiles', []):
+              rel=pathlib.PurePosixPath(raw)
+              if rel.is_absolute() or any(part in ('', '.', '..') for part in rel.parts) or '\\' in raw:
+                  raise SystemExit('UNSAFE_PAYLOAD_PATH:'+raw)
+              p=target / pathlib.Path(*rel.parts)
+              if p.exists():
+                  raise SystemExit('REMOVED_FILE_STILL_PRESENT:'+raw)
+          print('Verified applied payload bytes:', len(changed))
+          PY
 
       - name: Commit TT build to main
         shell: bash

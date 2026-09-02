@@ -208,6 +208,15 @@ function ensurePlan(m){
 }
 function begin(m){const setup=ensurePlan(m);if(setup)applyTargets(m,setup);return setup;}
 function assign(m){const setup=ensurePlan(m);if(!setup)return false;return applyTargets(m,setup);}
+// P0 coordinate guard: forced release is not an escape hatch for an
+// impossible CORNER/FREE_KICK/OFFSIDE assignment. Other restart families use
+// different tactical slot semantics and are intentionally not classified here.
+function hasWrongEndRequiredTarget(m,setup){
+  if(!setup||!['CORNER','FREE_KICK','OFFSIDE'].includes(setup.kind))return false;
+  const restartTeam=setup.team,defTeam=other(restartTeam),restartGoal={x:restartTeam===HOME?0:105,y:34},defGoal={x:defTeam===HOME?0:105,y:34};
+  for(const id of setup.requiredIds){const p=playerById(m,id),t=setup.targets[id];if(!p||!t)continue;const own=dist(t,p.team===restartTeam?restartGoal:defGoal),otherGoal=dist(t,p.team===restartTeam?defGoal:restartGoal);if(own>otherGoal)return true;}
+  return false;
+}
 function readiness(m){
   const r=m.restart,setup=ensurePlan(m);if(!r||!setup)return{ready:false,ratio:0,kickerReady:false,forced:false};
   const kicker=playerById(m,setup.kickerId),kickerTarget=setup.targets[setup.kickerId];
@@ -216,7 +225,7 @@ function readiness(m){
   const kickerReady=!!(kicker&&(approachToBall?dist(kicker,{x:r.x,y:r.y})<=0.95:(kickerTarget&&dist(kicker,kickerTarget)<=0.95)));
   let facingReady=true;if(setup.kind==='GOAL_KICK'&&kicker&&setup.goalKickPlan?.targetPoint){const a=Math.atan2(setup.goalKickPlan.targetPoint.y-kicker.y,setup.goalKickPlan.targetPoint.x-kicker.x);kicker.faceTargetAngle=a;facingReady=Math.abs(angleDiff(Number.isFinite(kicker.bodyAngle)?kicker.bodyAngle:a,a))<=0.20;}
   let readyN=0,total=0;for(const id of setup.requiredIds){const p=playerById(m,id),t=setup.targets[id];if(!p||!t)continue;total++;if(dist(p,t)<=2.65)readyN++;}
-  const ratio=total?readyN/total:1,forced=m.time>=setup.maxReadyAt,requiredRatio=setup.kind==='CORNER'?0.90:setup.kind==='PENALTY'?0.90:0.72,ready=kickerReady&&facingReady&&((m.time>=setup.minReadyAt&&ratio>=requiredRatio)||forced);setup.readyRatio=ratio;return{ready,ratio,kickerReady,facingReady,forced,requiredRatio,stage:r.stage||'SETUP',kickerPosition:kicker?{x:Number(kicker.x.toFixed(3)),y:Number(kicker.y.toFixed(3))}:null,kickerTarget:kickerTarget?{x:Number(kickerTarget.x.toFixed(3)),y:Number(kickerTarget.y.toFixed(3))}:null,kickerDistance:kicker?(approachToBall?dist(kicker,{x:r.x,y:r.y}):kickerTarget?dist(kicker,kickerTarget):null):null,elapsed:m.time-setup.createdAt,minReadyAt:setup.minReadyAt,maxReadyAt:setup.maxReadyAt};
+  const ratio=total?readyN/total:1,forced=m.time>=setup.maxReadyAt,wrongEndRequiredTarget=hasWrongEndRequiredTarget(m,setup),requiredRatio=setup.kind==='CORNER'?0.90:setup.kind==='PENALTY'?0.90:0.72,ready=kickerReady&&facingReady&&!wrongEndRequiredTarget&&((m.time>=setup.minReadyAt&&ratio>=requiredRatio)||forced);setup.readyRatio=ratio;return{ready,ratio,kickerReady,facingReady,forced,wrongEndRequiredTarget,requiredRatio,stage:r.stage||'SETUP',kickerPosition:kicker?{x:Number(kicker.x.toFixed(3)),y:Number(kicker.y.toFixed(3))}:null,kickerTarget:kickerTarget?{x:Number(kickerTarget.x.toFixed(3)),y:Number(kickerTarget.y.toFixed(3))}:null,kickerDistance:kicker?(approachToBall?dist(kicker,{x:r.x,y:r.y}):kickerTarget?dist(kicker,kickerTarget):null):null,elapsed:m.time-setup.createdAt,minReadyAt:setup.minReadyAt,maxReadyAt:setup.maxReadyAt};
 }
 function isReady(m){return readiness(m).ready;}
 function kickerId(m){const s=ensurePlan(m);return s?.kickerId||null;}
@@ -252,5 +261,5 @@ function updateGoalKickFlight(m){
   gp.applied=true;return true;
 }
 function debugSummary(m){const s=ensurePlan(m),rd=readiness(m);return s?{version:VERSION,kind:s.kind,team:s.team,kickerId:s.kickerId,targetCount:Object.keys(s.targets).length,requiredCount:s.requiredIds.length,readyRatio:Number(rd.ratio.toFixed(3)),kickerReady:rd.kickerReady,ready:rd.ready,forced:rd.forced}:null;}
-return{VERSION,begin,assign,isReady,readiness,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,debugSummary};
+return{VERSION,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,debugSummary};
 });
