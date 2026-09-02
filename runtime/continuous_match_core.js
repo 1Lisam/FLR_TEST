@@ -1344,6 +1344,13 @@ function executePass(m,owner,target,kind,option=null,actionReason=null){
   const olx=worldToLocal(owner.team,owner.x,owner.y).x,tlx=worldToLocal(owner.team,target.x,target.y).x;const backwardFinalThird=!!option?.flowRecycle&&olx>80&&tlx>=66&&dir(owner.team)*(target.x-owner.x)<-4&&['PASS','LONG_PASS'].includes(kind)&&m.time-(m.lastRecycleAt?.[owner.team]??-99)>5.5;
   if(backwardFinalThird)startRecyclePhase(m,owner.team,owner,target);
   setBallFlight(m,{source:owner,target,kind,speed,loft,targetPoint:tp,deliveryMode,style:passStyle,groundDragK});
+  // Establish defending channel responsibility in the same transition as the
+  // cross so the first user-visible FLIGHT frame is causally complete.
+  if(kind==='CROSS'&&owner.role==='WF'){
+    const defTeam=other(owner.team),threatL=worldToLocal(defTeam,owner.x,owner.y),side=threatL.y<34?'LB':'RB';
+    const fb=teamPlayers(m,defTeam).find(p=>p.role==='FB'&&p.slot===side);
+    if(fb){const naturalY=side==='LB'?9:59,tx=clamp(threatL.x-2.6,8,68),ty=clamp(naturalY+(threatL.y-naturalY)*.74,5,63),w=localToWorld(defTeam,tx,ty);fb.tx=w.x;fb.ty=w.y;fb.action=fb.tacticalTask='CROSS_CHANNEL_OWNER';fb.markTargetId=owner.id;fb.targetId=owner.id;fb.sprint=Math.hypot(fb.x-w.x,fb.y-w.y)>2.4;}
+  }
   // STEP76: a forward pass creates a short complementary run for the passer. The source does
   // not collapse onto the receiver/ball lane immediately after release; it attacks a different
   // channel for the next tempo. This is current-state movement only and precomputes no outcome.

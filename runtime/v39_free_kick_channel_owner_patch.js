@@ -1,26 +1,41 @@
 (function(root){'use strict';
 const R=root&&root.FLRPG_RESTART_MOVEMENT;if(!R||R.__v39FreeKickChannelOwner)return;
-const VERSION='V39-FREE-KICK-CHANNEL-OWNER-0.1';
+const VERSION='V39-FREE-KICK-CHANNEL-OWNER-0.2';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const world=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
 const local=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
 const player=(m,id)=>m.playersById?.[id]||m.players.find(p=>p.id===id)||null;
 const opposite=t=>t==='HOME'?'AWAY':'HOME';
+const dist=(a,b)=>Math.hypot((a?.x||0)-(b?.x||0),(a?.y||0)-(b?.y||0));
 function samePhysicalChannel(a,b){return (Number(a?.y)<34)===(Number(b?.y)<34);}
 function assignTracker(m,setup,attacker,fb){
   const plan=setup.freeKickPlan,defs=m.players.filter(p=>p.team===opposite(m.restart.team)&&p.role!=='GK');
   const previous=defs.find(d=>d.id!==fb.id&&d.markTargetId===attacker.id);
   if(previous){
-    previous.markTargetId=null;
+    previous.markTargetId=null;previous.targetId=null;
     if(plan.roles?.[previous.id]==='TRACK_RUNNER')plan.roles[previous.id]='LINE_ZONE';
     const pt=setup.targets?.[previous.id];if(pt){pt.task='FREE_KICK_LINE_HOLD';pt.sprint=false;}
   }
-  fb.markTargetId=attacker.id;plan.roles[fb.id]='TRACK_RUNNER';
+  fb.markTargetId=attacker.id;fb.targetId=attacker.id;plan.roles[fb.id]='TRACK_RUNNER';
   const at=setup.targets?.[attacker.id],al=at?local(m.restart.team,at.x,at.y):local(m.restart.team,attacker.x,attacker.y);
   const markX=clamp(al.x+1.3,82,99),markY=clamp(al.y+(al.y<34?.55:-.55),7,61),w=world(m.restart.team,markX,markY);
   setup.targets[fb.id]={...(setup.targets[fb.id]||{}),x:w.x,y:w.y,task:'FREE_KICK_TRACK_RUNNER_HOLD',required:true,sprint:false};
-  fb.tx=w.x;fb.ty=w.y;fb.action='FREE_KICK_TRACK_RUNNER_HOLD';fb.tacticalTask='FREE_KICK_TRACK_RUNNER_HOLD';
+  fb.tx=w.x;fb.ty=w.y;fb.action='FREE_KICK_TRACK_RUNNER_HOLD';fb.tacticalTask='FREE_KICK_TRACK_RUNNER_HOLD';fb.sprint=dist(fb,w)>2.4;
 }
+function assignCentralOwner(m,setup,attacker,defender){
+  const plan=setup.freeKickPlan,team=m.restart.team,al=local(team,attacker.x,attacker.y),w=world(team,clamp(al.x+1.8,84,99),clamp(al.y,20,48));
+  defender.markTargetId=attacker.id;defender.targetId=attacker.id;plan.roles[defender.id]='TRACK_CENTRAL_FORWARD';
+  setup.targets[defender.id]={...(setup.targets[defender.id]||{}),x:w.x,y:w.y,task:'FREE_KICK_CENTRAL_FORWARD_HOLD',required:true,sprint:false};
+  defender.tx=w.x;defender.ty=w.y;defender.action='FREE_KICK_CENTRAL_FORWARD_HOLD';defender.tacticalTask='FREE_KICK_CENTRAL_FORWARD_HOLD';defender.sprint=dist(defender,w)>2.4;
+  plan.v39CentralForwardOwner={attackerId:attacker.id,defenderId:defender.id};
+}
+function ensureCentralOwner(m,setup){
+  const r=m.restart,plan=setup.freeKickPlan,attackTeam=r.team,defTeam=opposite(attackTeam),st=m.players.find(p=>p.team===attackTeam&&p.role==='ST'&&p.id!==setup.kickerId);if(!st)return;
+  const sl=local(attackTeam,st.x,st.y);if(sl.x<80)return;
+  const defs=m.players.filter(p=>p.team===defTeam&&p.role!=='GK'),existing=defs.find(d=>d.markTargetId===st.id||d.targetId===st.id);if(existing){plan.v39CentralForwardOwner={attackerId:st.id,defenderId:existing.id};return;}
+  const candidates=defs.filter(d=>!d.markTargetId&&!d.targetId).map(d=>({d,score:(d.role==='CB'?0:d.role==='FB'?3:d.role==='CM'?5:9)+dist(d,st)})).sort((a,b)=>a.score-b.score);const q=candidates[0]?.d;if(q)assignCentralOwner(m,setup,st,q);
+}
+function rememberContinuation(m,setup){const r=m.restart,plan=setup.freeKickPlan,attackTeam=r.team,defTeam=opposite(attackTeam),pairs={};for(const d of m.players.filter(p=>p.team===defTeam&&p.role!=='GK')){const a=d.markTargetId||d.targetId;if(a&&player(m,a)?.team===attackTeam)pairs[a]=d.id;}/* Setup begins before the kick; retain the ownership contract long enough to cover the kick, first contest, and second-ball transition. */m._v39FreeKickContinuation={attackTeam,defTeam,pairs,startedAt:m.time,until:m.time+10.0,central:plan.v39CentralForwardOwner||null};}
 function reconcile(m,setup){
   const r=m?.restart,plan=setup?.freeKickPlan;if(!r||r.kind!=='FREE_KICK'||!plan)return setup;
   const attackTeam=r.team,defTeam=opposite(attackTeam),fbs=m.players.filter(p=>p.team===defTeam&&p.role==='FB');
@@ -32,7 +47,7 @@ function reconcile(m,setup){
     const currentAligned=current&&samePhysicalChannel(current,a)&&Math.abs(current.y-a.y)<=18;
     if(!currentAligned)assignTracker(m,setup,a,physical);
   }
-  plan.v39PhysicalChannelOwner=VERSION;return setup;
+  ensureCentralOwner(m,setup);rememberContinuation(m,setup);plan.v39PhysicalChannelOwner=VERSION;return setup;
 }
 const begin=R.begin.bind(R),assign=R.assign.bind(R),debug=R.debugSummary?.bind(R);
 R.begin=function(m){const out=begin(m);reconcile(m,out);return out;};
