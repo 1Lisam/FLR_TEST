@@ -1,19 +1,19 @@
 {
-  "schemaVersion":"V40_HUMAN_CALIBRATION_1.0",
+  "schemaVersion":"V40_HUMAN_CALIBRATION_1.1",
   "maxCases":12,
-  "userFacingRule":"Show only case order and renderable scenario; expected judgment is stored separately.",
+  "userFacingRule":"Show only case order and renderable scenario; expected judgment and evaluation category are stored separately.",
   "cases":[
-    {"id":"HC-01","category":"obvious catastrophic fault","scenario":"ST_BREAKAWAY","seed":"FINAL-MATCH-TEST-95","renderable":true},
-    {"id":"HC-02","category":"obvious catastrophic fault","scenario":"CORNER_ATTACK_RIGHT","seed":"FINAL-MATCH-TEST-13","renderable":true},
-    {"id":"HC-03","category":"obvious catastrophic fault","scenario":"GK_SHOT_CLOSE","seed":"FINAL-MATCH-TEST-135","renderable":true},
-    {"id":"HC-04","category":"subtle football plausibility","scenario":"CROSS_LEFT","seed":"FINAL-MATCH-TEST-77","renderable":true},
-    {"id":"HC-05","category":"subtle football plausibility","scenario":"FREE_KICK_ATTACK_LEFT","seed":"FINAL-MATCH-TEST-21","renderable":true},
-    {"id":"HC-06","category":"subtle football plausibility","scenario":"CORNER_ATTACK_LEFT","seed":"FINAL-MATCH-TEST-4","renderable":true},
-    {"id":"HC-07","category":"legitimate rare variation","scenario":"ST_BREAKAWAY","seed":"FINAL-MATCH-TEST-98","renderable":true},
-    {"id":"HC-08","category":"legitimate rare variation","scenario":"FREE_KICK_DEFEND_RIGHT","seed":"FINAL-MATCH-TEST-27","renderable":true},
-    {"id":"HC-09","category":"legitimate rare variation","scenario":"CORNER_DEFEND_LEFT","seed":"FINAL-MATCH-TEST-15","renderable":true},
-    {"id":"HC-10","category":"presentation/continuity","scenario":"ST_BREAKAWAY","seed":"FINAL-MATCH-TEST-95","renderable":true},
-    {"id":"HC-11","category":"presentation/continuity","scenario":"GK_SHOT_BOX","seed":"FINAL-MATCH-TEST-135","renderable":true},
-    {"id":"HC-12","category":"presentation/continuity","scenario":"CORNER_ATTACK_RIGHT","seed":"FINAL-MATCH-TEST-8","renderable":true}
+    {"id":"HC-01","scenario":"ST_BREAKAWAY","seed":"FINAL-MATCH-TEST-95","renderable":true},
+    {"id":"HC-02","scenario":"CORNER_ATTACK_RIGHT","seed":"FINAL-MATCH-TEST-13","renderable":true},
+    {"id":"HC-03","scenario":"GK_SHOT_CLOSE","seed":"FINAL-MATCH-TEST-135","renderable":true},
+    {"id":"HC-04","scenario":"CROSS_LEFT","seed":"FINAL-MATCH-TEST-77","renderable":true},
+    {"id":"HC-05","scenario":"FREE_KICK_ATTACK_LEFT","seed":"FINAL-MATCH-TEST-21","renderable":true},
+    {"id":"HC-06","scenario":"CORNER_ATTACK_LEFT","seed":"FINAL-MATCH-TEST-4","renderable":true},
+    {"id":"HC-07","scenario":"ST_BREAKAWAY","seed":"FINAL-MATCH-TEST-98","renderable":true},
+    {"id":"HC-08","scenario":"FREE_KICK_DEFEND_RIGHT","seed":"FINAL-MATCH-TEST-27","renderable":true},
+    {"id":"HC-09","scenario":"CORNER_DEFEND_LEFT","seed":"FINAL-MATCH-TEST-15","renderable":true},
+    {"id":"HC-10","scenario":"ST_BREAKAWAY","seed":"FINAL-MATCH-TEST-95","renderable":true},
+    {"id":"HC-11","scenario":"GK_SHOT_BOX","seed":"FINAL-MATCH-TEST-135","renderable":true},
+    {"id":"HC-12","scenario":"CORNER_ATTACK_RIGHT","seed":"FINAL-MATCH-TEST-8","renderable":true}
   ]
 }
