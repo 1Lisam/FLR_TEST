@@ -6,8 +6,16 @@ const world=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
 const local=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
 const player=(m,id)=>m.playersById?.[id]||m.players.find(p=>p.id===id)||null;
 const opposite=t=>t==='HOME'?'AWAY':'HOME';
+// FB runner tracking and central-forward ownership follow the attacker's
+// restart-frame target. The assigned defender does not select the X frame.
 const dist=(a,b)=>Math.hypot((a?.x||0)-(b?.x||0),(a?.y||0)-(b?.y||0));
-function samePhysicalChannel(a,b){return (Number(a?.y)<34)===(Number(b?.y)<34);}
+function samePhysicalChannel(team,a,b){
+  // Both players must be compared in the restart team's local frame. Comparing
+  // raw world-y made an AWAY defender on the opposite physical half look like
+  // the matching HOME winger, causing mirrored LB/RB ownership crossings.
+  const ay=local(team,a.x,a.y).y,by=local(team,b.x,b.y).y;
+  return (ay<34)===(by<34);
+}
 function assignTracker(m,setup,attacker,fb){
   const plan=setup.freeKickPlan,defs=m.players.filter(p=>p.team===opposite(m.restart.team)&&p.role!=='GK');
   const previous=defs.find(d=>d.id!==fb.id&&d.markTargetId===attacker.id);
@@ -41,13 +49,15 @@ function reconcile(m,setup){
   const attackTeam=r.team,defTeam=opposite(attackTeam),fbs=m.players.filter(p=>p.team===defTeam&&p.role==='FB');
   const runners=Object.entries(plan.roles||{}).map(([id,role])=>({p:player(m,id),role})).filter(x=>x.p&&x.p.role==='WF'&&/^(PRIMARY|SECONDARY|DECOY)_RUNNER$/.test(x.role));
   for(const {p:a} of runners){
-    const physical=[...fbs].filter(f=>samePhysicalChannel(f,a)).sort((x,y)=>Math.abs(x.y-a.y)-Math.abs(y.y-a.y))[0];
+    const physical=[...fbs].filter(f=>samePhysicalChannel(attackTeam,a,f)).sort((x,y)=>Math.abs(local(attackTeam,x.x,x.y).y-local(attackTeam,a.x,a.y).y)-Math.abs(local(attackTeam,y.x,y.y).y-local(attackTeam,a.x,a.y).y))[0];
     if(!physical)continue;
     const current=m.players.find(d=>d.team===defTeam&&d.markTargetId===a.id)||null;
-    const currentAligned=current&&samePhysicalChannel(current,a)&&Math.abs(current.y-a.y)<=18;
+    const currentAligned=current&&samePhysicalChannel(attackTeam,a,current)&&Math.abs(local(attackTeam,current.x,current.y).y-local(attackTeam,a.x,a.y).y)<=18;
     if(!currentAligned)assignTracker(m,setup,a,physical);
   }
-  ensureCentralOwner(m,setup);rememberContinuation(m,setup);plan.v39PhysicalChannelOwner=VERSION;return setup;
+  ensureCentralOwner(m,setup);rememberContinuation(m,setup);
+  for(const [id,role] of Object.entries(plan.roles||{})){const p=player(m,id);if(p&&/REST_DEFENCE|LINE_ZONE|TRACK_RUNNER|TRACK_CENTRAL_FORWARD|SECOND_BALL_DEFENCE|COUNTER_OUTLET/.test(role))p.responsibilityReason='FREE_KICK_EXPLICIT_COVERAGE_HANDOFF';}
+  plan.v39PhysicalChannelOwner=VERSION;return setup;
 }
 const begin=R.begin.bind(R),assign=R.assign.bind(R),debug=R.debugSummary?.bind(R);
 R.begin=function(m){const out=begin(m);reconcile(m,out);return out;};

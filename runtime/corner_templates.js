@@ -21,6 +21,11 @@
   const defenceFamilies=['ZONAL_COMPACT','PLAYER_MARKING','HYBRID','NEAR_POST_PROTECT','COUNTER_OUTLET'];
   const pseudoEdgeX=slot=>slot==='LCM'?82:slot==='RCM'?89:86;
   const pseudoEdgeY=slot=>slot==='LCM'?23:slot==='RCM'?45:34;
+  // Zonal corner responsibility is lane-based, not a single box point.  The
+  // slot lanes keep unmarked defenders from inheriting one another's target;
+  // their small gaps are meaningful (near/central/far coverage), not cosmetic
+  // spacing.  Marker assignments still take precedence over these lanes.
+  const zoneLaneY=slot=>({LB:24,LCB:29,RCB:39,RB:44,LW:19,RW:49,ST:34}[slot]??34);
   function choose(m,team,names,kind){
     const p=profile(m,team),h=hash(`${m.seed}|${m.restart?.setupStartedAt}|${team}|CORNER|${kind}`),base=h%names.length;
     const scores=names.map((name,i)=>({name,score:(i===base?1:0)+((h>>>((i%4)*7))&31)/1000}));
@@ -31,7 +36,9 @@
     return scores.sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))[0].name;
   }
   function set(setup,p,w,task,role,required=false,sprint=false){
-    if(!p)return;const t=setup.targets[p.id]||(setup.targets[p.id]={});t.x=clamp(w.x,1,104);t.y=clamp(w.y,1,67);t.task=task;t.required=!!required;t.sprint=!!sprint;
+    // The kicker's outside-field origin is authored by restart_movement and
+    // must remain authoritative throughout the corner overlay build.
+    if(!p||p.id===setup.kickerId)return;const t=setup.targets[p.id]||(setup.targets[p.id]={});t.x=clamp(w.x,1,104);t.y=clamp(w.y,1,67);t.task=task;t.required=!!required;t.sprint=!!sprint;
     if(required&&!setup.requiredIds.includes(p.id))setup.requiredIds.push(p.id);setup.cornerPlan.roles[p.id]=role;
   }
   function nearest(ps,point,used,roles){const q=ps.filter(p=>!used.has(p.id)&&(!roles||roles.includes(p.role))).map(p=>({p,d:Math.hypot(p.x-point.x,p.y-point.y)})).sort((a,b)=>a.d-b.d)[0]?.p;if(q)used.add(q.id);return q;}
@@ -42,8 +49,8 @@
     const plan=setup.cornerPlan={version:VERSION,attackTemplate,defenceTemplate,localCornerY:lp.y,nearSlot,farSlot,stage:'SETTLE',launched:false,firstContestAt:null,secondPhaseAt:null,roles:{},roleHistory:[]};
     const atk=m.players.filter(p=>p.team===team),defs=m.players.filter(p=>p.team===def),used=new Set([setup.kickerId]);
     const kicker=player(m,setup.kickerId);if(kicker)plan.roles[kicker.id]='KICKER';
-    const near=player(m,team==='HOME'?`H-${nearSlot}`:`A-${nearSlot}`)||nearest(atk,{x:r.x,y:r.y},used,['WF']);if(near)used.add(near.id);
-    const far=player(m,team==='HOME'?`H-${farSlot}`:`A-${farSlot}`)||nearest(atk,{x:r.x,y:r.y},used,['WF']);if(far)used.add(far.id);
+    const nearCandidate=player(m,team==='HOME'?`H-${nearSlot}`:`A-${nearSlot}`);const near=nearCandidate&&nearCandidate.id!==setup.kickerId?nearCandidate:nearest(atk.filter(p=>p.id!==setup.kickerId),{x:r.x,y:r.y},used,['WF']);if(near)used.add(near.id);
+    const farCandidate=player(m,team==='HOME'?`H-${farSlot}`:`A-${farSlot}`);const far=farCandidate&&farCandidate.id!==setup.kickerId?farCandidate:nearest(atk.filter(p=>p.id!==setup.kickerId),{x:r.x,y:r.y},used,['WF']);if(far)used.add(far.id);
     const st=atk.find(p=>p.role==='ST'&&p.id!==setup.kickerId)||nearest(atk,{x:r.x,y:r.y},used,['ST','WF','CM']);if(st)used.add(st.id);
     const central=st||nearest(atk,{x:r.x,y:r.y},used,['CM']);if(central)used.add(central.id);
     const edge=nearest(atk,{x:r.x,y:r.y},used,['CM']);
@@ -68,7 +75,7 @@
     const danger=[near,central,far].filter(Boolean),defUsed=new Set();
     const markerMode=defenceTemplate==='PLAYER_MARKING'||defenceTemplate==='HYBRID';
     danger.slice(0,markerMode?3:1).forEach((a,i)=>{const d=nearest(defs,a,defUsed,['CB','FB','CM']);if(!d)return;const al=local(team,a.x,a.y),my=clamp(al.y+(al.y<34?.65:-.65),8,60);set(setup,d,restartFrameWorld(team,markerMode?94:95,my),markerMode?'CORNER_MARK_HOLD':'CORNER_ZONE_HOLD',markerMode?'MARKER':'ZONE',true,false);if(markerMode)d.markTargetId=a.id;});
-    for(const d of defs.filter(p=>!defUsed.has(p.id)&&p.role!=='GK')){let role='ZONE',task='CORNER_ZONE_HOLD',x=94,y=local(team,r.x,r.y).y;if(d.role==='CM'){role=`CLEARANCE_EDGE_${d.slot||'CM'}`;task='CORNER_CLEARANCE_EDGE_HOLD';x=pseudoEdgeX(d.slot);y=pseudoEdgeY(d.slot);}if(defenceTemplate==='NEAR_POST_PROTECT'&&Math.abs(y-34)<8){role='NEAR_POST_PROTECT';task='CORNER_NEAR_POST_PROTECT_HOLD';x=96;y=top?29:39;}if(defenceTemplate==='COUNTER_OUTLET'&&d.role==='ST'){role='COUNTER_OUTLET';task='CORNER_COUNTER_OUTLET_HOLD';x=72;y=34;set(setup,d,defenderFrameWorld(def,x,y),task,role,false,false);continue;}const target=d.role==='CM'?restartXDefenderY(team,def,x,y):restartFrameWorld(team,x,y);set(setup,d,target,task,role,false,false);}
+    for(const d of defs.filter(p=>!defUsed.has(p.id)&&p.role!=='GK')){let role='ZONE',task='CORNER_ZONE_HOLD',x=94,y=zoneLaneY(d.slot);if(d.role==='CM'){role=`CLEARANCE_EDGE_${d.slot||'CM'}`;task='CORNER_CLEARANCE_EDGE_HOLD';x=pseudoEdgeX(d.slot);y=pseudoEdgeY(d.slot);}if(defenceTemplate==='NEAR_POST_PROTECT'&&Math.abs(y-34)<8){role='NEAR_POST_PROTECT';task='CORNER_NEAR_POST_PROTECT_HOLD';x=96;y=top?29:39;}if(defenceTemplate==='COUNTER_OUTLET'&&d.role==='ST'){role='COUNTER_OUTLET';task='CORNER_COUNTER_OUTLET_HOLD';x=72;y=34;set(setup,d,defenderFrameWorld(def,x,y),task,role,false,false);continue;}const target=d.role==='CM'?restartXDefenderY(team,def,x,y):restartFrameWorld(team,x,y);set(setup,d,target,task,role,false,false);}
     const gk=defs.find(p=>p.role==='GK');if(gk)set(setup,gk,restartFrameWorld(team,98,34),'CORNER_GK_SET','ZONE',true,false);
     plan.roleHistory.push({at:m.time,stage:'SETTLE',roles:{...plan.roles}});return setup;
   }

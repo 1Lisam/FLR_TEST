@@ -16,7 +16,8 @@ function assignCounterLink(setup,p){const w=world(p.team,62,34),taskName='CORNER
 function ensureDefendingForwardLayer(m,setup,defTeam){const plan=setup.cornerPlan,defs=m.players.filter(p=>p.team===defTeam&&p.role!=='GK'),st=defs.find(p=>p.role==='ST'&&!p.markTargetId&&!p.targetId);if(!st)return;const role=plan.roles[st.id]||'';if(!['','ZONE','NEAR_POST_PROTECT'].includes(role))return;const outlets=defs.filter(p=>/COUNTER_OUTLET/.test(plan.roles[p.id]||''));if(outlets.length>=2)assignCounterLink(setup,st);else assignOutlet(m,setup,st,34);}
 function reconcileSetup(m,setup){const r=m?.restart,plan=setup?.cornerPlan;if(!r||r.kind!=='CORNER'||!plan)return setup;const defTeam=other(r.team),defs=m.players.filter(p=>p.team===defTeam&&p.role!=='GK');
   plan.v39MarkerOwners=plan.v39MarkerOwners||{};
-  for(const [id,role] of Object.entries(plan.roles||{})){if(role!=='MARKER')continue;const p=player(m,id);if(p?.markTargetId)plan.v39MarkerOwners[id]=p.markTargetId;}
+  const markerOwners=new Map();
+  for(const [id,role] of Object.entries(plan.roles||{})){if(role!=='MARKER')continue;const p=player(m,id);if(!p?.markTargetId)continue;const prior=markerOwners.get(p.markTargetId);if(prior){p.markTargetId=null;p.targetId=null;plan.roles[p.id]=`CLEARANCE_EDGE_${p.slot||'CM'}`;if(setup.targets[p.id]){setup.targets[p.id].task='CORNER_CLEARANCE_EDGE_HOLD';setup.targets[p.id].sprint=false;}continue;}markerOwners.set(p.markTargetId,p.id);plan.v39MarkerOwners[id]=p.markTargetId;}
   const protect=Object.entries(plan.roles||{}).filter(([,role])=>role==='NEAR_POST_PROTECT').map(([id])=>player(m,id)).filter(Boolean);
   if(protect.length>1){const keeper=protect.find(p=>!['ST','WF'].includes(p.role))||protect[0];for(const p of protect){if(p.id===keeper.id)continue;assignOutlet(m,setup,p,localChannelY(p.team,p));}}
   const zonePlayers=defs.filter(p=>(plan.roles[p.id]||'')==='ZONE');
@@ -27,6 +28,32 @@ function reconcileSetup(m,setup){const r=m?.restart,plan=setup?.cornerPlan;if(!r
 function restDefenceCandidates(m,sp){const team=sp.team,plan=sp.cornerPlan;return m.players.filter(p=>p.team===team&&p.role!=='GK'&&/^REST_DEFENCE/.test(plan.roles?.[p.id]||'')).map(p=>({p,l:local(team,p.x,p.y)}));}
 function ensureWideCounterOwnership(m,sp){const team=sp.team,opp=other(team),plan=sp.cornerPlan;if(!plan)return;const live=String(m.ball?.mode||'').toUpperCase()!=='DEAD';const threats=m.players.filter(p=>p.team===opp&&p.role==='WF'&&/COUNTER_OUTLET|LOOSE_RECEIVER|WIDE_OUTLET|RECEIVER_LANE/.test(`${plan.roles?.[p.id]||''} ${task(p)}`)).filter(p=>{const al=local(team,p.x,p.y);return live&&Math.abs(al.y-34)>=12;});if(!threats.length)return;const candidates=restDefenceCandidates(m,sp),used=new Set();plan.v39WideOutletOwners=plan.v39WideOutletOwners||{};
   for(const a of threats){const existing=m.players.find(d=>d.team===team&&d.role!=='GK'&&(d.markTargetId===a.id||d.targetId===a.id));if(existing){used.add(existing.id);plan.v39WideOutletOwners[a.id]=existing.id;continue;}const al=local(team,a.x,a.y),desired=al.y<34?'LB':'RB';let rows=candidates.filter(x=>!used.has(x.p.id)).map(x=>({x,score:(x.p.slot===desired?0:4)+Math.abs(x.l.y-al.y)*.18+Math.abs(x.l.x-al.x)*.06})).sort((u,v)=>u.score-v.score);if(!rows.length)continue;const q=rows[0].x.p;used.add(q.id);const tx=clamp(al.x-3.2,50,88),ty=clamp(al.y+(al.y<34?1.0:-1.0),5,63),w=world(team,tx,ty);q.tx=w.x;q.ty=w.y;q.action='CORNER_WIDE_OUTLET_OWNER';q.tacticalTask='CORNER_WIDE_OUTLET_OWNER';q.markTargetId=a.id;q.targetId=a.id;q.sprint=dist(q,a)>9.5;plan.v39WideOutletOwners[a.id]=q.id;
+  }
+}
+function ensureLiveWideReceiverOwnership(m,sp){
+  const plan=sp?.cornerPlan;if(!plan||String(m.ball?.mode||'').toUpperCase()==='DEAD')return;
+  const attackTeam=sp.team,defTeam=other(attackTeam),wide=(m.players||[]).filter(p=>p.team===attackTeam&&p.role==='WF'&&/LOOSE_RECEIVER|RECEIVER_LANE|WIDE_OUTLET/.test(task(p)));
+  if(!wide.length)return;const used=new Set();plan.v39LiveWideOwners=plan.v39LiveWideOwners||{};
+  for(const a of wide){
+    const owners=(m.players||[]).filter(d=>d.team===defTeam&&d.role!=='GK'&&(d.markTargetId===a.id||d.targetId===a.id)).sort((x,y)=>(x.role==='FB'?0:x.role==='CB'?1:2)-(y.role==='FB'?0:y.role==='CB'?1:2));
+    if(owners.length){
+      const existing=owners[0];used.add(existing.id);plan.v39LiveWideOwners[a.id]=existing.id;
+      for(const extra of owners.slice(1)){extra.markTargetId=null;extra.targetId=null;if(extra.role==='CM'){extra.action=extra.tacticalTask='CORNER_CLEARANCE_EDGE';}}
+      plan.roles[existing.id]='LIVE_WIDE_OWNER';
+      continue;
+    }
+    const al=local(attackTeam,a.x,a.y),candidates=(m.players||[]).filter(d=>d.team===defTeam&&d.role!=='GK'&&!used.has(d.id)&&!d.markTargetId&&!d.targetId).map(d=>{
+      const dl=local(attackTeam,d.x,d.y),channel=(al.y<34)===(dl.y<34),roleBias=d.role==='FB'?0:d.role==='CB'?1.5:3.0;
+      return{d,score:dist(d,a)+roleBias+(channel?0:5)+Math.abs(dl.y-al.y)*.12};
+    }).sort((x,y)=>x.score-y.score);
+    const q=candidates[0]?.d;if(!q)continue;used.add(q.id);
+    const w=world(defTeam,Math.max(4,Math.min(96,al.x+1.2)),Math.max(5,Math.min(63,al.y+(al.y<34?.45:-.45))));
+    q.tx=w.x;q.ty=w.y;q.action=q.tacticalTask='CORNER_LIVE_WIDE_OWNER';q.markTargetId=a.id;q.targetId=a.id;q.sprint=dist(q,w)>2.4;plan.roles[q.id]='LIVE_WIDE_OWNER';
+    plan.v39LiveWideOwners[a.id]=q.id;
+  }
+  for(const [id,role] of Object.entries(plan.roles||{}))if(role==='LIVE_WIDE_OWNER'){
+    const q=player(m,id),aid=plan.v39LiveWideOwners&&Object.keys(plan.v39LiveWideOwners).find(x=>plan.v39LiveWideOwners[x]===id),a=aid&&player(m,aid);if(!q||!a)continue;
+    const al=local(attackTeam,a.x,a.y),w=world(defTeam,Math.max(4,Math.min(96,al.x+1.2)),Math.max(5,Math.min(63,al.y+(al.y<34?.45:-.45))));q.tx=w.x;q.ty=w.y;q.action=q.tacticalTask='CORNER_LIVE_WIDE_OWNER';q.markTargetId=a.id;q.targetId=a.id;q.sprint=dist(q,w)>2.4;
   }
 }
 const begin=R.begin.bind(R),assign=R.assign.bind(R),live=R.cornerLiveUpdate?.bind(R),debug=R.debugSummary?.bind(R);
@@ -44,7 +71,7 @@ if(live)R.cornerLiveUpdate=function(m,sp){const ok=live(m,sp),plan=sp?.cornerPla
       const w=world(q.team,62,34);q.tx=w.x;q.ty=w.y;q.action='CORNER_COUNTER_LINK_SUPPORT';q.tacticalTask='CORNER_COUNTER_LINK_SUPPORT';q.sprint=Math.hypot(q.x-w.x,q.y-w.y)>2.8;
     }
   }
-  ensureWideCounterOwnership(m,sp);return ok;};
+  ensureWideCounterOwnership(m,sp);ensureLiveWideReceiverOwnership(m,sp);return ok;};
 if(debug)R.debugSummary=function(m){const d=debug(m);if(d&&m.restart?.setup?.cornerPlan)d.cornerPlan=m.restart.setup.cornerPlan;return d;};
 R.V39_CORNER_RESPONSIBILITY_VERSION=VERSION;R.__v39CornerResponsibility=true;
 })(typeof globalThis!=='undefined'?globalThis:this);
