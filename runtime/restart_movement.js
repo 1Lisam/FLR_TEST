@@ -71,6 +71,17 @@ function applyTargets(m,setup){
   setup.lastAssignedAt=m.time;return true;
 }
 function localSlotTarget(team,p,lx,ly){return localToWorld(team,clamp(lx,1,104),clamp(ly,1,67));}
+// A counter outlet is a transition shape, not a single shared waypoint.
+// Preserve a central forward release while giving wide, midfield, and centre-
+// back outlets their own plausible recovery/escape channels.  Callers retain
+// the semantic task name; this only supplies restart-relative geometry.
+function counterOutletTarget(team,p,side='CENTER'){
+  const left=side==='LEFT',right=side==='RIGHT';
+  if(!left&&!right)return localToWorld(team,68,34);
+  const y=left?{WF:14,FB:11,CB:22,CM:26}:{WF:54,FB:57,CB:46,CM:42};
+  const x={WF:70,FB:67,CB:64,CM:66}[p?.role]??68;
+  return localToWorld(team,x,y[p?.role]??(left?18:50));
+}
 function opponentSlotTarget(restartTeam,p,restartLocalX,ownLocalY){
   const ownLocalX=clamp(105-restartLocalX,1,104);
   return localToWorld(p.team,ownLocalX,clamp(ownLocalY,1,67));
@@ -279,5 +290,5 @@ function cornerKickerOutsideStart(m){
   const l=worldToLocal(s.team,p.x,p.y),cornerTop=worldToLocal(s.team,r.x,r.y).y<34;
   return l.x>105&&((cornerTop&&l.y<0)||(!cornerTop&&l.y>68));
 }
-return{VERSION,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,cornerKickerOutsideStart,debugSummary};
+return{VERSION,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,cornerKickerOutsideStart,counterOutletTarget,debugSummary};
 });
