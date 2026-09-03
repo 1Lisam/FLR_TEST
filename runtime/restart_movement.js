@@ -30,7 +30,11 @@ function roleCost(role,kind){
   return map[kind]?.[role]??1.5;
 }
 function setWorldTarget(p,w,task,sprint=false){
-  const throwerOutside=task==='THROW_IN_THROWER',cornerOutside=task==='CORNER_KICKER_RUNUP_START';
+  // A corner kicker has a two-part pre-contact path: the authored start is
+  // outside both boundary lines, then CORNER_RUN_UP moves toward the live
+  // dead ball.  Keep that task outside-capable so the later target overwrite
+  // cannot silently apply ordinary in-field clamping.
+  const throwerOutside=task==='THROW_IN_THROWER',cornerOutside=['CORNER_KICKER_RUNUP_START','CORNER_RUN_UP'].includes(task);
   p.tx=clamp(w.x,cornerOutside?-1.2:throwerOutside?0.5:1,cornerOutside?106.2:throwerOutside?104.5:104);
   p.ty=cornerOutside?clamp(w.y,-1.2,69.2):throwerOutside?clamp(w.y,-1.2,69.2):clamp(w.y,1,67);
   p.action=task;p.tacticalTask=task;p.sprint=!!sprint;if(!String(task).startsWith('FREE_KICK_TRACK_RUNNER'))p.markTargetId=null;
@@ -57,7 +61,7 @@ function freshSetup(m){
   return r.setup;
 }
 function target(setup,id,w,task,required=true,sprint=true){
-  if(!id||!w)return;const throwerOutside=task==='THROW_IN_THROWER',cornerOutside=task==='CORNER_KICKER_RUNUP_START';
+  if(!id||!w)return;const throwerOutside=task==='THROW_IN_THROWER',cornerOutside=['CORNER_KICKER_RUNUP_START','CORNER_RUN_UP'].includes(task);
   setup.targets[id]={x:clamp(w.x,cornerOutside?-1.2:throwerOutside?0.5:1,cornerOutside?106.2:throwerOutside?104.5:104),y:cornerOutside?clamp(w.y,-1.2,69.2):throwerOutside?clamp(w.y,-1.2,69.2):clamp(w.y,1,67),task,required:!!required,sprint:!!sprint};
   if(required&&!setup.requiredIds.includes(id))setup.requiredIds.push(id);
 }
@@ -95,7 +99,7 @@ function buildCorner(m,setup){
   const kicker=nearestForTarget(outfield(m,team),point,'SET_PIECE',used);if(!kicker)return null;used.add(kicker.id);setup.kickerId=kicker.id;
   const lp=worldToLocal(team,r.x,r.y),top=lp.y<34;
   const runupLocal={x:Math.max(105.45,lp.x+1.55),y:top?-0.72:68.72},runup=localToWorld(team,runupLocal.x,runupLocal.y);
-  target(setup,kicker.id,runup,'CORNER_KICKER_RUNUP_START',true,true);setup.cornerRunup={start:runup,ball:{x:r.x,y:r.y}};
+  target(setup,kicker.id,runup,'CORNER_KICKER_RUNUP_START',true,true);setup.cornerRunup={start:runup,ball:{x:r.x,y:r.y},outsideInvariant:'CORNER_KICKER_ORIGIN_OUTSIDE_PRE_CONTACT'};
   const yUpper=28.8,yLower=39.2;
   // Corner roles are local to the restart team.  The upper/lower slot is not
   // itself near/far: on the lower corner the semantic sides are mirrored.
@@ -214,7 +218,15 @@ function assign(m){const setup=ensurePlan(m);if(!setup)return false;return apply
 function hasWrongEndRequiredTarget(m,setup){
   if(!setup||!['CORNER','FREE_KICK','OFFSIDE'].includes(setup.kind))return false;
   const restartTeam=setup.team,defTeam=other(restartTeam),restartGoal={x:restartTeam===HOME?0:105,y:34},defGoal={x:defTeam===HOME?0:105,y:34};
-  for(const id of setup.requiredIds){const p=playerById(m,id),t=setup.targets[id];if(!p||!t)continue;const own=dist(t,p.team===restartTeam?restartGoal:defGoal),otherGoal=dist(t,p.team===restartTeam?defGoal:restartGoal);if(own>otherGoal)return true;}
+  for(const id of setup.requiredIds){const p=playerById(m,id),t=setup.targets[id];if(!p||!t)continue;
+    // The corner kicker is intentionally outside the field before contact.
+    // A defensive counter outlet is also intentional: it is an escape lane
+    // toward that defender's attacking half, not a box/wall/mark danger
+    // target.  Those two semantic exceptions must not hold a legal restart
+    // in SETUP; every defensive danger target remains guarded.
+    if(p.team===restartTeam)continue;
+    if(/(?:^|_)COUNTER_OUTLET(?:_|$)/.test(String(t.task||'')))continue;
+    const own=dist(t,p.team===restartTeam?restartGoal:defGoal),otherGoal=dist(t,p.team===restartTeam?defGoal:restartGoal);if(own>otherGoal)return true;}
   return false;
 }
 function readiness(m){
@@ -261,5 +273,11 @@ function updateGoalKickFlight(m){
   gp.applied=true;return true;
 }
 function debugSummary(m){const s=ensurePlan(m),rd=readiness(m);return s?{version:VERSION,kind:s.kind,team:s.team,kickerId:s.kickerId,targetCount:Object.keys(s.targets).length,requiredCount:s.requiredIds.length,readyRatio:Number(rd.ratio.toFixed(3)),kickerReady:rd.kickerReady,ready:rd.ready,forced:rd.forced}:null;}
-return{VERSION,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,debugSummary};
+function cornerKickerOutsideStart(m){
+  const r=m.restart,s=r?.setup;if(!r||!s||s.kind!=='CORNER'||!s.cornerRunup?.start)return false;
+  const p=s.targets[s.kickerId];if(!p)return false;
+  const l=worldToLocal(s.team,p.x,p.y),cornerTop=worldToLocal(s.team,r.x,r.y).y<34;
+  return l.x>105&&((cornerTop&&l.y<0)||(!cornerTop&&l.y>68));
+}
+return{VERSION,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,cornerKickerOutsideStart,debugSummary};
 });
