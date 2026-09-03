@@ -235,7 +235,8 @@ function createMatch(seed='step34',opts={}){
   if(TELEMETRY&&typeof TELEMETRY.createState==='function')m.telemetry=TELEMETRY.createState(opts.telemetry||{});
   rebuildMap(m);kickoff(m,m.r()<.5?HOME:AWAY);return m;
 }
-function event(m,type,text,meta=null){m.events.push({t:m.time,type,text,...(meta&&typeof meta==='object'?meta:{})});if(m.events.length>100)m.events.shift();if(TELEMETRY&&m.telemetry&&typeof TELEMETRY.onEvent==='function')TELEMETRY.onEvent(m,type,text);}
+function event(m,type,text,meta=null){const row={t:m.time,type,text,...(meta&&typeof meta==='object'?meta:{})};m.events.push(row);if(m.events.length>100)m.events.shift();if(TELEMETRY&&m.telemetry&&typeof TELEMETRY.onEvent==='function')TELEMETRY.onEvent(m,type,text);return row;}
+function nextUserCommitEventId(m,playerId){m.userCommitSequence=Number(m.userCommitSequence||0)+1;return`USER_COMMIT:${m.seed}:${playerId}:${Number(m.time.toFixed(3))}:${m.userCommitSequence}`;}
 
 function slotLane(slot){
   return{LB:10,LCB:27,RCB:41,RB:58,LCM:21,CM:34,RCM:47,LW:11,ST:34,RW:57,GK:34}[slot]??34;
@@ -2185,7 +2186,10 @@ function performRestart(m){
     if(r.kind==='CORNER'&&r.stage==='RUN_UP'){kicker.tx=r.x;kicker.ty=r.y;kicker.action='CORNER_RUN_UP';kicker.tacticalTask='CORNER_RUN_UP';kicker.sprint=false;if(dist(kicker,{x:r.x,y:r.y})>.42)return false;}
     if(r.kind!=='CORNER'&&r.stage!=='APPROACH'){r.stage='APPROACH';kicker.tx=r.x;kicker.ty=r.y;kicker.action=r.kind==='OFFSIDE'?'OFFSIDE_RESTART_APPROACH':'FREE_KICK_APPROACH';kicker.tacticalTask=kicker.action;kicker.sprint=false;return false;}
     if(r.kind!=='CORNER'&&r.stage==='APPROACH'&&dist(kicker,{x:r.x,y:r.y})>.42){kicker.tx=r.x;kicker.ty=r.y;kicker.action=r.kind==='OFFSIDE'?'OFFSIDE_RESTART_APPROACH':'FREE_KICK_APPROACH';kicker.tacticalTask=kicker.action;kicker.sprint=false;return false;}
-    if(dist(kicker,{x:r.x,y:r.y})>.35){kicker.x=r.x;kicker.y=r.y;}kicker.tx=r.x;kicker.ty=r.y;kicker.vx=kicker.vy=0;kicker.hasBall=false;m.ball.x=r.x;m.ball.y=r.y;m.ball.z=0;m.ball.mode='DEAD';m.ball.ownerId=null;m.ballOwner=null;
+    // Contact is reached by the authored run-up; never bridge a remaining gap by teleporting
+    // the kicker to a dead ball.  This keeps setup -> approach -> contact physically causal.
+    if(dist(kicker,{x:r.x,y:r.y})>.10){kicker.tx=r.x;kicker.ty=r.y;kicker.action=r.kind==='CORNER'?'CORNER_RUN_UP':'FREE_KICK_APPROACH';kicker.tacticalTask=kicker.action;return false;}
+    kicker.x=r.x;kicker.y=r.y;kicker.tx=r.x;kicker.ty=r.y;kicker.vx=kicker.vy=0;kicker.hasBall=false;m.ball.x=r.x;m.ball.y=r.y;m.ball.z=0;m.ball.mode='DEAD';m.ball.ownerId=null;m.ballOwner=null;
     const mates=teamPlayers(m,r.team).filter(p=>p.id!==kicker.id&&p.role!=='GK');let target=r.userRestartChoice?.targetId?playerById(m,r.userRestartChoice.targetId):null;
     if(!target&&r.kind==='CORNER')target=mates.filter(p=>['ST','WF','CM'].includes(p.role)).sort((a,b)=>{const la=worldToLocal(r.team,a.x,a.y),lb=worldToLocal(r.team,b.x,b.y);return ((105-la.x)+Math.abs(la.y-34)*.10)-((105-lb.x)+Math.abs(lb.y-34)*.10);})[0]||mates[0];
     else if(!target){const candidates=r.kind==='FREE_KICK'?mates.filter(p=>!isOffsideAtPass(m,p,r.team)):mates;target=candidates.sort((a,b)=>worldToLocal(r.team,b.x,b.y).x-worldToLocal(r.team,a.x,a.y).x)[0]||mates[0];}if(!target)return false;
@@ -2201,7 +2205,8 @@ function performRestart(m){
       const wallTeam=other(r.team);m.setPieceWallRecovery={team:wallTeam,wallIds:freeKickWallIds,startedAt:m.time,until:m.time+2.6};
       for(const id of freeKickWallIds){const wp=playerById(m,id);if(!wp)continue;wp.pressCommitUntil=0;wp.markTargetId=null;wp.pressRecoverUntil=Math.max(wp.pressRecoverUntil||0,m.time+1.35);}
     }
-    event(m,r.kind==='CORNER'?'CORNER_KICK':r.kind==='OFFSIDE'?'OFFSIDE_RESTART':'FREE_KICK_TAKEN',`${subjectName(kicker.name)} ${r.kind==='CORNER'?'뒤로 물러난 뒤 도움닫기해 코너킥 크로스를 올립니다.':r.kind==='OFFSIDE'?'오프사이드 지점에서 동료들이 자리를 잡은 뒤 프리킥으로 재개합니다.':'정지된 공 앞에서 준비한 뒤 경기를 재개합니다.'}`);
+    const restartGeometry={restartType:r.kind,restartPoint:{x:r.x,y:r.y},ballAtRestart:{x:r.x,y:r.y},kickerStart:r.setup?.cornerRunup?.start?{...r.setup.cornerRunup.start}:{x:kicker.x,y:kicker.y},approachStart:r.setup?.cornerRunup?.start?{...r.setup.cornerRunup.start}:{x:kicker.x,y:kicker.y},contactOrigin:{x:kicker.x,y:kicker.y},attackingEnd:r.team===HOME?'RIGHT':'LEFT',transition:'SETUP_TO_LIVE',setupKickerId:r.setup?.kickerId||kicker.id};
+    event(m,r.kind==='CORNER'?'CORNER_KICK':r.kind==='OFFSIDE'?'OFFSIDE_RESTART':'FREE_KICK_TAKEN',`${subjectName(kicker.name)} ${r.kind==='CORNER'?'뒤로 물러난 뒤 도움닫기해 코너킥 크로스를 올립니다.':r.kind==='OFFSIDE'?'오프사이드 지점에서 동료들이 자리를 잡은 뒤 프리킥으로 재개합니다.':'정지된 공 앞에서 준비한 뒤 경기를 재개합니다.'}`,{restartGeometry});
     if(r.kind==='OFFSIDE'){m.phase='OPEN_PLAY';m.restart=null;m.nextShape=m.time+.12;}else{beginSetPieceLive(m,r);m.restart=null;m.nextShape=m.time+.12;}kicker.nextThink=m.time+.75;return true;
   }
   let owner;
@@ -2461,8 +2466,9 @@ function applyChoiceCandidate(m,playerId,candidateId,targetId=null,inputSource='
   const resolvedTargetId=c.meta?.targetId||c.targetId||null;
   const directedPassChoices=new Set(['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','EARLY_CROSS','DEEP_CROSS','CUTBACK']);
   if(directedPassChoices.has(c.id)&&resolvedTargetId){m.lastUserDirectedPassTrace={at:Number(m.time.toFixed(3)),sourceId:owner.id,choiceId:c.id,requestedTargetId:targetId||resolvedTargetId,resolvedTargetId,intendedReceiverId:m.ball.intendedReceiverId||null,firstControllerId:null,outcome:'IN_FLIGHT'};}
-  m.userChoiceLog=m.userChoiceLog||[];m.userChoiceLog.push({at:Number(m.time.toFixed(3)),playerId:owner.id,team:owner.team,role:owner.role,choice:c.id,requestedTargetId:targetId||null,targetId:resolvedTargetId,inputSource,result:'APPLIED_CURRENT_STATE',futureOutcomePrecomputed:false});event(m,'USER_CHOICE',`${owner.id}: ${c.id}${resolvedTargetId?` -> ${resolvedTargetId}`:''}`);
-  return{ok:true,kind:'ON_BALL',choice:c.id,requestedTargetId:targetId||null,targetId:resolvedTargetId,inputSource,action:{type:action.type,kind:action.kind||null,reason:action.reason||null},intentUntil,intentProtected:!!intentUntil,futureOutcomePrecomputed:false};
+  const commitEventId=nextUserCommitEventId(m,owner.id),executedAction={type:action.type,kind:action.kind||null,reason:action.reason||null};
+  m.userChoiceLog=m.userChoiceLog||[];m.userChoiceLog.push({at:Number(m.time.toFixed(3)),commitEventId,playerId:owner.id,team:owner.team,role:owner.role,choice:c.id,requestedTargetId:targetId||null,targetId:resolvedTargetId,inputSource,executedAction,result:'APPLIED_CURRENT_STATE',futureOutcomePrecomputed:false});event(m,'USER_CHOICE',`${owner.id}: ${c.id}${resolvedTargetId?` -> ${resolvedTargetId}`:''}`,{commitEventId,playerId:owner.id,choiceId:c.id,targetId:resolvedTargetId,inputSource,executedAction});
+  return{ok:true,kind:'ON_BALL',choice:c.id,requestedTargetId:targetId||null,targetId:resolvedTargetId,commitEventId,inputSource,action:executedAction,intentUntil,intentProtected:!!intentUntil,futureOutcomePrecomputed:false};
 }
 function choiceStateBridge(){return{inspect:inspectChoiceState,applyCandidate:applyChoiceCandidate,restartChoiceState,applyRestartChoice,safePassSupportViability};}
 function choiceActionBridge(){
