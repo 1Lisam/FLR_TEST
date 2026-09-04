@@ -96,6 +96,8 @@
 .in-pitch-choice-grid{display:grid;grid-template-columns:1fr;gap:5px}
 .in-pitch-choice-option{min-width:132px;max-width:270px;padding:8px 10px;border:1px solid #4b6470;border-radius:8px;background:#17252d;color:#f1f7fa;font-size:12px;font-weight:750;line-height:1.2;text-align:left;white-space:normal;cursor:pointer;touch-action:manipulation}
 .in-pitch-choice-option:hover,.in-pitch-choice-option:focus-visible{border-color:#a8e9ff;background:#203541;outline:none}
+.in-pitch-choice-option.recommended{border:2px solid #f2c94c;box-shadow:0 0 0 1px rgba(255,220,92,.28)}
+.in-pitch-choice-recommended-label{display:inline-block;margin-left:7px;padding:1px 5px;border-radius:8px;background:#f2c94c;color:#241b00;font-size:9px;font-weight:900;vertical-align:1px}
 .in-pitch-choice-leader{position:absolute;height:0;border-top:2px dotted rgba(226,246,255,.72);transform-origin:0 50%;pointer-events:none;z-index:5}
 .in-pitch-choice-tooltip{position:absolute;z-index:9;max-width:300px;padding:8px 10px;border:1px solid rgba(158,213,235,.72);border-radius:8px;background:rgba(7,17,23,.97);box-shadow:0 8px 24px rgba(0,0,0,.42);color:#dcebf2;font-size:11px;line-height:1.45;white-space:pre-line;pointer-events:none}
 .in-pitch-choice-layer.locked{pointer-events:none}.in-pitch-choice-layer.locked *{pointer-events:none!important}
