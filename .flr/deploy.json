@@ -1,0 +1,233 @@
+{
+  "baseCommit": "17682ea324728dac4396f010bc76218545e6bce7",
+  "changedFiles": [
+    "live_hybrid_session_v02.js",
+    "runtime/technical_test.css",
+    "step71_hybrid_v06_ui.js"
+  ],
+  "commitMessage": "V42 validated production closure payload (TEST_ONLY)",
+  "mode": "cross-repo",
+  "payloadManifest": {
+    "files": [
+      {
+        "bytes": 10719,
+        "path": "index.html",
+        "sha256": "128d18f057a763ae105f85237848f630a9d7450fe45ec2721eed3362f11898b1"
+      },
+      {
+        "bytes": 21827,
+        "path": "runtime/technical_test.css",
+        "sha256": "aa2d4293448c2e20c2d02fe7fe5300b5aeae7fd28021d1407ab265809014ba2b"
+      },
+      {
+        "bytes": 2515,
+        "path": "runtime/step38_test.css",
+        "sha256": "c0537abe518ffc9e778d401a9eb9ed77e0176beec71158fe3cf47ee634431ae2"
+      },
+      {
+        "bytes": 2892,
+        "path": "final_match_test_dock.css",
+        "sha256": "192f98a4b4daec41a01ff8cc3bed104c55f258b05795aafb8892d98c63b0b072"
+      },
+      {
+        "bytes": 773,
+        "path": "runtime/v40_human_calibration.css",
+        "sha256": "a00a56b67fb55617db5aba280c8401fe5cb34c19a05ba43134a72aa897072173"
+      },
+      {
+        "bytes": 13494,
+        "path": "runtime/match_flow_resolution.js",
+        "sha256": "a7177331523130c8604cb8fa2714702e61ecdae5832ecd3efef01f6a80da3551"
+      },
+      {
+        "bytes": 98043,
+        "path": "runtime/tactical_movement.js",
+        "sha256": "b1573cfabfa6c18d432cc9d820b5ef5d165a417c81747837ed236ff9f1ca277c"
+      },
+      {
+        "bytes": 24847,
+        "path": "runtime/restart_movement.js",
+        "sha256": "93236daed1c5b897a84cc9e8f2469b0f618288fe58de913dd066809f13384980"
+      },
+      {
+        "bytes": 11232,
+        "path": "runtime/free_kick_templates.js",
+        "sha256": "aff3b560928d5cb8b1c404f6b5c7b314a14c0e69d5c1b85b884506c518adeb46"
+      },
+      {
+        "bytes": 8757,
+        "path": "runtime/free_kick_wall_model.js",
+        "sha256": "77fc07b94feca51928f18e05a869ad5404c9cc9ddb9c99824b9e613203afd8ae"
+      },
+      {
+        "bytes": 13629,
+        "path": "runtime/corner_templates.js",
+        "sha256": "122979121db70bd86c229c3f29162b55304bdce1803b564702e831433ced9f10"
+      },
+      {
+        "bytes": 4083,
+        "path": "runtime/v37_set_piece_liveliness_patch.js",
+        "sha256": "7f973f8042a3c75e511b85f5f553ba70d0206c618c937dac3e8e146b68affbd3"
+      },
+      {
+        "bytes": 14109,
+        "path": "runtime/match_choice_telemetry.js",
+        "sha256": "6e5330be4002d73cad9c4dcdd18c86a776baec8cf365a23a6dc0045235f4eb8a"
+      },
+      {
+        "bytes": 5167,
+        "path": "runtime/attribute_match_adapter.js",
+        "sha256": "fa62c7ba112952472c8ea52fc75501aef8ea8219d1200abccc3b478c52217417"
+      },
+      {
+        "bytes": 9277,
+        "path": "runtime/action_candidate_engine.js",
+        "sha256": "26b80c564b1b02bd9a3ec801cacbfd78235d7dd7b75897c9668c1bd5455baf53"
+      },
+      {
+        "bytes": 3770,
+        "path": "runtime/match_academy.js",
+        "sha256": "678152ed6ae3107fa4032eeadce3864507d113df6a479e6db279d858928d3062"
+      },
+      {
+        "bytes": 1726,
+        "path": "runtime/aerial_contest.js",
+        "sha256": "e4de9c1f5e9c24d036a639443b92bfe5e277d0c5d89f53e273064b1adb58d760"
+      },
+      {
+        "bytes": 1000,
+        "path": "runtime/take_on_duel.js",
+        "sha256": "0fda708e61580fb97d91cb9f96e19e9fe3e08191edf48938e9be15e03302cc0e"
+      },
+      {
+        "bytes": 5254,
+        "path": "runtime/ball_strike_model.js",
+        "sha256": "2b28c59571f8155d065b276afb169ee4464427d1a101c8c3414395c6b33d8b0f"
+      },
+      {
+        "bytes": 269955,
+        "path": "runtime/continuous_match_core.js",
+        "sha256": "e94c2e15e6c2668715c79b01d56598f3d9b7644832c6e2baaccb48e257970a5e"
+      },
+      {
+        "bytes": 7682,
+        "path": "runtime/v37_match_feel_patch.js",
+        "sha256": "b5b301cffaa880664f9af93260777430f2b8a9f6ab8178fe3a9dbecfe78690d5"
+      },
+      {
+        "bytes": 7856,
+        "path": "runtime/choice_action_resolver.js",
+        "sha256": "990a4ebb9b6d1e940ff08faaa9e8847c583be10c01e442c0aec66e2cfda7edf5"
+      },
+      {
+        "bytes": 14196,
+        "path": "runtime/choice_resolution_harness.js",
+        "sha256": "7eedb1c9a8801525b5992ba12f2f641b055fa543c025b06a658bea6537a623ca"
+      },
+      {
+        "bytes": 7949,
+        "path": "runtime/choice_action_resolver_step38.js",
+        "sha256": "3efb736f6171590649b6e1fa9f2ee07375fc2bd2fbd78bc1f79c56f79931f44b"
+      },
+      {
+        "bytes": 13252,
+        "path": "runtime/manager_tendency_adapter.js",
+        "sha256": "ce457d09a28e1a2f5dc9d8d99773b1995345d13fe386e9b0352ca2db33120701"
+      },
+      {
+        "bytes": 14002,
+        "path": "runtime/step38_influence_harness.js",
+        "sha256": "94cb10d825c7f8d8c95946792d910d99c006cef810ae3ba351d8ec33cbc9ab40"
+      },
+      {
+        "bytes": 79876,
+        "path": "runtime/protagonist_match_controller.js",
+        "sha256": "04e119eeef347a12c5fa8702bc0fcfb0832efe8374fa3eb26529b9d77760a341"
+      },
+      {
+        "bytes": 27581,
+        "path": "live_hybrid_session_v02.js",
+        "sha256": "fe04cd586b9658a151073c006bb5751dfb1c665a863cc05c918972429eb4a898"
+      },
+      {
+        "bytes": 22229,
+        "path": "live_v06_scene_authority_browser.js",
+        "sha256": "6820ee6e5069fd1605f75068ddc759f5804d1e8f1a4a36838b5946298f1207c1"
+      },
+      {
+        "bytes": 1979,
+        "path": "scene_debug_export.js",
+        "sha256": "46477d1dec35bedc06c76b9b28821bb0db4f11df522dec42d6eecfe44a791b22"
+      },
+      {
+        "bytes": 1644,
+        "path": "full_time_presentation.js",
+        "sha256": "beefe840ff0ac96ad9f0a133d7dd19ae655f522f3e1aba4f8d6f72b470e29ae1"
+      },
+      {
+        "bytes": 14480,
+        "path": "in_pitch_choice_ui.js",
+        "sha256": "5c6b89fe5fa72a5b3f003465a7a960244fe5b3b88f63df994065f910f45ea330"
+      },
+      {
+        "bytes": 567,
+        "path": "bug_report_config.js",
+        "sha256": "0cf5bcbd123ebacb929dbefdc66ca7eba80122b86ed313dfbdd76a036efad91d"
+      },
+      {
+        "bytes": 52852,
+        "path": "step71_hybrid_v06_ui.js",
+        "sha256": "09394683962922d413207592bc0ce0c9f431c24d42e6f6bb97e5e2f9caecedc5"
+      },
+      {
+        "bytes": 10972,
+        "path": "final_match_bug_report_ui.js",
+        "sha256": "940025ddd69e9685fee75a4bda95bf509f96d3a917a0578d02e934ee394dd5bb"
+      },
+      {
+        "bytes": 13976,
+        "path": "final_match_rare_scenario_harness.js",
+        "sha256": "bc23b32bba2e2b81b17a110c96b293c5e3050b06de11c8c0eb4c873e587cc2d6"
+      },
+      {
+        "bytes": 1180,
+        "path": "final_match_forced_presentation_patch.js",
+        "sha256": "f9537aadf6d0c38bca4ce65ec1e893506a42a5524d9a79a25665c351a2530fe3"
+      },
+      {
+        "bytes": 5011,
+        "path": "final_match_v37_forced_harness_patch.js",
+        "sha256": "3cdeccab6cdc56ed35f4c1901c83215ffc5c0d659afec081e5ef0fc22e7838a8"
+      },
+      {
+        "bytes": 13436,
+        "path": "final_match_test_dock.js",
+        "sha256": "e99b86e96279b4cbdff085d53caebcfcf49e954d0f4cca1fb7162a4fcba8e33b"
+      },
+      {
+        "bytes": 447,
+        "path": "final_match_v37_test_visual_patch.js",
+        "sha256": "6fa2da52a1c04002a7c9bac63cd67fa31a8bef067bd0654fceafddf0aa896a2b"
+      },
+      {
+        "bytes": 4188,
+        "path": "v40_human_calibration_surface.js",
+        "sha256": "1f0f34f1aa3562e897daee5b995b5b2b8908566963866a1059f03a0c25dc2627"
+      },
+      {
+        "bytes": 11063,
+        "path": "reporter_source_identity.js",
+        "sha256": "1e7724310b2505a684cfeb51c88604127941afcddebb53065f0d7b416c7b53d6"
+      }
+    ]
+  },
+  "payloadManifestSha256": "22987d2915fa6688622e0ad8cc67f7c746ba9eac3c6cb5fd0cfe1de85695c2fa",
+  "removedFiles": [],
+  "schemaVersion": "V40_CROSS_REPO_DEPLOY_1.0",
+  "sourceRepo": "1Lisam/FLR_DEV",
+  "sourceSHA": "a25cc5aabaefbd7fdb76a42d58b76a9d9686c610",
+  "step79Started": false,
+  "targetBaseSHA": "17682ea324728dac4396f010bc76218545e6bce7",
+  "targetRepo": "1Lisam/FLR_TEST",
+  "validationStatus": "PASS_FOR_USER_VISUAL_RETEST"
+}
