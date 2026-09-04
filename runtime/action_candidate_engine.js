@@ -16,7 +16,7 @@ function generate(ctx){
     let s=(shot.score||0)*0.68+(shot.oneVOne?7.5:0)+(shot.openWindow?1.8:0)-(shot.blockers||0)*0.55;
     if(inBox&&shot.openWindow&&(shot.blockers||0)===0&&(shot.centrality??99)<=10.5)s+=0.75;
     if(ctx.recentTakeOnWin&&inBox&&(shot.oneVOne||shot.openWindow))s+=2.1;
-    if(!inBox)s-=role==='CM'?4.2:2.9;if(attackingReceive&&(shot.blockers||0)===0&&shot.dGoal<=26)s+=0.85;if(ctx.recentTeamShot)s-=2.2;
+    if(!inBox)s-=role==='CM'?4.2:2.9;if(attackingReceive&&(shot.blockers||0)===0&&shot.dGoal<=26)s+=0.85;if(ctx.recentTeamShot)s-=2.2;if(!shot.oneVOne&&!shot.clearKeeperChance)s-=6.0;
     const longRange=!inBox&&shot.dGoal>27; if(longRange)s-=2.1;if(shot.turningRequired)s-=1.35+(shot.backToGoal?0.65:0)+(longRange?0.55:0);out.push(c('SHOT',s,longRange?'long_range_open_window':'spatial_shot_window',{dGoal:shot.dGoal,inBox,oneVOne:shot.oneVOne,openWindow:shot.openWindow,longRange,turningRequired:!!shot.turningRequired,backToGoal:!!shot.backToGoal,facingAlignment:shot.facingAlignment}));
   }
   let carry=0.82+clamp(space,0,8)*0.22+(pressure>2.6?0.55:0)+(x>72?0.50:0)-(pressure<1.05?0.55:0);
@@ -62,20 +62,20 @@ function commitment(candidate,ctx){
         // A visible shooting lane is a real option, but wide/long box entries should not
         // automatically become a shot every possession. Central ST windows keep priority;
         // marginal-angle WF windows more often continue with a pass/carry/cut-back.
-        let p=0.100;
-        if(shot.dGoal<=14.5)p+=0.100;else if(shot.dGoal<=18.0)p+=0.040;
+        let p=0.022;
+        if(shot.dGoal<=14.5)p+=0.045;else if(shot.dGoal<=18.0)p+=0.015;
         const centrality=shot.centrality??99;
-        if(centrality<=10.5)p+=0.070;
-        if(ctx.role==='ST')p+=0.060;else if(ctx.role==='WF')p+=0.055;else if(ctx.role==='CM')p+=0.035;
+        if(centrality<=10.5)p+=0.030;
+        if(ctx.role==='ST')p+=0.028;else if(ctx.role==='WF')p+=0.020;else if(ctx.role==='CM')p+=0.012;
         if(shot.dGoal>17.0)p*=0.80;
         if(shot.dGoal>20.0)p*=0.72;
         if(centrality>12.5)p*=0.60;
         if(ctx.role==='WF'&&centrality>11.5)p*=0.78;
-        p+=Math.min(2.0,Math.max(0,held))*0.020;
-        if(ctx.recentTakeOnWin)p+=0.22;
-        if(ctx.attackingThroughReceive)p+=0.05;
+        p+=Math.min(2.0,Math.max(0,held))*0.012;
+        if(ctx.recentTakeOnWin)p+=0.16;
+        if(ctx.attackingThroughReceive)p+=0.035;
         if(ctx.recentTeamShot)p*=0.55;
-        return clamp(p,0.070,0.48);
+        return clamp(p,0.018,0.22);
       }
       let p=shot.inBox?0.018:0.004;if(shot.openWindow)p+=0.025;if((shot.blockers||0)===0)p+=0.010;if(shot.dGoal<=14)p+=0.015;if(pressure>2.4)p+=0.006;if(ctx.recentTeamShot)p*=0.22;return clamp(p,0.003,0.085);
     }

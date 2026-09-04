@@ -104,6 +104,12 @@ function enforceManagerGoalSide(m,team,ballOwner){
   const ownerL=local(team,ballOwner.x,ballOwner.y);
   for(const p of B.teamPlayers(m,team)){
     if(p.role==='GK')continue;
+    // Sol4-2 is the final semantic waypoint writer for a currently owned defensive
+    // responsibility.  This manager layer runs after the core tick and may still
+    // correct legacy/unowned defensive shape, but it must not clamp a live Sol4
+    // MARK/PRESS/COVER waypoint back to an older manager-specific target.
+    const r=m.defensiveResponsibility?.records?.[p.id],intent=p._defensivePursuitIntent;
+    if(r&&intent&&intent.epoch===r.epoch&&intent.type===r.type&&(intent.targetId||null)===(r.targetId||null)&&r.motion?.actualTarget)continue;
     const q=local(team,p.tx,p.ty),task=p.tacticalTask||p.action||'';
     let minX=null,maxX=null;
     if(task==='PRESS_CONTAIN'){minX=ownerL.x-3.20;maxX=ownerL.x-0.90;}

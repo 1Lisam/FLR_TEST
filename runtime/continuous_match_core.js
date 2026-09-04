@@ -835,25 +835,26 @@ function safePassSupportViability(m,owner,o){
 }
 
 
-function syntheticLeadPassCandidates(m,owner,opts,existingThroughTargets=new Set()){
+function syntheticLeadPassCandidates(m,owner,opts,existingThroughTargets=new Set(),lifecycle=null){
   // STEP78 TT-0.46: a through-pass is only available when the receiver has already
   // committed to a real run. Never invent a forward lead point for a stationary CM/FB.
   const team=owner.team,rows=[],runTasks=new Set(['CHASE_THROUGH','OVERLAP','UNDERLAP','BALANCED_OVERLAP','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','BOX_EDGE_ARRIVAL','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','PENALTY_SPOT_RUN','ATTACK_NEAR_POST','ATTACK_BACK_POST','ATTACK_OPEN_CHANNEL','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','POST_PASS_CONTINUE_RUN']);
   for(const o of opts||[]){
-    const p=o.p;if(!p||existingThroughTargets.has(p.id)||!['ST','WF','CM','FB'].includes(p.role))continue;
+    const p=o.p;if(!p)continue;const reject=reason=>{if(lifecycle)lifecycle.push({stage:'LEAD_GEOMETRY',candidateId:'THROUGH_PASS',targetId:p.id,included:false,reason});};
+    if(existingThroughTargets.has(p.id)){reject('DUPLICATE_EXISTING_THROUGH');continue;}if(!['ST','WF','CM','FB'].includes(p.role)){reject('ROLE_CONTEXT_EXCLUDED');continue;}
     // TT-0.51 1_5: a FAR_SIDE_RUN label is not enough by itself. The runner must already
     // have live physical velocity before an open-space through-ball can be offered.
     const liveNamedRun=p.tacticalTask!=='FAR_SIDE_RUN'||Math.hypot(p.vx||0,p.vy||0)>1.15;
     const committed=liveNamedRun&&(!!o.running||(runTasks.has(p.tacticalTask)&&o.lead&&o.leadForward>2.5));
-    if(!committed||!o.lead||o.leadForward<2.5||o.d>44||o.open<0.85)continue;
-    const lead={x:o.lead.x,y:o.lead.y},receiverTravel=dist(p,lead);if(receiverTravel<2.2||receiverTravel>17.0)continue;
+    if(!committed){reject('NO_CAUSAL_RUN_COMMITMENT');continue;}if(!o.lead||o.leadForward<2.5){reject('NO_FORWARD_LEAD_POINT');continue;}if(o.d>44){reject('LEAD_UNREACHABLE_DISTANCE');continue;}if(o.open<0.85){reject('RECEIVER_PRESSURE_FLOOR');continue;}
+    const lead={x:o.lead.x,y:o.lead.y},receiverTravel=dist(p,lead);if(receiverTravel<2.2){reject('LEAD_NOT_MATERIALLY_DIFFERENT_FROM_FEET');continue;}if(receiverTravel>17.0){reject('RECEIVER_CANNOT_REACH_LEAD');continue;}
     const blockers=laneBlockers(m,owner,lead,other(team)),leadOpen=outfield(m,other(team)).reduce((best,q)=>Math.min(best,Math.hypot(q.x-lead.x,q.y-lead.y)),99);
-    if(blockers.length>1||leadOpen<1.35)continue;
+    if(blockers.length>1){reject('LEAD_LANE_BLOCKED');continue;}if(leadOpen<1.35){reject('LEAD_POINT_OCCUPIED');continue;}
     let score=1.85+o.leadForward*0.12+Math.min(leadOpen,6)*0.23-receiverTravel*0.045-blockers.length*0.65;
     if(p.role==='WF')score+=0.48;else if(p.role==='ST')score+=0.35;else if(p.role==='CM')score+=0.12;
-    rows.push({id:'THROUGH_PASS',score:Number(score.toFixed(3)),reason:'user_visible_committed_run_lane',meta:{targetId:p.id,targetSlot:p.slot,runLead:true,leadX:Number(lead.x.toFixed(3)),leadY:Number(lead.y.toFixed(3)),leadForward:Number(o.leadForward.toFixed(3)),receiverTravel:Number(receiverTravel.toFixed(3)),receiverPressure:Number(o.open.toFixed(3)),leadOpen:Number(leadOpen.toFixed(3)),leadBlockers:blockers.length,runnerTask:p.tacticalTask||null}});
+    const row={id:'THROUGH_PASS',score:Number(score.toFixed(3)),reason:'user_visible_committed_run_lane',meta:{targetId:p.id,targetSlot:p.slot,runLead:true,leadX:Number(lead.x.toFixed(3)),leadY:Number(lead.y.toFixed(3)),leadForward:Number(o.leadForward.toFixed(3)),receiverTravel:Number(receiverTravel.toFixed(3)),receiverPressure:Number(o.open.toFixed(3)),leadOpen:Number(leadOpen.toFixed(3)),leadBlockers:blockers.length,runnerTask:p.tacticalTask||null}};rows.push(row);if(lifecycle)lifecycle.push({stage:'LEAD_GEOMETRY',candidateId:row.id,targetId:p.id,included:true,reason:'CAUSAL_LEAD_REACHABLE'});
   }
-  return rows.sort((a,b)=>b.score-a.score).slice(0,2);
+  return rows.sort((a,b)=>b.score-a.score);
 }
 
 function shotAssessment(m,owner){
@@ -968,7 +969,8 @@ function candidateContext(m,owner,shot,opts,pressure,space,held,deepDelivery,ear
   const deepEntryRestricted=boxApproach&&!runway.clear&&!recentTakeOnWin&&!counterActive&&(pressure<2.8||space<4.5);
   const meta=o=>o?{targetId:o.p.id,targetSlot:o.p.slot,score:o.score,leadForward:o.leadForward,forward:o.forward,d:o.d,receiverPressure:o.open,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0),task:o.p.tacticalTask||null,running:!!o.running,leadX:o.lead&&Number.isFinite(o.lead.x)?Number(o.lead.x.toFixed(3)):null,leadY:o.lead&&Number.isFinite(o.lead.y)?Number(o.lead.y.toFixed(3)):null}:null;
   const attackingThroughReceive=owner.lastReceivedFlightKind==='THROUGH'&&m.time-(owner.lastReceivedPassAt||-99)<1.65&&l.x>=76&&['WF','ST','CM'].includes(owner.role);
-  return{role:owner.role,localX:l.x,localY:l.y,wide:l.y<19||l.y>49,pressure,space,held,recentTakeOn:m.time-(owner.lastTakeOnAt||-99)<3.2,recentTakeOnWin,takeOn:takeOn||null,frontPassChain:m.frontPassChain[owner.team]||0,recycleActive:(m.attackRecycleUntil?.[owner.team]||0)>m.time,clearRunway:runway.clear,counterActive,boxApproach,deepEntryRestricted,attackingThroughReceive,recentTeamShot:m.time-(m.lastShotAt?.[owner.team]??-99)<2.4,boxCarryChain:(m.time-(owner.lastBoxCarryAt||-99)<3.0)?(owner.boxCarryChain||0):0,recentBoxCarry:m.time-(owner.lastBoxCarryAt||-99)<2.2,shot:{score:shot.score,dGoal:shot.dGoal,inBox:shot.inBox,oneVOne:shot.oneVOne,openWindow:shot.openWindow,blockers:shot.blockers.length,centrality:Math.abs(l.y-34),bodyAngleDiff:shot.bodyAngleDiff,facingAlignment:shot.facingAlignment,turningRequired:shot.turningRequired,backToGoal:shot.backToGoal},pass:{runner:meta(runner),progressive:meta(progressive),switch:meta(switchOpt),safe:meta(safe),recycle:meta(recycle)},earlyCross:early?early.candidateMeta:null,deepDelivery:deepDelivery?{kind:deepDelivery.kind,targetId:deepDelivery.target?.id,targetOpen:deepDelivery.option?.open||0,sourceX:l.x,sourceTouchline:Math.min(l.y,68-l.y)<=16.0,targetLocalX:deepDelivery.option?.q?.x??null,deliveryIntent:deepDelivery.deliveryIntent||null}:null};
+  const gk=teamPlayers(m,other(owner.team)).find(p=>p.role==='GK'),gkLocal=gk?worldToLocal(owner.team,gk.x,gk.y):null;
+  return{role:owner.role,localX:l.x,localY:l.y,wide:l.y<19||l.y>49,pressure,space,held,recentTakeOn:m.time-(owner.lastTakeOnAt||-99)<3.2,recentTakeOnWin,takeOn:takeOn||null,frontPassChain:m.frontPassChain[owner.team]||0,recycleActive:(m.attackRecycleUntil?.[owner.team]||0)>m.time,clearRunway:runway.clear,counterActive,boxApproach,deepEntryRestricted,attackingThroughReceive,recentTeamShot:m.time-(m.lastShotAt?.[owner.team]??-99)<2.4,boxCarryChain:(m.time-(owner.lastBoxCarryAt||-99)<3.0)?(owner.boxCarryChain||0):0,recentBoxCarry:m.time-(owner.lastBoxCarryAt||-99)<2.2,gkRelation:gkLocal?{id:gk.id,distance:Number(dist(owner,gk).toFixed(3)),localX:Number(gkLocal.x.toFixed(3)),localY:Number(gkLocal.y.toFixed(3)),laneSeparation:Number(Math.abs(gkLocal.y-(shot.bestAimY??34)).toFixed(3))}:null,shot:{score:shot.score,dGoal:shot.dGoal,inBox:shot.inBox,oneVOne:shot.oneVOne,cleanOneVOne:shot.cleanOneVOne,clearKeeperChance:shot.clearKeeperChance,openWindow:shot.openWindow,blockers:shot.blockers.length,centrality:Math.abs(l.y-34),bodyAngleDiff:shot.bodyAngleDiff,facingAlignment:shot.facingAlignment,turningRequired:shot.turningRequired,backToGoal:shot.backToGoal},pass:{runner:meta(runner),progressive:meta(progressive),switch:meta(switchOpt),safe:meta(safe),recycle:meta(recycle)},earlyCross:early?early.candidateMeta:null,deepDelivery:deepDelivery?{kind:deepDelivery.kind,targetId:deepDelivery.target?.id,targetOpen:deepDelivery.option?.open||0,sourceX:l.x,sourceTouchline:Math.min(l.y,68-l.y)<=16.0,targetLocalX:deepDelivery.option?.q?.x??null,deliveryIntent:deepDelivery.deliveryIntent||null}:null};
 }
 function candidateRank(m,owner,ctx){
   if(!ctx||!CANDIDATES)return[];return CANDIDATES.generate(ctx).map(c=>{const h=hash32(`${m.seed}|CANDIDATE|${Math.floor(m.time*10)}|${owner.id}|${c.id}`),j=((h%10001)/10000-0.5)*0.42,meta=c.id==='SAFE_PASS'&&c.meta?.targetId?{...c.meta,directSafe:true}:c.meta;return{...c,meta,baseScore:c.score,score:Number((c.score+j).toFixed(3))};}).sort((a,b)=>b.score-a.score);
@@ -996,6 +998,11 @@ function recordCandidateDecision(m,owner,shadow,selected,appliedNew){
   const legacy=(selected?.reason||selected?.kind||selected?.type||'NONE');t.legacyCounts[legacy]=(t.legacyCounts[legacy]||0)+1;if(shadow.id==='EARLY_CROSS')t.earlyCrossCandidates++;if(appliedNew&&selected?.reason==='EARLY_CROSS')t.earlyCrossApplied++;
   const mapped=selected?.kind==='CROSS'?(selected.reason==='EARLY_CROSS'?'EARLY_CROSS':'DEEP_CROSS'):selected?.kind==='CUTBACK'?'CUTBACK':selected?.type==='SHOT'?'SHOT':selected?.type==='CARRY'?'CARRY':selected?.kind==='THROUGH'?'THROUGH_PASS':selected?.reason==='CANDIDATE_SWITCH'?'SWITCH_PASS':selected?.reason==='CANDIDATE_SAFE'?'SAFE_PASS':selected?.reason==='CANDIDATE_RECYCLE'?'RECYCLE':selected?.type==='PASS'?'PROGRESSIVE_PASS':selected?.type==='HOLD'?'HOLD':selected?.type==='TURN_BACK'?'TURN_BACK':selected?.type;
   if(mapped&&mapped!==shadow.id)t.disagreements++;t.recent.push({t:Number(m.time.toFixed(2)),playerId:owner.id,role:owner.role,top:shadow,selected:{type:selected?.type,kind:selected?.kind,reason:selected?.reason},appliedNew:!!appliedNew});if(t.recent.length>16)t.recent.shift();
+}
+
+function recordAttackingDecisionTrace(m,owner,ctx,ranked,selected,reason){
+  const shot=ctx?.shot||{},row={t:Number(m.time.toFixed(3)),playerId:owner.id,team:owner.team,role:owner.role,currentState:{distanceToGoal:Number.isFinite(shot.dGoal)?Number(shot.dGoal.toFixed(3)):null,centrality:Number.isFinite(shot.centrality)?Number(shot.centrality.toFixed(3)):null,pressure:Number.isFinite(ctx?.pressure)?Number(ctx.pressure.toFixed(3)):null,shotLaneBlockers:Number(shot.blockers||0),openWindow:!!shot.openWindow,oneVOne:!!shot.oneVOne,clearKeeperChance:!!shot.clearKeeperChance,turningRequired:!!shot.turningRequired,gkRelation:ctx?.gkRelation||null},alternatives:(ranked||[]).filter(c=>c.id!=='SHOT').slice(0,4).map(c=>({id:c.id,score:c.score,targetId:c.meta?.targetId||null,reason:c.reason||null})),selected:{type:selected?.type||null,kind:selected?.kind||null,targetId:selected?.target?.id||null,reason:selected?.reason||reason||null},selectionReason:reason||selected?.reason||null,futureOutcomePrecomputed:false};
+  m.attackingDecisionTrace=m.attackingDecisionTrace||[];m.attackingDecisionTrace.push(row);if(m.attackingDecisionTrace.length>40)m.attackingDecisionTrace.shift();return row;
 }
 
 
@@ -1039,14 +1046,14 @@ function midfieldLongShotAction(m,owner,shot,pressure,held){
   // Distance and trajectory are independent: this is a shot decision, not a generic long-pass rule.
   if(pressure<1.85||shot.blockers.length>1)return null;
   m.stats.midfieldLongShotCandidates=(m.stats.midfieldLongShotCandidates||0)+1;
-  let chance=0.125;
-  if(shot.blockers.length===0)chance+=0.040;
-  if(shot.dGoal<=25.0)chance+=0.026;
-  if(shot.dGoal<=22.0)chance+=0.016;
-  if(pressure>=2.8)chance+=0.016;
-  if(pressure>=3.8)chance+=0.012;
-  if(['EDGE_SHOT','SECOND_BALL','BOX_EDGE_SUPPORT','CUTBACK_EDGE','SECOND_LINE_SUPPORT','SECOND_WAVE_8','ADVANCE_SUPPORT','LATE_BOX'].includes(owner.tacticalTask))chance+=0.026;
-  chance=clamp(chance,0.125,0.315);
+  let chance=0.045;
+  if(shot.blockers.length===0)chance+=0.025;
+  if(shot.dGoal<=25.0)chance+=0.018;
+  if(shot.dGoal<=22.0)chance+=0.012;
+  if(pressure>=2.8)chance+=0.010;
+  if(pressure>=3.8)chance+=0.008;
+  if(['EDGE_SHOT','SECOND_BALL','BOX_EDGE_SUPPORT','CUTBACK_EDGE','SECOND_LINE_SUPPORT','SECOND_WAVE_8','ADVANCE_SUPPORT','LATE_BOX'].includes(owner.tacticalTask))chance+=0.018;
+  chance=clamp(chance,0.045,0.16);
   if(m.r()<chance){owner.midfieldLongShotDecline=null;return{type:'SHOT',reason:'MIDFIELD_LONG_SHOT'};}
   owner.midfieldLongShotDecline={until:m.time+2.1+(shot.dGoal>25?0.45:0),dGoal:shot.dGoal,centrality,blockers:shot.blockers.length};
   return null;
@@ -1220,7 +1227,7 @@ function chooseOwnerAction(m,owner){
   // created by a teammate instead of automatically recycling until the ball returns to the
   // protagonist. This is still live/stochastic and uses the actual lane, pressure and body state.
   const receiveAge=m.time-(owner.lastReceivedAt||-99),throughReceiveFinalThird=owner.lastReceivedFlightKind==='THROUGH'&&receiveAge<=1.35&&local.x>=82&&shot.dGoal<=23.5&&shot.blockers.length<=1,decisiveReceive=receiveAge>=.22&&receiveAge<=1.35&&(shot.inBox||throughReceiveFinalThird)&&shot.dGoal<=23.5&&shot.blockers.length<=1&&shot.facingAlignment>=.55&&['ST','WF','CM'].includes(owner.role);
-  if(decisiveReceive){const open=shot.blockers.length===0,baseP=shot.oneVOne?.62:open?(shot.inBox?.32:.24):.16,roleP=owner.role==='ST'?0.06:owner.role==='WF'?0.02:-0.02,pressureP=pressure>=3.2?.08:pressure>=2.0?.03:pressure<1.2?-.10:0,p=clamp(baseP+roleP+pressureP,.10,.96),roll=(hash32(`${m.seed}|DECISIVE_RECEIVE_SHOT|${Math.floor((owner.controlledSince||m.time)*10)}|${owner.id}`)%10000)/10000;if(roll<p){m.stats.decisiveReceiveShots=(m.stats.decisiveReceiveShots||0)+1;return{type:'SHOT',reason:'DECISIVE_RECEIVE_FINISH'};}}
+  if(decisiveReceive){const open=shot.blockers.length===0,baseP=shot.oneVOne?.38:open?(shot.inBox?.030:.024):.016,roleP=owner.role==='ST'?0.020:owner.role==='WF'?0.006:-0.006,pressureP=pressure>=3.2?.012:pressure>=2.0?.006:pressure<1.2?-.012:0,p=clamp(baseP+roleP+pressureP,.012,.58),roll=(hash32(`${m.seed}|DECISIVE_RECEIVE_SHOT|${Math.floor((owner.controlledSince||m.time)*10)}|${owner.id}`)%10000)/10000;if(roll<p){m.stats.decisiveReceiveShots=(m.stats.decisiveReceiveShots||0)+1;return{type:'SHOT',reason:'DECISIVE_RECEIVE_FINISH'};}}
   const rhythmAction=rhythmBuildUpAction(m,owner,pre);if(rhythmAction)return rhythmAction;
   // Keep restart-sensitive goalkeeper and kick-off behaviour on the proven path. Candidate ownership begins once normal attacking play is established.
   if(owner.role==='GK'||(m.kickoffBuildUntil||0)>m.time)return chooseOwnerActionLegacy(m,owner,pre);
@@ -1232,25 +1239,12 @@ function chooseOwnerAction(m,owner){
   const timingMistake=opts.find(o=>o.offsideRisk&&o.running&&o.block===0&&o.forward>4&&o.score>=(opts[0]?.score??o.score)-0.55);
   if(timingMistake&&held>=0.45&&local.x>=28&&local.x<=88){m.stats.offsideTimingWindows=(m.stats.offsideTimingWindows||0)+1;const rr=(hash32(`${m.seed}|OFFSIDE_PICK|${Math.floor(m.time*4)}|${owner.id}|${timingMistake.p.id}`)%10000)/10000;if(rr<0.62){m.stats.offsideTimingPicks=(m.stats.offsideTimingPicks||0)+1;return{type:'PASS',target:timingMistake.p,kind:'THROUGH',option:timingMistake};}}
   const ctx=candidateContext(m,owner,shot,opts,pressure,space,held,deep,early,takeOn),ranked=candidateRank(m,owner,ctx);
-  // V0.6 rhythm calibration: keep one persistent clock for the SAME genuinely open
-  // finishing window. Repeated committed carries must not reset this clock; otherwise an
-  // attacker can keep choosing another small carry forever while the goal remains open.
-  const finishCentral=Math.abs(local.y-34),finishOpen=shot.inBox&&shot.openWindow&&shot.blockers.length===0&&shot.dGoal<=18.5&&finishCentral<=11.5&&['ST','WF','CM'].includes(owner.role);
-  if(finishOpen){
-    if(owner.openFinishingControlSince!==owner.controlledSince||!Number.isFinite(owner.openFinishingWindowSince)){owner.openFinishingControlSince=owner.controlledSince;owner.openFinishingWindowSince=m.time;}
-  }else{owner.openFinishingWindowSince=null;owner.openFinishingControlSince=null;}
-  const finishAge=finishOpen&&Number.isFinite(owner.openFinishingWindowSince)?m.time-owner.openFinishingWindowSince:0;
-  const recentAngleCarry=(owner.boxCarryChain||0)>=1&&m.time-(owner.lastBoxCarryAt||-99)<1.5;
-  const finishDeadline=recentAngleCarry?(owner.role==='ST'?0.40:(owner.role==='WF'?0.48:0.58)):(owner.role==='ST'?0.90:(owner.role==='WF'?0.88:1.00));
-  const finishForceDistance=owner.role==='ST'?18.0:(owner.role==='WF'?16.8:16.0);
-  // This is deliberately NOT a general shot quota. A striker should eventually finish a
-  // sustained central lane; midfielders/wingers get the same deadline only much closer to goal.
-  // This preserves decisive finishing without converting every marginal box entry into a shot.
-  const finishCandidate=recentAngleCarry?ranked.find(c=>c.id==='SHOT'):ranked[0];
-  if(finishOpen&&finishCandidate?.id==='SHOT'&&shot.dGoal<=finishForceDistance&&finishAge>=finishDeadline){
-    const fc=finishCandidate,selected=candidateToAction(m,owner,fc,{...pre,deep,early,takeOn,ctx});
-    if(selected){selected.reason='SUSTAINED_OPEN_FINISH';m.stats.sustainedOpenFinishShots=(m.stats.sustainedOpenFinishShots||0)+1;recordCandidateDecision(m,owner,fc,selected,true);return selected;}
-  }
+  // A decisive shot is chosen from current geometry, not from a timer or a target-score rule.
+  // Strict 1v1s always outrank recycling; the broader keeper-facing case must still beat the
+  // best real pass/cut-back alternative by a visible utility margin.
+  const shotCandidate=ranked.find(c=>c.id==='SHOT'),bestAlternative=ranked.find(c=>c.id!=='SHOT'&&!['HOLD','TURN_BACK'].includes(c.id));
+  const decisiveShot=!!shotCandidate&&(shot.oneVOne||(shot.clearKeeperChance&&shotCandidate.score>=(bestAlternative?.score??-99)+0.35));
+  if(decisiveShot){const selected=candidateToAction(m,owner,shotCandidate,{...pre,deep,early,takeOn,ctx});if(selected){selected.reason=shot.oneVOne?'DECISIVE_ONE_V_ONE':'CLEAR_KEEPER_CHANCE_SUPERIOR';recordCandidateDecision(m,owner,shotCandidate,selected,true);recordAttackingDecisionTrace(m,owner,ctx,ranked,selected,'CURRENT_SHOT_SUPERIOR');return selected;}}
   // STEP39 V0.6: a genuine 1v1 take-on can happen before the final third. This is kept narrow: only the
   // explicit TAKE_ON candidate may take ownership here; normal pass/carry policy remains on the proven path.
   if(CANDIDATES&&takeOn&&local.x>=48){
@@ -1260,30 +1254,33 @@ function chooseOwnerAction(m,owner){
   // STEP39 V0.2: in the attacking half the Candidate Engine is the primary decision owner, not a permanent shadow copy.
   if(CANDIDATES&&local.x>=70){
     const genuineOpenChance=shot.inBox&&shot.openWindow&&shot.blockers.length===0&&shot.dGoal<=18.5&&Math.abs(local.y-34)<=12.5&&['ST','WF','CM'].includes(owner.role);
-    for(const c of ranked.slice(0,5)){
+    const topUtility=ranked[0]?.score??-99,competitive=ranked.filter(c=>c.score>=topUtility-.70).slice(0,2);
+    for(const c of competitive){
       if(c.id==='HOLD'||c.id==='TURN_BACK')continue;
+      if(c.id==='SHOT'&&c!==ranked[0])continue;
       // STEP76 chance-preservation floor: when a real box lane is open, 'safest' back/recycle
       // options cannot win solely by possession security. Shot/carry/take-on/delivery are read first.
       if(genuineOpenChance&&['SAFE_PASS','RECYCLE'].includes(c.id))continue;
       if(c.id==='SHOT'&&owner.candidateShotDecline){
         const sd=owner.candidateShotDecline,central=Math.abs(local.y-34),improved=shot.oneVOne||shot.dGoal<=9.8||shot.dGoal<=sd.dGoal-1.8||central<=Math.max(6,sd.centrality-2.5);
-        if(m.time<(sd.until||0)&&!improved)continue;
-        if(improved||m.time>=(sd.until||0))owner.candidateShotDecline=null;
+        const sameControl=Math.abs(Number(sd.controlledSince)-Number(owner.controlledSince))<.001;
+        if(sameControl&&!improved)continue;
+        owner.candidateShotDecline=null;
       }
       const commit=typeof CANDIDATES.commitment==='function'?CANDIDATES.commitment(c,ctx):1,roll=(hash32(`${m.seed}|COMMIT|${Math.floor(m.time*10)}|${owner.id}|${c.id}`)%10000)/10000;
       if(roll>commit){
         const openCentralShot=c.id==='SHOT'&&ranked[0]?.id==='SHOT'&&shot.blockers.length===0&&shot.dGoal<=22&&Math.abs(local.y-34)<=10&&['ST','WF','CM'].includes(owner.role);
-        if(c.id==='SHOT'&&!shot.oneVOne&&shot.dGoal>9.8){const central=Math.abs(local.y-34),critical=shot.inBox&&shot.blockers.length===0&&shot.dGoal<=18.5&&central<=11.0;owner.candidateShotDecline={until:m.time+(critical?0.62:clamp(1.75+(shot.dGoal>17?0.55:0)+(central>12?0.50:0),1.75,2.90)),dGoal:shot.dGoal,centrality:central};}
+        if(c.id==='SHOT'&&!shot.oneVOne&&shot.dGoal>9.8){const central=Math.abs(local.y-34),critical=shot.inBox&&shot.blockers.length===0&&shot.dGoal<=18.5&&central<=11.0;owner.candidateShotDecline={until:m.time+(critical?1.65:clamp(2.6+(shot.dGoal>17?0.65:0)+(central>12?0.55:0),2.6,4.0)),controlledSince:owner.controlledSince,dGoal:shot.dGoal,centrality:central};}
         if(openCentralShot&&local.x<93&&space>1.8){const selected={type:'CARRY',reason:'OPEN_SHOT_CREATE_ANGLE'};recordCandidateDecision(m,owner,c,selected,true);return selected;}
         continue;
       }const selected=candidateToAction(m,owner,c,{...pre,deep,early,takeOn,ctx});
-      if(selected){m.actionCandidateTelemetry=m.actionCandidateTelemetry||{};m.actionCandidateTelemetry.primaryDecisions=(m.actionCandidateTelemetry.primaryDecisions||0)+1;m.actionCandidateTelemetry.commitmentRejects=(m.actionCandidateTelemetry.commitmentRejects||0)+(ranked[0]?.id===c.id?0:1);recordCandidateDecision(m,owner,c,selected,true);return selected;}
+      if(selected){m.actionCandidateTelemetry=m.actionCandidateTelemetry||{};m.actionCandidateTelemetry.primaryDecisions=(m.actionCandidateTelemetry.primaryDecisions||0)+1;m.actionCandidateTelemetry.commitmentRejects=(m.actionCandidateTelemetry.commitmentRejects||0)+(ranked[0]?.id===c.id?0:1);recordCandidateDecision(m,owner,c,selected,true);if(shot.inBox)recordAttackingDecisionTrace(m,owner,ctx,ranked,selected,'RANK_AND_COMMITMENT');return selected;}
     }
     m.actionCandidateTelemetry=m.actionCandidateTelemetry||{};m.actionCandidateTelemetry.primaryFallbacks=(m.actionCandidateTelemetry.primaryFallbacks||0)+1;
     // If every stochastic attacking commitment was declined while the goal lane is still open,
     // preserve the attack with a small forward/angle carry rather than falling through to a safe
     // backward pass. The sustained-open timer will reopen/finish the chance if it remains valid.
-    if(genuineOpenChance){const selected={type:'CARRY',reason:'PRESERVE_OPEN_ATTACKING_CHANCE'};recordCandidateDecision(m,owner,ranked.find(c=>c.id==='CARRY')||ranked[0]||null,selected,true);return selected;}
+    if(genuineOpenChance){const selected={type:'CARRY',reason:'PRESERVE_OPEN_ATTACKING_CHANCE'};recordCandidateDecision(m,owner,ranked.find(c=>c.id==='CARRY')||ranked[0]||null,selected,true);recordAttackingDecisionTrace(m,owner,ctx,ranked,selected,'SHOT_NOT_YET_SUPERIOR');return selected;}
   }
   const selected=chooseOwnerActionLegacy(m,owner,pre),shadow=ranked[0]||null;recordCandidateDecision(m,owner,shadow,selected,false);return selected;
 }
@@ -1394,7 +1391,7 @@ function executeShot(m,owner,reason='GENERAL',exec={}){
   const finishing=abilityValue(m,owner,'finishing'),keeperBeaten=!!oppGK&&gkLocal.x<local.x-0.55&&assess.blockers.length===0;
   // R2/C11: onTargetP is the shooter's pre-block aim execution, not final statistical SoT.
   // Defensive blocks are resolved later by live geometry, so do not calibrate this probability to post-block SoT%.
-  let onTargetP=clamp(0.265+assess.score*0.023-assess.dGoal*0.0040+(finishing-60)*0.0022,0.20,0.58);
+  let onTargetP=clamp(0.225+assess.score*0.019-assess.dGoal*0.0040+(finishing-60)*0.0022,0.18,0.54);
   if(stylePlan.style==='PLACED')onTargetP+=0.035;if(stylePlan.style==='CURLED')onTargetP+=0.020;if(stylePlan.style==='CHIP')onTargetP-=0.015;
   // TT-0.47: a genuine breakaway should primarily resolve as goal vs goalkeeper save, not as
   // a coin-flip between goal and a shot five metres wide. Keep a real execution miss tail and
@@ -1411,7 +1408,7 @@ function executeShot(m,owner,reason='GENERAL',exec={}){
   // than the normal goalkeeper-present ceiling. Keep a real miss tail for poor finishing/balance.
   if(keeperBeaten)onTargetP=Math.max(onTargetP,clamp(0.90+(finishing-60)*0.0025-Math.max(0,assess.dGoal-16)*0.008-(assess.pressure<1.1?0.10:0),0.76,0.97));
   const highQualityKeeperChance=assess.oneVOne||assess.clearKeeperChance;
-  const onTarget=m.r()<clamp(onTargetP,0.16,keeperBeaten?0.93:(highQualityKeeperChance?0.91:0.56));let aimY;
+  const onTarget=m.r()<clamp(onTargetP,0.16,keeperBeaten?0.93:(highQualityKeeperChance?0.91:0.56));if(onTarget)m.stats.shotsOnTarget=(m.stats.shotsOnTarget||0)+1;let aimY;
   if(onTarget){
     const base=assess.bestAimY??34;
     if(stylePlan.style==='CURLED')aimY=clamp(base+Math.sign(34-owner.y)*(1.35+m.r()*0.65),30.65,37.35);
@@ -1575,8 +1572,10 @@ function ownerThink(m,owner){
         // through several seconds of an already-finished chance. Unresolved TAKE_ON remains protected.
         if(carryCriticalOpen&&openCarryAge>=reopenDeadline&&owner.action!=='TAKE_ON'){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;owner.nextThink=m.time;m.stats.openFinishDecisionReopens=(m.stats.openFinishDecisionReopens||0)+1;}
         const takeOnFinish=takeOnBreak&&si.inBox&&si.blockers.length===0&&si.dGoal<=15.5&&(si.oneVOne||si.openWindow||Math.abs(slOpen.y-34)<=10.5),firstTouchFlow=owner.action==='FIRST_TOUCH_FLOW';
-        const instantOpenFinish=!firstTouchFlow&&si.openWindow&&si.dGoal<=13.2&&si.blockers.length===0&&m.r()<(takeOnBreak?0.72:0.28);
-        if(si.inBox&&((si.oneVOne)||(takeOnFinish&&m.r()<(si.dGoal<=11.5?0.98:0.82))||(si.dGoal<=9.5&&si.blockers.length===0)||instantOpenFinish)){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;if(takeOnBreak)m.stats.takeOnBreakawayShots=(m.stats.takeOnBreakawayShots||0)+1;applyResolvedOwnerAction(m,owner,{type:'SHOT',reason:takeOnBreak?(si.oneVOne?'TAKE_ON_ONE_V_ONE':'TAKE_ON_SHOT_WINDOW'):(si.oneVOne?'ONE_V_ONE':'CARRY_SHOT_WINDOW')});return;}
+        // Carry execution may release into a new decision, but must not run a fresh shot lottery
+        // every 0.22 s. Only an actual 1v1, close-range lane, or completed take-on can finish
+        // directly; ordinary open windows return to chooseOwnerAction for one ranked decision.
+        if(si.inBox&&((si.oneVOne)||(takeOnFinish&&m.r()<(si.dGoal<=11.5?0.98:0.82))||(si.dGoal<=9.5&&si.blockers.length===0))){owner.lockTargetUntil=0;owner.boxCarryCommittedUntil=0;if(takeOnBreak)m.stats.takeOnBreakawayShots=(m.stats.takeOnBreakawayShots||0)+1;applyResolvedOwnerAction(m,owner,{type:'SHOT',reason:takeOnBreak?(si.oneVOne?'TAKE_ON_ONE_V_ONE':'TAKE_ON_SHOT_WINDOW'):(si.oneVOne?'ONE_V_ONE':'CARRY_SHOT_WINDOW')});return;}
       }
       if(owner.action==='COMMITTED_BOX_CARRY'){
         const age=m.time-(owner.boxCarryStartedAt||m.time),pressure=ballCarrierPressureDistance(m,owner),sl=worldToLocal(owner.team,owner.x,owner.y),carryShot=shotAssessment(m,owner);
@@ -1791,7 +1790,7 @@ function executeCrossHeaderShot(m,p,defenderDistance=9){
   const x=m.ball.x,y=m.ball.y,z=clamp(m.ball.z||1.55,1.05,1.85),dx=gx-x,dy=aimY-y,n=norm(dx,dy),speed=clamp(19.0+(18-dGoal)*0.22,18.5,23.0);
   for(const q of m.players)q.hasBall=false;
   m.ball={mode:'FLIGHT',x,y,z,vx:n.x*speed,vy:n.y*speed,vz:-0.65,ownerId:null,intendedReceiverId:null,kind:'SHOT',deliveryMode:'AERIAL_HEADER',lastTouchTeam:p.team,lastTouchPlayer:p.id,age:0,originX:x,originY:y,targetX:gx,targetY:aimY,airborne:true,shotTargetY:aimY,shotTeam:p.team,onTarget};
-  m.ballOwner=null;m.possession=p.team;m.stats.shots++;m.stats.shotsByTeam[p.team]=(m.stats.shotsByTeam[p.team]||0)+1;m.stats.boxShots++;m.stats.crossHeaderAttempts=(m.stats.crossHeaderAttempts||0)+1;m.stats.headerShotsByTeam[p.team]=(m.stats.headerShotsByTeam[p.team]||0)+1;if(onTarget)m.stats.crossHeaderShotsOnTarget=(m.stats.crossHeaderShotsOnTarget||0)+1;m.stats.shotReasons.CROSS_HEADER=(m.stats.shotReasons.CROSS_HEADER||0)+1;m.lastShotAt[p.team]=m.time;
+  m.ballOwner=null;m.possession=p.team;m.stats.shots++;m.stats.shotsByTeam[p.team]=(m.stats.shotsByTeam[p.team]||0)+1;m.stats.boxShots++;m.stats.crossHeaderAttempts=(m.stats.crossHeaderAttempts||0)+1;m.stats.headerShotsByTeam[p.team]=(m.stats.headerShotsByTeam[p.team]||0)+1;if(onTarget){m.stats.crossHeaderShotsOnTarget=(m.stats.crossHeaderShotsOnTarget||0)+1;m.stats.shotsOnTarget=(m.stats.shotsOnTarget||0)+1;}m.stats.shotReasons.CROSS_HEADER=(m.stats.shotReasons.CROSS_HEADER||0)+1;m.lastShotAt[p.team]=m.time;
   if(TELEMETRY&&m.telemetry&&typeof TELEMETRY.onShot==='function')TELEMETRY.onShot(m,{team:p.team,ownerId:p.id,role:p.role,inBox:true,dGoal:Number(dGoal.toFixed(2)),reason:'CROSS_HEADER'});
   p.nextThink=m.time+0.45;event(m,'HEADER_SHOT',`${subjectName(p.name)} 크로스를 헤더 슈팅으로 연결했습니다.`,{actorId:p.id,team:p.team});return true;
 }
@@ -1899,8 +1898,10 @@ function resolveNpcGkShot(m,gk,prev){
     event(m,'RUSH_BLOCK',`${subjectName(gk.name)}가 달려 나와 몸으로 슈팅을 막았습니다.`,{npcGkOutcome:'RUSH_BLOCK',shotSourcePlayerId:m.ball.shotSourcePlayerId,contact:{time:m.time,gap:Number(gap.toFixed(3)),keeperBefore:{x:b.gkRush?.startX??gk.x,y:b.gkRush?.startY??gk.y},keeperAtContact:{x:gk.x,y:gk.y},ballAtContact:{x:b.x,y:b.y}},ballVelocityBefore:before,ballVelocityAfter:{x:m.ball.vx,y:m.ball.vy},ballState:{mode:m.ball.mode,kind:m.ball.kind,ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null,lastTouchTeam:m.ball.lastTouchTeam,lastTouchPlayer:m.ball.lastTouchPlayer}});
     return{outcome:'RUSH_BLOCK',sweep,gap};
   }
-  // Existing special contexts remain on their V3 routes until later phases.
-  if(b.shotOneVOne||b.shotClearKeeperChance||gk.action==='GK_RUSH'||gk.tacticalTask==='GK_RUSH')return null;
+  // A live rush owns its own contact route. Other keeper-facing chances still use this
+  // ability/difficulty contest when no physical rush contact was created; bypassing both
+  // routes made open 14-18 m shots cross the line without any goalkeeper contest.
+  if(gk.action==='GK_RUSH'||gk.tacticalTask==='GK_RUSH')return null;
   // Resolve only when the live shot reaches a broad near-GK interaction plane.
   // The previous/current segment makes the gate tolerant of fast 0.05s steps;
   // this is timing continuity, not collision or save-success authority.
@@ -1923,7 +1924,7 @@ function resolveNpcGkShot(m,gk,prev){
   // three Phase-1 contest abilities. No result quotas or distance lookup table.
   const difficulty=clamp((speed-18)*1.35+Math.max(0,offset-4)*0.75+Math.max(0,22-distance)*0.55+(height>0.35?1.5:0),-4,15);
   const contest=(abilityValue(m,gk,'reaction')*.38+abilityValue(m,gk,'gk_positioning')*.34+abilityValue(m,gk,'diving')*.28)-60;
-  const saveChance=clamp(.52+contest*.007-difficulty*.020,.14,.86),saveRoll=(hash32(`${key}|CONTEST`)%1000000)/1000000;
+  const saveChance=clamp(.90+contest*.007-difficulty*.006,.52,.97),saveRoll=(hash32(`${key}|CONTEST`)%1000000)/1000000;
   const saved=saveRoll<saveChance;
   if(!saved){b.npcGkResolved='GOAL';return{outcome:'GOAL',routine:false};}
   const handling=abilityValue(m,gk,'handling'),catchChance=clamp(.56+(handling-60)*.008-Math.max(0,speed-20)*.018-offset*.006,.24,.88),catchRoll=(hash32(`${key}|HANDLING`)%1000000)/1000000;
@@ -2365,7 +2366,7 @@ function incomingBallChoiceState(m,owner){
   const kind=m.ball.kind,eligible=new Set(['PASS','LONG_PASS','THROUGH','CUTBACK','CROSS']);if(!eligible.has(kind))return null;
   const rx=owner.x-m.ball.x,ry=owner.y-m.ball.y,d=Math.hypot(rx,ry);if(d<0.05)return null;
   const rvx=(m.ball.vx||0)-(owner.vx||0),rvy=(m.ball.vy||0)-(owner.vy||0),closing=(rx*rvx+ry*rvy)/d;
-  if(closing<=0.45)return null;const receiveRadius=(CONTROL_RADIUS[owner.role]||1.05)+(kind==='CROSS'?.20:.72),eta=Math.max(.055,(d-receiveRadius)/closing);if(eta>0.92)return null;
+  if(closing<=0.45)return null;const receiveRadius=(CONTROL_RADIUS[owner.role]||1.05)+(kind==='CROSS'?.20:.72),eta=Math.max(.055,(d-receiveRadius)/closing);if(eta>1.45)return null;
   const contactX=clamp(m.ball.x+(m.ball.vx||0)*eta,1,104),contactY=clamp(m.ball.y+(m.ball.vy||0)*eta,1,67);
   let contactZ;if(m.ball.airborne){contactZ=Math.max(0,(m.ball.z||0)+(m.ball.vz||0)*eta-4.905*eta*eta);}else contactZ=0;
   contactZ=Number(contactZ.toFixed(3));const local=worldToLocal(owner.team,contactX,contactY),goalX=oppGoalX(owner.team),dGoal=Math.hypot(goalX-contactX,34-contactY),central=Math.abs(local.y-34),incomingSpeed=Math.hypot(m.ball.vx||0,m.ball.vy||0),pressure=nearestOppDistance(m,owner);
@@ -2380,7 +2381,7 @@ function incomingBallChoiceState(m,owner){
   if(shotGeometry&&airborne&&contactZ>=0.42&&contactZ<=1.38&&incomingSpeed<=25)candidates.push({id:'VOLLEY_SHOT',score:2.35,reason:'live_volley_finish',targetId:null,targetName:null,meta:{eta,contactZ,incomingSpeed,dGoal,flightKind:kind}});
   const headHeight=contactZ>=0.88&&contactZ<=1.95&&incomingSpeed<=25.5,headingSkill=(abilityValue(m,owner,'heading')+abilityValue(m,owner,'anticipation'))/2;
   if(headHeight&&headingSkill>=42){for(const o of targets.slice(0,2))candidates.push({id:'HEADER_PASS',score:.95+o.forward*.02+o.open*.04,reason:'live_header_redirect',targetId:o.t.id,targetName:o.t.name,meta:{targetId:o.t.id,targetSlot:o.t.slot,eta,contactZ,incomingSpeed,forward:o.forward,d:o.d,receiverPressure:o.open,flightKind:kind}});if(dGoal<=20&&central<=18&&local.x>=84)candidates.push({id:'HEADER_SHOT',score:2.55,reason:'live_header_finish',targetId:null,targetName:null,meta:{eta,contactZ,incomingSpeed,dGoal,flightKind:kind}});}
-  return{kind:'INCOMING_BALL',playerId:owner.id,team:owner.team,role:owner.role,slot:owner.slot,time:m.time,localX:local.x,localY:local.y,eta:Number(eta.toFixed(3)),contactX:Number(contactX.toFixed(3)),contactY:Number(contactY.toFixed(3)),contactZ,incomingSpeed:Number(incomingSpeed.toFixed(3)),pressure,flightKind:kind,sourceId:m.ball.lastTouchPlayer,candidates};
+  return{kind:'INCOMING_BALL',playerId:owner.id,team:owner.team,role:owner.role,slot:owner.slot,time:m.time,localX:local.x,localY:local.y,eta:Number(eta.toFixed(3)),contactX:Number(contactX.toFixed(3)),contactY:Number(contactY.toFixed(3)),contactZ,incomingSpeed:Number(incomingSpeed.toFixed(3)),pressure,flightKind:kind,sourceId:m.ball.lastTouchPlayer,candidates,futureOutcomePrecomputed:false};
 }
 function matchingIncomingIntent(m,p,flightKind,sourceId){
   const x=m.userIncomingIntent;if(!x||x.playerId!==p.id)return null;if(m.time>(x.expiresAt||0)||x.sourceId!==sourceId||x.flightKind!==flightKind||Math.abs(Number(x.originX)-Number(m.ball.originX))>.02||Math.abs(Number(x.originY)-Number(m.ball.originY))>.02){if(x.playerId===p.id)m.userIncomingIntent=null;return null;}return x;
@@ -2410,15 +2411,17 @@ function inspectChoiceState(m,playerId){
   const owner=playerById(m,playerId);if(!owner)return null;
   const incoming=incomingBallChoiceState(m,owner);if(incoming)return incoming;
   if(m.ball.mode==='CONTROLLED'&&m.ball.ownerId===owner.id){
-    const local=worldToLocal(owner.team,owner.x,owner.y),pressure=ballCarrierPressureDistance(m,owner),space=forwardSpace(m,owner,13),shot=shotAssessment(m,owner),opts=passOptions(m,owner,'PLAYER'),held=Math.max(0,m.time-(owner.controlledSince||m.time)),deep=finalThirdDelivery(m,owner),early=earlyCrossDelivery(m,owner),takeOn=takeOnOpportunity(m,owner,shot,held),ctx=candidateContext(m,owner,shot,opts,pressure,space,held,deep,early,takeOn),ranked=candidateRank(m,owner,ctx);
+    const lifecycle=[],local=worldToLocal(owner.team,owner.x,owner.y),pressure=ballCarrierPressureDistance(m,owner),space=forwardSpace(m,owner,13),shot=shotAssessment(m,owner),opts=passOptions(m,owner,'PLAYER'),held=Math.max(0,m.time-(owner.controlledSince||m.time)),deep=finalThirdDelivery(m,owner),early=earlyCrossDelivery(m,owner),takeOn=takeOnOpportunity(m,owner,shot,held),ctx=candidateContext(m,owner,shot,opts,pressure,space,held,deep,early,takeOn),ranked=candidateRank(m,owner,ctx);
+    for(const p of teamPlayers(m,owner.team)){if(p.id===owner.id)continue;const o=opts.find(x=>x.p.id===p.id);let reason='GENERATED_LEGAL_GEOMETRY';if(!o){const d=dist(owner,p),line=offsideLine(m,owner.team),offside=owner.team===HOME?(p.x>Math.max(52.5,m.ball.x+.25,line+.25)):(p.x<Math.min(52.5,m.ball.x-.25,line-.25));reason=p.role==='GK'&&local.x>45?'GK_CONTEXT_EXCLUDED':d<3?'TOO_CLOSE':d>52?'UNREACHABLE_DISTANCE':offside?'OFFSIDE_EXCLUDED':'PASS_GEOMETRY_EXCLUDED';}else if(o.block>1)reason='LANE_BLOCKED';else if(o.open<.35)reason='RECEIVER_PRESSURE_FLOOR';lifecycle.push({stage:'GENERATION_LEGALITY',candidateId:'PASS_TARGET',targetId:p.id,included:!!o&&o.block<=1&&o.open>=.35,reason,geometry:o?{distance:Number(o.d.toFixed(3)),forward:Number(o.forward.toFixed(3)),laneBlockers:o.block,receiverSpace:Number(o.open.toFixed(3)),offsideRisk:!!o.offsideRisk}:null});}
     const nameById=id=>playerById(m,id)?.name||id||null,represented=new Set(ranked.filter(c=>['THROUGH_PASS','PROGRESSIVE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE'].includes(c.id)&&c.meta?.targetId).map(c=>c.meta.targetId));
     const oRisk=o=>(o.offsideRisk?3:0)+(o.running?1.5:0)+(['ST','WF'].includes(o.p.role)?1:0)+(o.block>0?0.5:0);
     const physicalPasses=opts.filter(o=>o.block<=1&&!represented.has(o.p.id)&&o.d<=42&&o.forward>-6.0&&o.open>=0.35&&['ST','WF','CM','FB'].includes(o.p.role)).sort((a,b)=>{const ar=oRisk(a),br=oRisk(b);return br-ar||(b.forward-a.forward)||(b.score-a.score)}).slice(0,3).map(o=>({id:'AVAILABLE_PASS',score:Number((o.score-0.45).toFixed(3)),reason:'physically_available_receiver',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,contested:o.open<1.8||o.block>0,laneBlockers:o.block,offsideRisk:!!o.offsideRisk,offsideMargin:Number(o.offsideMargin||0)}}));
-    const existingThroughTargets=new Set(ranked.filter(c=>c.id==='THROUGH_PASS'&&c.meta?.targetId).map(c=>c.meta.targetId)),openSpacePasses=syntheticLeadPassCandidates(m,owner,opts,existingThroughTargets);
+    const existingThroughTargets=new Set(ranked.filter(c=>c.id==='THROUGH_PASS'&&c.meta?.targetId).map(c=>c.meta.targetId)),openSpacePasses=syntheticLeadPassCandidates(m,owner,opts,existingThroughTargets,lifecycle);
     const existingSafeTargets=new Set(ranked.filter(c=>c.id==='SAFE_PASS'&&c.meta?.targetId).map(c=>c.meta.targetId));
     const directSafePasses=opts.filter(o=>!existingSafeTargets.has(o.p.id)&&o.block===0&&o.d<=30&&o.open>=2.35&&o.forward<=5.5&&o.forward>=-20&&['CM','FB','WF','ST'].includes(o.p.role)&&safePassSupportViability(m,owner,o).ok).sort((a,b)=>(b.open-a.open)||(a.d-b.d)).slice(0,2).map(o=>({id:'SAFE_PASS',score:Number((1.15+Math.min(5,o.open)*.18-o.d*.018).toFixed(3)),reason:'user_visible_safe_feet',meta:{targetId:o.p.id,targetSlot:o.p.slot,forward:o.forward,d:o.d,receiverPressure:o.open,directSafe:true,supportContract:safePassSupportViability(m,owner,o).reason}}));
     const userCandidates=[...ranked,...openSpacePasses,...directSafePasses,...physicalPasses];
-    return{kind:'ON_BALL',playerId:owner.id,team:owner.team,role:owner.role,slot:owner.slot,time:m.time,nextThink:owner.nextThink,lockedUntil:owner.lockTargetUntil||0,localX:local.x,localY:local.y,pressure,space,held,shot:{score:shot.score,dGoal:shot.dGoal,inBox:shot.inBox,oneVOne:shot.oneVOne,openWindow:shot.openWindow,blockers:shot.blockers.length,bodyAngleDiff:shot.bodyAngleDiff,facingAlignment:shot.facingAlignment,turningRequired:shot.turningRequired,backToGoal:shot.backToGoal},context:ctx,candidates:userCandidates.map(c=>({...c,targetId:c.meta?.targetId||null,targetName:nameById(c.meta?.targetId)})),_frame:{owner,shot,opts,pressure,space,held,deep,early,takeOn,ctx}};
+    for(const c of userCandidates)lifecycle.push({stage:'CANDIDATE_GENERATED',candidateId:c.id,targetId:c.meta?.targetId||null,included:true,reason:c.reason||'RANKED_CURRENT_STATE',score:Number(c.score||0)});
+    return{kind:'ON_BALL',playerId:owner.id,team:owner.team,role:owner.role,slot:owner.slot,time:m.time,nextThink:owner.nextThink,lockedUntil:owner.lockTargetUntil||0,localX:local.x,localY:local.y,pressure,space,held,shot:{score:shot.score,dGoal:shot.dGoal,inBox:shot.inBox,oneVOne:shot.oneVOne,openWindow:shot.openWindow,blockers:shot.blockers.length,bodyAngleDiff:shot.bodyAngleDiff,facingAlignment:shot.facingAlignment,turningRequired:shot.turningRequired,backToGoal:shot.backToGoal},context:ctx,candidates:userCandidates.map(c=>({...c,targetId:c.meta?.targetId||null,targetName:nameById(c.meta?.targetId)})),candidateLifecycle:lifecycle,futureOutcomePrecomputed:false,_frame:{owner,shot,opts,pressure,space,held,deep,early,takeOn,ctx}};
   }
   const ballOwner=playerById(m,m.ball.ownerId);if(ballOwner&&ballOwner.team!==owner.team&&m.ball.mode==='CONTROLLED'){
     const d=dist(owner,ballOwner),att=worldToLocal(ballOwner.team,ballOwner.x,ballOwner.y),own=worldToLocal(owner.team,ballOwner.x,ballOwner.y),goalSideMargin=dir(ballOwner.team)*(owner.x-ballOwner.x),threats=teamPlayers(m,ballOwner.team).filter(q=>q.id!==ballOwner.id&&q.role!=='GK').map(q=>({id:q.id,name:q.name,role:q.role,d:dist(ballOwner,q),forward:dir(ballOwner.team)*(q.x-ballOwner.x)})).filter(q=>q.forward>1).sort((a,b)=>b.forward-a.forward||a.d-b.d),threatShot=shotAssessment(m,ballOwner);
@@ -2476,11 +2479,11 @@ function choiceActionBridge(){
   // existing action executors without adding a second simulation path or choice policy here.
   return{
     playerById,teamPlayers,other,dir,ownGoalX,clamp,norm,dist,laneBlockers,nearestOppDistance,passOptions,
-    executeShot,executeCarry,executeTakeOn,takeOnOpportunity,executePass,setControlled,setLoose,startDeadRestart,event
+    executeShot,executeCarry,executeTakeOn,takeOnOpportunity,executePass,setControlled,setLoose,startDeadRestart,startGoalCelebration,handleOut,event,shotAssessment,chooseOwnerAction
   };
 }
 
-function snapshot(m){const longest={...m.stats.longestPossession};if(m.stats.currentPossessionTeam){const t=m.stats.currentPossessionTeam;longest[t]=Math.max(longest[t]||0,Math.max(0,m.time-m.stats.currentPossessionStartedAt));}const stats={...m.stats,possessionSeconds:{...m.stats.possessionSeconds},firstHalfPossession:{...m.stats.firstHalfPossession},secondHalfPossession:{...m.stats.secondHalfPossession},longestPossession:longest,possessionPct:possessionPct(m.stats.possessionSeconds),firstHalfPossessionPct:possessionPct(m.stats.firstHalfPossession),secondHalfPossessionPct:possessionPct(m.stats.secondHalfPossession)};return{time:m.time,...(Number.isFinite(m.visualReplayTime)?{visualTime:m.visualReplayTime}:{}),score:{...m.score},phase:phaseName(m),possession:m.possession,ball:{...m.ball},players:m.players.map(p=>({id:p.id,name:p.name,team:p.team,role:p.role,slot:p.slot,x:p.x,y:p.y,vx:p.vx,vy:p.vy,tx:p.tx,ty:p.ty,action:p.action,tacticalTask:p.tacticalTask,markTargetId:p.markTargetId||null,responsibilityReason:p.responsibilityReason||null,hasBall:p.hasBall,bodyAngle:Number.isFinite(p.bodyAngle)?p.bodyAngle:null,faceTargetAngle:Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:null})),actionCandidates:m.actionCandidateTelemetry?JSON.parse(JSON.stringify(m.actionCandidateTelemetry)):null,userDirectedPassTrace:m.lastUserDirectedPassTrace?JSON.parse(JSON.stringify(m.lastUserDirectedPassTrace)):null,tactical:m.tactical?JSON.parse(JSON.stringify(m.tactical)):null,looseBallArbitration:m.looseBallArbitration?JSON.parse(JSON.stringify(m.looseBallArbitration)):null,lastLooseBallArbitration:m.lastLooseBallArbitration?JSON.parse(JSON.stringify(m.lastLooseBallArbitration)):null,setPieceLive:m.setPieceLive?{kind:m.setPieceLive.kind,team:m.setPieceLive.team,startedAt:m.setPieceLive.startedAt,maxUntil:m.setPieceLive.maxUntil,roleCount:Object.keys(m.setPieceLive.roles||{}).length}:null,events:m.events.slice(-20),stats,telemetry:(TELEMETRY&&m.telemetry&&typeof TELEMETRY.summary==='function')?TELEMETRY.summary(m.telemetry):null,completed:m.completed};}
+function snapshot(m){const longest={...m.stats.longestPossession};if(m.stats.currentPossessionTeam){const t=m.stats.currentPossessionTeam;longest[t]=Math.max(longest[t]||0,Math.max(0,m.time-m.stats.currentPossessionStartedAt));}const stats={...m.stats,possessionSeconds:{...m.stats.possessionSeconds},firstHalfPossession:{...m.stats.firstHalfPossession},secondHalfPossession:{...m.stats.secondHalfPossession},longestPossession:longest,possessionPct:possessionPct(m.stats.possessionSeconds),firstHalfPossessionPct:possessionPct(m.stats.firstHalfPossession),secondHalfPossessionPct:possessionPct(m.stats.secondHalfPossession)};return{time:m.time,...(Number.isFinite(m.visualReplayTime)?{visualTime:m.visualReplayTime}:{}),score:{...m.score},phase:phaseName(m),possession:m.possession,ball:{...m.ball},players:m.players.map(p=>({id:p.id,name:p.name,team:p.team,role:p.role,slot:p.slot,x:p.x,y:p.y,vx:p.vx,vy:p.vy,tx:p.tx,ty:p.ty,action:p.action,tacticalTask:p.tacticalTask,markTargetId:p.markTargetId||null,responsibilityType:p.responsibilityType||null,responsibilityEpoch:Number.isFinite(p.responsibilityEpoch)?p.responsibilityEpoch:null,responsibilityTargetId:p.responsibilityTargetId||null,responsibilityReason:p.responsibilityReason||null,responsibilityMotionMode:p.responsibilityMotionMode||null,responsibilityRewriteReason:p.responsibilityRewriteReason||null,responsibilityContinuityReason:p.responsibilityContinuityReason||null,hasBall:p.hasBall,bodyAngle:Number.isFinite(p.bodyAngle)?p.bodyAngle:null,faceTargetAngle:Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:null})),actionCandidates:m.actionCandidateTelemetry?JSON.parse(JSON.stringify(m.actionCandidateTelemetry)):null,attackingDecisionTrace:m.attackingDecisionTrace?JSON.parse(JSON.stringify(m.attackingDecisionTrace)):null,userDirectedPassTrace:m.lastUserDirectedPassTrace?JSON.parse(JSON.stringify(m.lastUserDirectedPassTrace)):null,tactical:m.tactical?JSON.parse(JSON.stringify(m.tactical)):null,looseBallArbitration:m.looseBallArbitration?JSON.parse(JSON.stringify(m.looseBallArbitration)):null,lastLooseBallArbitration:m.lastLooseBallArbitration?JSON.parse(JSON.stringify(m.lastLooseBallArbitration)):null,setPieceLive:m.setPieceLive?{kind:m.setPieceLive.kind,team:m.setPieceLive.team,startedAt:m.setPieceLive.startedAt,maxUntil:m.setPieceLive.maxUntil,roleCount:Object.keys(m.setPieceLive.roles||{}).length}:null,events:m.events.slice(-20),stats,telemetry:(TELEMETRY&&m.telemetry&&typeof TELEMETRY.summary==='function')?TELEMETRY.summary(m.telemetry):null,completed:m.completed};}
 function runToEnd(seed='perf',opts={}){const m=createMatch(seed,opts),dt=opts.dt||m.dt,max=Math.ceil(5410/dt)+100;let steps=0;while(!m.completed&&steps++<max)step(m,dt);return{match:m,snapshot:snapshot(m),steps};}
 return{createMatch,step,snapshot,runToEnd,choiceActionBridge,choiceStateBridge,FIELD,HOME,AWAY,DEFAULT_DT};
 });

@@ -1,5 +1,5 @@
 (function(root){'use strict';
-const API_VERSION='STEP78-IN-PITCH-CHOICE-0.4-RUN-ARROW-EXPLICIT-INPUT';
+const API_VERSION='V42-SOL2-IN-PITCH-CHOICE-0.5-RECOMMENDATION';
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function resolveAnchorId(option,heroId,playerIds){
   if(option&&option.targetId&&playerIds.has(option.targetId)) return option.targetId;
@@ -84,8 +84,8 @@ function createController(cfg){
     const title=make('div','in-pitch-choice-title');title.textContent=player?(player.id===heroId()?`내 선수 · ${player.slot||player.role}`:(hero&&player.team===hero.team?`같은 팀 ${player.slot||player.role}`:`상대 ${player.slot||player.role}`)):'선택';menu.appendChild(title);
     const grid=make('div','in-pitch-choice-grid');
     for(const o of options){
-      const b=make('button','in-pitch-choice-option');b.type='button';b.setAttribute('role','menuitem');const tip=o.tooltip||o.hint||'';
-      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.textContent=shortLabel(o);
+      const b=make('button',`in-pitch-choice-option${o.recommended?' recommended':''}`);b.type='button';b.setAttribute('role','menuitem');const tip=o.tooltip||o.hint||'';
+      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.dataset.recommended=o.recommended?'true':'false';b.textContent=shortLabel(o);if(o.recommended){const badge=make('span','in-pitch-choice-recommended-label');badge.textContent='추천';b.appendChild(badge);}
       b.addEventListener('mouseenter',()=>showTooltipFor(b,tip));b.addEventListener('mouseleave',hideTooltip);b.addEventListener('focus',()=>showTooltipFor(b,tip));b.addEventListener('blur',hideTooltip);
       b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();if(locked||generation!==menuGeneration||performance.now()<menuArmAt){resetPointerCommit();return;}pointerCommit={pointerId:ev.pointerId,generation,choiceId:o.id,targetId:o.targetId||null,button:b};});
       b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();const c=pointerCommit;resetPointerCommit();if(!c||c.pointerId!==ev.pointerId||c.generation!==generation||c.button!==b)return;commitChoice(o,anchorId,generation,ev.pointerType||'pointer');});

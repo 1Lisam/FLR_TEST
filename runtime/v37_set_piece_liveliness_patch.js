@@ -8,7 +8,10 @@ const worldToLocal=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
 function hash32(str){let h=2166136261>>>0;for(let i=0;i<String(str).length;i++){h^=String(str).charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 function playerById(m,id){return m?.playersById?.[id]||m?.players?.find(p=>p.id===id)||null;}
 function repairCornerRunup(m,setup){const r=m?.restart;if(!r||r.kind!=='CORNER'||!setup||setup.kind!=='CORNER'||r.stage!=='SETUP'||!setup.kickerId)return setup;const t=setup.targets?.[setup.kickerId],kicker=playerById(m,setup.kickerId);if(!t||!kicker)return setup;
-  const sx=r.x<52.5?1:-1,sy=r.y<34?1:-1,w={x:clamp(r.x+sx*1.65,.9,104.1),y:clamp(r.y+sy*1.65,.9,67.1)};
+  // This wrapper must preserve the canonical outside-field origin.  The old
+  // repair used an in-field offset and ordinary clamps, undoing buildCorner
+  // and causing the recurring visual failure before RUN_UP even began.
+  const lp=worldToLocal(r.team,r.x,r.y),top=lp.y<34,runupLocal={x:Math.max(105.45,lp.x+1.55),y:top?-0.72:68.72},w=localToWorld(r.team,runupLocal.x,runupLocal.y);
   t.x=w.x;t.y=w.y;t.task='CORNER_KICKER_RUNUP_START';t.required=true;t.sprint=true;if(setup.cornerRunup)setup.cornerRunup.start={...w};
   kicker.tx=w.x;kicker.ty=w.y;kicker.action='CORNER_KICKER_RUNUP_START';kicker.tacticalTask='CORNER_KICKER_RUNUP_START';kicker.sprint=dist(kicker,w)>2.0;setup.v37CornerRunupReachable=true;return setup;}
 function nearestMarker(m,p,restartTeam){const wanted=p.team===restartTeam?m.players.filter(q=>q.team!==p.team&&q.role!=='GK'):m.players.filter(q=>q.team===restartTeam&&q.role!=='GK'&&q.id!==m.restart?.setup?.kickerId);let best=null,bd=99;for(const q of wanted){const d=dist(p,q);if(d<bd){bd=d;best=q;}}return bd<=5.4?best:null;}

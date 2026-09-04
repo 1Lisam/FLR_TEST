@@ -21,7 +21,6 @@ function createState(opts={}){
     focusPlayerId:opts.focusPlayerId||'H-ST',
     focusThreshold:opts.focusThreshold||'IMPORTANT',
     decisions:[],chains:[],activeChain:null,linkedEvents:[],lastDecision:null,lastFocusDecision:null,lastWindowByPlayer:{},lastDisplayedChainAt:-999,
-    focusStats:{shots:0,goals:0,tacklesWon:0,fouls:0,interceptions:0,saves:0,parries:0,blocks:0,clearances:0,goalsConceded:0},
     counters:{
       rawDecisions:0,decisions:0,focusDecisions:0,focusVisibleDecisions:0,suppressedFocusWindows:0,defensiveWindows:0,chainsStarted:0,chainsCompleted:0,
       directReinvolvement:0,resultLinked:0,turnoverEnded:0,restartEnded:0,timeoutEnded:0,
@@ -156,13 +155,13 @@ function onDefensiveDecision(m,payload){
 }
 function onChallengeOutcome(m,payload){
   const state=m.telemetry;if(!state)return;
-  if(payload.outcome==='TACKLE_WON'){state.counters.tacklesByTeam[payload.team]++;if(payload.playerId===state.focusPlayerId)state.focusStats.tacklesWon++;}
-  if(payload.outcome==='FOUL'){state.counters.foulsByTeam[payload.team]++;if(payload.playerId===state.focusPlayerId)state.focusStats.fouls++;}
+  if(payload.outcome==='TACKLE_WON')state.counters.tacklesByTeam[payload.team]++;
+  if(payload.outcome==='FOUL')state.counters.foulsByTeam[payload.team]++;
 }
-function onInterception(m,payload){const state=m.telemetry;if(state){state.counters.interceptionsByTeam[payload.team]++;if(payload.playerId===state.focusPlayerId)state.focusStats.interceptions++;}}
+function onInterception(m,payload){const state=m.telemetry;if(state)state.counters.interceptionsByTeam[payload.team]++;}
 function onShot(m,payload){
   const state=m.telemetry;if(!state)return;
-  state.counters.shotsByTeam[payload.team]++;if(payload.ownerId===state.focusPlayerId)state.focusStats.shots++;
+  state.counters.shotsByTeam[payload.team]++;
   if(!payload.inBox)state.counters.outsideBoxShotsByTeam[payload.team]++;
   if(!payload.inBox&&payload.dGoal>=18&&payload.dGoal<=30)state.counters.longShotsByTeam[payload.team]++;
   if(!payload.inBox&&payload.role==='CM')state.counters.midfieldLongShotsByTeam[payload.team]++;
@@ -170,15 +169,9 @@ function onShot(m,payload){
 }
 function onEvent(m,type,text){
   const state=m.telemetry;if(!state)return;
-  const focus=state.focusPlayerId,fp=m.playersById?.[focus]||m.players?.find(p=>p.id===focus)||null,last=m.ball?.lastTouchPlayer||m.lastTouchPlayer||null;
-  if(type==='GOAL'){if(last===focus)state.focusStats.goals++;if(fp?.role==='GK'&&m.ball?.shotTeam&&fp.team!==m.ball.shotTeam)state.focusStats.goalsConceded++;}
-  if((type==='SAVE'||type==='CHIP_SAVE')&&last===focus)state.focusStats.saves++;
-  if((type==='PARRY'||type==='CHIP_PARRY')&&last===focus)state.focusStats.parries++;
-  if(type==='BLOCK'&&last===focus)state.focusStats.blocks++;
-  if(type==='CLEARANCE'&&last===focus)state.focusStats.clearances++;
   const item={at:Number(m.time.toFixed(3)),type,text};pushLimited(state.linkedEvents,item,MAX_EVENTS);
   const ch=state.activeChain;if(!ch||ch.endedAt)return;
-  if(['SHOT','GOAL','CORNER','FOUL','SAVE','BLOCK','TACKLE','INTERCEPT','CLEARANCE','CROSS_RECEIVE'].includes(type)){
+  if(['SHOT','GOAL','CORNER','FOUL','SAVE','PARRY','GK_CROSS_CATCH','PUNCH','BLOCK','TACKLE','INTERCEPT','CLEARANCE','CROSS_RECEIVE'].includes(type)){
     ch.events.push(item);ch.lastMeaningfulAt=m.time;
   }
   if(type==='GOAL'){ch.flags.goal=true;ch.flags.resultLinked=true;}
@@ -224,8 +217,7 @@ function summary(state){
     lastFocusDecision:last?{id:last.id,kind:last.kind,at:last.at,role:last.role,importance:last.importance,candidates:[...last.candidates],action:last.action,reason:last.reason,context:last.context}:null,
     byImportance:{...c.byImportance},byRole:{...c.byRole},byAction:{...c.byAction},
     shotsByTeam:{...c.shotsByTeam},outsideBoxShotsByTeam:{...c.outsideBoxShotsByTeam},longShotsByTeam:{...c.longShotsByTeam},midfieldLongShotsByTeam:{...c.midfieldLongShotsByTeam},
-    tacklesByTeam:{...c.tacklesByTeam},foulsByTeam:{...c.foulsByTeam},interceptionsByTeam:{...c.interceptionsByTeam},
-    focusStats:{...state.focusStats}
+    tacklesByTeam:{...c.tacklesByTeam},foulsByTeam:{...c.foulsByTeam},interceptionsByTeam:{...c.interceptionsByTeam}
   };
 }
 return{VERSION,LEVELS,createState,configure,onDecision,onDefensiveDecision,onChallengeOutcome,onInterception,onShot,onEvent,tick,currentPresentation,summary};
