@@ -27,7 +27,7 @@ function installV43OriginalViewerTestAdapter(){
   window.FLR_V43_ORIGINAL_VIEWER_ADAPTER=adapter;return adapter;
 }
 
-function roleInfo(){const id=$('heroPlayer').value;return{id,role:id==='H-ST'?'ST':id==='H-GK'?'GK':id==='H-LCB'?'CB':'CM'}}function freshSeed(){const nonce=globalThis.crypto?.randomUUID?.()||`${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`;return`LIVE-V03-${nonce}`}function seed(){if(!currentSeed)currentSeed=freshSeed();bindSeedButtons();return currentSeed}
+function roleInfo(){const id=$('heroPlayer').value;return{id,role:id==='H-ST'?'ST':id==='H-GK'?'GK':id==='H-LCB'?'CB':'CM'}}function freshSeed(){const nonce=globalThis.crypto?.randomUUID?.()||`${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`;return`LIVE-V03-${nonce}`}function seed(){if(!currentSeed)currentSeed=freshSeed();return currentSeed}
 function clearAutoAdvance(){clearTimeout(autoAdvanceTimer);clearInterval(autoAdvanceInterval);autoAdvanceTimer=autoAdvanceInterval=null;const x=$('heroAutoNext');if(x)x.textContent='';const n=$('heroSceneNotice');if(n?.classList.contains('end-countdown')){n.hidden=true;n.classList.remove('end-countdown');}}
 function periodMinute(t){const sec=Math.max(0,Number(t)||0),m=Math.floor(sec/60)+1;return sec<2700?`전반 ${Math.min(45,m)}분`:`후반 ${Math.max(1,Math.min(45,m-45))}분`;}
 function pushLiveFeed(text,kind=''){const box=$('heroLiveFeed');if(!box||!text)return;const row=document.createElement('div');row.className=`live-feed-row ${kind}`.trim();row.textContent=text;box.appendChild(row);while(box.children.length>3)box.removeChild(box.firstChild);}
