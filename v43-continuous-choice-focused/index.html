@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FLR V43 · 연속 선택 집중 검증</title>
+  <link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<main class="shell">
+  <header><p class="eyebrow">TEST_ONLY · V43 CONTINUOUS CHOICE</p><h1>연속 경기 선택 집중 검증</h1><p>실제 킥오프부터 진행한 경기에서만 선택 장면을 표시합니다. 장면을 새로 배치하거나 결과를 미리 계산하지 않습니다.</p></header>
+  <section class="controls"><button id="start">테스트 시작</button><button id="again" disabled>다시 테스트</button><button id="other" disabled>다른 케이스</button><span id="status">준비됨</span></section>
+  <section class="pitch-card"><div class="score"><strong id="clock">0'</strong><b id="score">0 - 0</b><span id="mode">LIVE</span></div><canvas id="pitch" width="1050" height="680" aria-label="2D football pitch"></canvas><p id="message">테스트 시작을 누르면 실제 연속 경기에서 유효한 선택 지점을 찾습니다.</p></section>
+  <section id="choice" class="choice" hidden><h2>정확한 정지 지점의 선택</h2><p>재생은 직전 실제 플레이이며, 마지막 프레임에서 멈춥니다.</p><div id="options"></div></section>
+  <details class="proof"><summary>테스트 검증 정보</summary><dl id="proof"></dl></details>
+  <section class="guide"><strong>확인할 점</strong><span>플레이가 자연스럽게 이어져 멈추는지 · 선택 뒤 고른 행동만 먼저 실행되는지 · 같은 경기가 계속되는지</span></section>
+</main>
+<script src="../runtime/match_flow_resolution.js"></script><script src="../runtime/tactical_movement.js"></script><script src="../runtime/restart_movement.js"></script><script src="../runtime/free_kick_templates.js"></script><script src="../runtime/free_kick_wall_model.js"></script><script src="../runtime/corner_templates.js"></script><script src="../runtime/v37_set_piece_liveliness_patch.js"></script><script src="../runtime/match_choice_telemetry.js"></script><script src="../runtime/attribute_match_adapter.js"></script><script src="../runtime/action_candidate_engine.js"></script><script src="../runtime/match_academy.js"></script><script src="../runtime/aerial_contest.js"></script><script src="../runtime/take_on_duel.js"></script><script src="../runtime/ball_strike_model.js"></script><script src="../runtime/continuous_match_core.js"></script><script src="../runtime/v37_match_feel_patch.js"></script><script src="../runtime/choice_action_resolver.js"></script><script src="../runtime/choice_resolution_harness.js"></script><script src="../runtime/choice_action_resolver_step38.js"></script><script src="../runtime/manager_tendency_adapter.js"></script><script src="../runtime/step38_influence_harness.js"></script><script src="../runtime/protagonist_match_controller.js"></script>
+<script src="viewer.js"></script>
+</body></html>
