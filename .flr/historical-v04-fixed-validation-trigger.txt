@@ -1,0 +1,2 @@
+Validate the fixed V0.4 repeated-CARRY cadence candidate.
+Expected candidate parent/fix lineage includes ef8faea5fee2519d8119c0789d2d12353c1176c9.
