@@ -1,0 +1,5 @@
+{
+  "schemaVersion": "FLR_HF2_PR_RETRY_3",
+  "reason": "Run exact user five-issue regression, 4x90 role benches, CB decision survival, and protected invariants on current HF1 source.",
+  "gameFilesModified": false
+}
