@@ -73,7 +73,76 @@ function releaseForwardLocal(m,p,wanted){
   }
   return clamp(safeForwardLocal(m,p,wanted)+(p.releaseRunTimingBias||0),5,96.5);
 }
-function applyTarget(p,lx,ly,action,sprint=false,m=null){const w=localToWorld(p.team,clamp(lx,2.5,102.5),clamp(ly,3,65));const runTasks=new Set(['OVERLAP','UNDERLAP','BALANCED_OVERLAP','UNDERLAP_SUPPORT','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','ATTACK_NEAR_POST','ATTACK_BACK_POST','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','WIDE_SUPPORT_8','BOX_WIDE_CUTBACK_LANE','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','EMERGENCY_TRACK','RECOVERY_CHASE','ST_WALL_SUPPORT','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','SECOND_BALL_SUPPORT','PULL_OFF_FOR_CROSS','ATTACK_OPEN_CHANNEL','POST_PASS_CONTINUE_RUN']);const changed=p.tacticalTask!==action;if(m&&runTasks.has(action)&&changed&&(!p.lastRunCountAt||m.time-p.lastRunCountAt>70.0)){m.stats.runsStarted=(m.stats.runsStarted||0)+1;p.lastRunCountAt=m.time;}p.tx=w.x;p.ty=w.y;p.action=action;p.tacticalTask=action;p.sprint=!!sprint;}
+const SHAPE_RECOVERY_TASKS=new Set(['HOLD_BLOCK','REST_DEFENCE','MIDFIELD_LANE_SCREEN','MIDFIELD_BLOCK','FAR_SIDE_BLOCK','PIVOT_SCREEN_DEF','BUILD_PLATFORM','GK_BUILD_SUPPORT','GK_SET','HOLD']);
+const LIVE_RELATIONSHIP_TASKS=new Set(['MARK_LANE_SCREEN','SHOT_LANE_COVER','RECOVERY_CHASE','TRANSITION_FB_RECOVERY','TRANSITION_WIDE_COVER','FB_CHANNEL_HOLD','FB_WEAK_SIDE_TUCK','OVERLAP','UNDERLAP','BALANCED_OVERLAP','FULLBACK_RECYCLE_SUPPORT','FULLBACK_BALANCED_SUPPORT','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','POST_PASS_CONTINUE_RUN','POST_SAFE_PASS_SUPPORT','WIDE_RELEASE_OUTLET','SECOND_BALL_SUPPORT','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','ATTACK_NEAR_POST','ATTACK_BACK_POST','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','WIDE_SUPPORT_8','BOX_WIDE_CUTBACK_LANE','ATTACK_OPEN_CHANNEL']);
+function applyTarget(p,lx,ly,action,sprint=false,m=null){const w=localToWorld(p.team,clamp(lx,2.5,102.5),clamp(ly,3,65));const runTasks=new Set(['OVERLAP','UNDERLAP','BALANCED_OVERLAP','UNDERLAP_SUPPORT','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','ATTACK_NEAR_POST','ATTACK_BACK_POST','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','WIDE_SUPPORT_8','BOX_WIDE_CUTBACK_LANE','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','EMERGENCY_TRACK','RECOVERY_CHASE','ST_WALL_SUPPORT','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','SECOND_BALL_SUPPORT','PULL_OFF_FOR_CROSS','ATTACK_OPEN_CHANNEL','POST_PASS_CONTINUE_RUN']);const changed=p.tacticalTask!==action;if(m&&runTasks.has(action)&&changed&&(!p.lastRunCountAt||m.time-p.lastRunCountAt>70.0)){m.stats.runsStarted=(m.stats.runsStarted||0)+1;p.lastRunCountAt=m.time;}
+  // Shape ticks may refresh their rails every .25s, but a rail is only a recovery reference.
+  // Retain a short-lived live relationship until it expires or the possession/phase changes.
+  const prior=p._shapeContinuityIntent,phase=m?m._shapeAuthorityPhase?.[p.team]:null;
+  const referenceKind=SHAPE_RECOVERY_TASKS.has(action)?'SHAPE_RECOVERY_REFERENCE':'LIVE_INTENT_TARGET';
+  const baseRoleAnchor={formation:FORMATION,roleSlot:p.slot||p.role||null,baseLane:lane(p.slot)};
+  // The defensive assignment pass produces proposals only.  This includes an
+  // already-live-looking press/mark task: responsibility reconciliation is the
+  // sole current-tick authority that decides whether it becomes executable.
+  const contract=m?._defensiveTargetAuthorityContract?.[p.team];
+  if(contract?.active){
+    const source=contract.currentHelper||(contract.collecting?'assignDefence':'applyTarget');
+    recordDefensiveTargetProposal(contract,p,{x:w.x,y:w.y,action,sprint:!!sprint,baseRoleAnchor,formationReferenceTarget:w,referenceKind,at:m.time},source);
+    m._testOnlyCausalLedger?.reference(m,p,{baseRoleAnchor,formationReferenceTarget:w,referenceKind:referenceKind==='SHAPE_RECOVERY_REFERENCE'?'SHAPE_RECOVERY_PROPOSAL':'DEFENSIVE_ASSIGNMENT_PROPOSAL',referenceFunction:'applyTarget',continuityPreserved:false,selectedTarget:{x:w.x,y:w.y},deferredBy:'DEFENSIVE_FINAL_TARGET_AUTHORITY',proposalSource:source});
+    return;
+  }
+  if(m&&SHAPE_RECOVERY_TASKS.has(action)&&prior&&prior.until>m.time&&prior.possession===m.possession&&prior.phase===phase){m._testOnlyCausalLedger?.reference(m,p,{baseRoleAnchor,formationReferenceTarget:w,referenceKind,referenceFunction:'applyTarget',continuityPreserved:true,selectedTarget:{x:prior.x,y:prior.y}});p.tx=prior.x;p.ty=prior.y;p.action=p.tacticalTask=prior.task;p.sprint=prior.sprint;p.shapeContinuityReason='LIVE_RELATIONSHIP_RETAINS_OVER_SHAPE_RAIL';return;}
+  m?._testOnlyCausalLedger?.reference(m,p,{baseRoleAnchor,formationReferenceTarget:w,referenceKind,referenceFunction:'applyTarget',continuityPreserved:false,selectedTarget:{x:w.x,y:w.y}});
+  p.tx=w.x;p.ty=w.y;p.action=action;p.tacticalTask=action;p.sprint=!!sprint;
+  if(m&&LIVE_RELATIONSHIP_TASKS.has(action)){p._shapeContinuityIntent={x:w.x,y:w.y,task:action,sprint:!!sprint,until:m.time+1.10,possession:m.possession,phase,futureOutcomePrecomputed:false};p.shapeContinuityReason='LIVE_RELATIONSHIP_AUTHORITY';}
+}
+
+const FINAL_DEFENSIVE_RESPONSIBILITY_TYPES=new Set(['PRESS','MARK','COVER','RECOVERY']);
+function beginDefensiveTargetAuthorityContract(m,team){
+  if(!m||m.restart)return null;
+  const all=m._defensiveTargetAuthorityContract||(m._defensiveTargetAuthorityContract={});
+  const contract={schemaVersion:'DEFENSIVE_FINAL_TARGET_AUTHORITY_1.1',team,at:m.time,active:true,collecting:false,currentHelper:null,shapeProposals:new Map(),proposalHistory:[],futureOutcomePrecomputed:false};
+  all[team]=contract;return contract;
+}
+function recordDefensiveTargetProposal(contract,p,proposal,source){
+  const row={...proposal,source};
+  contract.shapeProposals.set(p.id,row);
+  contract.proposalHistory.push({actorId:p.id,source,target:{x:row.x,y:row.y},action:row.action,tacticalTask:row.action,at:row.at});
+}
+// A direct geometry helper may need to calculate against the current target rails, but it
+// must not make those rails executable before reconciliation knows the responsibility.
+// Capture its target/task delta as a proposal and restore the pre-helper executable state.
+function collectDefensiveHelperProposals(m,team,name,fn){
+  const contract=m?._defensiveTargetAuthorityContract?.[team];
+  if(!contract?.active)return fn();
+  const before=new Map(outfield(m,team).map(p=>[p.id,{tx:p.tx,ty:p.ty,action:p.action,tacticalTask:p.tacticalTask,sprint:p.sprint}]));
+  contract.currentHelper=name;
+  try{fn();}finally{contract.currentHelper=null;}
+  for(const p of outfield(m,team)){
+    const prior=before.get(p.id);if(!prior)continue;
+    if(p.tx!==prior.tx||p.ty!==prior.ty||p.action!==prior.action||p.tacticalTask!==prior.tacticalTask||p.sprint!==prior.sprint){
+      recordDefensiveTargetProposal(contract,p,{x:p.tx,y:p.ty,action:p.action,tacticalTask:p.tacticalTask,sprint:!!p.sprint,baseRoleAnchor:{formation:FORMATION,roleSlot:p.slot||p.role||null,baseLane:lane(p.slot)},formationReferenceTarget:{x:p.tx,y:p.ty},referenceKind:'DIRECT_HELPER_PROPOSAL',at:m.time},name);
+      p.tx=prior.tx;p.ty=prior.ty;p.action=prior.action;p.tacticalTask=prior.tacticalTask;p.sprint=prior.sprint;
+      m._testOnlyCausalLedger?.reference(m,p,{referenceKind:'DIRECT_HELPER_PROPOSAL',referenceFunction:name,continuityPreserved:false,selectedTarget:{x:contract.shapeProposals.get(p.id).x,y:contract.shapeProposals.get(p.id).y},deferredBy:'DEFENSIVE_FINAL_TARGET_AUTHORITY',proposalSource:name});
+    }
+  }
+}
+function arbitrateDefensiveTargetAuthority(m,team,state){
+  const contract=m?._defensiveTargetAuthorityContract?.[team];
+  if(!contract||!contract.active)return state;
+  const decisions=[];
+  for(const [id,proposal]of contract.shapeProposals){
+    const p=playerById(m,id),r=state?.records?.[id],finalResponsibility=!!r&&FINAL_DEFENSIVE_RESPONSIBILITY_TYPES.has(r.type);
+    if(!p)continue;
+    if(finalResponsibility){decisions.push({actorId:id,decision:'SHAPE_PROPOSAL_SUPERSEDED_BY_RESPONSIBILITY',proposalSource:proposal.source||'assignDefence',responsibilityType:r.type,responsibilityEpoch:r.epoch,targetId:r.targetId||null,proposalTarget:{x:proposal.x,y:proposal.y}});continue;}
+    p.tx=proposal.x;p.ty=proposal.y;p.action=p.tacticalTask=proposal.action;p.sprint=proposal.sprint;
+    decisions.push({actorId:id,decision:'SHAPE_PROPOSAL_APPLIED_NO_LIVE_RESPONSIBILITY',proposalSource:proposal.source||'assignDefence',responsibilityType:r?.type||null,responsibilityEpoch:r?.epoch||null,proposalTarget:{x:proposal.x,y:proposal.y}});
+  }
+  contract.active=false;contract.decisions=decisions;contract.finalizedAt=m.time;
+  if(state)state.targetAuthorityContract={schemaVersion:contract.schemaVersion,at:m.time,decisions,futureOutcomePrecomputed:false};
+  m._testOnlyCausalLedger?.authorityArbitrated(m,team,state,decisions);
+  return state;
+}
 
 function phaseFromProgress(progress,transition){if(transition)return'TRANSITION';if(progress<28)return'BUILD_UP';if(progress<58)return'PROGRESSION';if(progress<80)return'FINAL_THIRD';return'CHANCE';}
 
@@ -422,15 +491,19 @@ function dangerBlockAnchor(pr,ball,slot,role){
 function captureTransitionWideVacancies(m,lostTeam){
   if(!lostTeam)return;
   if(!m._transitionWideVacancies)m._transitionWideVacancies={};
-  const pr=profile(m,lostTeam),state=m._transitionWideVacancies[lostTeam]||(m._transitionWideVacancies[lostTeam]={});
+  const pr=profile(m,lostTeam),state=m._transitionWideVacancies[lostTeam]||(m._transitionWideVacancies[lostTeam]={}),prior=m._defensiveResponsibility?.[lostTeam];
   for(const slot of ['LB','RB']){
-    const policy=slot==='LB'?pr.leftBack:pr.rightBack;if(policy!=='INVERT')continue;
     const fb=teamPlayers(m,lostTeam).find(p=>p.slot===slot&&p.role==='FB');if(!fb)continue;
-    const l=worldToLocal(lostTeam,fb.x,fb.y),laneY=lane(slot),lateralGap=Math.abs(l.y-laneY);
-    // Only create the hand-off when the inverted full-back really is away from his
-    // normal flank.  A normal turnover with the FB already home needs no special case.
-    if(lateralGap<7.5)continue;
-    state[slot]={fbId:fb.id,slot,createdAt:m.time,until:m.time+4.6,laneY};
+    const threat=sameSideWideThreat(m,lostTeam,slot),tl=threat&&worldToLocal(lostTeam,threat.x,threat.y);if(!threat||!tl||tl.x>49||Math.abs(tl.y-34)<15)continue;
+    const ball=worldToLocal(lostTeam,m.ball.x,m.ball.y),base=defendingBlockAnchors(pr,ball.x,ball.y,slot,'FB'),l=worldToLocal(lostTeam,fb.x,fb.y),laneY=lane(slot),lateralGap=Math.abs(l.y-laneY),advanceGap=l.x-base.x;
+    // This is intentionally policy-neutral: an overlap and an episodic surge can vacate a
+    // channel just as materially as an inversion. No threat means no artificial hand-off.
+    if(lateralGap<7.5&&advanceGap<11.0)continue;
+    const candidates=outfield(m,lostTeam).filter(p=>p.id!==fb.id).filter(p=>{
+      const old=prior?.records?.[p.id];return !old?.targetId||old.targetId===threat.id;
+    }).map(p=>{const pl=worldToLocal(lostTeam,p.x,p.y),sidePenalty=sideSign(p.slot)===sideSign(slot)?0:5,rolePenalty=p.role==='CM'?0:p.role==='CB'?3:p.role==='WF'?5:8;return{p,score:Math.hypot(pl.x-tl.x,pl.y-tl.y)+sidePenalty+rolePenalty};}).sort((a,b)=>a.score-b.score||a.p.id.localeCompare(b.p.id));
+    const handoffOwnerId=candidates[0]?.p.id||null;
+    state[slot]={fbId:fb.id,slot,policy:slot==='LB'?pr.leftBack:pr.rightBack,threatId:threat.id,handoffOwnerId,createdAt:m.time,until:m.time+4.6,laneY,reason:handoffOwnerId?'VACATED_WIDE_CHANNEL_ATOMIC_HANDOFF':'VACATED_WIDE_CHANNEL_FB_RECOVERY'};
   }
 }
 function activeTransitionWideVacancy(m,team,slot){
@@ -581,6 +654,7 @@ function cmScreenException(p){
 
 function assignDefence(m,team,ctx){
   const pr=profile(m,team),ps=teamPlayers(m,team),ball=worldToLocal(team,m.ball.x,m.ball.y),owner=ctx.owner;
+  (m._shapeAuthorityPhase||(m._shapeAuthorityPhase={}))[team]='DEFENCE:'+phaseFromProgress(100-ball.x,m.transitionUntil>m.time);
   const field=ps.filter(p=>p.role!=='GK');
   const candidates=field.map(p=>({p,d:dist(p,{x:m.ball.x,y:m.ball.y})})).sort((a,b)=>a.d-b.d);
   const wideVacancies={LB:activeTransitionWideVacancy(m,team,'LB'),RB:activeTransitionWideVacancy(m,team,'RB')};
@@ -652,8 +726,8 @@ function assignDefence(m,team,ctx){
       // until he is close enough to resume normal FB responsibility.
       const rb=defendingBlockAnchors(pr,ball.x,ball.y,p.slot,p.role);
       lx=rb.x;ly=rb.y;task='TRANSITION_FB_RECOVERY';sprint=true;
-    }else if(p.role==='CM'&&((p.slot==='LCM'&&wideVacancies.LB)||(p.slot==='RCM'&&wideVacancies.RB))){
-      const v=p.slot==='LCM'?wideVacancies.LB:wideVacancies.RB,slot=p.slot==='LCM'?'LB':'RB',wf=sameSideWideThreat(m,team,slot),wl=wf?worldToLocal(team,wf.x,wf.y):null;
+    }else if((wideVacancies.LB?.handoffOwnerId===p.id||wideVacancies.RB?.handoffOwnerId===p.id)){
+      const v=wideVacancies.LB?.handoffOwnerId===p.id?wideVacancies.LB:wideVacancies.RB,slot=v.slot,wf=playerById(m,v.threatId)||sameSideWideThreat(m,team,slot),wl=wf?worldToLocal(team,wf.x,wf.y):null;
       if(wf&&wl){
         // Temporary rest-defence hand-off: the same-side 8 protects the open channel
         // without dropping onto the CB line.  As soon as the FB recovers this branch
@@ -847,6 +921,7 @@ function enforceOffBallMarkSeparation(m,defTeam,owner){
 
 function assignAttack(m,team,ctx){
   const pr=profile(m,team),ball=worldToLocal(team,m.ball.x,m.ball.y),owner=ctx.owner,rawProgress=ball.x,recycleActive=(m.attackRecycleUntil?.[team]||0)>m.time,progress=recycleActive?Math.max(rawProgress,m.attackRecycleFloor?.[team]||rawProgress):rawProgress,phase=phaseFromProgress(progress,m.transitionUntil>m.time),bl=ballLane(ball.y),rt=tacticalRuntime(m,team,progress);
+  (m._shapeAuthorityPhase||(m._shapeAuthorityPhase={}))[team]='ATTACK:'+phase;
   const deepSupport=!!owner&&rawProgress>=85.0&&['ST','WF','CM','FB'].includes(owner.role);
   const ownerOppCount=owner?outfield(m,other(team)).filter(q=>dist(q,owner)<=8.2).length:0;
   const strikerPinned=!!owner&&owner.role==='ST'&&rawProgress>=76&&ownerOppCount>=2;
@@ -877,6 +952,38 @@ function assignAttack(m,team,ctx){
     }
     const t=attackTask(m,p,c);applyTarget(p,t.lx,t.ly,t.task,t.sprint,m);
   }
+  arbitrateAttackingTargets(m,team,c);
+}
+
+// V42 attack-side spacing: arbitrate only a live possessing team's proposed support
+// geometry when it would worsen an already compact aggregate shape. This is a target
+// adjustment, not a formation reset; carrier and active-run intent remain authoritative.
+function arbitrateAttackingTargets(m,team,ctx){
+  const owner=ctx?.owner;
+  if(!m||!owner||owner.team!==team||m.restart||m.setPieceLive||m.ball?.mode==='LOOSE')return;
+  if(['SET_PIECE_LIVE','SET_PIECE_SETUP','GOAL_CELEBRATION'].includes(String(m.phase||'')))return;
+  if((m.events||[]).some(e=>m.time-Number(e.t||0)<=1.5&&['SAVE','PARRY','BLOCK','CLEARANCE','CROSS_RECEIVE','HEADER_SHOT','DUEL_CONTACT','DUEL_DEFLECTION'].includes(e.type)))return;
+  const ps=outfield(m,team),localTarget=p=>worldToLocal(team,Number.isFinite(p.tx)?p.tx:p.x,Number.isFinite(p.ty)?p.ty:p.y),localLive=p=>worldToLocal(team,p.x,p.y);
+  const shape=rows=>{const central=rows.filter(q=>q.x>=25&&q.x<=82&&Math.abs(q.y-34)<=16).length,seen=new Set(),groups=[];for(let i=0;i<rows.length;i++){if(seen.has(i))continue;const q=[i];let n=0;seen.add(i);while(q.length){const a=q.pop();n++;for(let j=0;j<rows.length;j++)if(!seen.has(j)&&Math.hypot(rows[a].x-rows[j].x,rows[a].y-rows[j].y)<=14){seen.add(j);q.push(j);}}groups.push(n);}let pair=0,count=0;for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){pair+=Math.hypot(rows[i].x-rows[j].x,rows[i].y-rows[j].y);count++;}return{central,cluster:groups.length?Math.max(...groups):0,pairDistance:count?pair/count:0};};
+  const live=shape(ps.map(localLive)),proposed=shape(ps.map(localTarget));
+  const alreadyCompact=live.central>=6||live.cluster>=6;
+  const worsens=proposed.central>live.central||proposed.cluster>live.cluster||(live.pairDistance>0&&proposed.pairDistance<live.pairDistance*.92);
+  if(!alreadyCompact||!worsens)return;
+  const activeRun=new Set(['OVERLAP','UNDERLAP','BALANCED_OVERLAP','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','ATTACK_NEAR_POST','ATTACK_BACK_POST','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','SECOND_BALL_SUPPORT','PULL_OFF_FOR_CROSS','ATTACK_OPEN_CHANNEL']);
+  const supportTask=/SUPPORT|CONNECT|SCREEN|RECOVER|RECONNECT|PIVOT|HOLD|REST|INVERT|DROP|SECOND_LINE|EDGE/;
+  const rolePriority={CB:0,FB:1,CM:2,WF:3};
+  const candidates=ps.filter(p=>p.id!==owner.id&&!activeRun.has(String(p.tacticalTask||''))&&supportTask.test(String(p.tacticalTask||''))&&['CM','FB','CB','WF'].includes(p.role)).sort((a,b)=>rolePriority[a.role]-rolePriority[b.role]||String(a.id).localeCompare(String(b.id)));
+  const used=[];
+  for(const p of candidates){
+    const t=localTarget(p);if(t.x<25||t.x>82||Math.abs(t.y-34)>16)continue;
+    const sg=sideSign(p.slot)||((hash32(`${m.seed}|V42_ATTACK_CHANNEL|${p.id}`)&1)?1:-1),offset=p.role==='FB'?18:p.role==='WF'?21:10.5;
+    const desiredY=34+sg*offset,shift=clamp((desiredY-t.y)*.62,-5.8,5.8);
+    if(Math.abs(shift)<1.0)continue;
+    const w=localToWorld(team,t.x,clamp(t.y+shift,4,64));p.tx=w.x;p.ty=w.y;used.push({playerId:p.id,shift:Number(shift.toFixed(3)),task:p.tacticalTask||p.action||null});
+    const next=shape(ps.map(localTarget));
+    if(next.central<proposed.central||next.cluster<proposed.cluster||next.pairDistance>proposed.pairDistance*.92)break;
+  }
+  if(used.length){m.stats.attackingTargetArbitrations=(m.stats.attackingTargetArbitrations||0)+1;m._attackingTargetArbitration={at:m.time,team,applied:used,futureOutcomePrecomputed:false};}
 }
 
 function enforceActualDefenderCrowdExit(m,team,owner){
@@ -915,10 +1022,95 @@ function eligibleOwnerScore(m,team,d,a,threat){const al=worldToLocal(team,a.x,a.
 function reconcileDefensiveResponsibilities(m,team,owner){
   if(!m||m.restart||!team)return null;const defenders=outfield(m,team),lock=m._defenceRoleLocks?.[team]||{},pressId=lock.pressId&&playerById(m,lock.pressId)?.team===team?lock.pressId:null,coverId=lock.coverId&&lock.coverId!==pressId?lock.coverId:null;
   const prior=m._defensiveResponsibility?.[team]||null,threats=currentDefensiveThreats(m,team,owner),byThreat=new Map(),records={};if(pressId&&owner)byThreat.set(owner.id,[pressId]);const used=new Set([pressId].filter(Boolean));const priorOwnerFor=tid=>prior?.threats?.find(t=>t.id===tid)?.owners?.find(id=>id!==pressId)||null;
-  for(const threat of threats.filter(t=>t.material&&t.kind!=='BALL')){const a=playerById(m,threat.id);if(!a)continue;let chosen=null,previous=priorOwnerFor(threat.id);const explicit=defenders.filter(d=>d.id!==pressId&&d.markTargetId===a.id&&!used.has(d.id)).sort((x,y)=>eligibleOwnerScore(m,team,x,a,threat)-eligibleOwnerScore(m,team,y,a,threat));if(explicit[0])chosen=explicit[0];if(!chosen&&previous){const p=playerById(m,previous);if(p&&p.team===team&&!used.has(p.id)&&dist(p,a)<=16.5)chosen=p;}if(!chosen){const candidates=defenders.filter(d=>d.id!==pressId&&!used.has(d.id)).map(d=>({d,score:eligibleOwnerScore(m,team,d,a,threat)})).sort((x,y)=>x.score-y.score||x.d.id.localeCompare(y.d.id));if(candidates[0])chosen=candidates[0].d;}if(chosen){used.add(chosen.id);byThreat.set(threat.id,[chosen.id]);chosen.markTargetId=threat.id;}}
+  for(const threat of threats.filter(t=>t.material&&t.kind!=='BALL')){const a=playerById(m,threat.id);if(!a)continue;let chosen=null,previous=priorOwnerFor(threat.id),vacancy=['LB','RB'].map(slot=>activeTransitionWideVacancy(m,team,slot)).find(v=>v?.threatId===threat.id&&v.handoffOwnerId);const handoff=vacancy&&playerById(m,vacancy.handoffOwnerId);if(handoff&&handoff.team===team&&handoff.id!==pressId&&!used.has(handoff.id))chosen=handoff;const explicit=defenders.filter(d=>d.id!==pressId&&d.markTargetId===a.id&&!used.has(d.id)).sort((x,y)=>eligibleOwnerScore(m,team,x,a,threat)-eligibleOwnerScore(m,team,y,a,threat));if(!chosen&&explicit[0])chosen=explicit[0];if(!chosen&&previous){const p=playerById(m,previous);if(p&&p.team===team&&!used.has(p.id)&&dist(p,a)<=16.5)chosen=p;}if(!chosen){const candidates=defenders.filter(d=>d.id!==pressId&&!used.has(d.id)).map(d=>({d,score:eligibleOwnerScore(m,team,d,a,threat)})).sort((x,y)=>x.score-y.score||x.d.id.localeCompare(y.d.id));if(candidates[0])chosen=candidates[0].d;}if(chosen){used.add(chosen.id);byThreat.set(threat.id,[chosen.id]);chosen.markTargetId=threat.id;}}
   for(const d of defenders){let targetId=null;for(const[tid,ids]of byThreat)if(ids.includes(d.id)){targetId=tid;break;}const previous=prior?.records?.[d.id]||null,type=responsibilityTypeFor(d,pressId,coverId),changed=!previous||previous.type!==type||previous.targetId!==targetId,assignmentAt=changed?m.time:previous.assignmentAt,handoff=changed&&previous?{fromOwnerId:previous.ownerId||d.id,fromTargetId:previous.targetId||null,reason:previous.targetId&&targetId?'THREAT_OR_ROLE_THRESHOLD_CROSSED':previous.targetId?'EXPLICIT_RELEASE_TO_COVER':'ATOMIC_CURRENT_STATE_ASSIGNMENT',at:m.time}:null,reason=d.id===pressId?'PRIMARY_BALL_PRESSURE':targetId?(threats.find(t=>t.id===targetId)?.reason||'EXPLICIT_THREAT_OWNER'):d.id===coverId?'PRIMARY_PRESS_COVER':/FB_WEAK_SIDE_TUCK/.test(String(d.tacticalTask||''))?'WEAK_SIDE_WIDE_ZONE_RETAINED':'EXPLICIT_TEAM_SHAPE_ZONE';records[d.id]={ownerId:d.id,type,targetId,reason,assignmentAt,epoch:changed?(Number(previous?.epoch)||0)+1:(previous.epoch||1),previousOwnerId:handoff?.fromOwnerId||previous?.previousOwnerId||null,previousTargetId:handoff?.fromTargetId??previous?.previousTargetId??null,handoffReason:handoff?.reason||null,holdUntil:changed?m.time+RESPONSIBILITY_HOLD_SECONDS:(previous.holdUntil||m.time),futureOutcomePrecomputed:false};d.responsibilityType=type;d.responsibilityTargetId=targetId;d.responsibilityReason=reason;d.responsibilityAssignmentAt=assignmentAt;d.responsibilityEpoch=records[d.id].epoch;d.responsibilityHandoffReason=records[d.id].handoffReason;}
   const threatRows=threats.map(t=>{const owners=byThreat.get(t.id)||[];return{...t,owners,coverage:owners.length?'EXPLICIT_OWNER':t.material?'UNOWNED':'EXPLICIT_ZONE_SAFE',zoneReason:owners.length?null:(t.material?null:t.reason)};}),unowned=threatRows.filter(t=>t.material&&!t.owners.length),duplicates=threatRows.filter(t=>t.owners.length>1),pressOwners=defenders.filter(d=>PRESS_TASKS.has(String(d.tacticalTask||''))).map(d=>d.id),diagnostics={unownedThreatIds:unowned.map(t=>t.id),duplicateThreats:duplicates.map(t=>({threatId:t.id,owners:t.owners})),duplicatePressureOwnerIds:pressOwners.filter(id=>id!==pressId)};
-  const state={schemaVersion:'DEFENSIVE_RESPONSIBILITY_1.0',team,phase:String(m.phase||''),at:m.time,primaryPressureOwnerId:pressId,primaryPressureTargetId:owner?.id||null,coverOwnerId:coverId,records,threats:threatRows,diagnostics,futureOutcomePrecomputed:false};m._defensiveResponsibility=m._defensiveResponsibility||{};m._defensiveResponsibility[team]=state;m.defensiveResponsibility=state;return state;
+  const state={schemaVersion:'DEFENSIVE_RESPONSIBILITY_1.0',team,phase:String(m.phase||''),at:m.time,primaryPressureOwnerId:pressId,primaryPressureTargetId:owner?.id||null,coverOwnerId:coverId,records,threats:threatRows,diagnostics,futureOutcomePrecomputed:false};m._defensiveResponsibility=m._defensiveResponsibility||{};m._defensiveResponsibility[team]=state;m.defensiveResponsibility=state;m._testOnlyCausalLedger?.responsibilityReconciled(m,state);return state;
+}
+
+// V42: arbitrate the complete responsibility waypoint set before it is written.
+// This compares the proposed set with this tick's existing role-zone waypoints;
+// it does not import the QA detector, alter ownership, or alter live positions.
+function arbitrateDefensiveWaypointSet(m,team,state,planned){
+  const shape=rows=>{const centralRows=rows.filter(q=>q.x<48&&Math.abs(q.y-34)<12),central=centralRows.length;let pair=0,n=0;for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){pair+=Math.hypot(rows[i].x-rows[j].x,rows[i].y-rows[j].y);n++;}const linkRadius=Math.max(10,Math.min(14,(n?pair/n:0)*.55)),seen=new Set(),groups=[];for(const p of centralRows){if(seen.has(p))continue;const q=[p],g=[];seen.add(p);while(q.length){const a=q.pop();g.push(a);for(const b of centralRows)if(!seen.has(b)&&Math.hypot(a.x-b.x,a.y-b.y)<=linkRadius){seen.add(b);q.push(b);}}groups.push(g.length);}return{central,pairDistance:n?pair/n:0,centralConnected:groups.length?Math.max(...groups):0};};
+  const exempt=!!(m.restart||m.setPieceLive||m.ball?.mode==='LOOSE'||worldToLocal(team,m.ball.x,m.ball.y).x<13.5||['SET_PIECE_LIVE','SET_PIECE_SETUP','GOAL_CELEBRATION'].includes(String(m.phase||''))||(m.events||[]).some(e=>m.time-Number(e.t||0)<=1.5&&['SAVE','PARRY','BLOCK','CLEARANCE','CROSS_RECEIVE','HEADER_SHOT','DUEL_CONTACT','DUEL_DEFLECTION'].includes(e.type)));
+  const base=shape(planned.map(p=>{const q=worldToLocal(team,p.previous.x,p.previous.y);return{x:q.x,y:q.y};}));
+  const live=shape(planned.map(p=>{const q=worldToLocal(team,p.d.x,p.d.y);return{x:q.x,y:q.y};}));
+  const proposed=shape(planned.map(p=>{const q=p.chosen;return{x:q.x,y:q.y};}));
+  const urgency=p=>{const r=p.r,t=r.targetId?playerById(m,r.targetId):null,tl=t?worldToLocal(team,t.x,t.y):null,centralThreat=state.threats?.find(q=>q.kind==='CENTRAL'&&q.material);if(r.type==='PRESS')return 400;if(r.type==='MARK'&&t&&t.role==='ST'&&tl&&Math.abs(tl.y-34)<13)return 300;if(r.type==='MARK'&&t&&['WF','FB'].includes(t.role)&&tl&&Math.abs(tl.y-34)>14)return 290;if(r.type==='COVER'&&p.d.id===state.coverOwnerId&&centralThreat)return 280;if(r.type==='COVER'&&p.d.role==='CB'&&t&&t.role==='ST'&&tl&&Math.abs(tl.y-34)<13)return 280;if(r.type==='MARK')return 260;if(r.type==='RECOVERY')return 220;return 100;};
+  const relativeSpacingLoss=base.pairDistance>0?(base.pairDistance-proposed.pairDistance)/base.pairDistance:0;
+  const centralShell=base.central>=3&&base.centralConnected>=1;
+  // A connected central shell can be damaged by compression without gaining a new
+  // central occupant.  Compare the responsibility geometry to the existing role-zone
+  // geometry, then let urgency decide which rewrites may yield; this is not a detector
+  // mirror and does not inspect result/statistical signals.
+  const worsens=!exempt&&centralShell&&relativeSpacingLoss>=.12&&proposed.pairDistance<base.pairDistance;
+  const nearSevereCompression=live.central>=7||live.centralConnected>=7;
+  const preservesOrWorsensDanger=proposed.central>=live.central||proposed.centralConnected>=live.centralConnected;
+  // Activation-only detector-like observation over the current full team.  The
+  // arbitration metrics above intentionally remain unchanged; this observation
+  // uses all current outfielders, the wider central domain, and fixed R14 links
+  // so near-threshold dangerous structure is not hidden by a duty subset.
+  const fullTeamStructuralShape=(players,overrides)=>{
+    const rows=players.map(p=>{const q=overrides?.get(p.id)||{x:p.x,y:p.y},l=q.local?{x:q.x,y:q.y}:worldToLocal(team,q.x,q.y);return{x:l.x,y:l.y};});
+    const central=rows.filter(q=>q.x>=25&&q.x<=82&&Math.abs(q.y-34)<=16).length,seen=new Set(),groups=[];
+    for(let i=0;i<rows.length;i++){
+      if(seen.has(i))continue;const queue=[i];let size=0;seen.add(i);
+      while(queue.length){const a=queue.pop();size++;for(let j=0;j<rows.length;j++)if(!seen.has(j)&&Math.hypot(rows[a].x-rows[j].x,rows[a].y-rows[j].y)<=14){seen.add(j);queue.push(j);}}
+      groups.push(size);
+    }
+    return{centralOccupancy:central,largestConnectedCluster:groups.length?Math.max(...groups):0};
+  };
+  const fullTeam=outfield(m,team),plannedById=new Map(planned.map(p=>[p.d.id,{x:p.chosen.x,y:p.chosen.y,local:true}]));
+  const fullTeamLive=fullTeamStructuralShape(fullTeam),fullTeamProposed=fullTeamStructuralShape(fullTeam,plannedById);
+  const fullTeamAlreadyDangerous=fullTeamLive.centralOccupancy>=8||fullTeamLive.largestConnectedCluster>=8;
+  const fullTeamPreservesOrWorsensDanger=fullTeamProposed.centralOccupancy>=8||fullTeamProposed.largestConnectedCluster>=8;
+  const nearThresholdActivation=!exempt&&((nearSevereCompression&&preservesOrWorsensDanger)||(fullTeamAlreadyDangerous&&fullTeamPreservesOrWorsensDanger));
+  const arbitrationActive=worsens||nearThresholdActivation;
+  const deferred=[],spaced=[];
+  if(arbitrationActive){
+    const candidates=planned.filter(p=>Math.hypot(p.chosen.x-p.previous.x,p.chosen.y-p.previous.y)>.35).sort((a,b)=>urgency(a)-urgency(b)||a.d.id.localeCompare(b.d.id));
+    for(const p of candidates){
+      const u=urgency(p),canDefer=u<280;if(!canDefer)continue;
+      const from={x:p.chosen.x,y:p.chosen.y};p.chosen={x:p.previous.x,y:p.previous.y};p.sprint=false;p.arbitration='BASE_WAYPOINT_DEFERRED';deferred.push({playerId:p.d.id,from,to:p.chosen,urgency:u,responsibility:p.r.reason,targetId:p.r.targetId||null});
+      const now=shape(planned.map(q=>{return{x:q.chosen.x,y:q.chosen.y};}));
+      const nowLoss=base.pairDistance>0?(base.pairDistance-now.pairDistance)/base.pairDistance:0;
+      const stillDangerous=worsens
+        ? now.central>=base.central&&now.centralConnected>=1&&nowLoss>=.12&&now.pairDistance<base.pairDistance
+        : now.central>=live.central||now.centralConnected>=live.centralConnected;
+      if(!stillDangerous)break;
+    }
+    // Lower-urgency zone rewrites are the first things to yield.  If the remaining
+    // protected duties still form a compressed shell, space their waypoints as well.
+    // This is a waypoint adjustment only: ownership, target IDs, live position and
+    // velocity remain untouched.  Each duty is projected back onto its valid
+    // target/goal-side manifold after the bounded lateral/depth nudge.
+    const protectedDuties=planned.filter(p=>urgency(p)>=280&&p.r.type!=='ZONE');
+    const carrier=state.primaryPressureTargetId?playerById(m,state.primaryPressureTargetId):null;
+    const project=(p,q)=>{
+      const t=p.r.targetId?playerById(m,p.r.targetId):null,tl=t?worldToLocal(team,t.x,t.y):null;
+      let x=clamp(q.x,3,96),y=clamp(q.y,4,64);
+      if(p.r.type==='MARK'&&tl){x=Math.min(x,tl.x-.75);y=clamp(y,tl.y-8.0,tl.y+8.0);if(['WF','FB'].includes(t.role)&&Math.abs(tl.y-34)>14){const side=Math.sign(tl.y-34);y=side<0?Math.min(y,34-20):Math.max(y,34+20);}}
+      else if(p.r.type==='PRESS'&&tl){x=Math.min(x,tl.x-.9);y=clamp(y,tl.y-7.0,tl.y+7.0);}
+      else if(p.r.type==='COVER'&&carrier){const ol=worldToLocal(team,carrier.x,carrier.y);x=Math.min(x,ol.x-1.0);y=clamp(y,ol.y-10.0,ol.y+10.0);}
+      return{x,y};
+    };
+    for(let pass=0;pass<4;pass++)for(let i=0;i<protectedDuties.length;i++)for(let j=i+1;j<protectedDuties.length;j++){
+      const a=protectedDuties[i],b=protectedDuties[j],dx=a.chosen.x-b.chosen.x,dy=a.chosen.y-b.chosen.y,gap=Math.hypot(dx,dy),need=12.0;
+      if(gap>=need)continue;
+      const v=gap>.01?{x:dx/gap,y:dy/gap}:stablePairVector(a.d.id,b.d.id),push=(need-gap)*.90;
+      // The less urgent duty absorbs more of the correction; PRESS remains the
+      // carrier-facing anchor while COVER stays goal-side and staggered.
+      const wa=1/(1+urgency(a)),wb=1/(1+urgency(b)),sum=wa+wb;
+      const aMove=push*wa/sum,bMove=push*wb/sum,af={x:a.chosen.x,y:a.chosen.y},bf={x:b.chosen.x,y:b.chosen.y};
+      a.chosen=project(a,{x:a.chosen.x+v.x*aMove,y:a.chosen.y+v.y*aMove});
+      b.chosen=project(b,{x:b.chosen.x-v.x*bMove,y:b.chosen.y-v.y*bMove});
+      for(const p of [a,b]){const before=p===a?af:bf,amount=Math.hypot(p.chosen.x-before.x,p.chosen.y-before.y);if(amount>.02){p.arbitration='PROTECTED_DUTY_SPACED';spaced.push({playerId:p.d.id,from:before,to:{x:p.chosen.x,y:p.chosen.y},amount,urgency:urgency(p),responsibility:p.r.reason,targetId:p.r.targetId||null});}}
+    }
+    for(const p of protectedDuties){const before={x:p.chosen.x,y:p.chosen.y},projected=project(p,before),amount=Math.hypot(projected.x-before.x,projected.y-before.y);if(amount>.02){p.chosen=projected;p.arbitration='PROTECTED_DUTY_SPACED';spaced.push({playerId:p.d.id,from:before,to:projected,amount,urgency:urgency(p),responsibility:p.r.reason,targetId:p.r.targetId||null});}}
+  }
+  const finalShape=shape(planned.map(p=>{const q=p.chosen;return{x:q.x,y:q.y};}));
+  state.waypointArbitration={schemaVersion:'DEFENSIVE_WAYPOINT_ARBITRATION_1.0',at:m.time,exempt,baseShape:base,proposedShape:proposed,finalShape,worsened:worsens,deferred,spaced,applied:deferred.length>0||spaced.length>0,futureOutcomePrecomputed:false};
 }
 
 // V42 Sol 4-2 movement execution. Responsibility remains owned exclusively by
@@ -927,16 +1119,36 @@ function reconcileDefensiveResponsibilities(m,team,owner){
 // real handoff resets immediately while ordinary shape refreshes cannot produce A-B-A jitter.
 function executeDefensiveResponsibilityMotion(m,team,owner,state){
   if(!m||!state||state.team!==team||m.restart)return state;
+  m._testOnlyCausalLedger?.responsibilityConsumed(m,state);
   const planned=[];
   for(const d of outfield(m,team)){
     const r=state.records?.[d.id];if(!r)continue;
+    // ZONE is deliberately not an executable responsibility. Its current-tick geometry was
+    // already selected by final arbitration, so re-running it here would recreate a proposal
+    // -> executor reversal despite there being no live PRESS/MARK/COVER/RECOVERY authority.
+    if(!FINAL_DEFENSIVE_RESPONSIBILITY_TYPES.has(r.type)){
+      // A relationship-facing target is owned only while that responsibility is live.
+      // Once it hands back, the already-arbitrated shape/support target becomes the next
+      // executable authority; leaving a former carrier angle here can pin an off-ball body.
+      if(d._defensiveFacingAuthority){d.faceTargetAngle=null;delete d._defensiveFacingAuthority;}
+      continue;
+    }
     const previous={x:Number.isFinite(d.tx)?d.tx:d.x,y:Number.isFinite(d.ty)?d.ty:d.y},dl=worldToLocal(team,d.x,d.y);
     const target=playerById(m,r.targetId)||(r.type==='PRESS'?owner:null);
     let desired=worldToLocal(team,previous.x,previous.y),task=String(d.tacticalTask||d.action||'HOLD_BLOCK'),mode=r.type,rewriteReason='RESPONSIBILITY_ZONE_PRESERVE',sprint=!!d.sprint;
     if(r.type==='PRESS'&&target){
       const al=worldToLocal(team,target.x,target.y),avx=dir(team)*Number(target.vx||0),avy=Number(target.vy||0),beaten=dl.x>al.x+.35;
       if(beaten){desired={x:clamp(al.x-1.15+Math.min(0,avx)*.28,3,96),y:clamp(lerp(dl.y,al.y+avy*.28,.58),4,64)};task='RECOVERY_CHASE';mode='TURN_RUN';sprint=true;rewriteReason='PRESS_CARRIER_BEYOND_TURN_RUN';}
-      else{let side=dl.y-al.y;if(Math.abs(side)<.22)side=(hash32(`${d.id}|${target.id}|CONTAIN`)&1)?1:-1;desired={x:clamp(al.x-1.75,3,96),y:clamp(al.y+(side>=0?.58:-.58),4,64)};task='PRESS_CONTAIN';mode='CONTAIN';sprint=dist(d,target)>3.1;rewriteReason='PRESS_CURRENT_CARRIER_CONTAIN';}
+      else{
+        let side=dl.y-al.y;if(Math.abs(side)<.22)side=(hash32(`${d.id}|${target.id}|CONTAIN`)&1)?1:-1;
+        const held=Math.max(0,m.time-(target.controlledSince||m.time)),carry=['CARRY_SCAN','CARRY_FORWARD','COMMITTED_BOX_CARRY','DRIBBLE_EVADE','TAKE_ON'].includes(target.action),pairCooling=(d.duelPairCooldownUntil||0)>m.time&&d.duelPairCooldownOwnerId===target.id,cooling=(d.duelContainUntil||0)>m.time||pairCooling,plannedCommit=(d.pressCommitUntil||0)>m.time,contactReady=dist(d,target)<=2.05;
+        // The planner may nominate the current press owner to commit.  Preserve that
+        // current-state decision at the final responsibility boundary: a close, live carrier
+        // must become challenge-eligible instead of being rewritten back to passive contain.
+        const engage=!cooling&&(plannedCommit||(contactReady&&(carry||held>.70)));
+        if(engage){desired={x:clamp(al.x-.88,3,96),y:clamp(al.y+(side>=0?.30:-.30),4,64)};task='ENGAGE';mode='ENGAGE';sprint=dist(d,target)>1.22;rewriteReason='PRESS_CURRENT_CARRIER_ENGAGE';}
+        else{const gap=pairCooling?2.45:cooling?1.32:1.75;desired={x:clamp(al.x-gap,3,96),y:clamp(al.y+(side>=0?.58:-.58),4,64)};task='PRESS_CONTAIN';mode='CONTAIN';sprint=dist(d,target)>3.1;rewriteReason='PRESS_CURRENT_CARRIER_CONTAIN';}
+      }
     }else if(r.type==='MARK'&&target){
       const al=worldToLocal(team,target.x,target.y),avx=dir(team)*Number(target.vx||0),avy=Number(target.vy||0),beaten=dl.x>al.x+.45;
       if(beaten){desired={x:clamp(al.x-1.35+Math.min(0,avx)*.32,3,96),y:clamp(lerp(dl.y,al.y+avy*.32,.62),4,64)};task='RECOVERY_CHASE';mode='TURN_RUN';sprint=true;rewriteReason='MARK_RUNNER_BEYOND_TURN_RUN';}
@@ -960,6 +1172,7 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
     chosen.x=clamp(chosen.x,2.5,102.5);chosen.y=clamp(chosen.y,3,65);
     planned.push({d,r,previous,desired,chosen,task,mode,sprint,rewriteReason,continuity});
   }
+  arbitrateDefensiveWaypointSet(m,team,state,planned);
   // Distinct jobs retain distinct destinations. Live contact resolution remains in the core
   // integrator and may still make documented temporary physical corrections.
   const emergency=worldToLocal(team,m.ball.x,m.ball.y).x<13.5;
@@ -971,7 +1184,11 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
   }
   for(const p of planned){
     const w=localToWorld(team,clamp(p.chosen.x,2.5,102.5),clamp(p.chosen.y,3,65));p.d.tx=w.x;p.d.ty=w.y;p.d.action=p.d.tacticalTask=p.task;p.d.sprint=p.sprint;
+    if(['PRESS','MARK','COVER','RECOVERY'].includes(p.r.type))p.d._shapeContinuityIntent={x:w.x,y:w.y,task:p.task,sprint:!!p.sprint,until:m.time+1.10,possession:m.possession,phase:m._shapeAuthorityPhase?.[team],futureOutcomePrecomputed:false};
     p.d._defensivePursuitIntent={epoch:p.r.epoch,type:p.r.type,targetId:p.r.targetId||null,localX:p.chosen.x,localY:p.chosen.y,phase:String(m.phase||''),mode:p.mode,at:m.time,futureOutcomePrecomputed:false};
+    const faceTarget=(p.r.type==='PRESS'||p.r.type==='MARK')&&playerById(m,p.r.targetId);
+    if(faceTarget){p.d.faceTargetAngle=Math.atan2(faceTarget.y-p.d.y,faceTarget.x-p.d.x);p.d._defensiveFacingAuthority={type:p.r.type,targetId:faceTarget.id,epoch:p.r.epoch,at:m.time,futureOutcomePrecomputed:false};}
+    else if(p.d._defensiveFacingAuthority){p.d.faceTargetAngle=null;delete p.d._defensiveFacingAuthority;}
     p.r.motion={desiredPursuitTarget:localToWorld(team,p.desired.x,p.desired.y),actualTarget:{x:p.d.tx,y:p.d.ty},previousTarget:p.previous,rewriteReason:p.rewriteReason,continuityReason:p.continuity,velocityIntent:{x:p.d.tx-p.d.x,y:p.d.ty-p.d.y,sprint:!!p.d.sprint},mode:p.mode,overrideReason:p.separationReason||null,futureOutcomePrecomputed:false};
     p.d.responsibilityMotionMode=p.mode;p.d.responsibilityRewriteReason=p.rewriteReason;p.d.responsibilityContinuityReason=p.continuity;
   }
@@ -1046,8 +1263,40 @@ function enforceWideLaneHierarchy(m,team){
     if(!wf)continue;const w=worldToLocal(team,wf.tx,wf.ty),sg=left?-1:1;
     const wingerWide=w.x>62&&(w.y<17.5||w.y>50.5);if(!wingerWide)continue;
     if(cm){const c=worldToLocal(team,cm.tx,cm.ty);if(c.x>55&&Math.abs(c.y-w.y)<7.5){const q=localToWorld(team,c.x,34+sg*9.0);cm.tx=q.x;cm.ty=q.y;}}
-    if(fb){const f=worldToLocal(team,fb.tx,fb.ty);if(f.x>55&&Math.abs(f.y-w.y)<6.5){const q=localToWorld(team,f.x,34+sg*18.0);fb.tx=q.x;fb.ty=q.y;if(['OVERLAP','BALANCED_OVERLAP','OUTSIDE_SUPPORT'].includes(fb.tacticalTask))fb.tacticalTask='UNDERLAP_SUPPORT';}}
+    if(fb){const f=worldToLocal(team,fb.tx,fb.ty);if(f.x>55&&Math.abs(f.y-w.y)<6.5){
+      // attackTask is evaluated player-by-player.  A winger may therefore be inside at
+      // the FB's turn but receive a wide target later in the same tick.  Once the final
+      // winger target owns the outside lane, an ordinary overlap has no live relationship
+      // left to justify the FB being beyond it.  Episodic surge/underlap tasks remain a
+      // deliberate rotation and are not constrained here.
+      const tacticalException=['FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','BALANCED_OVERLAP'].includes(fb.tacticalTask);
+      const x=tacticalException?f.x:Math.min(f.x,w.x-2.4),y=34+sg*18.0,q=localToWorld(team,x,y);
+      fb.tx=q.x;fb.ty=q.y;
+      if(!tacticalException){fb.action=fb.tacticalTask='FULLBACK_RECYCLE_SUPPORT';fb.sprint=dist(fb,q)>4.0;}
+    }}
   }
+}
+
+function enforceRoleAnchorRecoveryReferences(m,team){
+  // A role anchor is a recovery reference, never a new tactical command.  It acts only
+  // when three or more unrelated support/shape targets have themselves collapsed into the
+  // central channel.  Current PRESS/MARK/COVER/RECOVERY remains final executable authority.
+  const state=m?._defensiveResponsibility?.[team],isLive=p=>FINAL_DEFENSIVE_RESPONSIBILITY_TYPES.has(state?.records?.[p.id]?.type);
+  const support=/HOLD|REST|BUILD|RECOVER|RECONNECT|SUPPORT|CONNECT|BLOCK|SCREEN|BALANCE|INVERT|SECOND_LINE|EDGE/;
+  const rows=outfield(m,team).filter(p=>!isLive(p)&&p.id!==m.ball?.ownerId&&support.test(String(p.tacticalTask||p.action||''))).map(p=>({p,l:worldToLocal(team,p.tx,p.ty)}));
+  const central=rows.filter(r=>r.l.x>=24&&r.l.x<=80&&Math.abs(r.l.y-34)<=10);
+  if(central.length<3)return;
+  const span=Math.max(...central.map(r=>r.l.y))-Math.min(...central.map(r=>r.l.y));
+  if(span>=12)return;
+  const applied=[];
+  for(const r of central){
+    const base=lane(r.p.slot),targetY=clamp(base,6,62),shift=clamp(targetY-r.l.y,-3.2,3.2);
+    if(Math.abs(shift)<.75)continue;
+    const q=localToWorld(team,r.l.x,clamp(r.l.y+shift,4,64));r.p.tx=q.x;r.p.ty=q.y;
+    r.p.shapeAnchorRecoveryReason='CENTRAL_REFERENCE_CLUSTER_RECOVERY';r.p.shapeAnchorRecoveryWriter='enforceRoleAnchorRecoveryReferences';
+    applied.push({playerId:r.p.id,fromY:Number(r.l.y.toFixed(3)),toY:Number((r.l.y+shift).toFixed(3)),baseLane:base});
+  }
+  if(applied.length){m._formationAnchorRecovery={team,at:m.time,reason:'CENTRAL_REFERENCE_CLUSTER_RECOVERY',applied,futureOutcomePrecomputed:false};m._testOnlyCausalLedger?.reference(m,central[0].p,{referenceKind:'ROLE_ANCHOR_RECOVERY_REFERENCE',referenceFunction:'enforceRoleAnchorRecoveryReferences',continuityPreserved:false,selectedTarget:{x:central[0].p.tx,y:central[0].p.ty},reason:'CENTRAL_REFERENCE_CLUSTER_RECOVERY'});}
 }
 
 function abilityVal(m,p,key){const prof=m?.playerAbilityProfiles?.[p?.id];return prof&&Number.isFinite(prof[key])?prof[key]:60;}
@@ -1154,6 +1403,8 @@ function assignLooseBallArbitration(m){
 
 function assign(m){
   if(!m||m.completed)return;
+  const ledger=m._testOnlyCausalLedger;
+  const observe=(name,fn,meta={})=>{ledger?.start(m,name,meta);const out=fn();ledger?.end(m,name,meta);return out;};
   const poss=m.possession;
   // Production integration guard: a press/mark lock belongs to one defensive phase.
   // When possession flips, stale assignments from the team's previous defending spell
@@ -1167,11 +1418,24 @@ function assign(m){
     m._defenceRoleLocks={};
     m._markLocks={};
     m._defensiveResponsibility={};
+    // The new possessing team was the prior defensive side. Its carrier/mark-facing
+    // relationship has no authority after the possession handback; attack/support now
+    // supplies its next destination on this same assignment tick.
+    for(const p of outfield(m,poss))if(p._defensiveFacingAuthority){p.faceTargetAngle=null;delete p._defensiveFacingAuthority;}
     m._lastTacticalPossession=poss;
   }
-  if(m.ball?.mode==='LOOSE'){assignLooseBallArbitration(m);const defTeam=other(poss),owner=playerById(m,m.ball.lastTouchPlayer)||outfield(m,poss).sort((a,b)=>dist(a,m.ball)-dist(b,m.ball))[0]||null;reconcileDefensiveResponsibilities(m,defTeam,owner);m.tactical={...(m.tactical||{}),defensiveResponsibility:m.defensiveResponsibility};return;}
+  if(m.ball?.mode==='LOOSE'){observe('assignLooseBallArbitration',()=>assignLooseBallArbitration(m));const defTeam=other(poss),owner=playerById(m,m.ball.lastTouchPlayer)||outfield(m,poss).sort((a,b)=>dist(a,m.ball)-dist(b,m.ball))[0]||null;const responsibility=observe('reconcileDefensiveResponsibilities',()=>reconcileDefensiveResponsibilities(m,defTeam,owner));observe('arbitrateDefensiveTargetAuthority',()=>arbitrateDefensiveTargetAuthority(m,defTeam,responsibility));observe('executeDefensiveResponsibilityMotion',()=>executeDefensiveResponsibilityMotion(m,defTeam,owner,responsibility));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,poss));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,defTeam));m.tactical={...(m.tactical||{}),defensiveResponsibility:m.defensiveResponsibility};return;}
   const owner=playerById(m,m.ball.ownerId),ctx={owner};
-  assignAttack(m,poss,ctx);separateRecoveringMidfieldFromStriker(m,poss);enforceAttackingCarrierLane(m,poss);const defTeam=other(poss);assignDefence(m,defTeam,ctx);applyAerialFirstBallChallenger(m,defTeam);enforceDefensiveLayering(m,defTeam,owner);enforceOffBallMarkSeparation(m,defTeam,owner);recoverFreeKickWall(m,defTeam);targetSeparation(m);enforceActualDefenderCrowdExit(m,defTeam,owner);const responsibility=reconcileDefensiveResponsibilities(m,defTeam,owner);enforceWideLaneHierarchy(m,poss);preserveHybridEntryContinuity(m);executeDefensiveResponsibilityMotion(m,defTeam,owner,responsibility);
+  observe('assignAttack',()=>assignAttack(m,poss,ctx));observe('separateRecoveringMidfieldFromStriker',()=>separateRecoveringMidfieldFromStriker(m,poss));observe('enforceAttackingCarrierLane',()=>enforceAttackingCarrierLane(m,poss));const defTeam=other(poss),authorityContract=beginDefensiveTargetAuthorityContract(m,defTeam);if(authorityContract)authorityContract.collecting=true;observe('assignDefence',()=>assignDefence(m,defTeam,ctx));if(authorityContract)authorityContract.collecting=false;
+  // These are the complete adjacent pre-reconciliation defensive target-writer family.
+  // Their geometry remains available as proposals; none may transiently become execution.
+  observe('applyAerialFirstBallChallenger',()=>collectDefensiveHelperProposals(m,defTeam,'applyAerialFirstBallChallenger',()=>applyAerialFirstBallChallenger(m,defTeam)));
+  observe('enforceDefensiveLayering',()=>collectDefensiveHelperProposals(m,defTeam,'enforceDefensiveLayering',()=>enforceDefensiveLayering(m,defTeam,owner)));
+  observe('enforceOffBallMarkSeparation',()=>collectDefensiveHelperProposals(m,defTeam,'enforceOffBallMarkSeparation',()=>enforceOffBallMarkSeparation(m,defTeam,owner)));
+  observe('recoverFreeKickWall',()=>collectDefensiveHelperProposals(m,defTeam,'recoverFreeKickWall',()=>recoverFreeKickWall(m,defTeam)));
+  observe('targetSeparation',()=>collectDefensiveHelperProposals(m,defTeam,'targetSeparation',()=>targetSeparation(m)));
+  observe('enforceActualDefenderCrowdExit',()=>collectDefensiveHelperProposals(m,defTeam,'enforceActualDefenderCrowdExit',()=>enforceActualDefenderCrowdExit(m,defTeam,owner)));
+  const responsibility=observe('reconcileDefensiveResponsibilities',()=>reconcileDefensiveResponsibilities(m,defTeam,owner));observe('arbitrateDefensiveTargetAuthority',()=>arbitrateDefensiveTargetAuthority(m,defTeam,responsibility));observe('enforceWideLaneHierarchy',()=>enforceWideLaneHierarchy(m,poss));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,poss));observe('preserveHybridEntryContinuity',()=>preserveHybridEntryContinuity(m));observe('executeDefensiveResponsibilityMotion',()=>executeDefensiveResponsibilityMotion(m,defTeam,owner,responsibility));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,defTeam));
   m.tactical={
     formation:{HOME:FORMATION,AWAY:FORMATION},
     profile:{HOME:PROFILES.HOME.id,AWAY:PROFILES.AWAY.id},
