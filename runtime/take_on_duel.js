@@ -5,6 +5,9 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
 const VERSION='STEP39-TAKE-ON-DUEL-0.1';
+// TAKE_ON is a committed present-state action, not possession immunity. The
+// defender may win or force a loose ball when the live duel resolves.
+const STEP4_EXTERNAL_CONTACT_AUTHORITY='CURRENT_STATE_TAKE_ON_CAN_BE_TACKLED_OR_FORCED_LOOSE';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function resolve(ctx={}){
   const attack=Number(ctx.attackerSkill)||60,defend=Number(ctx.defenderSkill)||60;
@@ -18,5 +21,5 @@ function resolve(ctx={}){
   const residual=(r-win)/Math.max(0.0001,1-win);
   return{outcome:residual<cleanLoss?'TACKLED':'LOOSE_BALL',winProbability:win};
 }
-return{VERSION,resolve};
+return{VERSION,STEP4_EXTERNAL_CONTACT_AUTHORITY,resolve};
 });
