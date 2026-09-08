@@ -65,7 +65,13 @@
       const pos = world(s, team, ...HOME[i]);
       s.players.push({ id: team * 11 + i, team, role: ROLES[i], slot: i, x: pos.x, y: pos.y, vx: 0, vy: 0,
         target: { ...pos }, duty: i === 0 ? 'GK' : 'SUPPORT', markId: null, pressId: null,
+        // A present-tense explanation for a defender's target.  It is deliberately
+        // state, rather than a second movement system or a future tactical plan.
+        defensiveContext: null,
         decisionIn: 0.2 + random(s) * 0.5, challengeIn: 0, controlSince: -100, intent: null,
+        // Present-tense movement intent is serialized state, not a future plan.
+        // It prevents the shared 20 Hz tactical sample from becoming a shared 20 Hz motor command.
+        movementIntent: null,
         attributes: { pace: 5.1 + random(s) * 1.6, control: 0.55 + random(s) * 0.4,
           passing: 0.55 + random(s) * 0.4, shooting: 0.5 + random(s) * 0.45,
           tackling: 0.5 + random(s) * 0.45, keeping: i === 0 ? 0.7 + random(s) * 0.25 : 0.1 } });
@@ -124,6 +130,160 @@
     }
     return world(s, p.team, clamp(x, 4, 98), clamp(y, 4, 64));
   }
+  function localVelocity(s, team, p) {
+    return direction(s, team) === 1 ? { x: p.vx, y: p.vy } : { x: -p.vx, y: -p.vy };
+  }
+  function defenceTarget(s, team, p, duty, q, responsibility, extra = {}) {
+    p.duty = duty; p.markId = extra.markId ?? null; p.target = world(s, team, q.x, q.y);
+    p.defensiveContext = { responsibility, homeZone: { x: HOME[p.slot][0], y: HOME[p.slot][1] },
+      ...(extra.handoffTo === undefined ? {} : { handoffTo: extra.handoffTo }),
+      ...(extra.centralProtectedBy === undefined ? {} : { centralProtectedBy: extra.centralProtectedBy }),
+      ...(extra.attackTrigger === undefined ? {} : { attackTrigger: extra.attackTrigger }),
+      ...(extra.recoverableEnvelope === undefined ? {} : { recoverableEnvelope: extra.recoverableEnvelope }) };
+  }
+  function threatTarget(s, team, p, threat, anchor, responsibility, extra = {}) {
+    const q = local(s, team, threat.x, threat.y);
+    // Goal-side but not glued: the anchor keeps a defender in a useful relationship
+    // with the adjacent line rather than making the threat a forced coordinate.
+    defenceTarget(s, team, p, 'MARK', { x: clamp(Math.min(anchor.x + 3, q.x - 2.8), 4, 65),
+      y: clamp(anchor.y * 0.4 + q.y * 0.6, 4, 64) }, responsibility, { ...extra, markId: threat.id });
+  }
+  function recoverableWideEnvelope(s, team, fb, winger, owner) {
+    // This is a time-and-direction envelope, not a coordinate leash.  It asks
+    // whether the FB can re-engage the live wide threat before its plausible next
+    // receiving/progression window closes.
+    const fq = local(s, team, fb.x, fb.y), wq = local(s, team, winger.x, winger.y);
+    const fv = localVelocity(s, team, fb), wv = localVelocity(s, team, winger);
+    const reengage = { x: wq.x - 1.8, y: wq.y };
+    const recoverySeconds = Math.hypot(reengage.x - fq.x, reengage.y - fq.y) / Math.max(3.8, fb.attributes.pace);
+    const ballGap = owner ? distance(owner, winger) : distance(s.ball, winger);
+    const ballSpeed = Math.max(5, Math.hypot(s.ball.vx, s.ball.vy));
+    const passWindow = ballGap / ballSpeed + 0.55;
+    const wingerTowardGoal = Math.max(0, -wv.x);
+    const fbRecovering = Math.max(0, -fv.x);
+    const directionalCredit = fbRecovering * 0.16 - wingerTowardGoal * 0.13;
+    return recoverySeconds <= passWindow + directionalCredit;
+  }
+  function applyElasticDefence(s, team, owner, presser) {
+    const defenders = s.players.filter(p => p.team === team && ['LB', 'LCB', 'RCB', 'RB'].includes(p.role));
+    const cbs = defenders.filter(p => p.role === 'LCB' || p.role === 'RCB');
+    const dm = s.players.find(p => p.team === team && p.role === 'DM');
+    const threats = s.players.filter(p => p.team !== team && p.role !== 'GK').map(p => ({ p, q: local(s, team, p.x, p.y) }));
+    const central = threats.filter(t => Math.abs(t.q.y - 34) < 15).sort((a, b) => (a.q.x + Math.abs(a.q.y - 34) * 0.5) - (b.q.x + Math.abs(b.q.y - 34) * 0.5))[0]?.p || null;
+    const wide = side => threats.filter(t => side < 0 ? t.q.y < 34 : t.q.y >= 34)
+      .sort((a, b) => (a.q.x + Math.abs(a.q.y - HOME[side < 0 ? 1 : 4][1]) * 0.35) - (b.q.x + Math.abs(b.q.y - HOME[side < 0 ? 1 : 4][1]) * 0.35))[0]?.p || null;
+    const anchors = new Map([...defenders, dm].filter(Boolean).map(p => [p.id, local(s, team, p.target.x, p.target.y)]));
+    const protectCentral = (excluded = null) => {
+      if (!central) return null;
+      const candidates = [...cbs.filter(p => p !== excluded && p !== presser), dm].filter(Boolean);
+      return candidates.sort((a, b) => distance(a, central) - distance(b, central) || a.id - b.id)[0] || null;
+    };
+    for (const fb of defenders.filter(p => p.role === 'LB' || p.role === 'RB')) {
+      const side = fb.role === 'LB' ? -1 : 1, winger = wide(side), farSide = owner && (local(s, team, owner.x, owner.y).y < 34 ? 1 : -1) === side;
+      const anchor = anchors.get(fb.id);
+      if (fb === presser) {
+        fb.defensiveContext = { responsibility: 'DIRECT_PRESS', homeZone: { x: HOME[fb.slot][0], y: HOME[fb.slot][1] } };
+        continue;
+      }
+      if (winger && !farSide) threatTarget(s, team, fb, winger, anchor, 'WIDE_MARK');
+      else if (farSide) defenceTarget(s, team, fb, 'COVER', { x: clamp(anchor.x - 1.8, 4, 65), y: clamp(34 + (anchor.y - 34) * 0.48, 10, 58) }, 'FAR_SIDE_CENTRAL_PROTECTION');
+      else defenceTarget(s, team, fb, 'COVER', anchor, 'HOME_ZONE_RECOVERY');
+    }
+    // One central protector is explicit.  The other CB only covers the nearer
+    // relationship; this prevents all four defenders adopting one ball target.
+    const centralGuard = protectCentral();
+    if (centralGuard && centralGuard !== presser) threatTarget(s, team, centralGuard, central, anchors.get(centralGuard.id), 'CENTRAL_ST_MARK');
+    for (const cb of cbs) if (cb !== presser && cb !== centralGuard) {
+      const partner = centralGuard || dm;
+      const a = anchors.get(cb.id);
+      defenceTarget(s, team, cb, 'COVER', { x: clamp(a.x - 0.8, 4, 65), y: clamp(a.y * 0.72 + (partner ? local(s, team, partner.x, partner.y).y : 34) * 0.28, 8, 60) }, 'ADJACENT_COVER');
+    }
+    if (dm && dm !== presser && dm !== centralGuard) defenceTarget(s, team, dm, 'COVER', local(s, team, dm.target.x, dm.target.y), 'CENTRAL_LANE_COVER');
+  }
+  function applyFullbackAttackResponsibility(s, team, owner) {
+    const b = local(s, team, s.ball.x, s.ball.y);
+    const defenders = s.players.filter(p => p.team === team && ['LB', 'LCB', 'RCB', 'RB'].includes(p.role));
+    const cbs = defenders.filter(p => p.role === 'LCB' || p.role === 'RCB');
+    const dm = s.players.find(p => p.team === team && p.role === 'DM');
+    const threats = s.players.filter(p => p.team !== team && p.role !== 'GK').map(p => ({ p, q: local(s, team, p.x, p.y) }));
+    const central = threats.filter(t => Math.abs(t.q.y - 34) < 15).sort((a, b2) => a.q.x - b2.q.x)[0]?.p || null;
+    for (const fb of defenders.filter(p => p.role === 'LB' || p.role === 'RB')) {
+      const side = fb.role === 'LB' ? -1 : 1;
+      const winger = threats.filter(t => side < 0 ? t.q.y < 34 : t.q.y >= 34).sort((a, b2) => a.q.x - b2.q.x)[0]?.p;
+      if (!winger) continue;
+      const fq = local(s, team, fb.x, fb.y), oq = local(s, team, owner.x, owner.y);
+      const wideProgression = (side < 0 ? oq.y < 29 : oq.y > 39) && oq.x > 43;
+      const receivingWidePass = owner.id === fb.id || (wideProgression && distance(fb, owner) < 16);
+      const crossingContinuation = owner.id === fb.id && oq.x > 68;
+      const attackTrigger = wideProgression || receivingWidePass || crossingContinuation;
+      const cb = cbs.slice().sort((a, b2) => distance(a, winger) - distance(b2, winger) || a.id - b2.id)[0];
+      const centralBackup = central && [...cbs.filter(p => p !== cb), dm].filter(Boolean).sort((a, b2) => distance(a, central) - distance(b2, central) || a.id - b2.id)[0];
+      const handoff = !!(attackTrigger && cb && centralBackup && cb !== centralBackup && distance(cb, winger) < 12);
+      const envelope = !handoff && attackTrigger && recoverableWideEnvelope(s, team, fb, winger, owner);
+      if (handoff) {
+        const cbAnchor = local(s, team, cb.target.x, cb.target.y), backupAnchor = local(s, team, centralBackup.target.x, centralBackup.target.y);
+        threatTarget(s, team, cb, winger, cbAnchor, 'CB_HANDOFF_WIDE', { handoffTo: fb.id, centralProtectedBy: centralBackup.id });
+        if (central) threatTarget(s, team, centralBackup, central, backupAnchor, 'CENTRAL_HANDOFF_BACKUP', { handoffTo: cb.id });
+      }
+      if (attackTrigger && (handoff || envelope)) {
+        const forward = clamp(Math.max(fq.x + 4, Math.min(oq.x + 3, 88)), 4, 94);
+        defenceTarget(s, team, fb, 'RUN', { x: forward, y: clamp(oq.y * 0.76 + HOME[fb.slot][1] * 0.24, 3, 65) }, 'ATTACKING_WIDE_SUPPORT',
+          { attackTrigger: true, recoverableEnvelope: envelope, handoffTo: handoff ? cb.id : null });
+      } else {
+        const a = local(s, team, fb.target.x, fb.target.y);
+        threatTarget(s, team, fb, winger, a, attackTrigger ? 'RECOVERABLE_ENVELOPE_BLOCK' : 'WIDE_RESPONSIBILITY_RETAINED',
+          { attackTrigger, recoverableEnvelope: envelope });
+      }
+    }
+  }
+  function stabilizeMovementIntents(s) {
+    // setTargets computes the current tactical truth every tick.  Defenders that are
+    // neither pressing nor receiving retain a short, role/context-bound intent until
+    // a material relationship changes.  This is deliberately not per-player noise:
+    // line role, threat relationship, ball side and urgency define the review window.
+    for (const p of s.players) {
+      if (p.role === 'GK' || s.phase !== 'play' || p.duty === 'PRESS' || p.duty === 'RECEIVE' || p.duty === 'CARRY') {
+        p.movementIntent = { target: { ...p.target }, duty: p.duty, markId: p.markId, reviewAt: s.time, turnNow: false };
+        continue;
+      }
+      const raw = { target: { ...p.target }, duty: p.duty, markId: p.markId };
+      const old = p.movementIntent;
+      const b = local(s, p.team, s.ball.x, s.ball.y);
+      const ballSide = b.y < 31 ? -1 : b.y > 37 ? 1 : 0;
+      const defensive = s.ball.owner !== null && s.players[s.ball.owner].team !== p.team;
+      const ballDistance = distance(p, s.ball);
+      const lineRole = p.slot <= 4 ? 'BACK_LINE' : p.slot <= 7 ? 'MID_BLOCK' : 'FRONT';
+      const marked = raw.markId === null ? null : s.players[raw.markId];
+      const cadence = raw.duty === 'MARK' ? (lineRole === 'BACK_LINE' ? 0.19 : lineRole === 'MID_BLOCK' ? 0.15 : 0.12)
+        : raw.duty === 'RECOVERY' ? 0.1 : lineRole === 'BACK_LINE' ? 0.2 : lineRole === 'MID_BLOCK' ? 0.17 : 0.14;
+      const relationshipDistance = marked ? clamp(distance(p, marked) / 90, 0, 0.1) : 0;
+      const reviewWindow = cadence + relationshipDistance + clamp(ballDistance / 180, 0, 0.16) + (ballSide === 0 ? 0.03 : 0);
+      const delta = old ? distance(raw.target, old.target) : Infinity;
+      const meaningfulDelta = raw.duty === 'MARK' ? 0.32 : lineRole === 'BACK_LINE' ? 0.48 : 0.4;
+      const dutyChanged = !old || raw.duty !== old.duty;
+      const replacement = old && raw.markId !== old.markId ? s.players[raw.markId] : null;
+      // A ranking tie must not make every marker swap together.  A new mark is
+      // immediate only when it is a locally dangerous relationship; otherwise the
+      // held goal-side position remains valid until its own short review/delta gate.
+      const urgentMarkChange = !!replacement && distance(p, replacement) < 5 && distance(replacement, s.ball) < 4;
+      const relationshipChanged = dutyChanged || urgentMarkChange;
+      const sideChanged = old && old.ballSide !== ballSide && (defensive || raw.duty === 'RECOVERY') && ballDistance < 18;
+      const urgent = raw.duty === 'RECOVERY' || (defensive && ballDistance < 10);
+      // Crossing the dead-zone alone is not an immediate command: otherwise a
+      // common moving threat still releases a whole line on the same tick.  A large
+      // relocation, danger, or role/side transition remains immediate.
+      const majorRelocation = delta >= meaningfulDelta * (raw.duty === 'MARK' ? 6 : 3);
+      const accept = !old || relationshipChanged || majorRelocation || sideChanged || urgent || s.time >= old.reviewAt;
+      if (accept) {
+        // A meaningful target may redirect a walking player immediately; target noise may not.
+        p.movementIntent = { ...raw, ballSide, reviewAt: s.time + reviewWindow,
+          turnNow: !!old && (relationshipChanged || majorRelocation || sideChanged) };
+      } else {
+        p.target = { ...old.target }; p.duty = old.duty; p.markId = old.markId;
+        p.movementIntent = { ...old, turnNow: false };
+      }
+    }
+  }
   function setTargets(s) {
     const owner = s.ball.owner === null ? null : s.players[s.ball.owner];
     const attackTeam = owner ? owner.team : s.possession ?? s.lastPossession;
@@ -180,18 +340,8 @@
           if (p === presser) continue;
           const q = local(s, team, p.x, p.y);
           if (q.x > b.x + 8 && s.time - s.transitionAt < 4) p.duty = 'RECOVERY';
-          const threats = opponents(s, p).filter(o => o.role !== 'GK').map(o => ({ o, q: local(s, team, o.x, o.y) }))
-            .filter(o => o.q.x < 65 && Math.abs(o.q.y - HOME[p.slot][1]) < (p.slot <= 4 ? 15 : 12));
-          threats.sort((a, b2) => (a.q.x + Math.abs(a.q.y - HOME[p.slot][1]) * 0.7) - (b2.q.x + Math.abs(b2.q.y - HOME[p.slot][1]) * 0.7));
-          if (threats.length && p.slot <= 7) {
-            const threat = threats[0];
-            const anchor = local(s, team, p.target.x, p.target.y);
-            p.duty = 'MARK'; p.markId = threat.o.id;
-            // Goal-side band, deliberately neither the opponent's position nor a fixed glued offset.
-            p.target = world(s, team, clamp(Math.min(anchor.x + 3, threat.q.x - 2.8), 4, 65),
-              clamp(anchor.y * 0.4 + threat.q.y * 0.6, 4, 64));
-          }
         }
+        applyElasticDefence(s, team, owner, presser);
       } else if (owner && owner.team === team) {
         const o = local(s, team, owner.x, owner.y);
         for (const p of ours) {
@@ -215,6 +365,7 @@
             p.target = world(s, team, target.x, target.y);
           }
         }
+        applyFullbackAttackResponsibility(s, team, owner);
       } else if (s.ball.owner === null) {
         const ranked = ours.slice().sort((a, b) => distance(a, s.ball) - distance(b, s.ball));
         for (const p of ranked.slice(0, 2)) {
@@ -236,6 +387,7 @@
         receiver.target = { x: clamp(s.ball.x + s.ball.vx * 0.22, 1, 104), y: clamp(s.ball.y + s.ball.vy * 0.22, 1, 67) };
       }
     }
+    stabilizeMovementIntents(s);
   }
   // The sole ongoing player-coordinate integrator, including explicit dead-ball formation resets.
   function integratePlayers(s) {
@@ -270,12 +422,13 @@
         const response = (0.18 + (1 - p.attributes.control) * 0.3
           + (1 - p.attributes.passing) * 0.15) * (1 - urgency * 0.7);
         const demand = p.motionDemand || { vx: p.vx, vy: p.vy };
+        const immediateLowSpeedTurn = !!p.movementIntent?.turnNow && Math.hypot(p.vx, p.vy) < 0.85 && dist > 0.1;
         const blend = 1 - Math.exp(-DT / response);
-        demand.vx += (vx - demand.vx) * blend;
-        demand.vy += (vy - demand.vy) * blend;
+        if (immediateLowSpeedTurn) { demand.vx = vx; demand.vy = vy; }
+        else { demand.vx += (vx - demand.vx) * blend; demand.vy += (vy - demand.vy) * blend; }
         p.motionDemand = demand;
         vx = demand.vx; vy = demand.vy;
-        accelerationRate = 6.8 + urgency * 2.2 + (p.attributes.pace - 5.1) * 0.5;
+        accelerationRate = immediateLowSpeedTurn ? 80 : 6.8 + urgency * 2.2 + (p.attributes.pace - 5.1) * 0.5;
       } else {
         // Restarts, keeper motion and explicit owner actions retain V1 response.
         p.motionDemand = null;
