@@ -12,7 +12,7 @@
     <div class="transport"><label>SEED <input id="seed" value="frl-a-745-001" maxlength="64"></label><button data-speed="0.5">0.5x</button><button data-speed="1" class="active">1x</button><button data-speed="2">2x</button><button id="pause">일시 정지 / 계속</button><button id="restart">처음부터 다시 보기</button></div>
   </header>
   <main>
-    <section class="scenario-bar"><div class="scenario-buttons" aria-label="시나리오 선택"></div><div class="focus"><strong>관찰 포커스</strong> · 동시/안무식 cadence 감소? · 유기적 팀 shape 보존? · 중앙 붕괴/대량 볼 추격 없음? · 인공 random delay/jitter 없음? · <em>#745 watch: 공격 sharpness와 support progression</em></div></section>
+    <section class="scenario-bar"><div id="scenario-buttons" class="scenario-buttons" aria-label="시나리오 선택"></div><div class="scenario-actions"><span id="viewer-status" role="status" aria-live="polite">부팅 중</span><button id="start" disabled>시작하기</button></div><div class="focus"><strong>관찰 포커스</strong> · 동시/안무식 cadence 감소? · 유기적 팀 shape 보존? · 중앙 붕괴/대량 볼 추격 없음? · 인공 random delay/jitter 없음? · <em>#745 watch: 공격 sharpness와 support progression</em></div></section>
     <section class="panels">
       <article class="panel"><div class="panel-title"><strong>A · 수정 전 · FRL A버전 Initial V1</strong><span id="a-status">대기</span></div><iframe id="panel-a" title="A 수정 전 FRL A버전 Initial V1"></iframe></article>
       <article class="panel"><div class="panel-title"><strong>B · 수정 후 · #745 Candidate</strong><span id="b-status">대기</span></div><iframe id="panel-b" title="B 수정 후 #745 Candidate"></iframe></article>
