@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Astra · Independent Football / V44</title>
+  <link rel="stylesheet" href="astra_match_styles.css">
+  <script defer src="astra_match_engine.js"></script>
+  <script defer src="astra_match_viewer.js"></script>
+</head>
+<body>
+  <header>
+    <div><span class="eyebrow">V44 · ISOLATED A/B EXPERIMENT</span><h1>Astra Football</h1></div>
+    <p>독립 엔진 · 11 vs 11 · 4-1-2-3<br><span class="muted">시각 비교 후보 / 기존 FLR 엔진과 연결되지 않음</span></p>
+  </header>
+  <main>
+    <section class="match-panel" aria-label="경기">
+      <div class="scoreboard">
+        <strong class="red">RED</strong><strong id="score">0 : 0</strong><strong class="blue">BLUE</strong>
+        <div class="clockline"><span id="clock">00:00</span><span id="half">전반</span><span id="possession">킥오프 대기</span></div>
+      </div>
+      <div class="controls">
+        <label>Seed <input id="seed" value="astra-659" maxlength="80" spellcheck="false" aria-label="결정론적 경기 시드"></label>
+        <button id="start" class="primary">새 경기 시작</button>
+        <button id="pause">계속</button><button id="step">한 틱 진행</button>
+        <label>속도 <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option><option value="8">8x</option></select></label>
+      </div>
+      <div class="view-meta"><span id="seedDisplay">Seed: astra-659</span><span>1x ≈ 5분 31초 / 전체 경기 · Space: 일시정지</span></div>
+      <div class="pitch-scroll"><canvas id="pitch" width="1200" height="816" aria-label="Red와 Blue의 22명 포지션을 표시하는 2D 축구 경기장">Canvas를 지원하는 브라우저가 필요합니다.</canvas></div>
+      <div id="action" class="action" aria-live="polite">킥오프 대기</div>
+      <div class="replay-controls">
+        <button id="replayRecent">이전 상황 다시 보기</button><button id="returnLive" hidden>라이브 복귀</button>
+        <label id="replayLabel" hidden>리플레이 <input id="replayScrub" type="range" min="0" max="1000" value="0" aria-label="기록된 리플레이 탐색"></label>
+        <span id="replayStatus" class="muted">실제 과거 10초 + 가능한 후속 2초</span>
+      </div>
+      <p class="hint">리플레이는 기록된 시뮬레이션 초를 보통 속도로 재생합니다. 경기 시계는 약 4.09배 압축됩니다. 선수 클릭: 역할 확인.</p>
+      <div id="selection" class="muted">원을 클릭하면 현재 수비·공격 역할을 볼 수 있습니다.</div>
+      <details id="diagnostics"><summary>진단 · 움직임 / 수비 / 단일 상태</summary><div id="diagnosticData"></div><p class="hint">진단 수치는 행동 관찰용 대리 지표이며 축구 자연스러움의 합격 판정이 아닙니다.</p></details>
+    </section>
+    <aside>
+      <section class="card"><h2>경기 기록 <span class="muted">RED / BLUE</span></h2><table id="stats"><tbody></tbody></table></section>
+      <section class="card events-card"><div class="event-heading"><h2>이벤트</h2><label><input id="notableOnly" type="checkbox" checked> 주요 장면만</label></div><p class="hint">↶ 버튼: 해당 장면 이전 기록부터 재생</p><ol id="events" aria-label="경기 이벤트 기록"></ol></section>
+    </aside>
+  </main>
+  <footer>고정 틱 · 명시적 RNG · 실제 기록 리플레이 · 향후 Choice Adapter 연결 지점 제공. A/B 우승 판정 전.</footer>
+</body>
+</html>
