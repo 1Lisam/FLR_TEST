@@ -75,6 +75,10 @@
           acquiredAt: 0, releaseReason: 'INITIAL', pressPhase: null, handoff: null, region: null },
         facingRadians: team === 0 ? 0 : Math.PI,
         facingSource: i === 0 ? 'HOME_GOAL' : 'MOVEMENT',
+        // Rendering may smooth only a stable defensive display angle.  The
+        // authoritative facingRadians/source above always remains current.
+        renderFacingRadians: team === 0 ? 0 : Math.PI,
+        renderFacingSource: i === 0 ? 'HOME_GOAL' : 'MOVEMENT',
         // A short-lived, current action direction.  This is MatchState authority
         // for a completed/selected action, never a visual-only renderer hint.
         facingIntent: null,
@@ -275,10 +279,18 @@
       y:clamp(anchor.y*.62 + q.y*.38 + (pressurePoint ? (q.y-pressurePoint.y)*.08 : 0),4,64)};
   }
   function goalSideWideTarget(anchor, threat, side, centralWeight = .42) {
-    // Current threat-relative goal-side position.  It preserves a route to goal
-    // without tethering the fullback to a fixed home coordinate or mirroring.
-    return { x: clamp(Math.min(anchor.x + anchor.span * .18, threat.q.x - Math.max(1.15, anchor.span * .14)), 4, 68),
-      y: clamp(anchor.y * centralWeight + threat.q.y * (1 - centralWeight) + side * .28, 4, 64) };
+    // A wide defender must be goal-side *and* inside the current attacker-to-goal
+    // corridor.  This is a present-state triangle, not a predicted dribble.
+    const x = clamp(Math.min(anchor.x + anchor.span * .18, threat.q.x - Math.max(1.15, anchor.span * .14)), 4, 68);
+    const nearPostY = side > 0 ? 52 : 16;
+    const routeAtDepth = threat.q.y + (nearPostY - threat.q.y)
+      * clamp((threat.q.x - x) / Math.max(1, threat.q.x), 0, 1);
+    const blendedY = anchor.y * centralWeight + threat.q.y * (1 - centralWeight) + side * .28;
+    // On the right, smaller y is inside; on the left, larger y is inside.
+    const corridorY = side > 0
+      ? Math.max(nearPostY, Math.min(blendedY, routeAtDepth + .55))
+      : Math.min(nearPostY, Math.max(blendedY, routeAtDepth - .55));
+    return { x, y: clamp(corridorY, 4, 64) };
   }
   function responsibilityOwnsThreat(p, threatId) {
     const r = p?.responsibility || {};
@@ -334,7 +346,11 @@
     for(const p of ours){
       if(p===primary?.p) continue;
       const a=anchors.get(p.id), pq=local(s,team,p.x,p.y), side=p.role==='LB'?-1:p.role==='RB'?1:0;
-      const localThreat=retainedWide.get(p.id)||threats.filter(t=>t.p!==carrier&&(side===0?Math.abs(t.q.y-a.y)<a.span*.9:(side<0?t.q.y<34:t.q.y>=34)))
+      // During a live pass, the named receiver is the current incoming threat for
+      // a fullback's mark/screen even though that receiver also feeds the single
+      // primary-pressure ranking.  This is current ball-flight state, not an
+      // assumed reception.
+      const localThreat=retainedWide.get(p.id)||(incoming&&side!==0?[primaryThreat,...threats.filter(t=>t.p!==carrier)]:threats.filter(t=>t.p!==carrier)).filter(t=>(side===0?Math.abs(t.q.y-a.y)<a.span*.9:(side<0?t.q.y<34:t.q.y>=34)))
         .sort((x,y)=>Math.hypot(x.q.x-a.x,x.q.y-a.y)-Math.hypot(y.q.x-a.x,y.q.y-a.y)||x.p.id-y.p.id)[0]||null;
       const wasDirect=/PRIMARY_CONTAIN|CLOSE_DOWN|TIGHT_MARK|CHALLENGE|LOOSE_MARK_SCREEN/.test(p.responsibility?.kind||'');
       const secondary=secondaryAssignments.get(p.id);
@@ -562,7 +578,7 @@
     // a material relationship changes.  This is deliberately not per-player noise:
     // line role, threat relationship, ball side and urgency define the review window.
     for (const p of s.players) {
-      if (p.role === 'GK' || s.phase !== 'play' || p.duty === 'PRESS' || p.duty === 'RECEIVE' || p.duty === 'CARRY') {
+      if (p.role === 'GK' || s.phase !== 'play' || p.duty === 'RECEIVE' || p.duty === 'CARRY') {
         p.movementIntent = { target: { ...p.target }, duty: p.duty, markId: p.markId, pressId: p.pressId,
           responsibilityVersion: p.responsibility?.version ?? 0, responsibility: p.responsibility ? copy(p.responsibility) : null, defensiveContext: p.defensiveContext ? copy(p.defensiveContext) : null, reviewAt: s.time, turnNow: false };
         continue;
@@ -586,7 +602,12 @@
       const reviewWindow = cadence + relationshipDistance + clamp(ballDistance / 180, 0, 0.16) + (ballSide === 0 ? 0.03 : 0);
       const delta = old ? distance(raw.target, old.target) : Infinity;
       const meaningfulDelta = raw.duty === 'MARK' ? 0.32 : lineRole === 'BACK_LINE' ? 0.48 : 0.4;
-      const dutyChanged = !old || raw.duty !== old.duty || raw.responsibilityVersion !== old.responsibilityVersion;
+      // Versions are audit sequencing, not a new motor instruction.  Several
+      // current defensive writers may republish the same relationship in a tick.
+      // Keep the newest responsibility live, while only a changed actor/lane/phase
+      // is allowed to reset a held motor destination.
+      const relationshipKey = `${raw.duty}|${raw.responsibility?.subjectId ?? ''}|${raw.markId ?? ''}|${raw.pressId ?? ''}|${raw.responsibility?.watchTargetId ?? ''}|${raw.responsibility?.pressureTargetId ?? ''}|${raw.responsibility?.pressPhase ?? ''}`;
+      const dutyChanged = !old || relationshipKey !== old.relationshipKey;
       const replacement = old && raw.markId !== old.markId ? s.players[raw.markId] : null;
       // A ranking tie must not make every marker swap together.  A new mark is
       // immediate only when it is a locally dangerous relationship; otherwise the
@@ -594,7 +615,7 @@
       const urgentMarkChange = !!replacement && distance(p, replacement) < 5 && distance(replacement, s.ball) < 4;
       const relationshipChanged = dutyChanged || urgentMarkChange;
       const sideChanged = old && old.ballSide !== ballSide && (defensive || raw.duty === 'RECOVERY') && ballDistance < 18;
-      const urgent = raw.duty === 'RECOVERY' || (defensive && ballDistance < 10);
+      const urgent = defensive && ballDistance < 10 && (raw.duty === 'PRESS' || raw.duty === 'RECOVERY');
       // Crossing the dead-zone alone is not an immediate command: otherwise a
       // common moving threat still releases a whole line on the same tick.  A large
       // relocation, danger, or role/side transition remains immediate.
@@ -609,7 +630,7 @@
         || (s.time >= old.reviewAt && materialAdjustment);
       if (accept) {
         // A meaningful target may redirect a walking player immediately; target noise may not.
-        p.movementIntent = { ...raw, ballSide, reviewAt: s.time + reviewWindow,
+        p.movementIntent = { ...raw, relationshipKey, ballSide, reviewAt: s.time + reviewWindow,
           turnNow: !!old && (relationshipChanged || majorRelocation || sideChanged) };
       } else {
         // Do not restore the old responsibility here.  Its target may be held for
@@ -646,6 +667,22 @@
   function setFacing(p, dx, dy, source) {
     if (Math.hypot(dx, dy) > .04) p.facingRadians = Math.atan2(dy, dx);
     p.facingSource = source;
+    const desired = p.facingRadians;
+    const explicit = new Set(['PASS', 'SHOT', 'CARRY', 'RECEIVE', 'POSSESSION_TRANSITION']);
+    const prior = p.renderFacingRadians;
+    if (!Number.isFinite(prior) || explicit.has(source) || p.renderFacingSource !== source) {
+      p.renderFacingRadians = desired;
+    } else if (source === 'CONTAIN_MARK_HALF_OPEN' || source === 'RECOVERY') {
+      // The authority above remains exact.  Only the body/arrow presentation gets
+      // a serialized deadband and turn-rate cap while its defensive source holds.
+      let delta = desired - prior;
+      while (delta > Math.PI) delta -= Math.PI * 2;
+      while (delta < -Math.PI) delta += Math.PI * 2;
+      if (Math.abs(delta) > .055) p.renderFacingRadians = prior + Math.sign(delta) * Math.min(Math.abs(delta), .22);
+    } else {
+      p.renderFacingRadians = desired;
+    }
+    p.renderFacingSource = source;
   }
   function updateMatchFacing(s) {
     // Facing priority is MatchState authority: current selected/physical action,
