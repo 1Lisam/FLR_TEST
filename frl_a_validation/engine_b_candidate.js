@@ -56,6 +56,7 @@
       players: [], ball: { x: 52.5, y: 34, z: 0.15, vx: 0, vy: 0, vz: 0, owner: null,
         mode: 'dead', lastTouch: null, releasedAt: -100, flight: null },
       restart: null, events: [], history: [], stats: [makeStats(), makeStats()],
+      responsibilityVacancies: [],
       diagnostics: { contacts: 0, markingSamples: 0, markingGlueTicks: 0, handoffs: 0,
         wideThreatSamples: 0, wideAbandonmentTicks: 0, massChaseTicks: 0, shapeSamples: 0,
         widths: [0, 0], depths: [0, 0], minWidth: [100, 100], maxDepth: [0, 0],
@@ -140,6 +141,11 @@
     return direction(s, team) === 1 ? { x: p.vx, y: p.vy } : { x: -p.vx, y: -p.vy };
   }
   function contractEpoch(s) { return `${s.phase}:${s.lastPossession ?? 'none'}:${s.ball.owner ?? 'loose'}`; }
+  function homeResponsibility(p) {
+    const channel = p.role === 'LB' ? 'LEFT_CHANNEL' : p.role === 'RB' ? 'RIGHT_CHANNEL'
+      : p.role === 'LCB' || p.role === 'RCB' ? 'CENTRAL_BACK' : p.role === 'DM' ? 'CENTRAL_SCREEN' : 'ROLE_SPACE';
+    return { role: p.role, channel, region: { x: HOME[p.slot][0], y: HOME[p.slot][1] } };
+  }
   function regionFor(s, team, p, anchor) {
     const linePeers = s.players.filter(q => q.team === team && q.role !== 'GK' && Math.abs(q.slot - p.slot) <= 2);
     const span = Math.max(7, linePeers.length > 1 ? linePeers.reduce((n, q) => n + distance(q, p), 0) / (linePeers.length - 1) : 11);
@@ -153,12 +159,16 @@
     const version = signature === priorSignature ? prior.version : prior.version + 1;
     p.duty = duty; p.markId = duty === 'MARK' ? subjectId : null; p.pressId = duty === 'PRESS' ? subjectId : null;
     p.target = world(s, team, target.x, target.y);
-    p.responsibility = { version, epoch, kind, subjectId, acquiredAt: signature === priorSignature ? prior.acquiredAt : s.time,
+    p.responsibility = { version, epoch, kind, subjectId, homeResponsibility: homeResponsibility(p), acquiredAt: signature === priorSignature ? prior.acquiredAt : s.time,
       releaseReason: extra.releaseReason || null, pressPhase: extra.pressPhase || null, handoff: extra.handoff || null,
       region: extra.region || null, protectedBy: extra.protectedBy ?? null, challengeIntent: !!extra.challengeIntent };
-    p.defensiveContext = { responsibility: kind, homeZone: { x: HOME[p.slot][0], y: HOME[p.slot][1] }, contractVersion: version,
+    p.defensiveContext = { responsibility: kind, homeResponsibility: homeResponsibility(p), homeZone: { x: HOME[p.slot][0], y: HOME[p.slot][1] }, contractVersion: version,
       ...(extra.handoff ? { handoffTo: p.id === extra.handoff.from ? extra.handoff.to : null, handoffFrom: extra.handoff.from, handoffReason: extra.handoff.reason } : { handoffTo: null }),
       ...(extra.pressPhase ? { pressPhase: extra.pressPhase } : {}),
+      ...(extra.reason ? { reason: extra.reason } : {}),
+      ...(extra.pressureOwner === undefined ? {} : { pressureOwner: extra.pressureOwner }),
+      ...(extra.markShadow === undefined ? {} : { markShadow: extra.markShadow }),
+      ...(extra.threatLevel === undefined ? {} : { threatLevel: round(extra.threatLevel) }),
       ...(extra.attackTrigger === undefined ? {} : { attackTrigger: extra.attackTrigger }),
       ...(extra.recoverableEnvelope === undefined ? {} : { recoverableEnvelope: extra.recoverableEnvelope }),
       ...(extra.protectedBy === undefined ? {} : { centralProtectedBy: extra.protectedBy }) };
@@ -203,6 +213,91 @@
     const target = { x: clamp(carrier.x - offset, 3, 72), y: clamp(carrier.y + centralBias, 4, 64) };
     return { gap, eligible, phase, target, score: gap + leaving * .42 + roleRisk, challengeIntent: phase === 'CHALLENGE' && closing < p.attributes.pace * .58 };
   }
+  // V3 is deliberately relationship-driven.  A role anchor follows current ball
+  // context, but its lane, depth and lateral response are role specific; it is
+  // never a shared far-ball coordinate for a whole defensive line.
+  function v3DefensiveAnchor(s, team, p) {
+    const b = local(s, team, s.ball.x, s.ball.y), h = HOME[p.slot];
+    const back = p.slot <= 4, midfield = p.slot >= 5 && p.slot <= 7;
+    const depthShift = back ? clamp((52 - b.x) * .16, -3.5, 6.4) : midfield ? clamp((52 - b.x) * .22, -5, 8) : clamp((52 - b.x) * .12, -3, 4);
+    const lateralWeight = p.role === 'LB' || p.role === 'RB' ? .30 : p.role === 'LCB' || p.role === 'RCB' ? .16 : midfield ? .25 : .11;
+    const centralBias = p.role === 'LCB' ? 1.1 : p.role === 'RCB' ? -1.1 : p.role === 'DM' ? (34 - h[1]) * .18 : 0;
+    const target = { x: clamp(h[0] + depthShift + (p.slot === 1 || p.slot === 4 ? (b.x - 52) * .035 : 0), 4, 82),
+      y: clamp(h[1] + (b.y - h[1]) * lateralWeight + centralBias, 4, 64) };
+    return regionFor(s, team, p, target);
+  }
+  function v3Danger(s, team, carrier) {
+    const q = local(s, team, carrier.x, carrier.y), v = localVelocity(s, team, carrier);
+    const box = clamp((39 - q.x) / 32, 0, 1);
+    const facesGoal = clamp((-v.x + .8) / 4.4, 0, 1);
+    const lane = clamp(1 - Math.abs(q.y - 34) / 27, 0, 1);
+    return clamp(box * .55 + facesGoal * .18 + lane * .27, 0, 1);
+  }
+  function v3PressurePlan(s, team, p, carrier, anchor, hasCentralCover, incoming) {
+    const q = local(s, team, p.x, p.y), c = local(s, team, carrier.x, carrier.y), v = localVelocity(s, team, p);
+    const dx = c.x - q.x, dy = c.y - q.y, gap = Math.hypot(dx, dy), span = anchor.span;
+    const leaving = Math.hypot(q.x - anchor.x, q.y - anchor.y);
+    const sameLane = anchor.lane === 'CENTRAL' || (anchor.lane === 'LEFT' && c.y < 40) || (anchor.lane === 'RIGHT' && c.y > 28) || (anchor.lane === 'MID' && Math.abs(c.y - anchor.y) < span * .95);
+    const eligible = sameLane && gap <= span * 1.28 && leaving <= span * 1.18
+      && (!['LCB','RCB'].includes(p.role) || hasCentralCover || gap < span * .55);
+    if (!eligible) return null;
+    const unit = gap > .01 ? {x:dx/gap,y:dy/gap} : {x:0,y:0};
+    const closing = v.x * unit.x + v.y * unit.y;
+    const stopping = closing > 0 ? closing * closing / Math.max(10, p.attributes.pace * 3.1) : 0;
+    const danger = v3Danger(s, team, carrier);
+    // Ordinary possession settles into a 2–3m-class relation.  The response
+    // contracts only as current box/facing/shot-lane danger rises.
+    const baseline = 2.25 + clamp((anchor.span - 7) * .055, 0, .42);
+    const desiredGap = clamp(baseline - danger * 1.12 + stopping * .48 + (incoming ? .18 : 0), 1.08, 3.05);
+    const laneSide = clamp((34 - c.y) * .07, -1.05, 1.05);
+    const goalSide = Math.max(.72, desiredGap * (danger > .56 ? 1.05 : .88));
+    const target = {x:clamp(c.x - goalSide, 2.5, 72),y:clamp(c.y + laneSide,4,64)};
+    let phase = gap > desiredGap + .72 ? 'PRIMARY_CONTAIN' : gap > desiredGap + .18 ? 'CLOSE_DOWN' : danger > .48 ? 'TIGHT_MARK' : 'PRIMARY_CONTAIN';
+    if (gap <= Math.max(1.12, desiredGap - .38) && danger > .63 && closing < p.attributes.pace * .52) phase = 'CHALLENGE';
+    return {gap, desiredGap, danger, phase, target, score:gap + leaving*.48 + (p.role === 'DM' ? .16 : 0),
+      challengeIntent:phase === 'CHALLENGE', eligible};
+  }
+  function v3ShadowTarget(anchor, threat, pressurePoint) {
+    const q = threat.q;
+    return {x:clamp(Math.min(anchor.x + anchor.span*.18, q.x - Math.max(1.15, anchor.span*.13)),4,68),
+      y:clamp(anchor.y*.62 + q.y*.38 + (pressurePoint ? (q.y-pressurePoint.y)*.08 : 0),4,64)};
+  }
+  function applyV3Defence(s, team, carrier, anchors, incoming = false) {
+    const ours=s.players.filter(p=>p.team===team&&p.role!=='GK'), backs=ours.filter(p=>['LB','LCB','RCB','RB'].includes(p.role));
+    const cbs=backs.filter(p=>p.role==='LCB'||p.role==='RCB'), dm=ours.find(p=>p.role==='DM');
+    const cq=local(s,team,carrier.x,carrier.y), threats=s.players.filter(p=>p.team!==team&&p.role!=='GK').map(p=>({p,q:local(s,team,p.x,p.y)}));
+    const primaryThreat={p:carrier,q:cq};
+    const central=threats.filter(t=>t.p!==carrier&&Math.abs(t.q.y-34)<10).sort((a,b)=>a.q.x-b.q.x||a.p.id-b.p.id)[0]||null;
+    const coverCandidates=[...cbs,dm].filter(Boolean).sort((a,b)=>Math.abs(local(s,team,a.x,a.y).y-34)-Math.abs(local(s,team,b.x,b.y).y-34)||a.id-b.id);
+    const hasCentralCover=coverCandidates.length>1;
+    const plans=ours.map(p=>({p,plan:v3PressurePlan(s,team,p,carrier,anchors.get(p.id),hasCentralCover,incoming)})).filter(x=>x.plan)
+      .sort((a,b)=>a.plan.score-b.plan.score||a.p.id-b.p.id);
+    const primary=plans[0]||null, danger=v3Danger(s,team,carrier);
+    if(primary) publishResponsibility(s,team,primary.p,'PRESS',primary.plan.target,primary.plan.phase,{subjectId:carrier.id,region:anchors.get(primary.p.id),pressPhase:primary.plan.phase,challengeIntent:primary.plan.challengeIntent,reason:incoming?'INCOMING_PASS_ARRIVAL':'CURRENT_CARRIER_THREAT',pressureOwner:primary.p.id,threatLevel:danger,markShadow:false,releaseReason:'COVER_OR_JURISDICTION_CHANGED'});
+    const ballSide=cq.y<34?-1:1;
+    for(const p of ours){
+      if(p===primary?.p) continue;
+      const a=anchors.get(p.id), pq=local(s,team,p.x,p.y), side=p.role==='LB'?-1:p.role==='RB'?1:0;
+      const localThreat=threats.filter(t=>t.p!==carrier&&(side===0?Math.abs(t.q.y-a.y)<a.span*.9:(side<0?t.q.y<34:t.q.y>=34)))
+        .sort((x,y)=>Math.hypot(x.q.x-a.x,x.q.y-a.y)-Math.hypot(y.q.x-a.x,y.q.y-a.y)||x.p.id-y.p.id)[0]||null;
+      const wasDirect=/PRIMARY_CONTAIN|CLOSE_DOWN|TIGHT_MARK|CHALLENGE|LOOSE_MARK_SCREEN/.test(p.responsibility?.kind||'');
+      if((p.role==='LB'||p.role==='RB')&&side!==ballSide){
+        publishResponsibility(s,team,p,'COVER',{x:clamp(a.x-1.1,4,68),y:clamp(34+(a.y-34)*.48,9,59)},'ZONE_HOLD',{region:a,reason:'FAR_SIDE_CENTRAL_AND_SWITCH_LANE',pressureOwner:primary?.p.id??null,threatLevel:danger,releaseReason:'FAR_SIDE_NOT_PRIMARY'});
+      } else if(localThreat && Math.abs(localThreat.q.y-a.y)<=a.span*1.22 && localThreat.q.x<=a.x+a.span*1.18){
+        const shadow=v3ShadowTarget(a,localThreat,primaryThreat.q);
+        publishResponsibility(s,team,p,'MARK',shadow,'LOOSE_MARK_SCREEN',{subjectId:localThreat.p.id,region:a,reason:incoming?'PASS_TARGET_OR_NEARBY_RUNNER':'LOCAL_RUNNER_AND_LANE',pressureOwner:primary?.p.id??null,threatLevel:danger,markShadow:true,releaseReason:'THREAT_LEFT_ZONE'});
+      } else if((p.role==='LCB'||p.role==='RCB'||p.role==='DM') && (central||Math.abs(cq.y-34)<13)){
+        const screenY=central?central.q.y*.30+34*.70:cq.y*.24+34*.76;
+        publishResponsibility(s,team,p,'COVER',{x:clamp(Math.min(a.x,cq.x-2.1),4,68),y:clamp(a.y*.68+screenY*.32,8,60)},'SCREEN_LANE',{subjectId:central?.p.id??carrier.id,region:a,reason:'CENTRAL_PASS_AND_GOAL_LANE',pressureOwner:primary?.p.id??null,threatLevel:danger,markShadow:false,releaseReason:'LANE_REBALANCE'});
+      } else if(wasDirect){
+        publishResponsibility(s,team,p,'RECOVERY',a,'RECOVER_HANDOFF',{region:a,reason:'PRIMARY_RELEASED_OR_THREAT_EXIT',pressureOwner:primary?.p.id??null,threatLevel:danger,releaseReason:'RETURN_TO_ROLE_SPACE'});
+      } else {
+        publishResponsibility(s,team,p,'COVER',a,'ZONE_HOLD',{region:a,reason:'ROLE_ZONE_AND_TEAM_SPACING',pressureOwner:primary?.p.id??null,threatLevel:danger,releaseReason:'CURRENT_ZONE_VALID'});
+      }
+      // A defender can screen a local route but never receives the carrier's exact target.
+      if(Math.hypot(p.target.x-carrier.x,p.target.y-carrier.y)<.08) p.target=world(s,team,{x:pq.x,y:pq.y}.x,a.y);
+    }
+  }
   function applyElasticDefence(s, team, owner, presser, anchors) {
     const defenders = s.players.filter(p => p.team === team && ['LB', 'LCB', 'RCB', 'RB'].includes(p.role));
     const cbs = defenders.filter(p => p.role === 'LCB' || p.role === 'RCB');
@@ -238,6 +333,78 @@
     }
     if (dm && dm !== presser && dm !== centralGuard) publishResponsibility(s, team, dm, 'COVER', anchors.get(dm.id), 'CENTRAL_LANE_COVER', { region: anchors.get(dm.id) });
   }
+  function vacancyLedger(s) {
+    if (!Array.isArray(s.responsibilityVacancies)) s.responsibilityVacancies = [];
+    return s.responsibilityVacancies;
+  }
+  function vacancyKey(team, fb) { return `${team}:${fb.id}:WIDE_CHANNEL`; }
+  function prepareVacancyTick(s) {
+    for (const v of vacancyLedger(s)) {
+      v.confirmedAt = null;
+      if (v.state === 'ACTIVE' && s.ball.owner !== null && s.players[s.ball.owner].team !== v.team) {
+        v.state = 'RELEASING'; v.releaseAt = s.time; v.releaseReason = 'POSSESSION_LOST';
+      }
+    }
+  }
+  function confirmVacancy(s, team, fb, winger, reason) {
+    const ledger = vacancyLedger(s), key = vacancyKey(team, fb);
+    let v = ledger.find(x => x.key === key);
+    if (!v) {
+      v = { key, team, homeOwnerId: fb.id, homeRole: fb.role,
+        channel: fb.role === 'RB' ? 'RIGHT_CHANNEL' : 'LEFT_CHANNEL', state: 'ACTIVE',
+        reason, subjectId: winger?.id ?? null, openedAt: s.time, releaseAt: null, contributors: [] };
+      ledger.push(v);
+    }
+    v.state = 'ACTIVE'; v.reason = reason; v.subjectId = winger?.id ?? null; v.confirmedAt = s.time;
+    v.releaseAt = null; v.releaseReason = null;
+    return v;
+  }
+  function finishVacancyTick(s) {
+    s.responsibilityVacancies = vacancyLedger(s).filter(v => {
+      if (v.state === 'ACTIVE' && v.confirmedAt !== s.time) {
+        v.state = 'RELEASING'; v.releaseAt = s.time; v.releaseReason = 'ORIGINAL_FB_RETURN_OR_TRIGGER_END';
+      }
+      return v.state !== 'RELEASING' || s.time - (v.releaseAt ?? s.time) < .8;
+    });
+  }
+  function applyVacancyCompensation(s, team, anchors) {
+    const ours = s.players.filter(p => p.team === team), ledger = vacancyLedger(s).filter(v => v.team === team);
+    for (const v of ledger) {
+      const fb = s.players[v.homeOwnerId], winger = v.subjectId === null ? null : s.players[v.subjectId];
+      const side = fb?.role === 'RB' ? 1 : -1;
+      const cb = ours.find(p => p.role === (side > 0 ? 'RCB' : 'LCB'));
+      const dm = ours.find(p => p.role === 'DM');
+      const cm = ours.find(p => p.role === (side > 0 ? 'RCM' : 'LCM'));
+      const threat = winger ? local(s, team, winger.x, winger.y) : { x: 56, y: side > 0 ? 56 : 12 };
+      const contributors = [cb, dm, cm].filter(Boolean);
+      v.contributors = contributors.map((p, index) => ({ playerId: p.id, role: p.role,
+        share: index === 0 ? 'REMOTE_WATCH' : index === 1 ? 'HALFSPACE_SCREEN' : 'LANE_SHARE' }));
+      for (const p of contributors) {
+        const a = anchors.get(p.id);
+        if (!a) continue;
+        const q = local(s, team, p.x, p.y), release = v.state === 'RELEASING';
+        let target, kind, reason;
+        if (release) {
+          const weight = p.role === 'DM' ? .54 : p.role === 'RCM' || p.role === 'LCM' ? .63 : .43;
+          target = { x: q.x * (1 - weight) + a.x * weight, y: q.y * (1 - weight) + a.y * weight };
+          kind = 'VACANCY_RELEASE'; reason = v.releaseReason || 'ORIGINAL_FB_RETURN';
+        } else if (p === cb) {
+          target = { x: clamp(Math.min(threat.x - 2.8, a.x + 2.4), 4, 68), y: clamp(a.y * .57 + threat.y * .43, 7, 61) };
+          kind = 'VACANCY_REMOTE_WATCH'; reason = 'VACATED_WIDE_CHANNEL_REMOTE_WATCH';
+        } else if (p === dm) {
+          target = { x: clamp(Math.min(threat.x - 5.2, a.x + 3.1), 6, 70), y: clamp(a.y * .66 + threat.y * .34, 10, 58) };
+          kind = 'VACANCY_HALFSPACE_SCREEN'; reason = 'VACATED_WIDE_CHANNEL_HALFSPACE_SCREEN';
+        } else {
+          target = { x: clamp(Math.min(threat.x - 7.4, a.x + 4.2), 9, 74), y: clamp(a.y * .73 + threat.y * .27, 10, 58) };
+          kind = 'VACANCY_LANE_SHARE'; reason = 'VACATED_WIDE_CHANNEL_LANE_SHARE';
+        }
+        publishResponsibility(s, team, p, release ? 'RECOVERY' : 'COVER', target, kind,
+          { subjectId: winger?.id ?? null, region: a, reason, pressureOwner: null, markShadow: false,
+            releaseReason: release ? 'GRADUAL_ROLE_REJOIN' : 'VACANCY_HANDED_BACK',
+            handoff: { from: fb?.id ?? null, to: p.id, subjectId: winger?.id ?? null, reason: v.channel } });
+      }
+    }
+  }
   function applyFullbackAttackResponsibility(s, team, owner, anchors) {
     const b = local(s, team, s.ball.x, s.ball.y);
     const defenders = s.players.filter(p => p.team === team && ['LB', 'LCB', 'RCB', 'RB'].includes(p.role));
@@ -270,8 +437,10 @@
       }
       if (attackTrigger && (handoff || envelope)) {
         const forward = clamp(Math.max(fq.x + 4, Math.min(oq.x + 3, 88)), 4, 94);
+        const vacancy = confirmVacancy(s, team, fb, winger, handoff ? 'ATTACK_SUPPORT_WITH_CB_DM_HANDOFF' : 'ATTACK_SUPPORT_RECOVERABLE_ENVELOPE');
         publishResponsibility(s, team, fb, 'RUN', { x: forward, y: clamp(oq.y * .76 + HOME[fb.slot][1] * .24, 3, 65) }, 'ATTACKING_WIDE_SUPPORT',
-          { region: anchor, attackTrigger: true, recoverableEnvelope: envelope, handoff: handoff ? { from: fb.id, to: cb.id, subjectId: winger.id, reason: 'WIDE_ATTACK_COVER_ACCEPTED' } : null });
+          { region: anchor, attackTrigger: true, recoverableEnvelope: envelope,
+            handoff: { from: fb.id, to: cb?.id ?? null, subjectId: winger.id, reason: vacancy.channel } });
       } else {
         publishResponsibility(s, team, fb, 'MARK', shadowTarget(anchor, { q: local(s, team, winger.x, winger.y) }), attackTrigger ? 'RECOVERABLE_ENVELOPE_BLOCK' : 'WIDE_RESPONSIBILITY_RETAINED',
           { subjectId: winger.id, region: anchor, attackTrigger, recoverableEnvelope: envelope, releaseReason: 'ATTACK_SUPPORT_NOT_SAFE' });
@@ -334,8 +503,7 @@
   function defensiveAnchors(s, team) {
     const out = new Map();
     for (const p of s.players.filter(p => p.team === team && p.role !== 'GK')) {
-      const a = local(s, team, p.target.x, p.target.y);
-      out.set(p.id, regionFor(s, team, p, a));
+      out.set(p.id, v3DefensiveAnchor(s, team, p));
     }
     return out;
   }
@@ -367,6 +535,7 @@
     const owner = s.ball.owner === null ? null : s.players[s.ball.owner];
     const attackTeam = owner ? owner.team : s.possession ?? s.lastPossession;
     const play = s.phase === 'play';
+    if (play) prepareVacancyTick(s);
     for (const p of s.players) {
       p.target = shapeTarget(s, p, p.team === attackTeam);
       p.duty = p.role === 'GK' ? 'GK' : p.team === attackTeam ? 'SUPPORT' : 'COVER';
@@ -402,19 +571,9 @@
       const ours = s.players.filter(p => p.team === team && p.role !== 'GK');
       const anchors = defensiveAnchors(s, team);
       if (owner && owner.team !== team) {
-        const coverage = ours.filter(p => ['LCB', 'RCB', 'DM'].includes(p.role)).length >= 3;
-        const plans = ours.map(p => {
-          const plan = pressPlan(s, team, p, owner, anchors.get(p.id), coverage || !['LCB', 'RCB'].includes(p.role));
-          return { p, plan };
-        }).filter(x => x.plan).sort((a, b2) => a.plan.score - b2.plan.score || a.p.id - b2.p.id);
-        const selected = plans[0] || null; // Explicit contain/no-primary-press is valid.
-        if (selected) {
-          const { p: presser, plan } = selected;
-          if (presser.pressId !== owner.id) s.diagnostics.handoffs++;
-          publishResponsibility(s, team, presser, 'PRESS', plan.target, 'PRIMARY_PRESS', { subjectId: owner.id, region: anchors.get(presser.id), pressPhase: plan.phase, challengeIntent: plan.challengeIntent, releaseReason: 'JURISDICTION_OR_COVER_LOSS' });
-        }
-        applyElasticDefence(s, team, owner, selected?.p || null, anchors);
-        for (const p of ours.filter(p => p !== selected?.p && p.duty === 'COVER')) publishResponsibility(s, team, p, 'RECOVERY', anchors.get(p.id), 'RETURN_TO_REGION', { region: anchors.get(p.id), releaseReason: 'TRANSITION_OR_PRESS_RESERVATION' });
+        // Current carrier only: pressure ownership is singular and every other
+        // defender retains a lane, mark shadow, or recovery responsibility.
+        applyV3Defence(s, team, owner, anchors, false);
       } else if (owner && owner.team === team) {
         const o = local(s, team, owner.x, owner.y);
         for (const p of ours) {
@@ -440,7 +599,12 @@
         }
         applyFullbackAttackResponsibility(s, team, owner, anchors);
       } else if (s.ball.owner === null) {
-        allocateLooseBall(s, team, ours, anchors);
+        const receiver = s.ball.flight?.type === 'pass' ? s.players[s.ball.flight.targetId] : null;
+        if (receiver && receiver.team !== team) {
+          // The flight vector and named intended receiver are already current
+          // MatchState.  This reads arrival risk; it supplies no future result.
+          applyV3Defence(s, team, receiver, anchors, true);
+        } else allocateLooseBall(s, team, ours, anchors);
       }
       const keeper = s.players[team * 11];
       const kb = local(s, team, s.ball.x, s.ball.y);
@@ -450,6 +614,8 @@
       }
       updateKeeperFacing(s, team);
     }
+    for (let team = 0; team < 2; team++) applyVacancyCompensation(s, team, defensiveAnchors(s, team));
+    finishVacancyTick(s);
     if (s.ball.flight && s.ball.flight.type === 'pass') {
       const receiver = s.players[s.ball.flight.targetId];
       if (receiver) {
