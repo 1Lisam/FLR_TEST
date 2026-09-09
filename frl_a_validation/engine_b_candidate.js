@@ -159,9 +159,13 @@
     const version = signature === priorSignature ? prior.version : prior.version + 1;
     p.duty = duty; p.markId = duty === 'MARK' ? subjectId : null; p.pressId = duty === 'PRESS' ? subjectId : null;
     p.target = world(s, team, target.x, target.y);
+    const pressureTargetId = extra.pressureTargetId ?? (duty === 'PRESS' ? subjectId : null);
+    const markTargetId = extra.markTargetId ?? (duty === 'MARK' ? subjectId : null);
+    const watchTargetId = extra.watchTargetId ?? markTargetId ?? null;
     p.responsibility = { version, epoch, kind, subjectId, homeResponsibility: homeResponsibility(p), acquiredAt: signature === priorSignature ? prior.acquiredAt : s.time,
       releaseReason: extra.releaseReason || null, pressPhase: extra.pressPhase || null, handoff: extra.handoff || null,
-      region: extra.region || null, protectedBy: extra.protectedBy ?? null, challengeIntent: !!extra.challengeIntent };
+      region: extra.region || null, protectedBy: extra.protectedBy ?? null, challengeIntent: !!extra.challengeIntent,
+      pressureTargetId, markTargetId, watchTargetId };
     p.defensiveContext = { responsibility: kind, homeResponsibility: homeResponsibility(p), homeZone: { x: HOME[p.slot][0], y: HOME[p.slot][1] }, contractVersion: version,
       ...(extra.handoff ? { handoffTo: p.id === extra.handoff.from ? extra.handoff.to : null, handoffFrom: extra.handoff.from, handoffReason: extra.handoff.reason } : { handoffTo: null }),
       ...(extra.pressPhase ? { pressPhase: extra.pressPhase } : {}),
@@ -171,7 +175,8 @@
       ...(extra.threatLevel === undefined ? {} : { threatLevel: round(extra.threatLevel) }),
       ...(extra.attackTrigger === undefined ? {} : { attackTrigger: extra.attackTrigger }),
       ...(extra.recoverableEnvelope === undefined ? {} : { recoverableEnvelope: extra.recoverableEnvelope }),
-      ...(extra.protectedBy === undefined ? {} : { centralProtectedBy: extra.protectedBy }) };
+      ...(extra.protectedBy === undefined ? {} : { centralProtectedBy: extra.protectedBy }),
+      pressureTargetId, markTargetId, watchTargetId };
   }
   function shadowTarget(anchor, threat) {
     const q = threat.q;
@@ -262,6 +267,12 @@
     return {x:clamp(Math.min(anchor.x + anchor.span*.18, q.x - Math.max(1.15, anchor.span*.13)),4,68),
       y:clamp(anchor.y*.62 + q.y*.38 + (pressurePoint ? (q.y-pressurePoint.y)*.08 : 0),4,64)};
   }
+  function goalSideWideTarget(anchor, threat, side, centralWeight = .42) {
+    // Current threat-relative goal-side position.  It preserves a route to goal
+    // without tethering the fullback to a fixed home coordinate or mirroring.
+    return { x: clamp(Math.min(anchor.x + anchor.span * .18, threat.q.x - Math.max(1.15, anchor.span * .14)), 4, 68),
+      y: clamp(anchor.y * centralWeight + threat.q.y * (1 - centralWeight) + side * .28, 4, 64) };
+  }
   function applyV3Defence(s, team, carrier, anchors, incoming = false) {
     const ours=s.players.filter(p=>p.team===team&&p.role!=='GK'), backs=ours.filter(p=>['LB','LCB','RCB','RB'].includes(p.role));
     const cbs=backs.filter(p=>p.role==='LCB'||p.role==='RCB'), dm=ours.find(p=>p.role==='DM');
@@ -281,8 +292,10 @@
       const localThreat=threats.filter(t=>t.p!==carrier&&(side===0?Math.abs(t.q.y-a.y)<a.span*.9:(side<0?t.q.y<34:t.q.y>=34)))
         .sort((x,y)=>Math.hypot(x.q.x-a.x,x.q.y-a.y)-Math.hypot(y.q.x-a.x,y.q.y-a.y)||x.p.id-y.p.id)[0]||null;
       const wasDirect=/PRIMARY_CONTAIN|CLOSE_DOWN|TIGHT_MARK|CHALLENGE|LOOSE_MARK_SCREEN/.test(p.responsibility?.kind||'');
-      if((p.role==='LB'||p.role==='RB')&&side!==ballSide){
-        publishResponsibility(s,team,p,'COVER',{x:clamp(a.x-1.1,4,68),y:clamp(34+(a.y-34)*.48,9,59)},'ZONE_HOLD',{region:a,reason:'FAR_SIDE_CENTRAL_AND_SWITCH_LANE',pressureOwner:primary?.p.id??null,threatLevel:danger,releaseReason:'FAR_SIDE_NOT_PRIMARY'});
+      if((p.role==='LB'||p.role==='RB') && localThreat){
+        const shadow=goalSideWideTarget(a,localThreat,side,side !== ballSide ? .52 : .42);
+        const kind=side!==ballSide?'WIDE_WATCH_COVER':'LOOSE_MARK_SCREEN';
+        publishResponsibility(s,team,p,'MARK',shadow,kind,{subjectId:localThreat.p.id,region:a,reason:side!==ballSide?'FAR_SIDE_WATCH_AND_SWITCH_LANE':(incoming?'PASS_TARGET_OR_NEARBY_RUNNER':'LOCAL_RUNNER_AND_LANE'),pressureOwner:primary?.p.id??null,threatLevel:danger,markShadow:true,watchTargetId:localThreat.p.id,releaseReason:'THREAT_LEFT_ZONE'});
       } else if(localThreat && Math.abs(localThreat.q.y-a.y)<=a.span*1.22 && localThreat.q.x<=a.x+a.span*1.18){
         const shadow=v3ShadowTarget(a,localThreat,primaryThreat.q);
         publishResponsibility(s,team,p,'MARK',shadow,'LOOSE_MARK_SCREEN',{subjectId:localThreat.p.id,region:a,reason:incoming?'PASS_TARGET_OR_NEARBY_RUNNER':'LOCAL_RUNNER_AND_LANE',pressureOwner:primary?.p.id??null,threatLevel:danger,markShadow:true,releaseReason:'THREAT_LEFT_ZONE'});
@@ -389,10 +402,13 @@
           target = { x: q.x * (1 - weight) + a.x * weight, y: q.y * (1 - weight) + a.y * weight };
           kind = 'VACANCY_RELEASE'; reason = v.releaseReason || 'ORIGINAL_FB_RETURN';
         } else if (p === cb) {
-          target = { x: clamp(Math.min(threat.x - 2.8, a.x + 2.4), 4, 68), y: clamp(a.y * .57 + threat.y * .43, 7, 61) };
+          // The outer CB protects the wide/half-space relation from its own
+          // shoulder; it does not become a teleported replacement fullback.
+          target = { x: clamp(Math.min(threat.x - 2.8, a.x + 2.4), 4, 68),
+            y: clamp(a.y * .32 + threat.y * .68, side > 0 ? 43 : 7, side > 0 ? 61 : 25) };
           kind = 'VACANCY_REMOTE_WATCH'; reason = 'VACATED_WIDE_CHANNEL_REMOTE_WATCH';
         } else if (p === dm) {
-          target = { x: clamp(Math.min(threat.x - 5.2, a.x + 3.1), 6, 70), y: clamp(a.y * .66 + threat.y * .34, 10, 58) };
+          target = { x: clamp(Math.min(threat.x - 5.2, a.x + 3.1), 6, 70), y: clamp(a.y * .56 + threat.y * .44, 10, 58) };
           kind = 'VACANCY_HALFSPACE_SCREEN'; reason = 'VACATED_WIDE_CHANNEL_HALFSPACE_SCREEN';
         } else {
           target = { x: clamp(Math.min(threat.x - 7.4, a.x + 4.2), 9, 74), y: clamp(a.y * .73 + threat.y * .27, 10, 58) };
@@ -418,18 +434,26 @@
       if (!winger) continue;
       const anchor = anchors.get(fb.id);
       const fq = local(s, team, fb.x, fb.y), oq = local(s, team, owner.x, owner.y);
+      const possessionOurs = owner.team === team && s.possession === team;
       const wideProgression = (side < 0 ? oq.y < 29 : oq.y > 39) && oq.x > 43;
       const receivingWidePass = owner.id === fb.id || (wideProgression && distance(fb, owner) < 16);
       const crossingContinuation = owner.id === fb.id && oq.x > 68;
-      const attackTrigger = wideProgression || receivingWidePass || crossingContinuation;
+      const validExcursionReason = receivingWidePass || crossingContinuation || (wideProgression && distance(fb, owner) < 16);
+      // This is a present-state threat gate, not a prediction of the next pass:
+      // an FB can go only while the tracked winger is currently recoverable as a
+      // genuine defensive concern, with an existing team cover relation.
+      const wingerQ = local(s, team, winger.x, winger.y);
+      const presentThreat = wingerQ.x < 60 || distance(owner, winger) < 28;
       const cb = cbs.slice().sort((a, b2) => distance(a, winger) - distance(b2, winger) || a.id - b2.id)[0];
       const centralBackup = central && [...cbs.filter(p => p !== cb), dm].filter(Boolean).sort((a, b2) => distance(a, central) - distance(b2, central) || a.id - b2.id)[0];
       const cbAnchor = cb && anchors.get(cb.id), backupAnchor = centralBackup && anchors.get(centralBackup.id);
+      const attackTrigger = possessionOurs && validExcursionReason && presentThreat;
       // Handoff is accepted only when the stepping CB is local to its region and
       // a distinct central protector remains.  The FB cannot self-authorize it.
       const handoff = !!(attackTrigger && cb && centralBackup && cb !== centralBackup && cbAnchor && backupAnchor
         && distance(cb, winger) <= cbAnchor.span * 1.12 && Math.abs(local(s, team, centralBackup.x, centralBackup.y).y - 34) <= backupAnchor.span * 1.22);
-      const envelope = !handoff && attackTrigger && recoverableWideEnvelope(s, team, fb, winger, owner);
+      const coverPresent = !!(handoff || (cb && dm && cbAnchor && distance(cb, winger) <= cbAnchor.span * 1.42));
+      const envelope = !handoff && attackTrigger && coverPresent && recoverableWideEnvelope(s, team, fb, winger, owner);
       if (handoff) {
         const transfer = { from: fb.id, to: cb.id, subjectId: winger.id, reason: 'WIDE_ATTACK_COVER_ACCEPTED' };
         publishResponsibility(s, team, cb, 'MARK', shadowTarget(cbAnchor, { q: local(s, team, winger.x, winger.y) }), 'CB_HANDOFF_WIDE', { subjectId: winger.id, region: cbAnchor, handoff: transfer, protectedBy: centralBackup.id });
@@ -531,6 +555,27 @@
     if (Math.hypot(dx, dy) > .04) keeper.facingRadians = Math.atan2(dy, dx);
     keeper.facingSource = source;
   }
+  function updateDefenderFacing(s, team) {
+    const defending = s.ball.owner === null || s.players[s.ball.owner]?.team !== team;
+    if (!defending) return;
+    for (const p of s.players.filter(q => q.team === team && q.role !== 'GK')) {
+      const r = p.responsibility || {}, watchId = r.watchTargetId ?? r.markTargetId ?? null;
+      const watch = Number.isInteger(watchId) ? s.players[watchId] : null;
+      const ballDx = s.ball.x - p.x, ballDy = s.ball.y - p.y;
+      let dx = ballDx, dy = ballDy, source = 'BALL_AWARENESS';
+      if (watch) {
+        // Body shape reads both the live ball and the current runner.  It is an
+        // awareness vector only: it never assigns a mirror-movement target.
+        const threatDx = watch.x - p.x, threatDy = watch.y - p.y;
+        const ballWeight = p.duty === 'PRESS' ? .78 : .58;
+        dx = ballDx * ballWeight + threatDx * (1 - ballWeight);
+        dy = ballDy * ballWeight + threatDy * (1 - ballWeight);
+        source = 'BALL_AND_WATCH';
+      }
+      if (Math.hypot(dx, dy) > .04) p.facingRadians = Math.atan2(dy, dx);
+      p.facingSource = source;
+    }
+  }
   function setTargets(s) {
     const owner = s.ball.owner === null ? null : s.players[s.ball.owner];
     const attackTeam = owner ? owner.team : s.possession ?? s.lastPossession;
@@ -613,6 +658,7 @@
           y: clamp(s.ball.y + s.ball.vy * 0.1, 23, 45) };
       }
       updateKeeperFacing(s, team);
+      updateDefenderFacing(s, team);
     }
     for (let team = 0; team < 2; team++) applyVacancyCompensation(s, team, defensiveAnchors(s, team));
     finishVacancyTick(s);
@@ -899,7 +945,14 @@
       b.vx *= -0.3; b.vy = b.vy * 0.4 + (random(s) - 0.5) * 7; b.vz = 1.2;
       b.mode = 'loose'; b.flight = null; b.lastTouch = p.id; b.releasedAt = s.time; s.possession = null;
     } else {
-      const control = p.attributes.control + 0.4 - speed / 48 - b.z * 0.2;
+      // Only the named, same-team pass receiver gets the reception calibration.
+      // Fast/high balls and actual nearby pressure still lower control; bad pass
+      // accuracy, opponent interceptions, and challenge-created loose balls use
+      // their own branches rather than being disguised as a first-touch error.
+      const intendedReceipt = !!(flight && flight.type === 'pass' && flight.team === p.team && flight.targetId === p.id);
+      const nearestOpponent = s.players.filter(q => q.team !== p.team).reduce((gap, q) => Math.min(gap, distance(p, q)), Infinity);
+      const pressurePenalty = clamp((3.2 - nearestOpponent) / 12, 0, .18);
+      const control = p.attributes.control + (intendedReceipt ? .58 : .46) - speed / 70 - b.z * 0.15 - pressurePenalty;
       if (random(s) < clamp(control, 0.18, 0.97)) {
         if (flight && flight.type === 'pass' && flight.team === p.team) s.stats[p.team].completedPasses++;
         else if (flight && flight.team !== p.team) event(s, 'tackle', p.team, `${p.role} intercepts`, p.id, { interception: true });
