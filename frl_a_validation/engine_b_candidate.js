@@ -75,6 +75,9 @@
           acquiredAt: 0, releaseReason: 'INITIAL', pressPhase: null, handoff: null, region: null },
         facingRadians: team === 0 ? 0 : Math.PI,
         facingSource: i === 0 ? 'HOME_GOAL' : 'MOVEMENT',
+        // A short-lived, current action direction.  This is MatchState authority
+        // for a completed/selected action, never a visual-only renderer hint.
+        facingIntent: null,
         decisionIn: 0.2 + random(s) * 0.5, challengeIn: 0, controlSince: -100, intent: null,
         // Present-tense movement intent is serialized state, not a future plan.
         // It prevents the shared 20 Hz tactical sample from becoming a shared 20 Hz motor command.
@@ -116,6 +119,10 @@
     s.ball.vx = s.ball.vy = s.ball.vz = 0;
     p.controlSince = s.time;
     p.intent = null;
+    p.facingIntent = null;
+    // Possession invalidates a prior defensive body contract immediately.  The
+    // next current target refines this on the same/next authoritative tick.
+    setFacing(p, direction(s, p.team), 0, 'POSSESSION_TRANSITION');
     p.decisionIn = 0.2 + random(s) * 0.4;
   }
   function shapeTarget(s, p, attacking) {
@@ -273,6 +280,19 @@
     return { x: clamp(Math.min(anchor.x + anchor.span * .18, threat.q.x - Math.max(1.15, anchor.span * .14)), 4, 68),
       y: clamp(anchor.y * centralWeight + threat.q.y * (1 - centralWeight) + side * .28, 4, 64) };
   }
+  function responsibilityOwnsThreat(p, threatId) {
+    const r = p?.responsibility || {};
+    return r.markTargetId === threatId || r.watchTargetId === threatId;
+  }
+  function dangerousWideThreat(s, team, threat, side) {
+    if (!threat || threat.team === team) return false;
+    const q = local(s, team, threat.x, threat.y);
+    return (side < 0 ? q.y < 35 : q.y > 33) && q.x < 76;
+  }
+  function eligibleThreatAcquirer(s, team, fb, threatId) {
+    return s.players.some(p => p.team === team && p.id !== fb.id &&
+      ['LB', 'LCB', 'RCB', 'RB', 'DM', 'LCM', 'RCM'].includes(p.role) && responsibilityOwnsThreat(p, threatId));
+  }
   function applyV3Defence(s, team, carrier, anchors, incoming = false) {
     const ours=s.players.filter(p=>p.team===team&&p.role!=='GK'), backs=ours.filter(p=>['LB','LCB','RCB','RB'].includes(p.role));
     const cbs=backs.filter(p=>p.role==='LCB'||p.role==='RCB'), dm=ours.find(p=>p.role==='DM');
@@ -286,13 +306,44 @@
     const primary=plans[0]||null, danger=v3Danger(s,team,carrier);
     if(primary) publishResponsibility(s,team,primary.p,'PRESS',primary.plan.target,primary.plan.phase,{subjectId:carrier.id,region:anchors.get(primary.p.id),pressPhase:primary.plan.phase,challengeIntent:primary.plan.challengeIntent,reason:incoming?'INCOMING_PASS_ARRIVAL':'CURRENT_CARRIER_THREAT',pressureOwner:primary.p.id,threatLevel:danger,markShadow:false,releaseReason:'COVER_OR_JURISDICTION_CHANGED'});
     const ballSide=cq.y<34?-1:1;
+    // A nearby new runner is not itself a release event.  Preserve a dangerous
+    // incumbent wide threat until another eligible player has an actual current
+    // watch/mark contract for it (acquire before release).
+    const retainedWide=new Map();
+    for(const fb of ours.filter(p=>p.role==='LB'||p.role==='RB')) {
+      const side=fb.role==='LB'?-1:1, a=anchors.get(fb.id), priorId=fb.responsibility?.watchTargetId??fb.responsibility?.markTargetId;
+      const prior=Number.isInteger(priorId)?s.players[priorId]:null;
+      const localPrior=prior&&prior.team!==team&&prior!==carrier&&dangerousWideThreat(s,team,prior,side)
+        && Math.abs(local(s,team,prior.x,prior.y).y-a.y)<=a.span*1.5;
+      if(localPrior&&!eligibleThreatAcquirer(s,team,fb,prior.id)) retainedWide.set(fb.id,{p:prior,q:local(s,team,prior.x,prior.y)});
+    }
+    // When the FB is already occupied by the retained dangerous winger, the
+    // same-side DM/CM takes a distinct second runner where its jurisdiction is
+    // sensible.  This prevents a second runner from stealing the FB's owner slot.
+    const secondaryAssignments=new Map();
+    for(const fb of ours.filter(p=>retainedWide.has(p.id))) {
+      const side=fb.role==='LB'?-1:1, held=retainedWide.get(fb.id), a=anchors.get(fb.id);
+      const secondary=threats.filter(t=>t.p!==carrier&&t.p!==held.p&&(side<0?t.q.y<34:t.q.y>=34))
+        .filter(t=>Math.abs(t.q.y-held.q.y)<a.span*1.35&&t.q.x<=a.x+a.span*1.45)
+        .sort((x,y)=>Math.hypot(x.q.x-a.x,x.q.y-a.y)-Math.hypot(y.q.x-a.x,y.q.y-a.y)||x.p.id-y.p.id)[0];
+      if(!secondary) continue;
+      const candidates=ours.filter(p=>p!==primary?.p&&((p.role==='DM')||(side>0?p.role==='RCM':p.role==='LCM')))
+        .filter(p=>!secondaryAssignments.has(p.id)).sort((x,y)=>distance(x,secondary.p)-distance(y,secondary.p)||x.id-y.id);
+      if(candidates[0]) secondaryAssignments.set(candidates[0].id,{threat:secondary,side,fbId:fb.id});
+    }
     for(const p of ours){
       if(p===primary?.p) continue;
       const a=anchors.get(p.id), pq=local(s,team,p.x,p.y), side=p.role==='LB'?-1:p.role==='RB'?1:0;
-      const localThreat=threats.filter(t=>t.p!==carrier&&(side===0?Math.abs(t.q.y-a.y)<a.span*.9:(side<0?t.q.y<34:t.q.y>=34)))
+      const localThreat=retainedWide.get(p.id)||threats.filter(t=>t.p!==carrier&&(side===0?Math.abs(t.q.y-a.y)<a.span*.9:(side<0?t.q.y<34:t.q.y>=34)))
         .sort((x,y)=>Math.hypot(x.q.x-a.x,x.q.y-a.y)-Math.hypot(y.q.x-a.x,y.q.y-a.y)||x.p.id-y.p.id)[0]||null;
       const wasDirect=/PRIMARY_CONTAIN|CLOSE_DOWN|TIGHT_MARK|CHALLENGE|LOOSE_MARK_SCREEN/.test(p.responsibility?.kind||'');
-      if((p.role==='LB'||p.role==='RB') && localThreat){
+      const secondary=secondaryAssignments.get(p.id);
+      if(secondary){
+        const shadow=goalSideWideTarget(a,secondary.threat,secondary.side,.58);
+        publishResponsibility(s,team,p,'MARK',shadow,'SECONDARY_WIDE_COMPENSATION',{subjectId:secondary.threat.p.id,region:a,
+          reason:'FB_RETAINS_DANGEROUS_WINGER_MIDFIELD_ABSORB_SECOND_RUNNER',pressureOwner:primary?.p.id??null,
+          markShadow:true,markTargetId:secondary.threat.p.id,watchTargetId:secondary.threat.p.id,releaseReason:'SECONDARY_THREAT_EXIT'});
+      } else if((p.role==='LB'||p.role==='RB') && localThreat){
         const shadow=goalSideWideTarget(a,localThreat,side,side !== ballSide ? .52 : .42);
         const kind=side!==ballSide?'WIDE_WATCH_COVER':'LOOSE_MARK_SCREEN';
         publishResponsibility(s,team,p,'MARK',shadow,kind,{subjectId:localThreat.p.id,region:a,reason:side!==ballSide?'FAR_SIDE_WATCH_AND_SWITCH_LANE':(incoming?'PASS_TARGET_OR_NEARBY_RUNNER':'LOCAL_RUNNER_AND_LANE'),pressureOwner:primary?.p.id??null,threatLevel:danger,markShadow:true,watchTargetId:localThreat.p.id,releaseReason:'THREAT_LEFT_ZONE'});
@@ -390,14 +441,46 @@
       const cm = ours.find(p => p.role === (side > 0 ? 'RCM' : 'LCM'));
       const threat = winger ? local(s, team, winger.x, winger.y) : { x: 56, y: side > 0 ? 56 : 12 };
       const contributors = [cb, dm, cm].filter(Boolean);
+      const centralThreat = s.players.filter(p => p.team !== team && p.role !== 'GK')
+        .filter(p => p !== winger && Math.abs(local(s, team, p.x, p.y).y - 34) < 8)
+        .sort((a, b) => local(s, team, a.x, a.y).x - local(s, team, b.x, b.y).x || a.id - b.id)[0] || null;
+      const fbAnchor = fb && anchors.get(fb.id);
+      // During return, the FB must actively acquire the wide runner before the
+      // temporary CB owner is released.  A separate present central guard is
+      // required before that CB can leave the flank relationship.
+      let centralGuard = null, returnAcquired = false;
+      if (v.state === 'RELEASING' && fb && winger && fbAnchor) {
+        publishResponsibility(s, team, fb, 'MARK', goalSideWideTarget(fbAnchor, { q: threat }, side, .42), 'HANDOFF_RETURN_WIDE_MARK',
+          { subjectId: winger.id, region: fbAnchor, reason: 'FB_RETURN_ACQUIRES_WIDE_THREAT', markShadow: true,
+            markTargetId: winger.id, watchTargetId: winger.id, handoff: { from: cb?.id ?? null, to: fb.id, subjectId: winger.id, reason: 'RETURN_WIDE_HANDOFF' } });
+        returnAcquired = responsibilityOwnsThreat(fb, winger.id);
+        if (centralThreat) {
+          centralGuard = [dm, ...s.players.filter(p => p.team === team && (p.role === 'LCB' || p.role === 'RCB') && p !== cb)]
+            .filter(p => p && p.duty !== 'PRESS').sort((a, b) => distance(a, centralThreat) - distance(b, centralThreat) || a.id - b.id)[0] || null;
+          if (centralGuard) {
+            const guardAnchor = anchors.get(centralGuard.id);
+            publishResponsibility(s, team, centralGuard, 'MARK', v3ShadowTarget(guardAnchor, { q: local(s, team, centralThreat.x, centralThreat.y) }, threat), 'HANDOFF_CENTRAL_GUARD',
+              { subjectId: centralThreat.id, region: guardAnchor, reason: 'FB_RETURN_PROTECT_CENTRAL_STRIKER', markShadow: true,
+                markTargetId: centralThreat.id, watchTargetId: centralThreat.id, handoff: { from: cb?.id ?? null, to: centralGuard.id, subjectId: centralThreat.id, reason: 'CENTRAL_GUARD_BEFORE_WIDE_RELEASE' } });
+          }
+        }
+      }
+      const releaseReady = v.state !== 'RELEASING' || (returnAcquired && (!centralThreat || !!centralGuard));
+      v.returnOwnershipEstablished = returnAcquired;
+      v.centralGuardId = centralGuard?.id ?? null;
       v.contributors = contributors.map((p, index) => ({ playerId: p.id, role: p.role,
-        share: index === 0 ? 'REMOTE_WATCH' : index === 1 ? 'HALFSPACE_SCREEN' : 'LANE_SHARE' }));
+        share: index === 0 ? 'WIDE_MARK_OWNER' : index === 1 ? 'HALFSPACE_SCREEN' : 'LANE_SHARE',
+        watchTargetId: index === 0 ? winger?.id ?? null : null }));
       for (const p of contributors) {
         const a = anchors.get(p.id);
         if (!a) continue;
-        const q = local(s, team, p.x, p.y), release = v.state === 'RELEASING';
+        const q = local(s, team, p.x, p.y), release = v.state === 'RELEASING' && releaseReady;
         let target, kind, reason;
-        if (release) {
+        if (p === centralGuard) continue;
+        if (v.state === 'RELEASING' && !releaseReady && p === cb) {
+          target = goalSideWideTarget(a, { q: threat }, side, .52);
+          kind = 'HANDOFF_WIDE_RETAIN_UNTIL_ACQUIRED'; reason = 'ACQUIRE_BEFORE_RELEASE_WAIT';
+        } else if (release) {
           const weight = p.role === 'DM' ? .54 : p.role === 'RCM' || p.role === 'LCM' ? .63 : .43;
           target = { x: q.x * (1 - weight) + a.x * weight, y: q.y * (1 - weight) + a.y * weight };
           kind = 'VACANCY_RELEASE'; reason = v.releaseReason || 'ORIGINAL_FB_RETURN';
@@ -414,8 +497,10 @@
           target = { x: clamp(Math.min(threat.x - 7.4, a.x + 4.2), 9, 74), y: clamp(a.y * .73 + threat.y * .27, 10, 58) };
           kind = 'VACANCY_LANE_SHARE'; reason = 'VACATED_WIDE_CHANNEL_LANE_SHARE';
         }
-        publishResponsibility(s, team, p, release ? 'RECOVERY' : 'COVER', target, kind,
-          { subjectId: winger?.id ?? null, region: a, reason, pressureOwner: null, markShadow: false,
+        const wideOwner = p === cb && !release;
+        publishResponsibility(s, team, p, wideOwner ? 'MARK' : release ? 'RECOVERY' : 'COVER', target, kind,
+          { subjectId: winger?.id ?? null, region: a, reason, pressureOwner: null, markShadow: wideOwner,
+            markTargetId: wideOwner ? winger?.id ?? null : null, watchTargetId: wideOwner ? winger?.id ?? null : null,
             releaseReason: release ? 'GRADUAL_ROLE_REJOIN' : 'VACANCY_HANDED_BACK',
             handoff: { from: fb?.id ?? null, to: p.id, subjectId: winger?.id ?? null, reason: v.channel } });
       }
@@ -482,6 +567,10 @@
           responsibilityVersion: p.responsibility?.version ?? 0, responsibility: p.responsibility ? copy(p.responsibility) : null, defensiveContext: p.defensiveContext ? copy(p.defensiveContext) : null, reviewAt: s.time, turnNow: false };
         continue;
       }
+      // `target` and responsibility remain the present tactical authority.  The
+      // held value below is only the motor destination consumed by integratePlayers.
+      // Keeping those layers distinct is important: a spatial deadband must never
+      // roll a current MARK/WATCH/PRESS contract back to a prior one.
       const raw = { target: { ...p.target }, duty: p.duty, markId: p.markId, pressId: p.pressId,
         responsibilityVersion: p.responsibility?.version ?? 0, responsibility: p.responsibility ? copy(p.responsibility) : null, defensiveContext: p.defensiveContext ? copy(p.defensiveContext) : null };
       const old = p.movementIntent;
@@ -510,16 +599,22 @@
       // common moving threat still releases a whole line on the same tick.  A large
       // relocation, danger, or role/side transition remains immediate.
       const majorRelocation = delta >= meaningfulDelta * (raw.duty === 'MARK' ? 6 : 3);
-      const accept = !old || relationshipChanged || majorRelocation || sideChanged || urgent || s.time >= old.reviewAt;
+      // A review expiry is permission to reconsider, not a command to move.  The
+      // raw target must have left its role-sensitive spatial deadband unless a
+      // present responsibility/threat/side change makes it urgent.  This prevents
+      // a slow stream of tiny anchor refinements from alternately pulling a player
+      // across an already-valid position.
+      const materialAdjustment = delta >= meaningfulDelta;
+      const accept = !old || relationshipChanged || majorRelocation || sideChanged || urgent
+        || (s.time >= old.reviewAt && materialAdjustment);
       if (accept) {
         // A meaningful target may redirect a walking player immediately; target noise may not.
         p.movementIntent = { ...raw, ballSide, reviewAt: s.time + reviewWindow,
           turnNow: !!old && (relationshipChanged || majorRelocation || sideChanged) };
       } else {
-        // An expired responsibility must never be resurrected merely to smooth a
-        // motor request.  The complete accepted contract travels with the hold.
-        p.target = { ...old.target }; p.duty = old.duty; p.markId = old.markId; p.pressId = old.pressId;
-        p.responsibility = old.responsibility ? copy(old.responsibility) : p.responsibility; p.defensiveContext = old.defensiveContext ? copy(old.defensiveContext) : p.defensiveContext;
+        // Do not restore the old responsibility here.  Its target may be held for
+        // motor stability, while MatchState still exposes the latest responsibility
+        // and facing authority from this tick.
         p.movementIntent = { ...old, turnNow: false };
       }
     }
@@ -548,32 +643,52 @@
     if (helper) selected.push(helper);
     for (const item of selected) publishResponsibility(s, team, item.p, 'RECEIVE', local(s, team, predicted.x, predicted.y), 'LOOSE_BALL_CLAIM', { subjectId: targetId, region: item.a, releaseReason: 'CLAIM_UNTIL_CONTROL_OR_CORRIDOR_EXIT' });
   }
-  function updateKeeperFacing(s, team) {
-    const keeper = s.players[team * 11], defending = s.ball.owner === null || s.players[s.ball.owner]?.team !== team;
-    const source = defending ? (s.ball.flight?.type === 'shot' ? 'SHOT_SOURCE' : s.ball.flight ? 'CROSS_OR_FLIGHT' : 'BALL_OR_CARRIER') : 'BUILD_OUT';
-    const dx = s.ball.x - keeper.x, dy = s.ball.y - keeper.y;
-    if (Math.hypot(dx, dy) > .04) keeper.facingRadians = Math.atan2(dy, dx);
-    keeper.facingSource = source;
+  function setFacing(p, dx, dy, source) {
+    if (Math.hypot(dx, dy) > .04) p.facingRadians = Math.atan2(dy, dx);
+    p.facingSource = source;
   }
-  function updateDefenderFacing(s, team) {
-    const defending = s.ball.owner === null || s.players[s.ball.owner]?.team !== team;
-    if (!defending) return;
-    for (const p of s.players.filter(q => q.team === team && q.role !== 'GK')) {
+  function updateMatchFacing(s) {
+    // Facing priority is MatchState authority: current selected/physical action,
+    // then receipt, then current defensive relationship, then movement.  It never
+    // reads a future result and does not rely on renderer velocity arrows.
+    for (const p of s.players) {
+      if (p.role === 'GK') {
+        const defending = s.ball.owner === null || s.players[s.ball.owner]?.team !== p.team;
+        setFacing(p, s.ball.x - p.x, s.ball.y - p.y, defending ? (s.ball.flight?.type === 'shot' ? 'SHOT' : 'BALL') : 'BUILD_OUT');
+        continue;
+      }
+      const action = p.facingIntent;
+      if (action && action.until > s.time) {
+        setFacing(p, action.dx, action.dy, action.source);
+        continue;
+      }
+      if (action && action.until <= s.time) p.facingIntent = null;
+      if (s.ball.owner === p.id || p.duty === 'CARRY') {
+        // CARRY faces the actual current dribble/intent target.  A backwards
+        // body angle therefore requires an actual backwards movement/action.
+        setFacing(p, p.target.x - p.x, p.target.y - p.y, 'CARRY');
+        continue;
+      }
+      if (p.duty === 'RECEIVE') {
+        const arrival = { x: s.ball.vx, y: s.ball.vy }, next = { x: p.target.x - p.x, y: p.target.y - p.y };
+        setFacing(p, arrival.x * .66 + next.x * .34, arrival.y * .66 + next.y * .34, 'RECEIVE');
+        continue;
+      }
       const r = p.responsibility || {}, watchId = r.watchTargetId ?? r.markTargetId ?? null;
       const watch = Number.isInteger(watchId) ? s.players[watchId] : null;
-      const ballDx = s.ball.x - p.x, ballDy = s.ball.y - p.y;
-      let dx = ballDx, dy = ballDy, source = 'BALL_AWARENESS';
-      if (watch) {
-        // Body shape reads both the live ball and the current runner.  It is an
-        // awareness vector only: it never assigns a mirror-movement target.
-        const threatDx = watch.x - p.x, threatDy = watch.y - p.y;
-        const ballWeight = p.duty === 'PRESS' ? .78 : .58;
-        dx = ballDx * ballWeight + threatDx * (1 - ballWeight);
-        dy = ballDy * ballWeight + threatDy * (1 - ballWeight);
-        source = 'BALL_AND_WATCH';
+      const defending = s.ball.owner === null || s.players[s.ball.owner]?.team !== p.team;
+      if (defending && (p.duty === 'PRESS' || p.duty === 'MARK' || watch)) {
+        const ballWeight = p.duty === 'PRESS' ? .76 : .58, threatDx = watch ? watch.x - p.x : 0, threatDy = watch ? watch.y - p.y : 0;
+        setFacing(p, (s.ball.x - p.x) * ballWeight + threatDx * (1 - ballWeight),
+          (s.ball.y - p.y) * ballWeight + threatDy * (1 - ballWeight), 'CONTAIN_MARK_HALF_OPEN');
+        continue;
       }
-      if (Math.hypot(dx, dy) > .04) p.facingRadians = Math.atan2(dy, dx);
-      p.facingSource = source;
+      if (defending && p.duty === 'RECOVERY') {
+        const threatDx = watch ? watch.x - p.x : 0, threatDy = watch ? watch.y - p.y : 0;
+        setFacing(p, (p.target.x - p.x) * .64 + threatDx * .36, (p.target.y - p.y) * .64 + threatDy * .36, 'RECOVERY');
+        continue;
+      }
+      setFacing(p, p.target.x - p.x, p.target.y - p.y, 'MOVEMENT');
     }
   }
   function setTargets(s) {
@@ -657,8 +772,6 @@
         keeper.target = { x: clamp(s.ball.x + s.ball.vx * 0.08, team === (s.half === 1 ? 0 : 1) ? 1 : 87, team === (s.half === 1 ? 0 : 1) ? 18 : 104),
           y: clamp(s.ball.y + s.ball.vy * 0.1, 23, 45) };
       }
-      updateKeeperFacing(s, team);
-      updateDefenderFacing(s, team);
     }
     for (let team = 0; team < 2; team++) applyVacancyCompensation(s, team, defensiveAnchors(s, team));
     finishVacancyTick(s);
@@ -669,6 +782,7 @@
         receiver.target = { x: clamp(s.ball.x + s.ball.vx * 0.22, 1, 104), y: clamp(s.ball.y + s.ball.vy * 0.22, 1, 67) };
       }
     }
+    updateMatchFacing(s);
     stabilizeMovementIntents(s);
   }
   // The sole ongoing player-coordinate integrator, including explicit dead-ball formation resets.
@@ -676,7 +790,8 @@
     const resetting = s.restart && s.restart.reset;
     const desired = s.players.map(p => {
       if (resetting) { p.motionDemand = null; return { x: p.target.x, y: p.target.y, vx: 0, vy: 0, reset: true }; }
-      let dx = p.target.x - p.x, dy = p.target.y - p.y;
+      const motorTarget = s.phase === 'play' && p.movementIntent?.target ? p.movementIntent.target : p.target;
+      let dx = motorTarget.x - p.x, dy = motorTarget.y - p.y;
       const dist = Math.hypot(dx, dy);
       const max = p.attributes.pace * (p.duty === 'CARRY' ? 0.73 : p.duty === 'SUPPORT' || p.duty === 'MARK' ? 0.78 : 1);
       let vx = dist > 0.1 ? dx / dist * Math.min(max, dist * 2.5) : 0;
@@ -777,6 +892,8 @@
     b.vz = loft;
     b.owner = null; b.mode = 'flight'; b.lastTouch = p.id; b.releasedAt = s.time;
     b.flight = { type, team: p.team, kickerId: p.id, targetId: target.id ?? null, offsideIds: [] };
+    p.facingIntent = { source: type === 'shot' ? 'SHOT' : 'PASS', dx: dx, dy: dy, until: s.time + .34 };
+    setFacing(p, dx, dy, p.facingIntent.source);
     p.decisionIn = 0.6;
     if (type === 'pass') {
       // Record current offside position at the kick, NOT a future infringement/result.
@@ -801,7 +918,7 @@
       if (input.playerId === p.id) {
         if (input.type === 'pass') launch(s, p, 'pass', s.players[input.targetId], input.loft || 0);
         if (input.type === 'shot') launch(s, p, 'shot', input.aim, input.loft);
-        if (input.type === 'carry') { p.intent = { aim: { ...input.aim }, until: s.time + 0.5 }; p.target = { ...input.aim }; p.decisionIn = 0.5; }
+        if (input.type === 'carry') { p.intent = { aim: { ...input.aim }, until: s.time + 0.5 }; p.target = { ...input.aim }; p.facingIntent = null; setFacing(p, p.target.x - p.x, p.target.y - p.y, 'CARRY'); p.decisionIn = 0.5; }
         return;
       }
     }
@@ -957,6 +1074,10 @@
         if (flight && flight.type === 'pass' && flight.team === p.team) s.stats[p.team].completedPasses++;
         else if (flight && flight.team !== p.team) event(s, 'tackle', p.team, `${p.role} intercepts`, p.id, { interception: true });
         setPossession(s, p);
+        if (intendedReceipt) {
+          p.facingIntent = { source: 'RECEIVE', dx: b.vx, dy: b.vy, until: s.time + .16 };
+          setFacing(p, b.vx, b.vy, 'RECEIVE');
+        }
       } else {
         b.vx *= 0.35; b.vy = b.vy * 0.35 + (random(s) - 0.5) * 3; b.vz = 0.5;
         b.mode = 'loose'; b.lastTouch = p.id; b.releasedAt = s.time; b.flight = null; s.possession = null;

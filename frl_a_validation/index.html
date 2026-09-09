@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div><h1>FRL A버전 Visual Comparison Viewer</h1><p>개발/검수 전용 · 동일한 현재 상태와 SEED에서 두 실제 엔진을 나란히 실행합니다.</p></div>
-    <div class="transport"><label>SEED <input id="seed" value="frl-a-v5-001" maxlength="64"></label><button data-speed="0.5">0.5x</button><button data-speed="1" class="active">1x</button><button data-speed="2">2x</button><button id="pause">일시 정지 / 계속</button><button id="restart">처음부터 다시 보기</button></div>
+    <div class="transport"><label>VARIANT <select id="variant" aria-label="시나리오 변형"></select></label><label>SEED <input id="seed" value="frl-a-v5-001" maxlength="64"></label><button data-speed="0.5">0.5x</button><button data-speed="1" class="active">1x</button><button data-speed="2">2x</button><button id="pause">일시 정지 / 계속</button><button id="restart">처음부터 다시 보기</button></div>
   </header>
   <main>
     <section class="scenario-bar"><div id="scenario-buttons" class="scenario-buttons" aria-label="시나리오 선택"></div><div id="scenario-observation" class="scenario-observation" aria-live="polite">관찰 포인트를 불러오는 중…</div><div class="scenario-actions"><span id="viewer-status" role="status" aria-live="polite">부팅 중</span><button id="start" disabled>시작하기</button><span id="scenario-contract" data-state="pending" role="status" aria-live="polite"><strong>강제상황 확인</strong><span>확인 대기</span></span></div><div class="focus"><strong>공통 관찰</strong> · 유기적 팀 shape · 중앙 붕괴/대량 볼 추격 없음 · 인공 random delay/jitter 없음</div></section>
