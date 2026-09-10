@@ -218,6 +218,40 @@
     publishResponsibility(s, p.team, p, duty, local(s, p.team, target.x, target.y), kind, { subjectId: null,
       reason: kind, releaseReason: 'CURRENT_ACTION', markShadow: false });
   }
+  function finalLineCfFallback(s, p) {
+    // This is deliberately narrower than normal cover allocation.  It only
+    // answers the final fallback question: may a currently unassigned CB be
+    // written as DEFAULT_SUPPORT while it is the sole present protector of a
+    // central CF already in the dangerous final-line zone?
+    if (!['LCB', 'RCB'].includes(p.role) || p.duty !== 'SUPPORT') return null;
+    const centralCf = s.players.filter(q => q.team !== p.team && q.role === 'CF').map(q => ({ p: q, q: local(s, p.team, q.x, q.y) }))
+      .filter(q => Math.abs(q.q.y - 34) <= 10 && q.q.x <= 52).sort((a, b) => a.q.x - b.q.x || a.p.id - b.p.id)[0];
+    if (!centralCf) return null;
+    const credible = defender => {
+      if (defender.team !== p.team || !['LCB', 'RCB'].includes(defender.role)) return false;
+      const dq = local(s, p.team, defender.x, defender.y), target = local(s, p.team, defender.target.x, defender.target.y);
+      return dq.x < centralCf.q.x && target.x < centralCf.q.x && Math.hypot(dq.x - centralCf.q.x, dq.y - centralCf.q.y) <= 15
+        && Math.abs(dq.y - centralCf.q.y) <= 13;
+    };
+    if (!credible(p)) return null;
+    // A current final-line screen is not released merely because the other CB
+    // is also momentarily credible.  It remains the actual owner until that
+    // other defender has a current mark/watch contract for this CF.
+    const incumbent = p.responsibility?.kind === 'SCREEN_LANE' && responsibilityOwnsThreat(p, centralCf.p.id);
+    if (incumbent) {
+      const anotherCurrentOwner = s.players.some(q => q.id !== p.id && credible(q) && responsibilityOwnsThreat(q, centralCf.p.id));
+      if (!anotherCurrentOwner) {
+        const anchor = v3DefensiveAnchor(s, p.team, p);
+        return { cf: centralCf.p, anchor, target: v3ShadowTarget(anchor, centralCf, null) };
+      }
+    }
+    const credibleProtectors = s.players.filter(credible);
+    if (credibleProtectors.length !== 1 || credibleProtectors[0].id !== p.id) return null;
+    const acquiredByOther = s.players.some(q => q.id !== p.id && credible(q) && responsibilityOwnsThreat(q, centralCf.p.id));
+    if (acquiredByOther) return null;
+    const anchor = v3DefensiveAnchor(s, p.team, p);
+    return { cf: centralCf.p, anchor, target: v3ShadowTarget(anchor, centralCf, null) };
+  }
   function finalAssignmentCommit(s, owner) {
     const flightReceiver = s.ball.owner === null && s.ball.flight?.type === 'pass' ? s.players[s.ball.flight.targetId] : null;
     if (owner) publishCurrentAction(s, owner, 'CARRY', owner.intent && owner.intent.until > s.time ? owner.intent.aim : owner.target,
@@ -231,10 +265,30 @@
       const r = p.responsibility;
       if (p.duty === 'RESTART') {
         if (r?.kind !== 'RESTART_SETUP' || r.duty !== 'RESTART') publishCurrentAction(s, p, 'RESTART', p.target, 'RESTART_SETUP');
-      } else if (r?.duty !== p.duty) {
-        // A default/loose player may not expose a previous mark or press as its
-        // current responsibility after its actual duty has changed.
-        publishCurrentAction(s, p, p.duty, p.target, s.ball.owner === null && !s.ball.flight ? `LOOSE_DEFAULT_${p.duty}` : `DEFAULT_${p.duty}`);
+      } else {
+        const finalLine = finalLineCfFallback(s, p);
+        const isFallbackCandidate = r?.kind === 'INVALIDATED' || r?.kind === 'DEFAULT_SUPPORT'
+          || (r?.kind === 'SCREEN_LANE' && responsibilityOwnsThreat(p, finalLine?.cf.id));
+        if (finalLine && isFallbackCandidate) {
+          // Preserve the exact same final-assignment relation without a new
+          // publish/version every tick.  The current target is still derived
+          // from only this tick's geometry; its identity is not re-acquired.
+          if (r?.kind === 'SCREEN_LANE' && r.subjectId === finalLine.cf.id && responsibilityOwnsThreat(p, finalLine.cf.id)) {
+            p.duty = r.duty; p.markId = r.markTargetId ?? null; p.pressId = r.pressureTargetId ?? null;
+            p.target = world(s, p.team, finalLine.target.x, finalLine.target.y);
+          } else {
+            publishResponsibility(s, p.team, p, 'COVER', finalLine.target, 'SCREEN_LANE', { subjectId: finalLine.cf.id,
+              region: finalLine.anchor, reason: 'SOLE_FINAL_LINE_CF_FALLBACK', releaseReason: 'CREDIBLE_CF_TAKEOVER_REQUIRED',
+              markShadow: false, markTargetId: null, watchTargetId: finalLine.cf.id,
+              writer: 'FINAL_ASSIGNMENT', acquisitionBasis: 'CURRENT_SOLE_GOAL_SIDE_CENTRAL_CF_PROTECTOR' });
+          }
+          continue;
+        }
+        if (r?.duty !== p.duty) {
+          // A default/loose player may not expose a previous mark or press as its
+          // current responsibility after its actual duty has changed.
+          publishCurrentAction(s, p, p.duty, p.target, s.ball.owner === null && !s.ball.flight ? `LOOSE_DEFAULT_${p.duty}` : `DEFAULT_${p.duty}`);
+        }
       }
     }
   }
