@@ -218,39 +218,66 @@
     publishResponsibility(s, p.team, p, duty, local(s, p.team, target.x, target.y), kind, { subjectId: null,
       reason: kind, releaseReason: 'CURRENT_ACTION', markShadow: false });
   }
-  function finalLineCfFallback(s, p) {
-    // This is deliberately narrower than normal cover allocation.  It only
-    // answers the final fallback question: may a currently unassigned CB be
-    // written as DEFAULT_SUPPORT while it is the sole present protector of a
-    // central CF already in the dangerous final-line zone?
-    if (!['LCB', 'RCB'].includes(p.role) || p.duty !== 'SUPPORT') return null;
-    const centralCf = s.players.filter(q => q.team !== p.team && q.role === 'CF').map(q => ({ p: q, q: local(s, p.team, q.x, q.y) }))
-      .filter(q => Math.abs(q.q.y - 34) <= 10 && q.q.x <= 52).sort((a, b) => a.q.x - b.q.x || a.p.id - b.p.id)[0];
-    if (!centralCf) return null;
-    const credible = defender => {
-      if (defender.team !== p.team || !['LCB', 'RCB'].includes(defender.role)) return false;
-      const dq = local(s, p.team, defender.x, defender.y), target = local(s, p.team, defender.target.x, defender.target.y);
-      return dq.x < centralCf.q.x && target.x < centralCf.q.x && Math.hypot(dq.x - centralCf.q.x, dq.y - centralCf.q.y) <= 15
-        && Math.abs(dq.y - centralCf.q.y) <= 13;
-    };
-    if (!credible(p)) return null;
-    // A current final-line screen is not released merely because the other CB
-    // is also momentarily credible.  It remains the actual owner until that
-    // other defender has a current mark/watch contract for this CF.
-    const incumbent = p.responsibility?.kind === 'SCREEN_LANE' && responsibilityOwnsThreat(p, centralCf.p.id);
-    if (incumbent) {
-      const anotherCurrentOwner = s.players.some(q => q.id !== p.id && credible(q) && responsibilityOwnsThreat(q, centralCf.p.id));
-      if (!anotherCurrentOwner) {
-        const anchor = v3DefensiveAnchor(s, p.team, p);
-        return { cf: centralCf.p, anchor, target: v3ShadowTarget(anchor, centralCf, null) };
-      }
+  const FINAL_LINE_PROTECTOR_ROLES = new Set(['LB', 'LWB', 'LCB', 'CB', 'RCB', 'RB', 'RWB', 'DM', 'LCM', 'CM', 'RCM']);
+  function finalLineCentralThreats(s, team) {
+    // This is a present-state final-line gate, not a forward result estimate.
+    // A striker profile is enough; another role must already be running toward
+    // goal or be in the near goal-side central pocket before it is included.
+    return s.players.filter(p => p.team !== team && p.role !== 'GK').map(p => ({ p, q: local(s, team, p.x, p.y) }))
+      .filter(t => {
+        const strikerLike = ['CF', 'ST'].includes(t.p.role);
+        const currentCentralRun = t.q.x <= 47;
+        return t.q.x >= 6 && t.q.x <= 58 && Math.abs(t.q.y - 34) <= 12 && (strikerLike || currentCentralRun);
+      }).sort((a, b) => a.q.x - b.q.x || Math.abs(a.q.y - 34) - Math.abs(b.q.y - 34) || a.p.id - b.p.id);
+  }
+  function finalLineProtectorGeometry(s, team, defender, threat) {
+    if (!defender || defender.team !== team || !FINAL_LINE_PROTECTOR_ROLES.has(defender.role)) return false;
+    const q = local(s, team, defender.x, defender.y);
+    return q.x <= threat.q.x - .35 && Math.hypot(q.x - threat.q.x, q.y - threat.q.y) <= 15
+      && Math.abs(q.y - threat.q.y) <= 13;
+  }
+  function finalLineFallbackCandidate(p) {
+    const r = p.responsibility;
+    return p.duty === 'SUPPORT' && (r?.kind === 'INVALIDATED' || r?.kind === 'DEFAULT_SUPPORT');
+  }
+  function finalLineCoveragePlan(s, team) {
+    // Every present threat receives one actual protector.  Existing current
+    // mark/watch contracts have first claim; only still-open lanes may acquire
+    // an otherwise-default support player in this same final assignment.
+    const threats = finalLineCentralThreats(s, team), assignments = new Map(), used = new Set();
+    const candidates = s.players.filter(p => p.team === team && FINAL_LINE_PROTECTOR_ROLES.has(p.role));
+    for (const threat of threats) {
+      const incumbent = candidates.filter(p => !used.has(p.id) && responsibilityOwnsThreat(p, threat.p.id)
+        && finalLineProtectorGeometry(s, team, p, threat)).sort((a, b) => distance(a, threat.p) - distance(b, threat.p) || a.id - b.id)[0];
+      if (incumbent) { assignments.set(incumbent.id, threat); used.add(incumbent.id); }
     }
-    const credibleProtectors = s.players.filter(credible);
-    if (credibleProtectors.length !== 1 || credibleProtectors[0].id !== p.id) return null;
-    const acquiredByOther = s.players.some(q => q.id !== p.id && credible(q) && responsibilityOwnsThreat(q, centralCf.p.id));
-    if (acquiredByOther) return null;
+    const open = threats.filter(threat => ![...assignments.values()].some(assigned => assigned.p.id === threat.p.id));
+    const available = candidates.filter(p => !used.has(p.id) && finalLineFallbackCandidate(p));
+    // Augmenting matching makes a single nearby defender unable to silently
+    // satisfy two separated strikers when another valid one-to-one allocation
+    // exists.  It is evaluated from this tick only and writes nothing itself.
+    const acquired = new Map();
+    const tryAcquire = (threat, seen) => {
+      const choices = available.filter(p => finalLineProtectorGeometry(s, team, p, threat))
+        .sort((a, b) => distance(a, threat.p) - distance(b, threat.p) || a.id - b.id);
+      for (const p of choices) {
+        if (seen.has(p.id)) continue;
+        seen.add(p.id);
+        const prior = acquired.get(p.id);
+        if (!prior || tryAcquire(prior, seen)) { acquired.set(p.id, threat); return true; }
+      }
+      return false;
+    };
+    for (const threat of open) tryAcquire(threat, new Set());
+    for (const [id, threat] of acquired) assignments.set(id, threat);
+    return assignments;
+  }
+  function finalLineCoverageFallback(s, p) {
+    if (!FINAL_LINE_PROTECTOR_ROLES.has(p.role)) return null;
+    const threat = finalLineCoveragePlan(s, p.team).get(p.id);
+    if (!threat) return null;
     const anchor = v3DefensiveAnchor(s, p.team, p);
-    return { cf: centralCf.p, anchor, target: v3ShadowTarget(anchor, centralCf, null) };
+    return { threat, anchor, target: v3ShadowTarget(anchor, threat, null), retain: responsibilityOwnsThreat(p, threat.p.id) };
   }
   function finalAssignmentCommit(s, owner) {
     const flightReceiver = s.ball.owner === null && s.ball.flight?.type === 'pass' ? s.players[s.ball.flight.targetId] : null;
@@ -266,21 +293,21 @@
       if (p.duty === 'RESTART') {
         if (r?.kind !== 'RESTART_SETUP' || r.duty !== 'RESTART') publishCurrentAction(s, p, 'RESTART', p.target, 'RESTART_SETUP');
       } else {
-        const finalLine = finalLineCfFallback(s, p);
+        const finalLine = finalLineCoverageFallback(s, p);
         const isFallbackCandidate = r?.kind === 'INVALIDATED' || r?.kind === 'DEFAULT_SUPPORT'
-          || (r?.kind === 'SCREEN_LANE' && responsibilityOwnsThreat(p, finalLine?.cf.id));
+          || (finalLine?.retain && responsibilityOwnsThreat(p, finalLine.threat.p.id));
         if (finalLine && isFallbackCandidate) {
           // Preserve the exact same final-assignment relation without a new
           // publish/version every tick.  The current target is still derived
           // from only this tick's geometry; its identity is not re-acquired.
-          if (r?.kind === 'SCREEN_LANE' && r.subjectId === finalLine.cf.id && responsibilityOwnsThreat(p, finalLine.cf.id)) {
+          if (finalLine.retain) {
             p.duty = r.duty; p.markId = r.markTargetId ?? null; p.pressId = r.pressureTargetId ?? null;
             p.target = world(s, p.team, finalLine.target.x, finalLine.target.y);
           } else {
-            publishResponsibility(s, p.team, p, 'COVER', finalLine.target, 'SCREEN_LANE', { subjectId: finalLine.cf.id,
-              region: finalLine.anchor, reason: 'SOLE_FINAL_LINE_CF_FALLBACK', releaseReason: 'CREDIBLE_CF_TAKEOVER_REQUIRED',
-              markShadow: false, markTargetId: null, watchTargetId: finalLine.cf.id,
-              writer: 'FINAL_ASSIGNMENT', acquisitionBasis: 'CURRENT_SOLE_GOAL_SIDE_CENTRAL_CF_PROTECTOR' });
+            publishResponsibility(s, p.team, p, 'COVER', finalLine.target, 'SCREEN_LANE', { subjectId: finalLine.threat.p.id,
+              region: finalLine.anchor, reason: 'CURRENT_FINAL_LINE_COVERAGE_ACQUIRE', releaseReason: 'CURRENT_CREDIBLE_TAKEOVER_REQUIRED',
+              markShadow: false, markTargetId: null, watchTargetId: finalLine.threat.p.id,
+              writer: 'FINAL_ASSIGNMENT', acquisitionBasis: 'CURRENT_DANGEROUS_CENTRAL_THREAT_ONE_TO_ONE_PROTECTOR' });
           }
           continue;
         }
