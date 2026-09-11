@@ -171,35 +171,89 @@
     const span = Math.max(7, linePeers.length > 1 ? linePeers.reduce((n, q) => n + distance(q, p), 0) / (linePeers.length - 1) : 11);
     return { x: round(anchor.x), y: round(anchor.y), span: round(span), lane: p.role === 'LB' ? 'LEFT' : p.role === 'RB' ? 'RIGHT' : p.slot <= 5 ? 'CENTRAL' : p.slot <= 7 ? 'MID' : 'FRONT' };
   }
-  function publishResponsibility(s, team, p, duty, target, kind, extra = {}) {
-    const prior = p.responsibility || { version: 0, acquiredAt: s.time };
+  function assignmentSnapshot(p) {
+    return { duty: p.duty, target: { ...p.target }, markId: p.markId ?? null, pressId: p.pressId ?? null,
+      responsibility: copy(p.responsibility), defensiveContext: copy(p.defensiveContext) };
+  }
+  function beginAssignmentPlanning(s) {
+    const planning = { sequence: 0, proposals: new Map(), proposalIndex: new Map(), priorFinal: new Map(),
+      vacancies: copy(Array.isArray(s.responsibilityVacancies) ? s.responsibilityVacancies : []), committing: false };
+    for (const p of s.players) planning.priorFinal.set(p.id, assignmentSnapshot(p));
+    Object.defineProperty(s, '_assignmentPlanning', { value: planning, writable: true, configurable: true, enumerable: false });
+    return planning;
+  }
+  function proposalRelationKey(duty, kind, extra) {
+    const subjectId = extra.subjectId ?? null;
+    if (Number.isInteger(subjectId)) return `${duty}|SUBJECT:${subjectId}`;
+    if (extra.region) return `${duty}|REGION:${extra.region.lane || ''}:${round(extra.region.x ?? 0)}:${round(extra.region.y ?? 0)}`;
+    return `${duty}|KIND:${kind}`;
+  }
+  function recordAssignmentProposal(s, team, p, duty, target, kind, extra = {}) {
+    const planning = s._assignmentPlanning;
+    if (!planning || planning.committing) return null;
+    const subjectId = extra.subjectId ?? null;
+    const normalized = { ...extra,
+      pressureTargetId: extra.pressureTargetId ?? (duty === 'PRESS' ? subjectId : null),
+      markTargetId: extra.markTargetId ?? (duty === 'MARK' ? subjectId : null) };
+    normalized.watchTargetId = extra.watchTargetId ?? normalized.markTargetId ?? null;
+    const key = proposalRelationKey(duty, kind, normalized), sequence = ++planning.sequence;
+    const proposal = { sequence, playerId: p.id, team, duty, target: world(s, team, target.x, target.y), kind,
+      extra: copy(normalized), relationKey: key, sources: [extra.writer || kind] };
+    if (!planning.proposals.has(p.id)) planning.proposals.set(p.id, []);
+    const list = planning.proposals.get(p.id), indexKey = `${p.id}|${key}`, priorIndex = planning.proposalIndex.get(indexKey);
+    if (priorIndex !== undefined) {
+      proposal.sources = [...new Set([...(list[priorIndex].sources || []), ...proposal.sources])];
+      list[priorIndex] = proposal;
+    } else {
+      planning.proposalIndex.set(indexKey, list.length);
+      list.push(proposal);
+    }
+    return proposal;
+  }
+  function proposalResponsibility(s, p, proposal, priorResponsibility = null) {
+    const extra = proposal.extra || {}, prior = priorResponsibility || p.responsibility || { version: 0, acquiredAt: s.time };
     const epoch = contractEpoch(s), subjectId = extra.subjectId ?? null;
-    const signature = `${epoch}|${kind}|${subjectId}|${extra.pressPhase || ''}|${extra.handoff?.to ?? ''}`;
+    const signature = `${epoch}|${proposal.kind}|${subjectId}|${extra.pressPhase || ''}|${extra.handoff?.to ?? ''}`;
     const priorSignature = `${prior.epoch}|${prior.kind}|${prior.subjectId}|${prior.pressPhase || ''}|${prior.handoff?.to ?? ''}`;
-    const version = signature === priorSignature ? prior.version : prior.version + 1;
-    p.duty = duty; p.markId = duty === 'MARK' ? subjectId : null; p.pressId = duty === 'PRESS' ? subjectId : null;
-    p.target = world(s, team, target.x, target.y);
-    const pressureTargetId = extra.pressureTargetId ?? (duty === 'PRESS' ? subjectId : null);
-    const markTargetId = extra.markTargetId ?? (duty === 'MARK' ? subjectId : null);
-    const watchTargetId = extra.watchTargetId ?? markTargetId ?? null;
-    p.responsibility = { version, epoch, kind, duty, subjectId, homeResponsibility: homeResponsibility(p), acquiredAt: signature === priorSignature ? prior.acquiredAt : s.time,
+    const same = signature === priorSignature;
+    return { version: same ? prior.version : (prior.version || 0) + 1, epoch, kind: proposal.kind, duty: proposal.duty, subjectId,
+      homeResponsibility: homeResponsibility(p), acquiredAt: same ? prior.acquiredAt : s.time,
       releaseReason: extra.releaseReason || null, pressPhase: extra.pressPhase || null, handoff: extra.handoff || null,
       region: extra.region || null, protectedBy: extra.protectedBy ?? null, challengeIntent: !!extra.challengeIntent,
-      pressureTargetId, markTargetId, watchTargetId,
+      pressureTargetId: extra.pressureTargetId ?? null, markTargetId: extra.markTargetId ?? null,
+      watchTargetId: extra.watchTargetId ?? null,
       transition: { previousKind: prior.kind ?? null, previousSubjectId: prior.subjectId ?? null, previousDuty: prior.duty ?? null,
-        reason: extra.reason || extra.releaseReason || 'CURRENT_ASSIGNMENT', writer: extra.writer || 'FINAL_ASSIGNMENT',
+        reason: extra.reason || extra.releaseReason || 'CURRENT_ASSIGNMENT', writer: extra.writer || proposal.kind,
         acquisitionBasis: extra.acquisitionBasis || null } };
-    p.defensiveContext = { responsibility: kind, homeResponsibility: homeResponsibility(p), homeZone: { x: HOME[p.slot][0], y: HOME[p.slot][1] }, contractVersion: version,
-      ...(extra.handoff ? { handoffTo: p.id === extra.handoff.from ? extra.handoff.to : null, handoffFrom: extra.handoff.from, handoffReason: extra.handoff.reason } : { handoffTo: null }),
-      ...(extra.pressPhase ? { pressPhase: extra.pressPhase } : {}),
-      ...(extra.reason ? { reason: extra.reason } : {}),
+  }
+  function writeAssignment(s, p, proposal, priorSnapshot = null, finalMeta = null) {
+    const prior = priorSnapshot?.responsibility || p.responsibility;
+    const responsibility = proposalResponsibility(s, p, proposal, prior);
+    p.duty = proposal.duty; p.target = { ...proposal.target };
+    p.markId = proposal.duty === 'MARK' ? responsibility.markTargetId ?? responsibility.subjectId : null;
+    p.pressId = proposal.duty === 'PRESS' ? responsibility.pressureTargetId ?? responsibility.subjectId : null;
+    p.responsibility = responsibility;
+    const extra = proposal.extra || {};
+    p.defensiveContext = { responsibility: proposal.kind, homeResponsibility: homeResponsibility(p),
+      homeZone: { x: HOME[p.slot][0], y: HOME[p.slot][1] }, contractVersion: responsibility.version,
+      ...(extra.handoff ? { handoffTo: p.id === extra.handoff.from ? extra.handoff.to : null,
+        handoffFrom: extra.handoff.from, handoffReason: extra.handoff.reason } : { handoffTo: null }),
+      ...(extra.pressPhase ? { pressPhase: extra.pressPhase } : {}), ...(extra.reason ? { reason: extra.reason } : {}),
       ...(extra.pressureOwner === undefined ? {} : { pressureOwner: extra.pressureOwner }),
       ...(extra.markShadow === undefined ? {} : { markShadow: extra.markShadow }),
       ...(extra.threatLevel === undefined ? {} : { threatLevel: round(extra.threatLevel) }),
       ...(extra.attackTrigger === undefined ? {} : { attackTrigger: extra.attackTrigger }),
       ...(extra.recoverableEnvelope === undefined ? {} : { recoverableEnvelope: extra.recoverableEnvelope }),
       ...(extra.protectedBy === undefined ? {} : { centralProtectedBy: extra.protectedBy }),
-      pressureTargetId, markTargetId, watchTargetId };
+      pressureTargetId: responsibility.pressureTargetId, markTargetId: responsibility.markTargetId,
+      watchTargetId: responsibility.watchTargetId, ...(finalMeta ? { finalAssignment: copy(finalMeta) } : {}) };
+  }
+  function publishResponsibility(s, team, p, duty, target, kind, extra = {}) {
+    const proposal = recordAssignmentProposal(s, team, p, duty, target, kind, extra)
+      || { playerId: p.id, team, duty, target: world(s, team, target.x, target.y), kind, extra: copy(extra), sources: [extra.writer || kind] };
+    if (s._assignmentPlanning && !s._assignmentPlanning.committing) return proposal;
+    writeAssignment(s, p, proposal);
+    return proposal;
   }
   function invalidateCurrentContract(s, p, reason) {
     p.markId = null; p.pressId = null; p.facingIntent = null; p.intent = null;
@@ -218,106 +272,199 @@
     publishResponsibility(s, p.team, p, duty, local(s, p.team, target.x, target.y), kind, { subjectId: null,
       reason: kind, releaseReason: 'CURRENT_ACTION', markShadow: false });
   }
-  const FINAL_LINE_PROTECTOR_ROLES = new Set(['LB', 'LWB', 'LCB', 'CB', 'RCB', 'RB', 'RWB', 'DM', 'LCM', 'CM', 'RCM']);
   function finalLineCentralThreats(s, team) {
     // This is a present-state final-line gate, not a forward result estimate.
-    // A striker profile is enough; another role must already be running toward
+    // A striker profile is enough; another role must already be moving toward
     // goal or be in the near goal-side central pocket before it is included.
-    return s.players.filter(p => p.team !== team && p.role !== 'GK').map(p => ({ p, q: local(s, team, p.x, p.y) }))
+    return s.players.filter(p => p.team !== team && p.role !== 'GK').map(p => {
+      const q = local(s, team, p.x, p.y), velocity = localVelocity(s, team, p);
+      const urgency = clamp((58 - q.x) / 38, 0, 1) + clamp(-velocity.x / 5, 0, .7)
+        + clamp(1 - Math.abs(q.y - 34) / 12, 0, .4);
+      return { p, q, velocity, urgency };
+    })
       .filter(t => {
         const strikerLike = ['CF', 'ST'].includes(t.p.role);
-        const currentCentralRun = t.q.x <= 47;
+        const currentCentralRun = t.q.x <= 47 && (t.velocity.x < -.25 || t.q.x <= 35);
         return t.q.x >= 6 && t.q.x <= 58 && Math.abs(t.q.y - 34) <= 12 && (strikerLike || currentCentralRun);
-      }).sort((a, b) => a.q.x - b.q.x || Math.abs(a.q.y - 34) - Math.abs(b.q.y - 34) || a.p.id - b.p.id);
+      }).sort((a, b) => b.urgency - a.urgency || a.q.x - b.q.x || Math.abs(a.q.y - 34) - Math.abs(b.q.y - 34) || a.p.id - b.p.id);
   }
   function finalLineProtectorGeometry(s, team, defender, threat) {
-    if (!defender || defender.team !== team || !FINAL_LINE_PROTECTOR_ROLES.has(defender.role)) return false;
+    if (!defender || defender.team !== team || defender.role === 'GK') return false;
     const q = local(s, team, defender.x, defender.y);
     return q.x <= threat.q.x - .35 && Math.hypot(q.x - threat.q.x, q.y - threat.q.y) <= 15
       && Math.abs(q.y - threat.q.y) <= 13;
   }
-  function finalLineFallbackCandidate(p) {
-    const r = p.responsibility;
-    return p.duty === 'SUPPORT' && (r?.kind === 'INVALIDATED' || r?.kind === 'DEFAULT_SUPPORT');
+  function proposalOwnsThreat(proposal, threatId) {
+    const extra = proposal?.extra || {};
+    return extra.subjectId === threatId || extra.markTargetId === threatId || extra.watchTargetId === threatId;
   }
-  function finalLineCoveragePlan(s, team) {
-    // Every present threat receives one actual protector.  Existing current
-    // mark/watch contracts have first claim; only still-open lanes may acquire
-    // an otherwise-default support player in this same final assignment.
-    const threats = finalLineCentralThreats(s, team), assignments = new Map(), used = new Set();
-    const candidates = s.players.filter(p => p.team === team && FINAL_LINE_PROTECTOR_ROLES.has(p.role));
-    for (const threat of threats) {
-      const incumbent = candidates.filter(p => !used.has(p.id) && responsibilityOwnsThreat(p, threat.p.id)
-        && finalLineProtectorGeometry(s, team, p, threat)).sort((a, b) => distance(a, threat.p) - distance(b, threat.p) || a.id - b.id)[0];
-      if (incumbent) { assignments.set(incumbent.id, threat); used.add(incumbent.id); }
+  function proposalTargetProtectsThreat(s, team, proposal, threat) {
+    if (!proposal) return false;
+    const target = local(s, team, proposal.target.x, proposal.target.y);
+    return target.x <= threat.q.x - .35 && Math.hypot(target.x - threat.q.x, target.y - threat.q.y) <= 17
+      && Math.abs(target.y - threat.q.y) <= 13;
+  }
+  function arbitrationProposal(s, team, p, duty, target, kind, extra = {}) {
+    const subjectId = extra.subjectId ?? null;
+    const normalized = { ...extra,
+      pressureTargetId: extra.pressureTargetId ?? (duty === 'PRESS' ? subjectId : null),
+      markTargetId: extra.markTargetId ?? (duty === 'MARK' ? subjectId : null) };
+    normalized.watchTargetId = extra.watchTargetId ?? normalized.markTargetId ?? null;
+    return { sequence: ++s._assignmentPlanning.sequence, playerId: p.id, team, duty,
+      target: world(s, team, target.x, target.y), kind, extra: normalized,
+      relationKey: proposalRelationKey(duty, kind, normalized), sources: [extra.writer || 'TEAM_FINAL_ARBITRATION'] };
+  }
+  function retainedFinalLineProposal(s, team, p, threat, prior) {
+    const anchor = v3DefensiveAnchor(s, p.team, p);
+    return arbitrationProposal(s, team, p, prior.duty || 'COVER', v3ShadowTarget(anchor, threat, null), prior.kind || 'SCREEN_LANE',
+      { subjectId: threat.p.id, region: anchor, releaseReason: prior.releaseReason || 'CURRENT_CREDIBLE_TAKEOVER_REQUIRED',
+        pressPhase: prior.pressPhase, challengeIntent: prior.challengeIntent, markTargetId: prior.markTargetId,
+        watchTargetId: prior.watchTargetId ?? threat.p.id, pressureTargetId: prior.pressureTargetId,
+        protectedBy: prior.protectedBy, reason: 'CURRENT_VALID_PRIOR_RELATION_RETAINED', writer: 'TEAM_FINAL_ARBITRATION',
+        acquisitionBasis: 'CURRENT_BODY_AND_TARGET_PROTECT_SAME_THREAT' });
+  }
+  function latestProposal(planning, playerId, predicate = null) {
+    const list = (planning.proposals.get(playerId) || []).filter(proposal => !predicate || predicate(proposal));
+    return list.slice().sort((a, b) => b.sequence - a.sequence)[0] || null;
+  }
+  function remainingSpaceGeometry(s, team, p, proposal, deepest, centralY) {
+    const body = local(s, team, p.x, p.y), target = local(s, team, proposal.target.x, proposal.target.y);
+    return { bodySafe: body.x <= deepest.q.x - .35 && Math.abs(body.y - centralY) <= 16,
+      targetSafe: target.x <= deepest.q.x - .35 && Math.abs(target.y - centralY) <= 16 };
+  }
+  function arbitrateTeamAssignments(s, team, planning, protectedIds) {
+    const ours = s.players.filter(p => p.team === team), outfield = ours.filter(p => p.role !== 'GK');
+    const finals = new Map(), threats = finalLineCentralThreats(s, team), direct = new Map(), used = new Set();
+    for (const p of ours) {
+      const candidate = latestProposal(planning, p.id);
+      if (candidate) finals.set(p.id, candidate);
     }
-    const open = threats.filter(threat => ![...assignments.values()].some(assigned => assigned.p.id === threat.p.id));
-    const available = candidates.filter(p => !used.has(p.id) && finalLineFallbackCandidate(p));
-    // Augmenting matching makes a single nearby defender unable to silently
-    // satisfy two separated strikers when another valid one-to-one allocation
-    // exists.  It is evaluated from this tick only and writes nothing itself.
+    // A valid prior direct relation has first claim, but only while its current
+    // body and the target selected by this arbitration both protect that threat.
+    for (const threat of threats) {
+      const incumbents = outfield.filter(p => !protectedIds.has(p.id) && !used.has(p.id)
+        && responsibilityOwnsThreat({ responsibility: planning.priorFinal.get(p.id)?.responsibility }, threat.p.id)
+        && finalLineProtectorGeometry(s, team, p, threat)).sort((a, b) => distance(a, threat.p) - distance(b, threat.p) || a.id - b.id);
+      const incumbent = incumbents[0];
+      if (!incumbent) continue;
+      const proposal = retainedFinalLineProposal(s, team, incumbent, threat, planning.priorFinal.get(incumbent.id).responsibility);
+      if (!proposalTargetProtectsThreat(s, team, proposal, threat)) continue;
+      finals.set(incumbent.id, proposal); direct.set(incumbent.id, threat); used.add(incumbent.id);
+    }
+    const open = threats.filter(threat => ![...direct.values()].some(item => item.p.id === threat.p.id));
     const acquired = new Map();
     const tryAcquire = (threat, seen) => {
-      const choices = available.filter(p => finalLineProtectorGeometry(s, team, p, threat))
-        .sort((a, b) => distance(a, threat.p) - distance(b, threat.p) || a.id - b.id);
-      for (const p of choices) {
-        if (seen.has(p.id)) continue;
-        seen.add(p.id);
-        const prior = acquired.get(p.id);
-        if (!prior || tryAcquire(prior, seen)) { acquired.set(p.id, threat); return true; }
+      const choices = outfield.filter(p => !protectedIds.has(p.id) && !used.has(p.id))
+        .flatMap(p => (planning.proposals.get(p.id) || []).filter(proposal => proposalOwnsThreat(proposal, threat.p.id)
+          && finalLineProtectorGeometry(s, team, p, threat) && proposalTargetProtectsThreat(s, team, proposal, threat))
+          .map(proposal => ({ p, proposal, score: distance(p, threat.p), prior: acquired.get(p.id) })))
+        .sort((a, b) => a.score - b.score || b.proposal.sequence - a.proposal.sequence || a.p.id - b.p.id);
+      for (const choice of choices) {
+        if (seen.has(choice.p.id)) continue;
+        seen.add(choice.p.id);
+        const priorThreat = acquired.get(choice.p.id)?.threat;
+        if (!priorThreat || tryAcquire(priorThreat, seen)) {
+          acquired.set(choice.p.id, { threat, proposal: choice.proposal }); return true;
+        }
       }
       return false;
     };
     for (const threat of open) tryAcquire(threat, new Set());
-    for (const [id, threat] of acquired) assignments.set(id, threat);
-    return assignments;
-  }
-  function finalLineCoverageFallback(s, p) {
-    if (!FINAL_LINE_PROTECTOR_ROLES.has(p.role)) return null;
-    const threat = finalLineCoveragePlan(s, p.team).get(p.id);
-    if (!threat) return null;
-    const anchor = v3DefensiveAnchor(s, p.team, p);
-    return { threat, anchor, target: v3ShadowTarget(anchor, threat, null), retain: responsibilityOwnsThreat(p, threat.p.id) };
+    for (const [playerId, item] of acquired) {
+      finals.set(playerId, item.proposal); direct.set(playerId, item.threat); used.add(playerId);
+    }
+    // Any still-open central threat may acquire one geometrically credible
+    // low-priority player. This is the #889/#894 direct-protection invariant,
+    // merged into this one team decision instead of a later fallback writer.
+    for (const threat of threats.filter(item => ![...direct.values()].some(assigned => assigned.p.id === item.p.id))) {
+      const choices = outfield.filter(p => !protectedIds.has(p.id) && !used.has(p.id)
+        && finalLineProtectorGeometry(s, team, p, threat)).map(p => {
+        const proposal = finals.get(p.id), lowPriority = proposal && /^DEFAULT_/.test(proposal.kind);
+        return { p, proposal, lowPriority, score: distance(p, threat.p) };
+      }).filter(item => item.lowPriority).sort((a, b) => a.score - b.score || a.p.id - b.p.id);
+      const choice = choices[0];
+      if (!choice) continue;
+      const anchor = v3DefensiveAnchor(s, team, choice.p);
+      const proposal = arbitrationProposal(s, team, choice.p, 'COVER', v3ShadowTarget(anchor, threat, null), 'SCREEN_LANE',
+        { subjectId: threat.p.id, region: anchor, reason: 'CURRENT_FINAL_LINE_COVERAGE_ACQUIRE',
+          releaseReason: 'CURRENT_CREDIBLE_TAKEOVER_REQUIRED', markShadow: false, markTargetId: null,
+          watchTargetId: threat.p.id, writer: 'TEAM_FINAL_ARBITRATION',
+          acquisitionBasis: 'CURRENT_DANGEROUS_CENTRAL_THREAT_ONE_TO_ONE_PROTECTOR' });
+      finals.set(choice.p.id, proposal); direct.set(choice.p.id, threat); used.add(choice.p.id);
+    }
+    const remainingSpace = { required: false, currentlySecured: true, targetSafe: true, supporterId: null };
+    const hasDefaultSupport = outfield.some(p => /^DEFAULT_SUPPORT$/.test(finals.get(p.id)?.kind || ''));
+    if (threats.length && [...direct.values()].length && hasDefaultSupport) {
+      const deepest = threats.slice().sort((a, b) => a.q.x - b.q.x || a.p.id - b.p.id)[0];
+      const centralY = threats.reduce((sum, threat) => sum + threat.q.y, 0) / threats.length;
+      const eligible = outfield.filter(p => !protectedIds.has(p.id) && !direct.has(p.id) && finals.has(p.id));
+      const safe = eligible.map(p => ({ p, geometry: remainingSpaceGeometry(s, team, p, finals.get(p.id), deepest, centralY) }))
+        .filter(item => item.geometry.bodySafe && item.geometry.targetSafe);
+      if (!safe.length) {
+        remainingSpace.required = true; remainingSpace.currentlySecured = false;
+        const choices = eligible.filter(p => /^DEFAULT_(SUPPORT|COVER)$/.test(finals.get(p.id).kind)).map(p => {
+          const q = local(s, team, p.x, p.y), anchor = v3DefensiveAnchor(s, team, p);
+          const target = { x: clamp(deepest.q.x - 2.2, 4, 65),
+            y: clamp(anchor.y * .55 + centralY * .45, 8, 60) };
+          return { p, q, anchor, target, score: Math.hypot(q.x - target.x, q.y - target.y) + Math.abs(q.y - centralY) * .35 };
+        }).sort((a, b) => a.score - b.score || a.p.id - b.p.id);
+        const choice = choices[0];
+        if (choice) {
+          const bodySafe = choice.q.x <= deepest.q.x - .35 && Math.abs(choice.q.y - centralY) <= 16;
+          const proposal = arbitrationProposal(s, team, choice.p, bodySafe ? 'COVER' : 'RECOVERY', choice.target, 'REST_DEFENCE_SPACE',
+            { subjectId: null, region: { x: round(choice.target.x), y: round(choice.target.y), span: 16, lane: 'CENTRAL_SPACE' },
+              reason: 'DEFAULT_TARGET_REJECTED_REMAINING_SPACE_UNSAFE', releaseReason: 'CURRENT_STRUCTURE_SAFE_OR_THREAT_ENDED',
+              markShadow: false, markTargetId: null, watchTargetId: null, writer: 'TEAM_FINAL_ARBITRATION',
+              acquisitionBasis: 'CURRENT_BODY_AND_PROPOSED_TARGET_REMAINING_SPACE' });
+          finals.set(choice.p.id, proposal); remainingSpace.supporterId = choice.p.id;
+          remainingSpace.targetSafe = remainingSpaceGeometry(s, team, choice.p, proposal, deepest, centralY).targetSafe;
+        } else remainingSpace.targetSafe = false;
+      }
+    }
+    return { finals, diagnostic: { snapshotTick: s.tick, threatIds: threats.map(threat => threat.p.id),
+      directAssignments: [...direct].map(([playerId, threat]) => ({ playerId, threatId: threat.p.id })),
+      protectedPlayerIds: [...protectedIds].filter(id => s.players[id]?.team === team), remainingSpace } };
   }
   function finalAssignmentCommit(s, owner) {
+    const planning = s._assignmentPlanning;
+    if (!planning) return;
     const flightReceiver = s.ball.owner === null && s.ball.flight?.type === 'pass' ? s.players[s.ball.flight.targetId] : null;
-    if (owner) publishCurrentAction(s, owner, 'CARRY', owner.intent && owner.intent.until > s.time ? owner.intent.aim : owner.target,
+    if (owner) publishCurrentAction(s, owner, 'CARRY', owner.intent && owner.intent.until > s.time ? owner.intent.aim
+      : latestProposal(planning, owner.id)?.target || planning.priorFinal.get(owner.id).target,
       owner.intent && owner.intent.until > s.time ? 'SELECTED_CARRY_OWNER' : 'CURRENT_BALL_OWNER');
     if (flightReceiver) {
       const incomingTarget = { x: clamp(s.ball.x + s.ball.vx * .22, 1, 104), y: clamp(s.ball.y + s.ball.vy * .22, 1, 67) };
       publishResponsibility(s, flightReceiver.team, flightReceiver, 'RECEIVE', local(s, flightReceiver.team, incomingTarget.x, incomingTarget.y),
-        'INTENDED_PASS_RECEIVE', { subjectId: flightReceiver.id, reason: 'CURRENT_FLIGHT_TARGET', releaseReason: 'FLIGHT_END_OR_CONTROL' });
+        'INTENDED_PASS_RECEIVE', { subjectId: flightReceiver.id, reason: 'CURRENT_FLIGHT_TARGET',
+          releaseReason: 'FLIGHT_END_OR_CONTROL', writer: 'CURRENT_ACTION_PROPOSAL' });
     }
+    const protectedIds = new Set([owner?.id, flightReceiver?.id].filter(Number.isInteger));
+    const teamDecisions = new Map([[0, arbitrateTeamAssignments(s, 0, planning, protectedIds)],
+      [1, arbitrateTeamAssignments(s, 1, planning, protectedIds)]]);
+    for (const vacancy of planning.vacancies.filter(item => item.state === 'RELEASING' && Number.isInteger(item.subjectId))) {
+      const decision = teamDecisions.get(vacancy.team), fb = s.players[vacancy.homeOwnerId], threat = s.players[vacancy.subjectId];
+      const finalFb = decision?.finals.get(vacancy.homeOwnerId), anchor = fb && v3DefensiveAnchor(s, vacancy.team, fb);
+      if (!decision || !fb || !threat || !anchor || !finalFb) { vacancy.returnOwnershipEstablished = false; continue; }
+      const tq = local(s, vacancy.team, threat.x, threat.y), bq = local(s, vacancy.team, fb.x, fb.y);
+      const target = local(s, vacancy.team, finalFb.target.x, finalFb.target.y);
+      vacancy.returnOwnershipEstablished = proposalOwnsThreat(finalFb, threat.id)
+        && Math.hypot(bq.x - tq.x, bq.y - tq.y) <= anchor.span * 1.45
+        && target.x <= tq.x - .35 && Math.abs(target.y - tq.y) <= anchor.span * 1.2;
+      const central = decision.diagnostic.directAssignments.find(item => item.threatId !== vacancy.subjectId);
+      vacancy.centralGuardId = central?.playerId ?? null;
+    }
+    planning.committing = true;
     for (const p of s.players) {
-      const r = p.responsibility;
-      if (p.duty === 'RESTART') {
-        if (r?.kind !== 'RESTART_SETUP' || r.duty !== 'RESTART') publishCurrentAction(s, p, 'RESTART', p.target, 'RESTART_SETUP');
-      } else {
-        const finalLine = finalLineCoverageFallback(s, p);
-        const isFallbackCandidate = r?.kind === 'INVALIDATED' || r?.kind === 'DEFAULT_SUPPORT'
-          || (finalLine?.retain && responsibilityOwnsThreat(p, finalLine.threat.p.id));
-        if (finalLine && isFallbackCandidate) {
-          // Preserve the exact same final-assignment relation without a new
-          // publish/version every tick.  The current target is still derived
-          // from only this tick's geometry; its identity is not re-acquired.
-          if (finalLine.retain) {
-            p.duty = r.duty; p.markId = r.markTargetId ?? null; p.pressId = r.pressureTargetId ?? null;
-            p.target = world(s, p.team, finalLine.target.x, finalLine.target.y);
-          } else {
-            publishResponsibility(s, p.team, p, 'COVER', finalLine.target, 'SCREEN_LANE', { subjectId: finalLine.threat.p.id,
-              region: finalLine.anchor, reason: 'CURRENT_FINAL_LINE_COVERAGE_ACQUIRE', releaseReason: 'CURRENT_CREDIBLE_TAKEOVER_REQUIRED',
-              markShadow: false, markTargetId: null, watchTargetId: finalLine.threat.p.id,
-              writer: 'FINAL_ASSIGNMENT', acquisitionBasis: 'CURRENT_DANGEROUS_CENTRAL_THREAT_ONE_TO_ONE_PROTECTOR' });
-          }
-          continue;
-        }
-        if (r?.duty !== p.duty) {
-          // A default/loose player may not expose a previous mark or press as its
-          // current responsibility after its actual duty has changed.
-          publishCurrentAction(s, p, p.duty, p.target, s.ball.owner === null && !s.ball.flight ? `LOOSE_DEFAULT_${p.duty}` : `DEFAULT_${p.duty}`);
-        }
-      }
+      const teamDecision = teamDecisions.get(p.team), proposal = teamDecision.finals.get(p.id);
+      if (!proposal) throw new Error(`Missing final assignment proposal for player ${p.id}`);
+      const proposals = planning.proposals.get(p.id) || [];
+      writeAssignment(s, p, proposal, planning.priorFinal.get(p.id), { commitWriter: 'TEAM_FINAL_ASSIGNMENT',
+        snapshotTick: s.tick, proposalCount: proposals.length, proposalKinds: proposals.map(item => item.kind),
+        proposalSources: [...new Set(proposals.flatMap(item => item.sources || []))], selectedKind: proposal.kind,
+        selectedSource: proposal.sources?.[0] || proposal.extra?.writer || null, teamArbitration: teamDecision.diagnostic });
     }
+    s.responsibilityVacancies = planning.vacancies;
+    delete s._assignmentPlanning;
   }
   function shadowTarget(anchor, threat) {
     const q = threat.q;
@@ -450,7 +597,7 @@
       return localEnough && !otherMoreDangerous;
     });
   }
-  function applyV3Defence(s, team, carrier, anchors, incoming = false) {
+  function applyV3Defence(s, team, carrier, anchors, incoming = false, priorFinal = null) {
     const ours=s.players.filter(p=>p.team===team&&p.role!=='GK'), backs=ours.filter(p=>['LB','LCB','RCB','RB'].includes(p.role));
     const cbs=backs.filter(p=>p.role==='LCB'||p.role==='RCB'), dm=ours.find(p=>p.role==='DM');
     const cq=local(s,team,carrier.x,carrier.y), threats=s.players.filter(p=>p.team!==team&&p.role!=='GK').map(p=>({p,q:local(s,team,p.x,p.y)}));
@@ -459,7 +606,11 @@
     // Read prior ownership once. All current writers below are proposals; a
     // primary pressure publish may not erase an incumbent before acquire/release
     // validation has examined it.
-    const priorContracts=new Map(ours.map(p=>[p.id,{responsibility:copy(p.responsibility),target:{...p.target},duty:p.duty}]));
+    const priorContracts=new Map(ours.map(p=>{
+      const prior = priorFinal?.get(p.id);
+      return [p.id, { responsibility:copy(prior?.responsibility || p.responsibility),
+        target:{...(prior?.target || p.target)}, duty:prior?.duty || p.duty }];
+    }));
     const coverCandidates=[...cbs,dm].filter(Boolean).sort((a,b)=>Math.abs(local(s,team,a.x,a.y).y-34)-Math.abs(local(s,team,b.x,b.y).y-34)||a.id-b.id);
     const hasCentralCover=coverCandidates.length>1;
     const danger=v3Danger(s,team,carrier);
@@ -525,17 +676,21 @@
         publishResponsibility(s,team,p,'COVER',a,'ZONE_HOLD',{region:a,reason:'ROLE_ZONE_AND_TEAM_SPACING',pressureOwner:primary?.p.id??null,threatLevel:danger,releaseReason:'CURRENT_ZONE_VALID'});
       }
       // A defender can screen a local route but never receives the carrier's exact target.
-      if(Math.hypot(p.target.x-carrier.x,p.target.y-carrier.y)<.08) p.target=world(s,team,{x:pq.x,y:pq.y}.x,a.y);
+      const proposed = latestProposal(s._assignmentPlanning, p.id);
+      if(proposed && Math.hypot(proposed.target.x-carrier.x,proposed.target.y-carrier.y)<.08) {
+        publishResponsibility(s, team, p, proposed.duty, { x:pq.x, y:a.y }, proposed.kind,
+          { ...proposed.extra, writer:'V3_CARRIER_TARGET_SEPARATION' });
+      }
     }
     // MARK and SCREEN may meet at a moving region boundary.  Preserve the same
     // subject's current relation for a tiny proposal displacement; a meaningful
     // lane relocation or subject change still commits immediately.  This is a
     // responsibility entry/release gate, not another motor smoother.
     for (const p of ours) {
-      const prior = priorContracts.get(p.id), before = prior?.responsibility, after = p.responsibility;
+      const prior = priorContracts.get(p.id), before = prior?.responsibility, after = latestProposal(s._assignmentPlanning, p.id);
       const boundaryKinds = new Set(['LOOSE_MARK_SCREEN', 'SCREEN_LANE']);
-      if (!before?.duty || !after || before.subjectId !== after.subjectId || before.kind === after.kind
-        || !boundaryKinds.has(before.kind) || !boundaryKinds.has(after.kind) || distance(prior.target, p.target) >= .65) continue;
+      if (!before?.duty || !after || before.subjectId !== after.extra?.subjectId || before.kind === after.kind
+        || !boundaryKinds.has(before.kind) || !boundaryKinds.has(after.kind) || distance(prior.target, after.target) >= .65) continue;
       publishResponsibility(s, team, p, before.duty, local(s, team, prior.target.x, prior.target.y), before.kind,
         { subjectId: before.subjectId, region: before.region || anchors.get(p.id), reason: 'SAME_SUBJECT_BOUNDARY_HYSTERESIS',
           releaseReason: 'MEANINGFUL_LANE_OR_SUBJECT_CHANGE_REQUIRED', markShadow: before.markTargetId !== null,
@@ -580,6 +735,7 @@
     if (dm && dm !== presser && dm !== centralGuard) publishResponsibility(s, team, dm, 'COVER', anchors.get(dm.id), 'CENTRAL_LANE_COVER', { region: anchors.get(dm.id) });
   }
   function vacancyLedger(s) {
+    if (s._assignmentPlanning) return s._assignmentPlanning.vacancies;
     if (!Array.isArray(s.responsibilityVacancies)) s.responsibilityVacancies = [];
     return s.responsibilityVacancies;
   }
@@ -606,7 +762,7 @@
     return v;
   }
   function finishVacancyTick(s) {
-    s.responsibilityVacancies = vacancyLedger(s).filter(v => {
+    const filtered = vacancyLedger(s).filter(v => {
       if (v.state === 'ACTIVE' && v.confirmedAt !== s.time) {
         v.state = 'RELEASING'; v.releaseAt = s.time; v.releaseReason = 'ORIGINAL_FB_RETURN_OR_TRIGGER_END';
       }
@@ -620,6 +776,8 @@
       // responsibility until present acquisition has actually been established.
       return v.state !== 'RELEASING' || !stillDangerous || !v.returnOwnershipEstablished || s.time - v.releaseAt < .8;
     });
+    if (s._assignmentPlanning) s._assignmentPlanning.vacancies = filtered;
+    else s.responsibilityVacancies = filtered;
   }
   function applyVacancyCompensation(s, team, anchors) {
     const ours = s.players.filter(p => p.team === team), ledger = vacancyLedger(s).filter(v => v.team === team);
@@ -643,7 +801,10 @@
         publishResponsibility(s, team, fb, 'MARK', goalSideWideTarget(fbAnchor, { q: threat }, side, .42), 'HANDOFF_RETURN_WIDE_MARK',
           { subjectId: winger.id, region: fbAnchor, reason: 'FB_RETURN_ACQUIRES_WIDE_THREAT', markShadow: true,
             markTargetId: winger.id, watchTargetId: winger.id, handoff: { from: cb?.id ?? null, to: fb.id, subjectId: winger.id, reason: 'RETURN_WIDE_HANDOFF' } });
-        returnAcquired = responsibilityOwnsThreat(fb, winger.id);
+        const returnProposal = latestProposal(s._assignmentPlanning, fb.id, proposal => proposalOwnsThreat(proposal, winger.id));
+        const body = local(s, team, fb.x, fb.y), target = returnProposal && local(s, team, returnProposal.target.x, returnProposal.target.y);
+        returnAcquired = !!(returnProposal && Math.hypot(body.x - threat.x, body.y - threat.y) <= fbAnchor.span * 1.45
+          && target.x <= threat.x - .35 && Math.abs(target.y - threat.y) <= fbAnchor.span * 1.2);
         if (centralThreat) {
           centralGuard = [dm, ...s.players.filter(p => p.team === team && (p.role === 'LCB' || p.role === 'RCB') && p !== cb)]
             .filter(p => p && p.duty !== 'PRESS').sort((a, b) => distance(a, centralThreat) - distance(b, centralThreat) || a.id - b.id)[0] || null;
@@ -909,35 +1070,39 @@
     const owner = s.ball.owner === null ? null : s.players[s.ball.owner];
     const attackTeam = owner ? owner.team : s.possession ?? s.lastPossession;
     const play = s.phase === 'play';
+    const planning = beginAssignmentPlanning(s);
     if (play) prepareVacancyTick(s);
     for (const p of s.players) {
-      p.target = shapeTarget(s, p, p.team === attackTeam);
-      p.duty = p.role === 'GK' ? 'GK' : p.team === attackTeam ? 'SUPPORT' : 'COVER';
-      p.markId = null;
+      const target = shapeTarget(s, p, p.team === attackTeam);
+      const duty = p.role === 'GK' ? 'GK' : p.team === attackTeam ? 'SUPPORT' : 'COVER';
+      publishResponsibility(s, p.team, p, duty, local(s, p.team, target.x, target.y),
+        p.role === 'GK' ? 'CURRENT_GK' : `DEFAULT_${duty}`,
+        { subjectId:null, reason:'CURRENT_SHAPE_DEFAULT', releaseReason:'CURRENT_DEFAULT', writer:'SHAPE_DEFAULT_PROPOSAL' });
     }
     if (!play) {
-      if (!s.restart) return;
+      if (!s.restart) { delete s._assignmentPlanning; return; }
       const r = s.restart;
       for (const p of s.players) {
-        p.duty = 'RESTART';
+        let target = latestProposal(planning, p.id).target;
         if (r.type === 'kickoff') {
           const h = HOME[p.slot];
-          p.target = world(s, p.team, p.slot === 0 ? 5 : h[0] * 0.63, h[1]);
-          if (p.team === r.team && p.role === 'CF') p.target = { x: 52.5 - direction(s, p.team) * 0.5, y: 34 };
-          if (p.team === r.team && p.role === 'RCM') p.target = world(s, p.team, 47, 39);
+          target = world(s, p.team, p.slot === 0 ? 5 : h[0] * 0.63, h[1]);
+          if (p.team === r.team && p.role === 'CF') target = { x: 52.5 - direction(s, p.team) * 0.5, y: 34 };
+          if (p.team === r.team && p.role === 'RCM') target = world(s, p.team, 47, 39);
         } else if (r.type === 'corner') {
-          if (p.team === r.team && p.slot >= 7) p.target = world(s, p.team, 94 + (p.slot % 2) * 3, 27 + (p.slot - 7) * 4);
-          if (p.team !== r.team && p.slot > 0 && p.slot <= 7) p.target = world(s, p.team, 6 + (p.slot % 3) * 3, 22 + p.slot * 3);
+          if (p.team === r.team && p.slot >= 7) target = world(s, p.team, 94 + (p.slot % 2) * 3, 27 + (p.slot - 7) * 4);
+          if (p.team !== r.team && p.slot > 0 && p.slot <= 7) target = world(s, p.team, 6 + (p.slot % 3) * 3, 22 + p.slot * 3);
         }
-        if (p.id === r.takerId) p.target = { ...r.spot };
+        if (p.id === r.takerId) target = { ...r.spot };
         if (p.team !== r.team && p.role !== 'GK') {
-          const d = distance(p.target, r.spot), radius = r.type === 'throwIn' ? 2.5 : 9.15;
+          const d = distance(target, r.spot), radius = r.type === 'throwIn' ? 2.5 : 9.15;
           if (d < radius) {
-            const dx = p.target.x - r.spot.x || -direction(s, r.team), dy = p.target.y - r.spot.y;
+            const dx = target.x - r.spot.x || -direction(s, r.team), dy = target.y - r.spot.y;
             const norm = Math.hypot(dx, dy);
-            p.target = { x: clamp(r.spot.x + dx / norm * radius, 1, 104), y: clamp(r.spot.y + dy / norm * radius, 1, 67) };
+            target = { x: clamp(r.spot.x + dx / norm * radius, 1, 104), y: clamp(r.spot.y + dy / norm * radius, 1, 67) };
           }
         }
+        publishCurrentAction(s, p, 'RESTART', target, 'RESTART_SETUP');
       }
       finalAssignmentCommit(s, null);
       return;
@@ -948,28 +1113,30 @@
       if (owner && owner.team !== team) {
         // Current carrier only: pressure ownership is singular and every other
         // defender retains a lane, mark shadow, or recovery responsibility.
-        applyV3Defence(s, team, owner, anchors, false);
+        applyV3Defence(s, team, owner, anchors, false, planning.priorFinal);
       } else if (owner && owner.team === team) {
         const o = local(s, team, owner.x, owner.y);
         for (const p of ours) {
           if (p.id === owner.id) {
-            p.duty = 'CARRY';
             const close = opponents(s, p).filter(q => distance(q, p) < 5);
             let avoidY = 0;
             for (const q of close) avoidY += (p.y - q.y) / Math.max(1, distance(q, p)) * 2;
             const goalY = o.x > 77 ? (34 - o.y) * 0.25 : 0;
             const aim = world(s, team, clamp(o.x + 9, 1, 102), clamp(o.y + goalY, 3, 65));
-            p.target = p.intent && p.intent.until > s.time ? { ...p.intent.aim }
+            const target = p.intent && p.intent.until > s.time ? { ...p.intent.aim }
               : { x: aim.x, y: clamp(aim.y + avoidY, 2, 66) };
             if (p.intent && p.intent.until <= s.time) p.intent = null;
+            publishCurrentAction(s, p, 'CARRY', target,
+              p.intent && p.intent.until > s.time ? 'SELECTED_CARRY_OWNER' : 'CURRENT_BALL_OWNER');
           } else if (p.slot >= 8) {
-            p.duty = 'RUN';
-            const target = local(s, team, p.target.x, p.target.y);
+            const shape = latestProposal(planning, p.id, proposal => proposal.kind === 'DEFAULT_SUPPORT');
+            const target = local(s, team, shape.target.x, shape.target.y);
             const defenders = s.players.filter(q => q.team !== team).map(q => local(s, team, q.x, q.y).x).sort((a, b) => b - a);
             // Active runs stay just onside until the pass is actually struck.
             target.x = Math.min(target.x, Math.max(o.x, defenders[1] - 0.8));
             if (o.x > 78) target.y = p.role === 'CF' ? 34 : p.role === 'LF' ? 22 : 46;
-            p.target = world(s, team, target.x, target.y);
+            publishResponsibility(s, team, p, 'RUN', target, 'DEFAULT_RUN',
+              { subjectId:null, reason:'CURRENT_ATTACK_RUN', releaseReason:'CURRENT_DEFAULT', writer:'ATTACK_RUN_PROPOSAL' });
           }
         }
         applyFullbackAttackResponsibility(s, team, owner, anchors);
@@ -978,14 +1145,16 @@
         if (receiver && receiver.team !== team) {
           // The flight vector and named intended receiver are already current
           // MatchState.  This reads arrival risk; it supplies no future result.
-          applyV3Defence(s, team, receiver, anchors, true);
+          applyV3Defence(s, team, receiver, anchors, true, planning.priorFinal);
         } else allocateLooseBall(s, team, ours, anchors);
       }
       const keeper = s.players[team * 11];
       const kb = local(s, team, s.ball.x, s.ball.y);
       if (kb.x < 18 && kb.y > 13 && kb.y < 55 && s.ball.owner === null) {
-        keeper.target = { x: clamp(s.ball.x + s.ball.vx * 0.08, team === (s.half === 1 ? 0 : 1) ? 1 : 87, team === (s.half === 1 ? 0 : 1) ? 18 : 104),
+        const target = { x: clamp(s.ball.x + s.ball.vx * 0.08, team === (s.half === 1 ? 0 : 1) ? 1 : 87, team === (s.half === 1 ? 0 : 1) ? 18 : 104),
           y: clamp(s.ball.y + s.ball.vy * 0.1, 23, 45) };
+        publishResponsibility(s, team, keeper, 'GK', local(s, team, target.x, target.y), 'CURRENT_GK_BALL',
+          { subjectId:null, reason:'CURRENT_LOOSE_BALL_POSITION', releaseReason:'CURRENT_GK', writer:'GK_TARGET_PROPOSAL' });
       }
     }
     for (let team = 0; team < 2; team++) applyVacancyCompensation(s, team, defensiveAnchors(s, team));
