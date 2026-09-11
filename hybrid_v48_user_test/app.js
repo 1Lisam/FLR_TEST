@@ -7801,6 +7801,12 @@
     harness = new import_hybrid_v48.default.HybridMatchController({ donor: live, donorContract: { pitch: initial.donorPitch, terminalMappings: mappings }, aEngine: import_engine_b_candidate.default, protagonistId, replayLimit: 180 });
     return protagonistId;
   }
+  function displayState() {
+    const raw = live.readState();
+    const pitch = raw.donorPitch;
+    if (!pitch || !Number.isFinite(pitch.length) || !Number.isFinite(pitch.width)) fail("DISPLAY_PITCH_CONTRACT_MISSING");
+    return import_hybrid_v48.default.DonorAdapter.toCanonical(raw, { pitch });
+  }
   function draw(s) {
     if (!s) return;
     ctx.clearRect(0, 0, 840, 544);
@@ -7838,7 +7844,7 @@
     render();
   }
   function render() {
-    const s = live.readState(), pending = harness.pending;
+    const s = displayState(), pending = harness.pending;
     draw(pending?.canonical || s);
     $("phase").textContent = PHASE_KO[harness.state] || harness.state;
     $("choices").replaceChildren(...(pending?.candidates || []).filter((c) => ["PASS", "PROGRESSIVE_PASS", "THROUGH_PASS", "SAFE_PASS", "CARRY", "SHOT"].includes(c.id)).map((c) => {
@@ -7848,7 +7854,7 @@
       return b;
     }));
     const cid = pending?.candidates?.[0]?.id ?? null;
-    $("diag").textContent = JSON.stringify({ "테스트 전용": true, "엔진 모드": "실제 엔진 / 브라우저 내장", "FLR 기준 커밋": FLR, "도너 SHA": SHA, "주인공 ID": harness.protagonistId, "선택 ID": cid ? `${CHOICE_KO[cid] || cid} (${cid})` : null, "선택 대상 보존": "내부 choiceId + targetId 정확히 유지", "현재 상태만 사용": true, "미래 선계산 없음": true, "이전 장면 프레임 수": harness.replay.current().length, "동일 도너 경기 객체 유지": true, "오프사이드 처리": "단독 오프사이드는 안전 중단 처리", "종료 이벤트": harness.lastScene?.terminal?.type ?? null, "오류": harness.error ?? null }, null, 2);
+    $("diag").textContent = JSON.stringify({ "테스트 전용": true, "엔진 모드": "실제 엔진 / 브라우저 내장", "FLR 기준 커밋": FLR, "도너 SHA": SHA, "주인공 ID": harness.protagonistId, "선택 ID": cid ? `${CHOICE_KO[cid] || cid} (${cid})` : null, "선택 대상 보존": "내부 choiceId + targetId 정확히 유지", "현재 상태만 사용": true, "미래 선계산 없음": true, "이전 장면 프레임 수": harness.replay.current().length, "화면 선수 수": s.players.length, "화면 안 선수 수": s.players.filter((p) => p.x >= 0 && p.x <= 105 && p.y >= 0 && p.y <= 68).length, "동일 도너 경기 객체 유지": true, "오프사이드 처리": "단독 오프사이드는 안전 중단 처리", "종료 이벤트": harness.lastScene?.terminal?.type ?? null, "오류": harness.error ?? null }, null, 2);
   }
   function tick() {
     if (playing && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING) {
@@ -7872,7 +7878,10 @@
       await new Promise((r) => setTimeout(r, 18));
     }
   };
-  window.__V48_STATIC_HYBRID_TEST__ = { status: () => ({ state: harness.state, donorMode: "REAL/BROWSER_BUNDLED", donorSha: SHA, protagonistId: harness.protagonistId, pending: harness.pending?.candidates || [], terminal: harness.lastScene?.terminal?.type ?? null, error: harness.error ?? null, sameLiveDonorObject: true }), select: (choiceId, targetId) => choose({ id: choiceId, targetId }) };
+  window.__V48_STATIC_HYBRID_TEST__ = { status: () => ({ state: harness.state, donorMode: "REAL/BROWSER_BUNDLED", donorSha: SHA, protagonistId: harness.protagonistId, pending: harness.pending?.candidates || [], terminal: harness.lastScene?.terminal?.type ?? null, error: harness.error ?? null, sameLiveDonorObject: true }), visualStatus: () => {
+    const s = displayState();
+    return { players: s.players.length, inBounds: s.players.filter((p) => p.x >= 0 && p.x <= 105 && p.y >= 0 && p.y <= 68).length, ballInBounds: s.ball.x >= 0 && s.ball.x <= 105 && s.ball.y >= 0 && s.ball.y <= 68 };
+  }, select: (choiceId, targetId) => choose({ id: choiceId, targetId }) };
   create(496001);
   render();
   setInterval(tick, 120);
