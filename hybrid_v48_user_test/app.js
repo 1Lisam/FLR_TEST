@@ -7659,6 +7659,13 @@
   function point(x) {
     return Array.isArray(x) ? { x: Number(x[0]), y: Number(x[1]) } : { x: Number(x?.x), y: Number(x?.y) };
   }
+  function donorToSemantic(x) {
+    const d = point(x);
+    return { x: d.y, y: d.x };
+  }
+  function semanticToDonor(p) {
+    return { x: Number(p.y), y: Number(p.x) };
+  }
   function putPoint(o, k, p) {
     o[k] = Array.isArray(o[k]) ? [p.x, p.y] : { x: p.x, y: p.y };
   }
@@ -7669,7 +7676,7 @@
     return p.playerID ?? p.id ?? p.playerId;
   }
   function pos(p) {
-    return point(p.currentPOS ?? p.position ?? p.pos);
+    return donorToSemantic(p.currentPOS ?? p.position ?? p.pos);
   }
   function roster(m) {
     return teams(m).flatMap((t, team) => (t.players || []).map((player) => ({ player, id: playerId(player), team })));
@@ -7699,7 +7706,7 @@
     const rs = roster(m), o = observation(m, { restart: allowRestartBoundary });
     if (o.kind === "INVALID_FAIL_CLOSED") fail(o.code);
     const pp = m.pitchSize;
-    return { tick: m.iteration ?? 0, clock: m.time ?? 0, phase: "play", score: [Number(m.kickOffTeamStatistics?.goals || 0), Number(m.secondTeamStatistics?.goals || 0)], possessionTeam: o.owner?.team ?? null, donorPitch: { length: Number(pp[0]), width: Number(pp[1]) }, players: rs.map(({ player, id, team }) => ({ id, team, role: player.position ?? player.role ?? "CM", ...pos(player) })), ball: { ...point(m.ball.position), z: Number(m.ball.z ?? 0.15), ownerId: o.owner?.id ?? null, mode: o.owner ? "controlled" : "loose" } };
+    return { tick: m.iteration ?? 0, clock: m.time ?? 0, phase: "play", score: [Number(m.kickOffTeamStatistics?.goals || 0), Number(m.secondTeamStatistics?.goals || 0)], possessionTeam: o.owner?.team ?? null, donorPitch: { length: Number(pp[1]), width: Number(pp[0]) }, players: rs.map(({ player, id, team }) => ({ id, team, role: player.position ?? player.role ?? "CM", ...pos(player) })), ball: { ...donorToSemantic(m.ball.position), z: Number(m.ball.z ?? 0.15), ownerId: o.owner?.id ?? null, mode: o.owner ? "controlled" : "loose" } };
   }
   function setPlayerPos2(p, q) {
     putPoint(p, p.currentPOS != null ? "currentPOS" : p.position != null ? "position" : "pos", q);
@@ -7708,10 +7715,10 @@
     const players = new Map(canonical.players.map((p) => [p.id, p]));
     for (const { player, id } of roster(m)) {
       const q = players.get(id);
-      if (q) setPlayerPos2(player, q);
+      if (q) setPlayerPos2(player, semanticToDonor(q));
       player.hasBall = false;
     }
-    putPoint(m.ball, "position", canonical.ball);
+    putPoint(m.ball, "position", semanticToDonor(canonical.ball));
     m.ball.withPlayer = true;
     m.ball.Player = canonical.ball.ownerId;
     if (Object.hasOwn(m.ball, "player")) m.ball.player = canonical.ball.ownerId;
@@ -7777,7 +7784,9 @@
       if (["goal", "corner", "goalKick", "throwIn", "freeKick"].includes(next.lastHybridTerminal)) return;
       patchControlled(this.match, next);
     } };
-    const initial = toCanonical(live.match), protagonistId = selectProtagonist(initial), mappings = { save: { kind: "controlledPossession", requiresStableControlled: true }, claim: { kind: "controlledPossession", requiresStableControlled: true }, block: { kind: "controlledPossession", requiresStableControlled: true }, goal: { apply(next, scene) {
+    const initial = toCanonical(live.match), initialCanonical = import_hybrid_v48.default.DonorAdapter.toCanonical(initial, { pitch: initial.donorPitch }), initialGK = initialCanonical.players.find((p) => p.team === 0 && String(p.role).toUpperCase() === "GK");
+    if (!initialGK || Math.abs(initialGK.x) > 0.5 || Math.abs(initialGK.y - 34) > 1) fail("DONOR_AXIS_ORIENTATION_INVALID");
+    const protagonistId = selectProtagonist(initial), mappings = { save: { kind: "controlledPossession", requiresStableControlled: true }, claim: { kind: "controlledPossession", requiresStableControlled: true }, block: { kind: "controlledPossession", requiresStableControlled: true }, goal: { apply(next, scene) {
       nativeGoal(live, scene, scene.evidence?.playerId);
       next.lastHybridTerminal = "goal";
       return { ok: true, state: next, terminalType: "goal" };
@@ -7854,7 +7863,7 @@
       return b;
     }));
     const cid = pending?.candidates?.[0]?.id ?? null;
-    $("diag").textContent = JSON.stringify({ "테스트 전용": true, "엔진 모드": "실제 엔진 / 브라우저 내장", "FLR 기준 커밋": FLR, "도너 SHA": SHA, "주인공 ID": harness.protagonistId, "선택 ID": cid ? `${CHOICE_KO[cid] || cid} (${cid})` : null, "선택 대상 보존": "내부 choiceId + targetId 정확히 유지", "현재 상태만 사용": true, "미래 선계산 없음": true, "이전 장면 프레임 수": harness.replay.current().length, "화면 선수 수": s.players.length, "화면 안 선수 수": s.players.filter((p) => p.x >= 0 && p.x <= 105 && p.y >= 0 && p.y <= 68).length, "동일 도너 경기 객체 유지": true, "오프사이드 처리": "단독 오프사이드는 안전 중단 처리", "종료 이벤트": harness.lastScene?.terminal?.type ?? null, "오류": harness.error ?? null }, null, 2);
+    $("diag").textContent = JSON.stringify({ "테스트 전용": true, "엔진 모드": "실제 엔진 / 브라우저 내장", "FLR 기준 커밋": FLR, "도너 SHA": SHA, "주인공 ID": harness.protagonistId, "선택 ID": cid ? `${CHOICE_KO[cid] || cid} (${cid})` : null, "선택 대상 보존": "내부 choiceId + targetId 정확히 유지", "현재 상태만 사용": true, "미래 선계산 없음": true, "이전 장면 프레임 수": harness.replay.current().length, "화면 선수 수": s.players.length, "화면 안 선수 수": s.players.filter((p) => p.x >= 0 && p.x <= 105 && p.y >= 0 && p.y <= 68).length, "좌표축": "도너 [폭,길이] → FLR x=길이, y=폭", "동일 도너 경기 객체 유지": true, "오프사이드 처리": "단독 오프사이드는 안전 중단 처리", "종료 이벤트": harness.lastScene?.terminal?.type ?? null, "오류": harness.error ?? null }, null, 2);
   }
   function tick() {
     if (playing && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING) {
