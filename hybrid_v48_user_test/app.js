@@ -2393,7 +2393,7 @@
               return x > 52.5 && x > bx && x > defenders[1];
             }).map((q) => q.id);
             s.stats[p.team].passes++;
-            event(s, "pass", p.team, `${p.role} \u2192 ${target.role || "space"}${loft > 0 ? " \xB7 lofted pass" : ""}`, p.id, { targetId: target.id ?? null });
+            event(s, "pass", p.team, `${p.role} → ${target.role || "space"}${loft > 0 ? " · lofted pass" : ""}`, p.id, { targetId: target.id ?? null });
           } else {
             s.stats[p.team].shots++;
             const e = event(s, "shot", p.team, `${p.role} shoots`, p.id);
@@ -2650,7 +2650,7 @@
                 s,
                 "goal",
                 attacking,
-                `${s.teams[attacking].name} GOAL \xB7 ${s.score[0]}\u2013${s.score[1]}`,
+                `${s.teams[attacking].name} GOAL · ${s.score[0]}–${s.score[1]}`,
                 b.lastTouch,
                 { ownGoal: lastTeam !== attacking }
               );
@@ -2805,13 +2805,13 @@
               startRestart(s, "kickoff", 1, { x: 52.5, y: 34 }, true);
               s.phase = "half-time";
               s.restart.elapsed = 0;
-              event(s, "halfTime", null, "Half time \xB7 teams change ends");
+              event(s, "halfTime", null, "Half time · teams change ends");
             } else if (s.half === 2 && s.clock >= 5400) {
               s.phase = "full-time";
               s.paused = true;
               s.restart = null;
               s.input = null;
-              event(s, "fullTime", null, `Full time \xB7 ${s.score[0]}\u2013${s.score[1]}`);
+              event(s, "fullTime", null, `Full time · ${s.score[0]}–${s.score[1]}`);
               record(s);
               return true;
             }
@@ -7761,6 +7761,8 @@
   var harness;
   var playing = true;
   var speed = 1;
+  var PHASE_KO = { MACRO_RUNNING: "경기 진행 중", INTERACTIVE_PENDING: "선택 대기", DECISION_PAUSED: "선택 대기", REPLAY_PAST: "이전 장면 재생", A_SCENE: "선택 장면 재생", DONOR_RESUMED: "경기 재개", FAILED_CLOSED: "안전 중단" };
+  var CHOICE_KO = { PASS: "패스", PROGRESSIVE_PASS: "전진 패스", THROUGH_PASS: "침투 패스", SAFE_PASS: "안전 패스", CARRY: "볼 운반", SHOT: "슈팅" };
   function create(seed) {
     setMatchSeed(Number(seed) || 496001);
     live = { match: initiateGame(clone(team1_default), clone(team2_default), clone(pitch_default)), paused: false, identity: `REAL-BROWSER_BUNDLED-${SHA}`, readState() {
@@ -7821,31 +7823,32 @@
   }
   async function choose(c) {
     const replay = harness.replay.current();
-    $("phase").textContent = "REPLAY_PAST";
+    $("phase").textContent = "이전 장면 재생";
     for (const x of replay) {
       draw(x);
       await new Promise((r) => setTimeout(r, 18));
     }
-    $("phase").textContent = "A_SCENE";
+    $("phase").textContent = "선택 장면 재생";
     const out = harness.submitAction({ choiceId: c.id, targetId: c.targetId, playerId: harness.protagonistId });
     for (const x of out.sceneFrames || []) {
       draw(x);
       await new Promise((r) => setTimeout(r, 18));
     }
-    $("phase").textContent = out.ok ? "DONOR_RESUMED" : "FAILED_CLOSED";
+    $("phase").textContent = out.ok ? "경기 재개" : "안전 중단";
     render();
   }
   function render() {
     const s = live.readState(), pending = harness.pending;
     draw(pending?.canonical || s);
-    $("phase").textContent = harness.state === "INTERACTIVE_PENDING" ? "DECISION_PAUSED" : harness.state;
+    $("phase").textContent = PHASE_KO[harness.state] || harness.state;
     $("choices").replaceChildren(...(pending?.candidates || []).filter((c) => ["PASS", "PROGRESSIVE_PASS", "THROUGH_PASS", "SAFE_PASS", "CARRY", "SHOT"].includes(c.id)).map((c) => {
       const b = document.createElement("button");
-      b.textContent = `${c.id}${c.targetId != null ? " \u2192 " + c.targetId : ""}`;
+      b.textContent = `${CHOICE_KO[c.id] || c.id}${c.targetId != null ? " → 대상 " + c.targetId : ""}`;
       b.onclick = () => choose(c);
       return b;
     }));
-    $("diag").textContent = JSON.stringify({ TEST_ONLY: true, donorMode: "REAL/BROWSER_BUNDLED", flrSourceCommit: FLR, donorSha: SHA, protagonistId: harness.protagonistId, choiceId: pending?.candidates?.[0]?.id ?? null, targetExactness: "choiceId + targetId required", currentOnly: true, noFutureLookahead: true, rollingPastReplayFrames: harness.replay.current().length, sameLiveDonorObject: true, offside: "ADAPTER_OFFSIDE_UNSUPPORTED_NO_NATIVE_RESTART (fail closed)", terminal: harness.lastScene?.terminal?.type ?? null, error: harness.error ?? null }, null, 2);
+    const cid = pending?.candidates?.[0]?.id ?? null;
+    $("diag").textContent = JSON.stringify({ "테스트 전용": true, "엔진 모드": "실제 엔진 / 브라우저 내장", "FLR 기준 커밋": FLR, "도너 SHA": SHA, "주인공 ID": harness.protagonistId, "선택 ID": cid ? `${CHOICE_KO[cid] || cid} (${cid})` : null, "선택 대상 보존": "내부 choiceId + targetId 정확히 유지", "현재 상태만 사용": true, "미래 선계산 없음": true, "이전 장면 프레임 수": harness.replay.current().length, "동일 도너 경기 객체 유지": true, "오프사이드 처리": "단독 오프사이드는 안전 중단 처리", "종료 이벤트": harness.lastScene?.terminal?.type ?? null, "오류": harness.error ?? null }, null, 2);
   }
   function tick() {
     if (playing && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING) {
@@ -7860,7 +7863,7 @@
   };
   $("play").onclick = () => {
     playing = !playing;
-    $("play").textContent = playing ? "Pause" : "Play";
+    $("play").textContent = playing ? "일시정지" : "재생";
   };
   $("speed").onchange = (e) => speed = Number(e.target.value);
   $("replay").onclick = async () => {
