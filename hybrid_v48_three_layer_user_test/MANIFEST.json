@@ -1,0 +1,33 @@
+{
+  "schema": "V48_SIMPLE_REAL_A_VIEWER_USER_TEST_1",
+  "testOnly": true,
+  "flrSourceCommit": "79c7670ec5d6c633752ba422e3a2d48eebb53ba2",
+  "donorSha": "ea35bbd3245af9c822f7db5cb359b119fb60ab33",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 766,
+      "sha256": "083c81d895c895fe587e6b59ba29e9ea9e7202e573f247793c242a0c238226d6"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.txt",
+      "bytes": 1145,
+      "sha256": "62966f919caff105051c7f98f0e0661e376e651a8c215b58ee716cf41087294c"
+    },
+    {
+      "path": "app.js",
+      "bytes": 372690,
+      "sha256": "8920d5465b5da89328c1a52b4c3152b6b0c5b59c80886d02b77948fd9c32c0ce"
+    },
+    {
+      "path": "index.html",
+      "bytes": 1211,
+      "sha256": "3f54c6d997e3f4533fe3f67ae47d47d7add37a25cfa1e445eac037188d3c8f64"
+    },
+    {
+      "path": "style.css",
+      "bytes": 630,
+      "sha256": "1d6c44e9fe369fb767d6699d9765ce7201a57fcae5235a0b72b0cb411022b896"
+    }
+  ]
+}
