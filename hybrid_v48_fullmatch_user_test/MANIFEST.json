@@ -1,0 +1,33 @@
+{
+  "schema": "V48_TRUE_A_HANDOFF_FULLMATCH_MANIFEST_1",
+  "testOnly": true,
+  "flrSourceCommit": "c6087b73aaa094feea0e1afea985c5846619f48f",
+  "donorSha": "ea35bbd3245af9c822f7db5cb359b119fb60ab33",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 290,
+      "sha256": "8b93bf4b3d4343e76eda240f6a0b70f1ff2c6ea76d8365e06aab68749440ff3c"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.txt",
+      "bytes": 1145,
+      "sha256": "62966f919caff105051c7f98f0e0661e376e651a8c215b58ee716cf41087294c"
+    },
+    {
+      "path": "app.js",
+      "bytes": 368883,
+      "sha256": "1871c91f9637b965a8b326005680b9dfe248bc182777025d7b96bdb8a3eb3493"
+    },
+    {
+      "path": "index.html",
+      "bytes": 1269,
+      "sha256": "efe6ce3f8c09bd9f4ce7b4cb870505f41d07f129fca2555455a1e833ed095d38"
+    },
+    {
+      "path": "style.css",
+      "bytes": 630,
+      "sha256": "1d6c44e9fe369fb767d6699d9765ce7201a57fcae5235a0b72b0cb411022b896"
+    }
+  ]
+}
