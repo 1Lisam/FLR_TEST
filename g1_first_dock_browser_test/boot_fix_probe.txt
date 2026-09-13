@@ -1,0 +1,3 @@
+V48 G1 USER VISUAL START FIX PENDING
+User visual report: Start first dock button appears inert.
+Technical Windows browser gate remains separate from USER VISUAL PASS.
