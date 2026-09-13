@@ -1,0 +1,1 @@
+This TEST_ONLY surface is under active G1 user-visual compatibility repair. Do not treat technical browser PASS as USER VISUAL PASS.
