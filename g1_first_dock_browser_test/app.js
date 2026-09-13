@@ -536,23 +536,36 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         session.evidence = { choiceId: choice.choiceId || choice.id, playerId: choice.playerId, targetId: action.targetId == null ? null : action.targetId, aPlayerId, aTargetId, retainedMatch: true };
         return { ok: true, match: session.match, evidence: session.evidence };
       }
+      function step(session, choice, options = {}) {
+        if (!session?.submitted) return { ok: false, code: "A_SESSION_NOT_SUBMITTED" };
+        const max = Math.min(options.maxSteps || 160, 160);
+        if (session.sceneSteps >= max) return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence };
+        if (!session.match.advance()) return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence };
+        session.sceneSteps = (session.sceneSteps || 0) + 1;
+        const rawInspect = session.match.inspect(), events = session.match.eventsSince(session.startEvents), observed = terminalFromEvents([...events].reverse());
+        const canonical = inspectInBounds(rawInspect) ? canonicalFromA(rawInspect, { scenePlayerIdMapping: session.mapping }) : null;
+        if (observed) session.pendingTerminal = observed;
+        const owner = rawInspect.ball.owner;
+        const differentControlled = rawInspect.phase === "play" && owner !== null && owner !== session.mapping.aForCanonical(session.protagonistId) && !rawInspect.ball.flight && inspectInBounds(rawInspect);
+        session.differentOwnerStableTicks = differentControlled ? (session.differentOwnerStableTicks || 0) + 1 : 0;
+        let terminal = null;
+        if (session.pendingTerminal && terminalBoundaryReady(rawInspect, session.pendingTerminal)) terminal = session.pendingTerminal;
+        else if (session.sceneSteps >= 3 && session.differentOwnerStableTicks >= 2) terminal = { type: "controlledPossession", ownerId: session.mapping.canonicalForA(owner) };
+        const scene = terminal && canonical ? { ok: true, terminal, canonicalState: canonical, steps: session.sceneSteps, evidence: session.evidence, match: session.match } : null;
+        if (!scene && session.sceneSteps >= max) return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence, rawInspect, steps: session.sceneSteps };
+        return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, differentOwnerStableTicks: session.differentOwnerStableTicks || 0, ready: !!scene, scene };
+      }
       function resolve(session, choice, options = {}) {
         if (!session?.submitted) return { ok: false, code: "A_SESSION_NOT_SUBMITTED" };
-        const max = options.maxSteps || 900, observedFrames = [], displayFrames = [];
-        let pendingTerminal = null;
-        for (let step = 0; step < max; step++) {
-          if (!session.match.advance()) break;
-          const currentInspect = session.match.inspect(), events = session.match.eventsSince(session.startEvents), observed = terminalFromEvents([...events].reverse()), current = inspectInBounds(currentInspect) ? canonicalFromA(currentInspect, { scenePlayerIdMapping: session.mapping }) : null;
-          if (displayFrames.length < 180) displayFrames.push(copy(currentInspect));
-          if (current) {
-            if (observedFrames.length < 180) observedFrames.push(current);
-            if (typeof options.onObservedFrame === "function") options.onObservedFrame(current, step + 1);
-          }
-          if (observed) pendingTerminal = observed;
-          if (pendingTerminal && terminalBoundaryReady(currentInspect, pendingTerminal)) return { ok: true, terminal: pendingTerminal, canonicalState: current, steps: step + 1, evidence: session.evidence, observedFrames, displayFrames, match: session.match };
-          if (choice.choiceId !== "SHOT" && choice.id !== "SHOT" && currentInspect.phase === "play" && currentInspect.ball.owner !== null && !currentInspect.ball.flight && inspectInBounds(currentInspect) && step >= (options.minimumSteps || 2)) return { ok: true, terminal: { type: "controlledPossession", ownerId: session.mapping.canonicalForA(currentInspect.ball.owner) }, canonicalState: current, steps: step + 1, evidence: session.evidence, observedFrames, displayFrames, match: session.match };
+        const observedFrames = [], displayFrames = [];
+        for (let i = 0; i < Math.min(options.maxSteps || 160, 160); i++) {
+          const out = step(session, choice, options);
+          if (!out.ok) return { ...out, observedFrames, displayFrames };
+          displayFrames.push(copy(out.rawInspect));
+          if (out.canonicalState) observedFrames.push(out.canonicalState);
+          if (out.ready) return { ...out.scene, observedFrames, displayFrames };
         }
-        return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence };
+        return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence, observedFrames, displayFrames };
       }
       function run(canonical, choice, options = {}) {
         const retained = begin(canonical, choice.playerId, options);
@@ -561,7 +574,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (!accepted.ok) return { ...accepted, evidence: accepted.evidence || retained.evidence };
         return resolve(retained, choice, options);
       }
-      module.exports = Object.freeze({ SUPPORTED, TERMINALS, makeSceneState, canonicalFromA, buildScenePlayerIdMapping, begin, createRetained, hydrateRetained, inspect: inspect2, submit, resolve, run, actionFor, terminalFromEvents, inspectInBounds });
+      module.exports = Object.freeze({ SUPPORTED, TERMINALS, makeSceneState, canonicalFromA, buildScenePlayerIdMapping, begin, createRetained, hydrateRetained, inspect: inspect2, submit, step, resolve, run, actionFor, terminalFromEvents, inspectInBounds });
     }
   });
 
@@ -679,7 +692,13 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const aCurrent = AScene.canonicalFromA(shown, { scenePlayerIdMapping: session.mapping });
           const generation = ++this.generation, sceneId = `${this.matchId}:scene:${++this.sceneCounter}`, choiceRevision = 1;
           const sourceStateDigest = JSON.stringify({ players: aCurrent.players.map((p) => [p.id, p.x, p.y]), ball: aCurrent.ball, score: aCurrent.score });
-          const candidates = Choices.generate(aCurrent, this.protagonistId).filter((c) => ["SAFE_PASS", "PROGRESSIVE_PASS"].includes(c.id) && Number.isInteger(c.targetId)).map((c) => Object.freeze({ ...c, choiceId: c.id, generation, sceneId, choiceRevision, sourceStateDigest }));
+          const rank = (c) => c.id === "PROGRESSIVE_PASS" ? 2 : c.id === "SAFE_PASS" ? 1 : 0;
+          const byTarget = /* @__PURE__ */ new Map();
+          for (const c of Choices.generate(aCurrent, this.protagonistId).filter((c2) => ["SAFE_PASS", "PROGRESSIVE_PASS"].includes(c2.id) && Number.isInteger(c2.targetId))) {
+            const prior = byTarget.get(c.targetId);
+            if (!prior || rank(c) > rank(prior) || rank(c) === rank(prior) && c.id < prior.id) byTarget.set(c.targetId, c);
+          }
+          const candidates = [...byTarget.values()].sort((a, b) => b.targetId - a.targetId).map((c) => Object.freeze({ ...c, choiceId: c.id, targetRole: aCurrent.players.find((p) => p.id === c.targetId)?.role || "UNKNOWN", generation, sceneId, choiceRevision, sourceStateDigest }));
           if (!candidates.length) return this.fail("G1_NO_EXECUTABLE_GROUNDED_PASS");
           this.pending = { canonical: aCurrent, trigger, candidates, session, shownMatch: session.match, generation, sceneId, choiceRevision, sourceStateDigest, submitted: false };
           this.state = STATES.INTERACTIVE_PENDING;
@@ -713,8 +732,27 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const accepted = AScene.submit(held, choice, { engine: this.aEngine, ...this.aOptions });
           if (!accepted.ok) return this.fail(accepted.code);
           if (accepted.match !== this.pending.shownMatch) return this.fail("A_MATCH_IDENTITY_LOST");
-          const scene = AScene.resolve(held, choice, { engine: this.aEngine, ...this.aOptions });
-          if (!scene.ok) return this.fail(scene.code, { terminal: scene.terminal || null });
+          held.sceneSteps = 0;
+          held.differentOwnerStableTicks = 0;
+          held.pendingTerminal = null;
+          this.pending.choice = choice;
+          this.pending.frames = [];
+          this.pending.readyScene = null;
+          return { ok: true, state: this.state, evidence: accepted.evidence, match: held.match, rawInspect: AScene.inspect(held) };
+        }
+        stepScene() {
+          if (this.state !== STATES.SCENE_RUNNING || !this.pending?.submitted) return { ok: false, code: "SCENE_NOT_RUNNING" };
+          const held = this.pending.session;
+          if (held.match !== this.pending.shownMatch) return this.fail("A_MATCH_IDENTITY_LOST");
+          const out = AScene.step(held, this.pending.choice, { engine: this.aEngine, ...this.aOptions, maxSteps: 160 });
+          if (!out.ok) return this.fail(out.code, { steps: out.steps || held.sceneSteps, evidence: out.evidence });
+          this.pending.frames.push(out.rawInspect);
+          if (out.ready) this.pending.readyScene = out.scene;
+          return { ok: true, state: this.state, rawInspect: out.rawInspect, steps: out.steps, differentOwnerStableTicks: out.differentOwnerStableTicks, ready: out.ready, evidence: out.scene?.evidence || held.evidence };
+        }
+        finalizeScene() {
+          if (this.state !== STATES.SCENE_RUNNING || !this.pending?.readyScene) return { ok: false, code: "SCENE_FINAL_FRAME_NOT_READY" };
+          const scene = this.pending.readyScene;
           this.lastScene = scene;
           this.state = STATES.SCENE_COMMIT;
           const patched = Donor.patchBack(this.donor.readState(), scene.canonicalState, scene, this.donorContract);
@@ -727,7 +765,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           this.handoffCount++;
           this.donor.resume();
           this.state = STATES.MACRO_RUNNING;
-          return { ok: true, terminal: scene.terminal, state: this.state, replayAvailable: this.replay.captures.length > 0, sceneFrames: scene.observedFrames || [], displayFrames: scene.displayFrames || [], evidence: scene.evidence };
+          return { ok: true, terminal: scene.terminal, state: this.state, replayAvailable: this.replay.captures.length > 0, sceneFrames: [], displayFrames: [], evidence: scene.evidence };
         }
         fail(code, detail = {}) {
           this.error = code;
@@ -8080,6 +8118,10 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   var lastIdentity = null;
   var retainedSceneId = null;
   var donorAdvanceCalls = 0;
+  var finalFrameRenderedAt = null;
+  var handbackAt = null;
+  var cycleComplete = false;
+  var lastRawFrame = null;
   var selected = null;
   function inspect() {
     return harness && harness.pending && harness.pending.session ? import_hybrid_v48.default.ASceneAdapter.inspect(harness.pending.session) : null;
@@ -8087,45 +8129,41 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   function donorCalls() {
     return donorAdvanceCalls;
   }
-  function showAuthority(label) {
-    $("phase").textContent = label;
-  }
   function renderA(frame, label) {
     renderer.draw(frame, { protagonistId: harness.protagonistId, selectedId: selected, phaseLabel: label });
   }
   function diagnostics() {
-    return { pageStarted: !!harness, interactiveChoicePresent: !!(harness && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && harness.pending.candidates.length), retainedAIdentity: !!(harness && harness.retainedSession && harness.retainedSession.match === lastIdentity), retainedAIdentityMarker: retainedSceneId, frameSampleCount: frameSamples, donorCallCountFrozenDuringA: donorCallsAtHandback === null ? 0 : Math.max(0, donorCallsAtHandback - donorCallsAtDock), handbackComplete: !!(harness && harness.handoffCount), twoPostHandbackDonorCalls: postHandbackCalls >= 2, state: harness ? harness.state : "READY", error: visibleError || harness && harness.error || null, seed: $("seed").value, rendererLineage: renderer.lineage, choice: harness && harness.lastScene ? harness.lastScene.evidence : null };
+    return { pageStarted: !!harness, interactiveChoicePresent: !!(harness && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && harness.pending.candidates.length), retainedAIdentity: !!(harness && harness.retainedSession && harness.retainedSession.match === lastIdentity), retainedAIdentityMarker: retainedSceneId, frameSampleCount: frameSamples, donorCallCountFrozenDuringA: donorCallsAtHandback === null ? 0 : Math.max(0, donorCallsAtHandback - donorCallsAtDock), handbackComplete: !!(harness && harness.handoffCount), twoPostHandbackDonorCalls: postHandbackCalls === 2, cycleComplete, finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), state: harness ? harness.state : "READY", error: visibleError || harness && harness.error || null, seed: $("seed").value, rendererLineage: renderer.lineage, choice: harness && harness.lastScene ? harness.lastScene.evidence : null };
   }
   function render() {
     const d = diagnostics(), boot = $("boot-status");
     $("diag").textContent = JSON.stringify(d, null, 2);
     boot.dataset.error = d.error ? "1" : "0";
-    boot.textContent = d.error ? "Start failed: " + d.error : !harness ? "Ready to start first dock" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "A scene ready · choose SAFE_PASS or PROGRESSIVE_PASS" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A scene executing" : "Donor resumed";
-    $("authority").textContent = harness ? { INTERACTIVE_PENDING: "Donor background paused → A waiting for choice", SCENE_RUNNING: "Donor background paused → A executing", MACRO_RUNNING: d.handbackComplete ? "Donor resumed" : "Donor background ready" }[harness.state] || harness.state : "Not started";
+    boot.textContent = d.error ? "Start failed: " + d.error : !harness ? "Ready to start first dock" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Donor paused · A waiting for exact choice" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A executing live ticks" : "Donor resumed · " + (cycleComplete ? "G1 cycle complete" : "continue donor ×2");
+    $("authority").textContent = harness ? { INTERACTIVE_PENDING: "Donor paused → A waiting for choice (no protagonist autoplay)", SCENE_RUNNING: "Donor paused → SAME retained A live tick/render", MACRO_RUNNING: cycleComplete ? "Same Donor resumed · exactly 2 TEST_ONLY calls complete · G1 cycle complete" : "Same Donor resumed after final A frame · Continue donor ×2" }[harness.state] || harness.state : "Not started";
     if (!harness) return;
     if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) {
       const a = inspect();
-      if (a) renderA(a, "A waiting for choice");
+      if (a) renderA(a, "A waiting for exact choice");
       const buttons = harness.pending.candidates.map((c) => {
         const b = document.createElement("button");
-        b.textContent = c.id + " → target " + c.targetId;
+        b.textContent = c.id + " → " + c.targetRole + " #" + c.targetId;
         b.dataset.choiceId = c.id;
         b.dataset.targetId = String(c.targetId);
         b.onclick = () => choose(c);
         return b;
       });
       $("choices").replaceChildren(...buttons);
-    } else if (harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && harness.lastScene) {
-      const frames = harness.lastScene.displayFrames, a = frames[frames.length - 1];
-      if (a) renderA(a, "Donor resumed after same-object handback");
-      $("choices").textContent = "Handback complete. Continue donor twice to verify retained donor continuation.";
+    } else if (harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && lastRawFrame) {
+      renderA(lastRawFrame, "Final A frame retained · Donor resumed");
+      $("choices").textContent = cycleComplete ? "G1 cycle complete: same Donor advanced exactly 2 TEST_ONLY calls." : "Final A frame displayed; same Donor resumed. Continue donor ×2.";
     }
   }
+  var waitTick = () => new Promise((r) => setTimeout(r, 50));
   async function choose(c) {
     if (!harness || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) return;
     selected = c.targetId;
     $("choices").replaceChildren();
-    showAuthority("Donor background paused → A executing");
     const exact = { choiceId: c.id, targetId: c.targetId, playerId: harness.protagonistId, generation: c.generation, sceneId: c.sceneId, choiceRevision: c.choiceRevision, sourceStateDigest: c.sourceStateDigest };
     let out;
     try {
@@ -8141,19 +8179,34 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       render();
       return;
     }
-    const frames = out.displayFrames || [];
-    if (frames.length < 3) {
-      visibleError = "G1_RENDER_FRAME_MINIMUM_FAILED";
-      render();
-      return;
-    }
-    for (const frame of frames) {
-      frameSamples++;
-      renderA(frame, "A executing · raw retained Match.inspect() frame");
-      await new Promise((r) => setTimeout(r, 18));
-    }
-    lastIdentity = harness.retainedSession.match;
     render();
+    while (harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING) {
+      out = harness.stepScene();
+      if (!out.ok) {
+        visibleError = out.code;
+        render();
+        return;
+      }
+      lastRawFrame = out.rawInspect;
+      frameSamples++;
+      renderA(lastRawFrame, "A executing · raw SAME retained Match.inspect() tick " + out.steps);
+      await waitTick();
+      if (out.ready) {
+        if (frameSamples < 3) {
+          visibleError = "G1_RENDER_FRAME_MINIMUM_FAILED";
+          render();
+          return;
+        }
+        finalFrameRenderedAt = Date.now();
+        await waitTick();
+        out = harness.finalizeScene();
+        handbackAt = Date.now();
+        if (!out.ok) visibleError = out.code;
+        lastIdentity = harness.retainedSession.match;
+        render();
+        return;
+      }
+    }
   }
   function start() {
     visibleError = null;
@@ -8161,6 +8214,10 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     postHandbackCalls = 0;
     donorCallsAtHandback = null;
     donorAdvanceCalls = 0;
+    finalFrameRenderedAt = null;
+    handbackAt = null;
+    cycleComplete = false;
+    lastRawFrame = null;
     selected = null;
     try {
       create($("seed").value);
@@ -8170,24 +8227,25 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (go) donorAdvanceCalls++;
         return originalAdvance();
       };
-      lastIdentity = harness.retainedSession && harness.retainedSession.match;
       const dock = harness.openTestOnlyCurrentDock();
       if (!dock.ok) throw Object.assign(new Error(dock.code), { code: dock.code });
+      lastIdentity = dock.aMatch;
       retainedSceneId = dock.sceneId;
       donorCallsAtDock = donorCalls();
-      renderA(dock.aInspect, "A waiting for choice");
     } catch (e) {
       visibleError = e.code || e.message;
     }
     render();
   }
   function continueDonor() {
-    if (!harness || harness.state !== import_hybrid_v48.default.STATES.MACRO_RUNNING || !harness.handoffCount) return;
+    if (!harness || harness.state !== import_hybrid_v48.default.STATES.MACRO_RUNNING || !harness.handoffCount || cycleComplete) return;
     for (let i = 0; i < 2; i++) {
       const before = donorCalls();
       harness.advanceMacro();
       if (donorCalls() > before) postHandbackCalls++;
     }
+    if (postHandbackCalls !== 2) visibleError = "G1_DONOR_TWO_CALLS_REQUIRED";
+    else cycleComplete = true;
     render();
   }
   $("seed").value = "496001";
