@@ -1,0 +1,3 @@
+FLR_DEV source commit: a57e1c58437c26904452650f949f93fbbf94f425
+Source branch: devworker/v48-g1-browser-counter-fix-1109
+Purpose: V48 G1 FIRST_DOCK user visual test
