@@ -1,0 +1,34 @@
+{
+  "schema": "V48_G1_FIRST_DOCK_BROWSER_TEST_1",
+  "testOnly": true,
+  "rollbackBase": "f318889e0cda0e3d00a2cecd0e6f44dbd5143077",
+  "rendererLineage": "78eba35aea15ba519b443c73d9e4c902d07fe2fa",
+  "donorSha": "ea35bbd3245af9c822f7db5cb359b119fb60ab33",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 716,
+      "sha256": "6f3ed7c1e7c7e4f49dfa758828464b539ae89dd3e7a23be68863b08d43699d37"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.txt",
+      "bytes": 1145,
+      "sha256": "62966f919caff105051c7f98f0e0661e376e651a8c215b58ee716cf41087294c"
+    },
+    {
+      "path": "app.js",
+      "bytes": 381642,
+      "sha256": "31fc007b22e2976818eab5a35b1b85ecc8a61980d43bd1d51ec1bd6e4affd945"
+    },
+    {
+      "path": "index.html",
+      "bytes": 926,
+      "sha256": "26fda14552033cb179188f2bb5d3f41844b1317f77a91fddf632b28ac14db3eb"
+    },
+    {
+      "path": "style.css",
+      "bytes": 562,
+      "sha256": "74db3c0a9c1781783cf0bc9e3a3e5f952da74d13679ab4864a03a5ba56f1aa8f"
+    }
+  ]
+}
