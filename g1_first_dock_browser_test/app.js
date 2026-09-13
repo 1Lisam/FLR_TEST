@@ -619,7 +619,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       "use strict";
       var IMPORTANT = /* @__PURE__ */ new Set(["goal", "save", "claim", "block", "corner", "goalKick", "throwIn", "freeKick", "offside"]);
       function presentTrigger(state, protagonistId) {
-        if (state.ball.ownerId === protagonistId) return { kind: "CONTROLLED_POSSESSION", playerId: protagonistId };
+        if (state.ball.ownerId === protagonistId && state.ball.mode === "controlled") return { kind: "CONTROLLED_POSSESSION", playerId: protagonistId };
         return null;
       }
       function classifyImportant(event) {
@@ -637,7 +637,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       var Choices = require_choice_adapter();
       var AScene = require_a_scene_adapter();
       var { ReplayBuffer } = require_replay_buffer();
-      var { presentTrigger, classifyImportant } = require_scene_trigger();
+      var { IMPORTANT, presentTrigger, classifyImportant } = require_scene_trigger();
       var HOST_SECONDS_PER_DONOR_ITERATION = 1;
       var HOST_HALF_TIME_SECONDS = 45 * 60;
       var HOST_FULL_TIME_SECONDS = 90 * 60;
@@ -654,12 +654,16 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           this.state = STATES.MACRO_RUNNING;
           this.pending = null;
           this.error = null;
+          if (!Number.isInteger(protagonistId)) throw new Error("FIXED_PROTAGONIST_ID_REQUIRED");
+          this.fixedProtagonistId = protagonistId;
           this.hostClock = { label: "V48 Hybrid host match clock", seconds: 0, halfTimeTransitions: 0, fullTimeTransitions: 0 };
           this.handoffCount = 0;
           this.matchId = matchId;
           this.generation = 0;
           this.sceneCounter = 0;
           this.retainedSession = null;
+          this.lastMacroCanonical = null;
+          this.lastMacroEvents = [];
         }
         hostClockStatus() {
           return { ...this.hostClock, half: this.hostClock.seconds < HOST_HALF_TIME_SECONDS ? 1 : 2 };
@@ -682,7 +686,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         }
         openSceneFromCurrent(canonical, trigger = { kind: "G1_CURRENT_CONTROLLED_OWNER", playerId: this.protagonistId }) {
           if (this.state !== STATES.MACRO_RUNNING) return { ok: false, code: "SCENE_OPEN_REQUIRES_MACRO_RUNNING" };
-          if (canonical.ball.ownerId !== this.protagonistId || canonical.ball.mode !== "controlled") return { ok: false, code: "PROTAGONIST_NOT_CURRENT_OWNER" };
+          if (this.protagonistId !== this.fixedProtagonistId) return this.fail("FIXED_PROTAGONIST_ID_MUTATED");
+          if (canonical.ball.ownerId !== this.fixedProtagonistId || canonical.ball.mode !== "controlled") return { ok: false, code: "PROTAGONIST_NOT_CURRENT_OWNER" };
           this.donor.pause();
           const session = this.retainedSession ? AScene.hydrateRetained(this.retainedSession, canonical, { engine: this.aEngine, ...this.aOptions }) : AScene.createRetained(canonical, this.protagonistId, { engine: this.aEngine, ...this.aOptions });
           if (!session.ok) return this.fail(session.code);
@@ -692,13 +697,12 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const aCurrent = AScene.canonicalFromA(shown, { scenePlayerIdMapping: session.mapping });
           const generation = ++this.generation, sceneId = `${this.matchId}:scene:${++this.sceneCounter}`, choiceRevision = 1;
           const sourceStateDigest = JSON.stringify({ players: aCurrent.players.map((p) => [p.id, p.x, p.y]), ball: aCurrent.ball, score: aCurrent.score });
-          const rank = (c) => c.id === "PROGRESSIVE_PASS" ? 2 : c.id === "SAFE_PASS" ? 1 : 0;
-          const byTarget = /* @__PURE__ */ new Map();
-          for (const c of Choices.generate(aCurrent, this.protagonistId).filter((c2) => ["SAFE_PASS", "PROGRESSIVE_PASS"].includes(c2.id) && Number.isInteger(c2.targetId))) {
-            const prior = byTarget.get(c.targetId);
-            if (!prior || rank(c) > rank(prior) || rank(c) === rank(prior) && c.id < prior.id) byTarget.set(c.targetId, c);
+          const byExactTarget = /* @__PURE__ */ new Map();
+          for (const c of Choices.generate(aCurrent, this.fixedProtagonistId).filter((c2) => ["SAFE_PASS", "PROGRESSIVE_PASS"].includes(c2.id) && Number.isInteger(c2.targetId))) {
+            const key = `${c.id}:${c.targetId}`;
+            if (!byExactTarget.has(key)) byExactTarget.set(key, c);
           }
-          const candidates = [...byTarget.values()].sort((a, b) => b.targetId - a.targetId).map((c) => Object.freeze({ ...c, choiceId: c.id, targetRole: aCurrent.players.find((p) => p.id === c.targetId)?.role || "UNKNOWN", generation, sceneId, choiceRevision, sourceStateDigest }));
+          const candidates = [...byExactTarget.values()].sort((a, b) => a.targetId - b.targetId || a.id.localeCompare(b.id)).map((c) => Object.freeze({ ...c, choiceId: c.id, targetRole: aCurrent.players.find((p) => p.id === c.targetId)?.role || "UNKNOWN", generation, sceneId, choiceRevision, sourceStateDigest }));
           if (!candidates.length) return this.fail("G1_NO_EXECUTABLE_GROUNDED_PASS");
           this.pending = { canonical: aCurrent, trigger, candidates, session, shownMatch: session.match, generation, sceneId, choiceRevision, sourceStateDigest, submitted: false };
           this.state = STATES.INTERACTIVE_PENDING;
@@ -709,16 +713,45 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         }
         advanceMacro() {
           if (this.state !== STATES.MACRO_RUNNING) return { ok: false, code: "MACRO_NOT_RUNNING" };
+          if (this.protagonistId !== this.fixedProtagonistId) return this.fail("FIXED_PROTAGONIST_ID_MUTATED");
+          const before = this.lastMacroCanonical || this.observe();
           this.donor.advance();
           const canonical = this.observe();
-          if (this.advanceHostClock()) return { ok: true, fullTime: true, hostClock: this.hostClockStatus() };
+          this.lastMacroCanonical = canonical;
+          const importantEvents = this.observeMacroImportantEvents(before, canonical);
+          if (this.advanceHostClock()) return { ok: true, fullTime: true, hostClock: this.hostClockStatus(), importantEvents };
           const trigger = presentTrigger(canonical, this.protagonistId);
-          if (trigger) return this.openSceneFromCurrent(canonical, trigger);
-          return { ok: true, interactive: false, hostClock: this.hostClockStatus() };
+          if (trigger) {
+            trigger.preChoiceCanonical = before;
+            const opened = this.openSceneFromCurrent(canonical, trigger);
+            return { ...opened, importantEvents };
+          }
+          return { ok: true, interactive: false, hostClock: this.hostClockStatus(), importantEvents };
+        }
+        observeMacroImportantEvents(before, current) {
+          const events = [];
+          if (typeof this.donor.drainEvents === "function") for (const raw of this.donor.drainEvents() || []) {
+            const type = String(raw?.type || raw?.event || "").trim();
+            if (IMPORTANT.has(type)) events.push({ ...raw, type, source: "donor-history" });
+          }
+          for (let team = 0; team < 2; team++) if ((current.score[team] || 0) > (before.score[team] || 0)) events.push({ type: "goal", team, tick: current.tick, clock: current.clock, source: "score-transition" });
+          const unique = [];
+          const seen = /* @__PURE__ */ new Set();
+          for (const event of events) {
+            const key = JSON.stringify([event.type, event.team ?? null, event.tick ?? current.tick, event.clock ?? current.clock]);
+            if (!seen.has(key)) {
+              seen.add(key);
+              unique.push(Object.freeze(event));
+              this.replay.captureImportant(event);
+            }
+          }
+          this.lastMacroEvents = unique;
+          return unique;
         }
         submitAction({ choiceId, targetId = null, aim = null, playerId: playerId2 = this.protagonistId, generation, sceneId, choiceRevision, sourceStateDigest }) {
           if (this.state !== STATES.INTERACTIVE_PENDING || !this.pending) return { ok: false, code: "NO_INTERACTIVE_HANDOFF" };
-          if (playerId2 !== this.protagonistId) return { ok: false, code: "PROTAGONIST_AUTHORITY_REJECTED" };
+          if (this.protagonistId !== this.fixedProtagonistId) return this.fail("FIXED_PROTAGONIST_ID_MUTATED");
+          if (playerId2 !== this.fixedProtagonistId) return { ok: false, code: "PROTAGONIST_AUTHORITY_REJECTED" };
           if (this.pending.submitted || generation !== this.pending.generation || sceneId !== this.pending.sceneId || choiceRevision !== this.pending.choiceRevision || sourceStateDigest !== this.pending.sourceStateDigest) return { ok: false, code: "STALE_OR_DOUBLE_CHOICE_REJECTED" };
           const candidate = this.pending.candidates.find((c) => c.id === choiceId && (c.targetId ?? null) === (targetId ?? null));
           if (!candidate) return { ok: false, code: "EXACT_CHOICE_OR_TARGET_REJECTED" };
@@ -2137,10 +2170,10 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
             return { p, a, travel, departure, corridor, score: travel + departure * 0.35 + (corridor ? 0 : a.span) };
           }).filter((x) => x.corridor && x.travel <= x.a.span * 1.75).sort((a, b) => a.score - b.score || a.p.id - b.p.id);
           const intended = targetId === null ? null : ours.find((p) => p.id === targetId);
-          const selected2 = intended ? [{ p: intended, a: anchors.get(intended.id) }] : candidates.slice(0, 1);
-          const helper = candidates.find((x) => !selected2.some((y) => y.p.id === x.p.id) && x.a.lane !== selected2[0]?.a.lane && x.travel < x.a.span * 1.05);
-          if (helper) selected2.push(helper);
-          for (const item of selected2) publishResponsibility(s, team, item.p, "RECEIVE", local(s, team, predicted.x, predicted.y), "LOOSE_BALL_CLAIM", { subjectId: targetId, region: item.a, releaseReason: "CLAIM_UNTIL_CONTROL_OR_CORRIDOR_EXIT" });
+          const selected = intended ? [{ p: intended, a: anchors.get(intended.id) }] : candidates.slice(0, 1);
+          const helper = candidates.find((x) => !selected.some((y) => y.p.id === x.p.id) && x.a.lane !== selected[0]?.a.lane && x.travel < x.a.span * 1.05);
+          if (helper) selected.push(helper);
+          for (const item of selected) publishResponsibility(s, team, item.p, "RECEIVE", local(s, team, predicted.x, predicted.y), "LOOSE_BALL_CLAIM", { subjectId: targetId, region: item.a, releaseReason: "CLAIM_UNTIL_CONTROL_OR_CORRIDOR_EXIT" });
         }
         function setFacing(p, dx, dy, source) {
           if (Math.hypot(dx, dy) > 0.04) p.facingRadians = Math.atan2(dy, dx);
@@ -3175,7 +3208,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           ctx2.fill();
           ctx2.restore();
         }
-        function draw(inspect2, { protagonistId = null, selectedId = null, phaseLabel = "" } = {}) {
+        function draw(inspect2, { protagonistId = null, selectedId = null, selectableIds: selectableIds2 = [], phaseLabel = "" } = {}) {
           if (!inspect2 || !Array.isArray(inspect2.players) || inspect2.players.length !== 22 || !inspect2.ball) throw new Error("FRL_A_RENDERER_INSPECT_REQUIRED");
           pitch();
           inspect2.players.forEach(drawRecoveryArrow);
@@ -3185,6 +3218,15 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
             ctx2.beginPath();
             ctx2.ellipse(x + 2, y + 4, radius, radius * 0.75, 0, 0, Math.PI * 2);
             ctx2.fill();
+            if (selectableIds2.includes(p.id) && p.id !== selectedId) {
+              ctx2.strokeStyle = "#8ee6a8";
+              ctx2.lineWidth = 2;
+              ctx2.setLineDash([4, 3]);
+              ctx2.beginPath();
+              ctx2.arc(x, y, radius + 5, 0, Math.PI * 2);
+              ctx2.stroke();
+              ctx2.setLineDash([]);
+            }
             if (p.id === protagonistId || p.id === selectedId) {
               ctx2.strokeStyle = "#ffe085";
               ctx2.lineWidth = 2.5;
@@ -7949,7 +7991,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     goalWidth: 90
   };
 
-  // deploy/v48/.g1-first-dock.generated.mjs
+  // deploy/v48/.g1-full-match-loop.generated.mjs
   var import_hybrid_v48 = __toESM(require_hybrid_v48(), 1);
   var import_engine_b_candidate = __toESM(require_engine_b_candidate(), 1);
   var import_historical_frl_a_renderer = __toESM(require_historical_frl_a_renderer(), 1);
@@ -8065,6 +8107,12 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     m.ball.lastTouch = { playerName: scorer.player.playerName, playerID: scorer.id, teamID: donorTeam(m, scoring) };
     (scoring === 0 ? setKickOffTeamGoalScored : setSecondTeamGoalScored)(m);
   }
+  function selectProtagonist(s) {
+    const rank = (p2) => ["ST", "CF"].includes(String(p2.role).toUpperCase()) ? 0 : ["LF", "RF", "LW", "RW"].includes(String(p2.role).toUpperCase()) ? 1 : String(p2.role).toUpperCase() === "GK" ? 3 : 2;
+    const p = s.players.filter((p2) => rank(p2) < 3).sort((a, b) => rank(a) - rank(b) || a.team - b.team || a.id - b.id)[0];
+    if (!p) fail("REAL_PROTAGONIST_UNRESOLVABLE");
+    return p.id;
+  }
   var live;
   var harness;
   function create(seed) {
@@ -8083,9 +8131,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     } };
     const initial = toCanonical(live.match), initialCanonical = import_hybrid_v48.default.DonorAdapter.toCanonical(initial, { pitch: initial.donorPitch }), initialGK = initialCanonical.players.find((p) => p.team === 0 && String(p.role).toUpperCase() === "GK");
     if (!initialGK || Math.abs(initialGK.x) > 0.5 || Math.abs(initialGK.y - 34) > 1) fail("DONOR_AXIS_ORIENTATION_INVALID");
-    const protagonistId = initial.ball.ownerId;
-    if (!Number.isInteger(protagonistId)) fail("G1_INITIAL_CURRENT_OWNER_REQUIRED");
-    mappings = { save: { kind: "controlledPossession", requiresStableControlled: true }, claim: { kind: "controlledPossession", requiresStableControlled: true }, block: { kind: "controlledPossession", requiresStableControlled: true }, goal: { apply(next, scene) {
+    const protagonistId = selectProtagonist(initial), mappings = { save: { kind: "controlledPossession", requiresStableControlled: true }, claim: { kind: "controlledPossession", requiresStableControlled: true }, block: { kind: "controlledPossession", requiresStableControlled: true }, goal: { apply(next, scene) {
       nativeGoal(live, scene, scene.evidence?.playerId);
       next.lastHybridTerminal = "goal";
       return { ok: true, state: next, terminalType: "goal" };
@@ -8111,151 +8157,200 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   }
   var renderer = (0, import_historical_frl_a_renderer.createHistoricalRenderer)(canvas);
   var visibleError = null;
-  var frameSamples = 0;
-  var donorCallsAtDock = 0;
-  var donorCallsAtHandback = null;
-  var postHandbackCalls = 0;
+  var lastRawFrame = null;
   var lastIdentity = null;
-  var retainedSceneId = null;
-  var donorAdvanceCalls = 0;
+  var selectedTargetId = null;
+  var presenting = false;
+  var notice = "";
+  var sceneFrameCount = 0;
+  var preChoiceFrameCount = 0;
   var finalFrameRenderedAt = null;
   var handbackAt = null;
-  var cycleComplete = false;
-  var lastRawFrame = null;
-  var selected = null;
+  var donorAdvanceCalls = 0;
+  var macroEvents = [];
+  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  var CLOCK = (x) => String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0");
   function inspect() {
-    return harness && harness.pending && harness.pending.session ? import_hybrid_v48.default.ASceneAdapter.inspect(harness.pending.session) : null;
+    return harness?.pending?.session ? import_hybrid_v48.default.ASceneAdapter.inspect(harness.pending.session) : null;
   }
-  function donorCalls() {
-    return donorAdvanceCalls;
+  function selectableIds() {
+    return harness?.pending?.candidates ? [...new Set(harness.pending.candidates.map((c) => c.targetId))] : [];
   }
   function renderA(frame, label) {
-    renderer.draw(frame, { protagonistId: harness.protagonistId, selectedId: selected, phaseLabel: label });
+    renderer.draw(frame, { protagonistId: harness.protagonistId, selectedId: selectedTargetId, selectableIds: presenting ? [] : selectableIds(), phaseLabel: label });
   }
   function diagnostics() {
-    return { pageStarted: !!harness, interactiveChoicePresent: !!(harness && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && harness.pending.candidates.length), retainedAIdentity: !!(harness && harness.retainedSession && harness.retainedSession.match === lastIdentity), retainedAIdentityMarker: retainedSceneId, frameSampleCount: frameSamples, donorCallCountFrozenDuringA: donorCallsAtHandback === null ? 0 : Math.max(0, donorCallsAtHandback - donorCallsAtDock), handbackComplete: !!(harness && harness.handoffCount), twoPostHandbackDonorCalls: postHandbackCalls === 2, cycleComplete, finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), state: harness ? harness.state : "READY", error: visibleError || harness && harness.error || null, seed: $("seed").value, rendererLineage: renderer.lineage, choice: harness && harness.lastScene ? harness.lastScene.evidence : null };
+    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hostClock: harness?.hostClockStatus?.().seconds || 0, fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
   }
   function render() {
-    const d = diagnostics(), boot = $("boot-status");
+    const d = diagnostics(), boot = $("boot-status"), a = inspect(), clock = harness?.hostClockStatus?.() || { seconds: 0 };
     $("diag").textContent = JSON.stringify(d, null, 2);
     boot.dataset.error = d.error ? "1" : "0";
-    boot.textContent = d.error ? "Start failed: " + d.error : !harness ? "Ready to start first dock" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Donor paused · A waiting for exact choice" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A executing live ticks" : "Donor resumed · " + (cycleComplete ? "G1 cycle complete" : "continue donor ×2");
-    $("authority").textContent = harness ? { INTERACTIVE_PENDING: "Donor paused → A waiting for choice (no protagonist autoplay)", SCENE_RUNNING: "Donor paused → SAME retained A live tick/render", MACRO_RUNNING: cycleComplete ? "Same Donor resumed · exactly 2 TEST_ONLY calls complete · G1 cycle complete" : "Same Donor resumed after final A frame · Continue donor ×2" }[harness.state] || harness.state : "Not started";
+    if (d.error) boot.textContent = "Match stopped safely: " + d.error;
+    else if (!harness) boot.textContent = "Ready to start full match";
+    else if (harness.state === import_hybrid_v48.default.STATES.FULL_TIME) boot.textContent = "Full time · " + CLOCK(clock.seconds);
+    else if (presenting) boot.textContent = notice;
+    else if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) boot.textContent = "Your touch · tap a highlighted teammate, then choose the exact grounded action";
+    else if (harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING) boot.textContent = "Resolving the chosen action";
+    else boot.textContent = "Match in progress · " + CLOCK(clock.seconds) + " · Donor fast-forward";
+    $("phase").textContent = !harness ? "Not started" : harness.state === import_hybrid_v48.default.STATES.FULL_TIME ? "Full time" : presenting ? "Important situation" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Your decision" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A scene" : "Match in progress";
+    $("authority").textContent = harness?.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Only the fixed protagonist has the ball. Select a green-ring teammate, then the exact pass." : harness?.state === import_hybrid_v48.default.STATES.MACRO_RUNNING ? "The same Donor simulates continuously. Goals and other important events surface without a user choice." : "No protagonist action is selected automatically.";
     if (!harness) return;
-    if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) {
-      const a = inspect();
-      if (a) renderA(a, "A waiting for exact choice");
-      const buttons = harness.pending.candidates.map((c) => {
+    if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && !presenting) {
+      if (a) renderA(a, "Retained A · exact choice pending");
+      const actions = selectedTargetId == null ? [] : harness.pending.candidates.filter((c) => c.targetId === selectedTargetId);
+      if (selectedTargetId == null) $("choices").textContent = "Tap/click one green-ring teammate on the pitch.";
+      else $("choices").replaceChildren(...actions.map((c) => {
         const b = document.createElement("button");
-        b.textContent = c.id + " → " + c.targetRole + " #" + c.targetId;
-        b.dataset.choiceId = c.id;
-        b.dataset.targetId = String(c.targetId);
+        b.textContent = c.id.replaceAll("_", " ") + " → " + c.targetRole + " #" + c.targetId;
         b.onclick = () => choose(c);
         return b;
-      });
-      $("choices").replaceChildren(...buttons);
-    } else if (harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && lastRawFrame) {
-      renderA(lastRawFrame, "Final A frame retained · Donor resumed");
-      $("choices").textContent = cycleComplete ? "G1 cycle complete: same Donor advanced exactly 2 TEST_ONLY calls." : "Final A frame displayed; same Donor resumed. Continue donor ×2.";
-    }
+      }));
+    } else if (harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && !presenting && lastRawFrame) renderA(lastRawFrame, "Final retained A frame · Donor resumed");
   }
-  var waitTick = () => new Promise((r) => setTimeout(r, 50));
+  async function presentDock(opened) {
+    presenting = true;
+    selectedTargetId = null;
+    notice = CLOCK(harness.hostClockStatus().seconds) + " · fixed protagonist received the live ball";
+    render();
+    await wait(260);
+    preChoiceFrameCount++;
+    presenting = false;
+    render();
+  }
+  async function presentEvent(event) {
+    presenting = true;
+    notice = CLOCK(harness.hostClockStatus().seconds) + " · " + String(event.type).replace(/([A-Z])/g, " $1") + " · play continues";
+    render();
+    await wait(550);
+    presenting = false;
+    render();
+  }
   async function choose(c) {
-    if (!harness || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) return;
-    selected = c.targetId;
-    $("choices").replaceChildren();
-    const exact = { choiceId: c.id, targetId: c.targetId, playerId: harness.protagonistId, generation: c.generation, sceneId: c.sceneId, choiceRevision: c.choiceRevision, sourceStateDigest: c.sourceStateDigest };
-    let out;
-    try {
-      out = harness.submitAction(exact);
-    } catch (e) {
-      visibleError = e.code || e.message;
-      render();
-      return;
-    }
-    donorCallsAtHandback = donorCalls();
+    if (!harness || presenting || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING || c.targetId !== selectedTargetId) return;
+    const out = harness.submitAction({ choiceId: c.id, targetId: c.targetId, playerId: harness.fixedProtagonistId, generation: c.generation, sceneId: c.sceneId, choiceRevision: c.choiceRevision, sourceStateDigest: c.sourceStateDigest });
     if (!out.ok) {
       visibleError = out.code;
       render();
       return;
     }
+    sceneFrameCount = 0;
     render();
     while (harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING) {
-      out = harness.stepScene();
-      if (!out.ok) {
-        visibleError = out.code;
+      const step = harness.stepScene();
+      if (!step.ok) {
+        visibleError = step.code;
         render();
         return;
       }
-      lastRawFrame = out.rawInspect;
-      frameSamples++;
-      renderA(lastRawFrame, "A executing · raw SAME retained Match.inspect() tick " + out.steps);
-      await waitTick();
-      if (out.ready) {
-        if (frameSamples < 3) {
-          visibleError = "G1_RENDER_FRAME_MINIMUM_FAILED";
+      lastRawFrame = step.rawInspect;
+      sceneFrameCount++;
+      renderA(lastRawFrame, "Retained A executing live tick " + step.steps);
+      await wait(45);
+      if (step.ready) {
+        if (sceneFrameCount < 3) {
+          visibleError = "G1_SCENE_MINIMUM_VISIBLE_TICKS_FAILED";
           render();
           return;
         }
         finalFrameRenderedAt = Date.now();
-        await waitTick();
-        out = harness.finalizeScene();
+        renderA(lastRawFrame, "Final retained A frame before Donor handback");
+        await wait(45);
+        const final = harness.finalizeScene();
         handbackAt = Date.now();
-        if (!out.ok) visibleError = out.code;
-        lastIdentity = harness.retainedSession.match;
+        if (!final.ok) visibleError = final.code;
+        lastIdentity = harness.retainedSession?.match || null;
+        selectedTargetId = null;
         render();
         return;
       }
     }
   }
+  function installDonorEventDrain() {
+    let seen = live.match?.iterationLog?.length || 0, pending = [];
+    const advance = live.advance.bind(live);
+    live.advance = function() {
+      const before = !this.paused;
+      const out = advance();
+      if (before) donorAdvanceCalls++;
+      const log = live.match?.iterationLog || [];
+      for (const item of log.slice(seen)) {
+        const text = String(item?.type || item?.event || item);
+        const type = /goal scored/i.test(text) ? "goal" : /corner/i.test(text) ? "corner" : /goal kick/i.test(text) ? "goalKick" : /throw in/i.test(text) ? "throwIn" : /freekick|free kick/i.test(text) ? "freeKick" : /ball saved/i.test(text) ? "save" : null;
+        if (type) pending.push({ type, tick: live.match.iteration, clock: live.match.time, source: "donor-history" });
+      }
+      seen = log.length;
+      return out;
+    };
+    live.drainEvents = () => {
+      const out = pending;
+      pending = [];
+      return out;
+    };
+  }
+  function macroTick() {
+    if (!harness || presenting || visibleError || harness.state !== import_hybrid_v48.default.STATES.MACRO_RUNNING) return;
+    for (let i = 0; i < 12 && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING; i++) {
+      const out = harness.advanceMacro();
+      macroEvents = out.importantEvents || [];
+      if (!out.ok) {
+        visibleError = out.code;
+        break;
+      }
+      if (out.interactive) {
+        lastIdentity = out.aMatch;
+        void presentDock(out);
+        break;
+      }
+      if (macroEvents.length) {
+        void presentEvent(macroEvents[0]);
+        break;
+      }
+    }
+    render();
+  }
   function start() {
     visibleError = null;
-    frameSamples = 0;
-    postHandbackCalls = 0;
-    donorCallsAtHandback = null;
-    donorAdvanceCalls = 0;
+    lastRawFrame = null;
+    lastIdentity = null;
+    selectedTargetId = null;
+    presenting = false;
+    notice = "";
+    sceneFrameCount = 0;
+    preChoiceFrameCount = 0;
     finalFrameRenderedAt = null;
     handbackAt = null;
-    cycleComplete = false;
-    lastRawFrame = null;
-    selected = null;
+    donorAdvanceCalls = 0;
+    macroEvents = [];
     try {
       create($("seed").value);
-      const originalAdvance = live.advance.bind(live);
-      live.advance = function() {
-        const go = !this.paused;
-        if (go) donorAdvanceCalls++;
-        return originalAdvance();
-      };
-      const dock = harness.openTestOnlyCurrentDock();
-      if (!dock.ok) throw Object.assign(new Error(dock.code), { code: dock.code });
-      lastIdentity = dock.aMatch;
-      retainedSceneId = dock.sceneId;
-      donorCallsAtDock = donorCalls();
+      installDonorEventDrain();
     } catch (e) {
       visibleError = e.code || e.message;
     }
     render();
   }
-  function continueDonor() {
-    if (!harness || harness.state !== import_hybrid_v48.default.STATES.MACRO_RUNNING || !harness.handoffCount || cycleComplete) return;
-    for (let i = 0; i < 2; i++) {
-      const before = donorCalls();
-      harness.advanceMacro();
-      if (donorCalls() > before) postHandbackCalls++;
+  canvas.addEventListener("pointerdown", (event) => {
+    if (!harness || presenting || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) return;
+    const a = inspect(), rect = canvas.getBoundingClientRect(), x = (event.clientX - rect.left) * canvas.width / rect.width, y = (event.clientY - rect.top) * canvas.height / rect.height, px = (x - 42) / 7.25, py = (y - 42) / 7.25, allowed = new Set(selectableIds()), hit = a?.players.filter((p) => allowed.has(p.id)).sort((l, r) => Math.hypot(l.x - px, l.y - py) - Math.hypot(r.x - px, r.y - py))[0];
+    if (hit && Math.hypot(hit.x - px, hit.y - py) <= 3) {
+      selectedTargetId = hit.id;
+      render();
     }
-    if (postHandbackCalls !== 2) visibleError = "G1_DONOR_TWO_CALLS_REQUIRED";
-    else cycleComplete = true;
-    render();
-  }
+  });
   $("seed").value = "496001";
   $("start").onclick = start;
-  $("continue").onclick = continueDonor;
-  window.__V48_G1_FIRST_DOCK_TEST_ONLY__ = Object.freeze({ status: diagnostics, start, select(choiceId, targetId) {
-    const c = harness && harness.pending && harness.pending.candidates.find((x) => x.id === choiceId && x.targetId === targetId);
+  window.__V48_G1_FULL_MATCH_LOOP_TEST_ONLY__ = Object.freeze({ status: diagnostics, start, selectTarget(id) {
+    if (!selectableIds().includes(id)) throw Error("G1_TARGET_NOT_SELECTABLE");
+    selectedTargetId = id;
+    render();
+  }, select(choiceId, targetId) {
+    const c = harness?.pending?.candidates.find((x) => x.id === choiceId && x.targetId === targetId);
     if (!c) throw Error("G1_TEST_HOOK_EXACT_CHOICE_NOT_PRESENT");
+    selectedTargetId = targetId;
     return choose(c);
-  }, continueDonor });
+  } });
   if (new URLSearchParams(location.search).get("autostart") === "1") start();
   render();
+  setInterval(macroTick, 120);
 })();

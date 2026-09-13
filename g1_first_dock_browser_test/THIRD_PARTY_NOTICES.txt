@@ -1,7 +1,4 @@
-footballsim pinned ea35bbd3245af9c822f7db5cb359b119fb60ab33
-MIT License
-
-MIT License
+footballsim pinned ea35bbd3245af9c822f7db5cb359b119fb60ab33\nMIT License\n\nMIT License
 
 Copyright (c) 2018 Aiden Gallagher
 
