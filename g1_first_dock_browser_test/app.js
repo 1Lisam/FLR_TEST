@@ -96,7 +96,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       "use strict";
       var Canonical = require_canonical_match_state();
       var terminalTypes = /* @__PURE__ */ new Set(["goal", "save", "claim", "block", "corner", "goalKick", "throwIn", "freeKick", "offside"]);
-      var CONTROLLED_TERMINALS = /* @__PURE__ */ new Set(["controlledPossession", "save", "claim", "block"]);
+      var CONTROLLED_TERMINALS = /* @__PURE__ */ new Set(["controlledPossession", "importanceDecay", "save", "claim", "block"]);
       function configOf(contract) {
         return { pitch: contract.pitch || { length: 105, width: 68 }, playerIdMap: contract.playerIdMap || {}, terminalMappings: contract.terminalMappings || {} };
       }
@@ -133,19 +133,22 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       function stableControlled(canonicalState) {
         return canonicalState.ball.ownerId != null && canonicalState.ball.mode === "controlled" && canonicalState.possessionTeam != null;
       }
+      function reconcileClock(donorClock, temporal = null) {
+        if (!temporal || !Number.isFinite(temporal.sceneEntryClock) || !Number.isFinite(temporal.elapsedSceneSeconds)) return donorClock;
+        return Math.max(donorClock, temporal.sceneEntryClock + Math.max(0, temporal.elapsedSceneSeconds));
+      }
       function patchBack(donorState, canonicalState, sceneResult, contract = {}) {
         Canonical.validate(canonicalState);
         if (!sceneResult || !sceneResult.terminal || !sceneResult.terminal.type) throw new Error("ADAPTER_SCENE_TERMINAL_REQUIRED");
         const type = sceneResult.terminal.type;
-        if (!terminalTypes.has(type) && type !== "controlledPossession") throw new Error(`ADAPTER_UNSUPPORTED_TERMINAL:${type}`);
-        const mapping = type === "controlledPossession" ? { kind: "controlledPossession", requiresStableControlled: true } : configOf(contract).terminalMappings[type];
+        if (!terminalTypes.has(type) && type !== "controlledPossession" && type !== "importanceDecay") throw new Error(`ADAPTER_UNSUPPORTED_TERMINAL:${type}`);
+        const mapping = type === "controlledPossession" || type === "importanceDecay" ? { kind: "controlledPossession", requiresStableControlled: true } : configOf(contract).terminalMappings[type];
         if (!mapping) return { ok: false, code: terminalFailureCode(type), terminalType: type, terminalContract: "UNMAPPED_FAIL_CLOSED" };
         if (mapping.kind === "unsupported") return { ok: false, code: mapping.code || terminalFailureCode(type), terminalType: type, terminalContract: "INTENTIONALLY_UNSUPPORTED" };
         if ((mapping.requiresStableControlled || CONTROLLED_TERMINALS.has(type)) && !stableControlled(canonicalState)) return { ok: false, code: `ADAPTER_${String(type).replace(/([A-Z])/g, "_$1").toUpperCase()}_CONTROLLED_BOUNDARY_UNSAFE`, terminalType: type, terminalContract: "CONTROLLED_PATCH_REJECTED" };
         const c = configOf(contract), next = JSON.parse(JSON.stringify(donorState));
         next.score = [...canonicalState.score];
-        next.tick = canonicalState.tick;
-        next.clock = canonicalState.clock;
+        next.clock = reconcileClock(next.clock, contract.timeReconciliation);
         next.possessionTeam = canonicalState.possessionTeam;
         next.players = next.players.map((p) => {
           const cp = canonicalState.players.find((q) => q.id === canonicalId(c.playerIdMap, p.id));
@@ -158,7 +161,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         next.lastHybridTerminal = type;
         return { ok: true, state: next, terminalType: type };
       }
-      module.exports = Object.freeze({ toCanonical: toCanonical2, toDonorCoordinates, patchBack, canonicalId, donorId, terminalFailureCode, terminalTypes: new Set(terminalTypes) });
+      module.exports = Object.freeze({ toCanonical: toCanonical2, toDonorCoordinates, patchBack, canonicalId, donorId, terminalFailureCode, terminalTypes: new Set(terminalTypes), reconcileClock });
     }
   });
 
@@ -401,6 +404,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       var Canonical = require_canonical_match_state();
       var SUPPORTED = /* @__PURE__ */ new Set(["PASS", "PROGRESSIVE_PASS", "THROUGH_PASS", "SAFE_PASS", "CARRY", "SHOT"]);
       var TERMINALS = /* @__PURE__ */ new Set(["goal", "save", "claim", "block", "corner", "goalKick", "throwIn", "freeKick", "offside"]);
+      var OPEN_PLAY_DECAY = Object.freeze({ minimumSceneTicks: 12, stableOtherOwnerTicks: 8, protagonistDistance: 6 });
+      var SCENE_END_POLICY = Object.freeze({ hardSafetySteps: 160, nearCeilingActionTicks: 12 });
       var copy = Canonical.clone;
       function actionFor(choice) {
         if (!choice || !SUPPORTED.has(choice.choiceId || choice.id)) throw new Error("SCENE_NOT_IMPLEMENTED");
@@ -490,6 +495,13 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (["save", "claim", "block"].includes(terminal.type)) return inspect3.ball.owner !== null && !inspect3.ball.flight;
         return inspect3.phase !== "play" || inspect3.ball.owner !== null && !inspect3.ball.flight;
       }
+      function safetyStepLimit(session, options = {}) {
+        const hard = Math.min(options.maxSteps || SCENE_END_POLICY.hardSafetySteps, SCENE_END_POLICY.hardSafetySteps), lastChoice = session.lastChoiceStep || 0;
+        return lastChoice >= hard - SCENE_END_POLICY.nearCeilingActionTicks ? Math.max(hard, lastChoice + SCENE_END_POLICY.nearCeilingActionTicks) : hard;
+      }
+      function safeOpenPlayBoundary(inspect3, canonical) {
+        return !!canonical && inspectInBounds(inspect3) && inspect3.phase === "play" && inspect3.ball.owner !== null && !inspect3.ball.flight && canonical.ball.mode === "controlled";
+      }
       function begin(canonical, protagonistId, options = {}) {
         Canonical.validate(canonical);
         if (canonical.ball.ownerId !== protagonistId) return { ok: false, code: "PROTAGONIST_NOT_CURRENT_OWNER" };
@@ -502,8 +514,10 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       }
       function createRetained(canonical, protagonistId, options = {}) {
         const rawTemplate = sceneTemplate(options), mapping = buildScenePlayerIdMapping(canonical, rawTemplate, options);
-        const match = new options.engine.Match(options.seed || "v48-g1-retained");
-        return hydrateRetained({ ok: true, match, mapping, protagonistId, submitted: false, retained: true, hydrations: 0 }, canonical, options);
+        const fixture = makeSceneState(canonical, { ...options, template: rawTemplate, scenePlayerIdMapping: mapping });
+        const match = options.engine.Match.restore(fixture), shown = match.inspect();
+        if (!inspectInBounds(shown)) return { ok: false, code: "A_BEGIN_OUT_OF_BOUNDS" };
+        return { ok: true, match, mapping, protagonistId, initialInspect: shown, submitted: false, retained: true, hydrations: 0 };
       }
       function hydrateRetained(session, canonical, options = {}) {
         Canonical.validate(canonical);
@@ -538,31 +552,44 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       }
       function step(session, choice, options = {}) {
         if (!session?.submitted) return { ok: false, code: "A_SESSION_NOT_SUBMITTED" };
-        const max = Math.min(options.maxSteps || 160, 160);
-        if (session.sceneSteps >= max) return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence };
+        const max = safetyStepLimit(session, options);
         if (!session.match.advance()) return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence };
         session.sceneSteps = (session.sceneSteps || 0) + 1;
         const rawInspect = session.match.inspect(), events = session.match.eventsSince(session.startEvents), observed = terminalFromEvents([...events].reverse());
         const canonical = inspectInBounds(rawInspect) ? canonicalFromA(rawInspect, { scenePlayerIdMapping: session.mapping }) : null;
         if (observed) session.pendingTerminal = observed;
-        const owner = rawInspect.ball.owner;
+        const owner = rawInspect.ball.owner, aProtagonistId = session.mapping.aForCanonical(session.protagonistId);
         const differentControlled = rawInspect.phase === "play" && owner !== null && owner !== session.mapping.aForCanonical(session.protagonistId) && !rawInspect.ball.flight && inspectInBounds(rawInspect);
         session.differentOwnerStableTicks = differentControlled ? (session.differentOwnerStableTicks || 0) + 1 : 0;
+        const protagonistControlled = rawInspect.phase === "play" && owner === aProtagonistId && !rawInspect.ball.flight && inspectInBounds(rawInspect);
+        if (protagonistControlled && session.sceneSteps > (session.lastChoiceStep || 0)) {
+          session.match.pause();
+          session.submitted = false;
+          return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, differentOwnerStableTicks: 0, choiceReady: true, receipt: { ownerId: session.protagonistId, atStep: session.sceneSteps }, ready: false, evidence: session.evidence };
+        }
         let terminal = null;
         if (session.pendingTerminal && terminalBoundaryReady(rawInspect, session.pendingTerminal)) terminal = session.pendingTerminal;
-        else if (session.sceneSteps >= 3 && session.differentOwnerStableTicks >= 2) terminal = { type: "controlledPossession", ownerId: session.mapping.canonicalForA(owner) };
+        else if (differentControlled && session.sceneSteps >= OPEN_PLAY_DECAY.minimumSceneTicks && session.differentOwnerStableTicks >= OPEN_PLAY_DECAY.stableOtherOwnerTicks) {
+          const protagonist = rawInspect.players.find((p) => p.id === aProtagonistId);
+          const distance = protagonist ? Math.hypot(protagonist.x - rawInspect.ball.x, protagonist.y - rawInspect.ball.y) : Infinity;
+          if (distance >= OPEN_PLAY_DECAY.protagonistDistance) terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(owner), rule: "settled-other-owner-away-from-protagonist", distance };
+        }
+        if (!terminal && session.sceneSteps >= max && safeOpenPlayBoundary(rawInspect, canonical)) {
+          terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(rawInspect.ball.owner), rule: "cumulative-safety-ceiling-current-open-play", hardSafetySteps: Math.min(options.maxSteps || SCENE_END_POLICY.hardSafetySteps, SCENE_END_POLICY.hardSafetySteps), selectedActionResolutionTicks: session.sceneSteps - (session.lastChoiceStep || 0) };
+        }
         const scene = terminal && canonical ? { ok: true, terminal, canonicalState: canonical, steps: session.sceneSteps, evidence: session.evidence, match: session.match } : null;
-        if (!scene && session.sceneSteps >= max) return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence, rawInspect, steps: session.sceneSteps };
         return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, differentOwnerStableTicks: session.differentOwnerStableTicks || 0, ready: !!scene, scene };
       }
       function resolve(session, choice, options = {}) {
         if (!session?.submitted) return { ok: false, code: "A_SESSION_NOT_SUBMITTED" };
         const observedFrames = [], displayFrames = [];
-        for (let i = 0; i < Math.min(options.maxSteps || 160, 160); i++) {
+        const stepBudget = safetyStepLimit(session, options) - (session.sceneSteps || 0);
+        for (let i = 0; i < stepBudget; i++) {
           const out = step(session, choice, options);
           if (!out.ok) return { ...out, observedFrames, displayFrames };
           displayFrames.push(copy(out.rawInspect));
           if (out.canonicalState) observedFrames.push(out.canonicalState);
+          if (out.choiceReady) return { ok: false, code: "SCENE_AWAITING_PROTAGONIST_CHOICE", choiceReady: true, rawInspect: out.rawInspect, canonicalState: out.canonicalState, observedFrames, displayFrames };
           if (out.ready) return { ...out.scene, observedFrames, displayFrames };
         }
         return { ok: false, code: "SCENE_UNRESOLVED_FAIL_CLOSED", evidence: session.evidence, observedFrames, displayFrames };
@@ -574,7 +601,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (!accepted.ok) return { ...accepted, evidence: accepted.evidence || retained.evidence };
         return resolve(retained, choice, options);
       }
-      module.exports = Object.freeze({ SUPPORTED, TERMINALS, makeSceneState, canonicalFromA, buildScenePlayerIdMapping, begin, createRetained, hydrateRetained, inspect: inspect2, submit, step, resolve, run, actionFor, terminalFromEvents, inspectInBounds });
+      module.exports = Object.freeze({ SUPPORTED, TERMINALS, OPEN_PLAY_DECAY, SCENE_END_POLICY, makeSceneState, canonicalFromA, buildScenePlayerIdMapping, begin, createRetained, hydrateRetained, inspect: inspect2, submit, step, resolve, run, actionFor, terminalFromEvents, inspectInBounds });
     }
   });
 
@@ -656,7 +683,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           this.error = null;
           if (!Number.isInteger(protagonistId)) throw new Error("FIXED_PROTAGONIST_ID_REQUIRED");
           this.fixedProtagonistId = protagonistId;
-          this.hostClock = { label: "V48 Hybrid host match clock", seconds: 0, halfTimeTransitions: 0, fullTimeTransitions: 0 };
+          this.hostClock = { label: "V48 hidden macro lifecycle clock", seconds: 0, halfTimeTransitions: 0, fullTimeTransitions: 0 };
+          this.visibleClock = { seconds: null, mode: "MATCH_IN_PROGRESS", source: null };
           this.handoffCount = 0;
           this.matchId = matchId;
           this.generation = 0;
@@ -667,6 +695,29 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         }
         hostClockStatus() {
           return { ...this.hostClock, half: this.hostClock.seconds < HOST_HALF_TIME_SECONDS ? 1 : 2 };
+        }
+        visibleClockStatus() {
+          return { ...this.visibleClock };
+        }
+        surfaceClock(canonical, source) {
+          if (Number.isFinite(canonical?.clock)) this.visibleClock = { seconds: canonical.clock, mode: source === "scene" ? "LIVE_A_SCENE" : "TIMESTAMP", source };
+        }
+        sceneClockAnchor(canonical, inspect2) {
+          if (!Number.isFinite(canonical?.clock) || !Number.isFinite(inspect2?.time)) throw new Error("SCENE_TIME_ANCHOR_REQUIRED");
+          return Object.freeze({ absoluteClock: canonical.clock, aLocalTime: inspect2.time, aLocalTick: inspect2.tick, localSecondsToMatchSeconds: 1 });
+        }
+        sceneElapsedSeconds(inspect2, anchor = this.pending?.timeAnchor) {
+          if (!anchor || !Number.isFinite(inspect2?.time)) return 0;
+          return Math.max(0, (inspect2.time - anchor.aLocalTime) * anchor.localSecondsToMatchSeconds);
+        }
+        surfaceSceneClock(inspect2) {
+          const anchor = this.pending?.timeAnchor, elapsed = this.sceneElapsedSeconds(inspect2, anchor);
+          if (anchor) this.visibleClock = { seconds: anchor.absoluteClock + elapsed, mode: "LIVE_A_SCENE", source: "scene" };
+          return this.visibleClockStatus();
+        }
+        macroClockStatus() {
+          this.visibleClock = { seconds: null, mode: "MATCH_IN_PROGRESS", source: null };
+          return this.visibleClockStatus();
         }
         advanceHostClock() {
           this.hostClock.seconds = Math.min(HOST_FULL_TIME_SECONDS, this.hostClock.seconds + HOST_SECONDS_PER_DONOR_ITERATION);
@@ -684,6 +735,14 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           this.replay.append({ tick: canonical.tick, clock: canonical.clock, score: canonical.score, ball: canonical.ball, players: canonical.players.map((p) => ({ id: p.id, x: p.x, y: p.y })) });
           return canonical;
         }
+        candidatesFor(aCurrent, generation, sceneId, choiceRevision, sourceStateDigest) {
+          const byExactTarget = /* @__PURE__ */ new Map();
+          for (const c of Choices.generate(aCurrent, this.fixedProtagonistId).filter((c2) => ["SAFE_PASS", "PROGRESSIVE_PASS"].includes(c2.id) && Number.isInteger(c2.targetId))) {
+            const key = `${c.id}:${c.targetId}`;
+            if (!byExactTarget.has(key)) byExactTarget.set(key, c);
+          }
+          return [...byExactTarget.values()].sort((a, b) => a.targetId - b.targetId || a.id.localeCompare(b.id)).map((c) => Object.freeze({ ...c, choiceId: c.id, targetRole: aCurrent.players.find((p) => p.id === c.targetId)?.role || "UNKNOWN", generation, sceneId, choiceRevision, sourceStateDigest }));
+        }
         openSceneFromCurrent(canonical, trigger = { kind: "G1_CURRENT_CONTROLLED_OWNER", playerId: this.protagonistId }) {
           if (this.state !== STATES.MACRO_RUNNING) return { ok: false, code: "SCENE_OPEN_REQUIRES_MACRO_RUNNING" };
           if (this.protagonistId !== this.fixedProtagonistId) return this.fail("FIXED_PROTAGONIST_ID_MUTATED");
@@ -696,17 +755,14 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           if (!AScene.inspectInBounds(shown) || shown.players.length !== 22) return this.fail("A_HANDOFF_RENDER_CONTRACT_FAILED");
           const aCurrent = AScene.canonicalFromA(shown, { scenePlayerIdMapping: session.mapping });
           const generation = ++this.generation, sceneId = `${this.matchId}:scene:${++this.sceneCounter}`, choiceRevision = 1;
-          const sourceStateDigest = JSON.stringify({ players: aCurrent.players.map((p) => [p.id, p.x, p.y]), ball: aCurrent.ball, score: aCurrent.score });
-          const byExactTarget = /* @__PURE__ */ new Map();
-          for (const c of Choices.generate(aCurrent, this.fixedProtagonistId).filter((c2) => ["SAFE_PASS", "PROGRESSIVE_PASS"].includes(c2.id) && Number.isInteger(c2.targetId))) {
-            const key = `${c.id}:${c.targetId}`;
-            if (!byExactTarget.has(key)) byExactTarget.set(key, c);
-          }
-          const candidates = [...byExactTarget.values()].sort((a, b) => a.targetId - b.targetId || a.id.localeCompare(b.id)).map((c) => Object.freeze({ ...c, choiceId: c.id, targetRole: aCurrent.players.find((p) => p.id === c.targetId)?.role || "UNKNOWN", generation, sceneId, choiceRevision, sourceStateDigest }));
+          const sourceStateDigest = JSON.stringify({ tick: aCurrent.tick, players: aCurrent.players.map((p) => [p.id, p.x, p.y]), ball: aCurrent.ball, score: aCurrent.score });
+          const candidates = this.candidatesFor(aCurrent, generation, sceneId, choiceRevision, sourceStateDigest);
           if (!candidates.length) return this.fail("G1_NO_EXECUTABLE_GROUNDED_PASS");
-          this.pending = { canonical: aCurrent, trigger, candidates, session, shownMatch: session.match, generation, sceneId, choiceRevision, sourceStateDigest, submitted: false };
+          const timeAnchor = this.sceneClockAnchor(canonical, shown);
+          this.pending = { canonical: aCurrent, trigger, candidates, session, shownMatch: session.match, generation, sceneId, choiceRevision, sourceStateDigest, timeAnchor, submitted: false };
           this.state = STATES.INTERACTIVE_PENDING;
-          return { ok: true, interactive: true, candidates, aInspect: shown, aMatch: session.match, hostClock: this.hostClockStatus(), generation, sceneId, choiceRevision, sourceStateDigest };
+          this.surfaceSceneClock(shown);
+          return { ok: true, interactive: true, candidates, aInspect: shown, aMatch: session.match, hostClock: this.hostClockStatus(), visibleClock: this.visibleClockStatus(), generation, sceneId, choiceRevision, sourceStateDigest };
         }
         openTestOnlyCurrentDock() {
           return this.openSceneFromCurrent(this.observe(), { kind: "G1_TEST_ONLY_CURRENT_DOCK", playerId: this.protagonistId });
@@ -719,14 +775,15 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const canonical = this.observe();
           this.lastMacroCanonical = canonical;
           const importantEvents = this.observeMacroImportantEvents(before, canonical);
-          if (this.advanceHostClock()) return { ok: true, fullTime: true, hostClock: this.hostClockStatus(), importantEvents };
+          if (this.advanceHostClock()) return { ok: true, fullTime: true, hostClock: this.hostClockStatus(), visibleClock: this.macroClockStatus(), importantEvents };
+          if (importantEvents.length) this.surfaceClock(canonical, "event");
           const trigger = presentTrigger(canonical, this.protagonistId);
           if (trigger) {
             trigger.preChoiceCanonical = before;
             const opened = this.openSceneFromCurrent(canonical, trigger);
             return { ...opened, importantEvents };
           }
-          return { ok: true, interactive: false, hostClock: this.hostClockStatus(), importantEvents };
+          return { ok: true, interactive: false, hostClock: this.hostClockStatus(), visibleClock: this.macroClockStatus(), importantEvents };
         }
         observeMacroImportantEvents(before, current) {
           const events = [];
@@ -765,12 +822,14 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const accepted = AScene.submit(held, choice, { engine: this.aEngine, ...this.aOptions });
           if (!accepted.ok) return this.fail(accepted.code);
           if (accepted.match !== this.pending.shownMatch) return this.fail("A_MATCH_IDENTITY_LOST");
-          held.sceneSteps = 0;
+          held.sceneSteps = held.sceneSteps || 0;
+          held.lastChoiceStep = held.sceneSteps;
           held.differentOwnerStableTicks = 0;
           held.pendingTerminal = null;
           this.pending.choice = choice;
-          this.pending.frames = [];
+          this.pending.frames = this.pending.frames || [];
           this.pending.readyScene = null;
+          this.surfaceSceneClock(AScene.inspect(held));
           return { ok: true, state: this.state, evidence: accepted.evidence, match: held.match, rawInspect: AScene.inspect(held) };
         }
         stepScene() {
@@ -780,15 +839,30 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const out = AScene.step(held, this.pending.choice, { engine: this.aEngine, ...this.aOptions, maxSteps: 160 });
           if (!out.ok) return this.fail(out.code, { steps: out.steps || held.sceneSteps, evidence: out.evidence });
           this.pending.frames.push(out.rawInspect);
+          this.surfaceSceneClock(out.rawInspect);
           if (out.ready) this.pending.readyScene = out.scene;
-          return { ok: true, state: this.state, rawInspect: out.rawInspect, steps: out.steps, differentOwnerStableTicks: out.differentOwnerStableTicks, ready: out.ready, evidence: out.scene?.evidence || held.evidence };
+          if (out.choiceReady) return this.openRetainedChoice(out);
+          return { ok: true, state: this.state, rawInspect: out.rawInspect, steps: out.steps, differentOwnerStableTicks: out.differentOwnerStableTicks, ready: out.ready, evidence: out.scene?.evidence || held.evidence, visibleClock: this.visibleClockStatus() };
+        }
+        openRetainedChoice(out) {
+          const held = this.pending.session;
+          if (held.match !== this.pending.shownMatch) return this.fail("A_MATCH_IDENTITY_LOST");
+          const aCurrent = out.canonicalState, generation = ++this.generation, choiceRevision = this.pending.choiceRevision + 1, sceneId = this.pending.sceneId;
+          const sourceStateDigest = JSON.stringify({ tick: aCurrent.tick, players: aCurrent.players.map((p) => [p.id, p.x, p.y]), ball: aCurrent.ball, score: aCurrent.score });
+          const candidates = this.candidatesFor(aCurrent, generation, sceneId, choiceRevision, sourceStateDigest);
+          if (!candidates.length) return this.fail("G1_NO_EXECUTABLE_GROUNDED_PASS");
+          this.pending = { ...this.pending, canonical: aCurrent, candidates, generation, choiceRevision, sourceStateDigest, submitted: false, choice: null, readyScene: null, receipt: out.receipt };
+          this.state = STATES.INTERACTIVE_PENDING;
+          this.surfaceSceneClock(out.rawInspect);
+          return { ok: true, interactive: true, chained: true, state: this.state, candidates, aMatch: held.match, generation, sceneId, choiceRevision, sourceStateDigest, rawInspect: out.rawInspect, receipt: out.receipt, visibleClock: this.visibleClockStatus() };
         }
         finalizeScene() {
           if (this.state !== STATES.SCENE_RUNNING || !this.pending?.readyScene) return { ok: false, code: "SCENE_FINAL_FRAME_NOT_READY" };
           const scene = this.pending.readyScene;
           this.lastScene = scene;
+          const finalInspect = AScene.inspect(this.pending.session), elapsedSceneSeconds = this.sceneElapsedSeconds(finalInspect), timeReconciliation = { sceneEntryClock: this.pending.timeAnchor.absoluteClock, elapsedSceneSeconds };
           this.state = STATES.SCENE_COMMIT;
-          const patched = Donor.patchBack(this.donor.readState(), scene.canonicalState, scene, this.donorContract);
+          const patched = Donor.patchBack(this.donor.readState(), scene.canonicalState, scene, { ...this.donorContract, timeReconciliation });
           if (!patched.ok) return this.fail(patched.code, { terminal: scene.terminal, terminalType: patched.terminalType, terminalContract: patched.terminalContract });
           if (typeof this.donor.patchState !== "function") return this.fail("DONOR_PATCH_CONTRACT_REQUIRED", { terminal: scene.terminal });
           this.donor.patchState(patched.state);
@@ -798,7 +872,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           this.handoffCount++;
           this.donor.resume();
           this.state = STATES.MACRO_RUNNING;
-          return { ok: true, terminal: scene.terminal, state: this.state, replayAvailable: this.replay.captures.length > 0, sceneFrames: [], displayFrames: [], evidence: scene.evidence };
+          this.macroClockStatus();
+          return { ok: true, terminal: scene.terminal, state: this.state, replayAvailable: this.replay.captures.length > 0, sceneFrames: [], displayFrames: [], evidence: scene.evidence, timeReconciliation, visibleClock: this.visibleClockStatus() };
         }
         fail(code, detail = {}) {
           this.error = code;
@@ -8229,23 +8304,29 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     if (visibleError) return;
     renderer.draw(frame, { protagonistId: harness.protagonistId, selectedId: selected, selectableIds: selectable, phaseLabel: label });
   }
+  function visibleTime() {
+    return harness?.visibleClockStatus?.() || { seconds: null, mode: "MATCH_IN_PROGRESS" };
+  }
+  function CLOCK_VISIBLE(c) {
+    return Number.isFinite(c.seconds) ? CLOCK(c.seconds) : "—";
+  }
   function diagnostics() {
-    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, selectedTargetId, candidates: exactCandidatePairs().map((c) => ({ choiceId: c.id, targetId: c.targetId, targetRole: c.targetRole })), donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hostClock: harness?.hostClockStatus?.().seconds || 0, fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
+    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, selectedTargetId, candidates: exactCandidatePairs().map((c) => ({ choiceId: c.id, targetId: c.targetId, targetRole: c.targetRole, generation: c.generation, choiceRevision: c.choiceRevision })), donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hiddenMacroClock: harness?.hostClockStatus?.().seconds || 0, visibleClock: visibleTime(), fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
   }
   function render() {
     const a = inspect();
     if (harness?.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && !presenting && a) selectableAIds();
-    const d = diagnostics(), boot = $("boot-status"), clock = harness?.hostClockStatus?.() || { seconds: 0 };
+    const d = diagnostics(), boot = $("boot-status"), clock = visibleTime();
     $("diag").textContent = JSON.stringify(d, null, 2);
     boot.dataset.error = d.error ? "1" : "0";
     if (d.error) boot.textContent = "Match stopped safely: " + d.error;
     else if (!harness) boot.textContent = "Ready to start full match";
-    else if (harness.state === import_hybrid_v48.default.STATES.FULL_TIME) boot.textContent = "Full time · " + CLOCK(clock.seconds);
+    else if (harness.state === import_hybrid_v48.default.STATES.FULL_TIME) boot.textContent = "Full time";
     else if (presenting) boot.textContent = notice;
-    else if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) boot.textContent = "Your touch · tap a highlighted teammate, then choose the exact grounded action";
-    else if (harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING) boot.textContent = "Resolving the chosen action";
-    else boot.textContent = "Match in progress · " + CLOCK(clock.seconds) + " · Donor fast-forward";
-    $("phase").textContent = !harness ? "Not started" : harness.state === import_hybrid_v48.default.STATES.FULL_TIME ? "Full time" : presenting ? "Important situation" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Your decision" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A scene" : "Match in progress";
+    else if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) boot.textContent = "Your touch · " + CLOCK_VISIBLE(clock) + " · tap a highlighted teammate, then choose the exact grounded action";
+    else if (harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING) boot.textContent = "Resolving the chosen action · " + CLOCK_VISIBLE(clock);
+    else boot.textContent = "Match in progress · background simulation";
+    $("phase").textContent = !harness ? "Not started" : harness.state === import_hybrid_v48.default.STATES.FULL_TIME ? "Full time" : presenting ? "Important situation" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Your decision · " + CLOCK_VISIBLE(clock) : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A scene · " + CLOCK_VISIBLE(clock) : "Match in progress";
     $("authority").textContent = harness?.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Only the fixed protagonist has the ball. Select a green-ring teammate, then the exact pass." : harness?.state === import_hybrid_v48.default.STATES.MACRO_RUNNING ? "The same Donor simulates continuously. Goals and other important events surface without a user choice." : "No protagonist action is selected automatically.";
     if (!harness || visibleError) return;
     if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && !presenting) {
@@ -8265,7 +8346,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   async function presentDock(opened) {
     presenting = true;
     selectedTargetId = null;
-    notice = CLOCK(harness.hostClockStatus().seconds) + " · fixed protagonist received the live ball";
+    notice = CLOCK_VISIBLE(opened?.visibleClock || visibleTime()) + " · fixed protagonist received the live ball";
     render();
     await wait(260);
     preChoiceFrameCount++;
@@ -8274,7 +8355,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   }
   async function presentEvent(event) {
     presenting = true;
-    notice = CLOCK(harness.hostClockStatus().seconds) + " · " + String(event.type).replace(/([A-Z])/g, " $1") + " · play continues";
+    notice = CLOCK_VISIBLE(visibleTime()) + " · " + String(event.type).replace(/([A-Z])/g, " $1") + " · play continues";
     render();
     await wait(550);
     presenting = false;
@@ -8301,6 +8382,12 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       sceneFrameCount++;
       renderA(lastRawFrame, "Retained A executing live tick " + step.steps);
       await wait(45);
+      if (step.choiceReady) {
+        lastIdentity = harness.retainedSession?.match || null;
+        selectedTargetId = null;
+        void presentDock(step);
+        return;
+      }
       if (step.ready) {
         if (sceneFrameCount < 3) {
           visibleError = "G1_SCENE_MINIMUM_VISIBLE_TICKS_FAILED";

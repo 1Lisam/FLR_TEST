@@ -17,13 +17,13 @@
     },
     {
       "path": "app.js",
-      "bytes": 394083,
-      "sha256": "aecc743251b6ba1f7bf9434072c13ad08ae451efe1a7300e418711a78d58e42b"
+      "bytes": 401616,
+      "sha256": "1bf027a55efe773c33d0152a4c63b4422b932f33491734473af5e87e510e0df8"
     },
     {
       "path": "index.html",
       "bytes": 1014,
-      "sha256": "de6532589cbd6bb14a7ab3899ac906140f85ef35c98c587e3a6b8ca29ec0e552"
+      "sha256": "848c08453fe8e098c70dd38a1322c02019bdc2bd5a6d9d31df40b9deb8bf0302"
     },
     {
       "path": "style.css",
