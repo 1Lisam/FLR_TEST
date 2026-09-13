@@ -1,3 +1,4 @@
+var structuredClone=globalThis.structuredClone||function(value){return JSON.parse(JSON.stringify(value));};
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -8096,8 +8097,10 @@
     return { pageStarted: !!harness, interactiveChoicePresent: !!(harness && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && harness.pending.candidates.length), retainedAIdentity: !!(harness && harness.retainedSession && harness.retainedSession.match === lastIdentity), retainedAIdentityMarker: retainedSceneId, frameSampleCount: frameSamples, donorCallCountFrozenDuringA: donorCallsAtHandback === null ? 0 : Math.max(0, donorCallsAtHandback - donorCallsAtDock), handbackComplete: !!(harness && harness.handoffCount), twoPostHandbackDonorCalls: postHandbackCalls >= 2, state: harness ? harness.state : "READY", error: visibleError || harness && harness.error || null, seed: $("seed").value, rendererLineage: renderer.lineage, choice: harness && harness.lastScene ? harness.lastScene.evidence : null };
   }
   function render() {
-    const d = diagnostics();
+    const d = diagnostics(), boot = $("boot-status");
     $("diag").textContent = JSON.stringify(d, null, 2);
+    boot.dataset.error = d.error ? "1" : "0";
+    boot.textContent = d.error ? "Start failed: " + d.error : !harness ? "Ready to start first dock" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "A scene ready · choose SAFE_PASS or PROGRESSIVE_PASS" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A scene executing" : "Donor resumed";
     $("authority").textContent = harness ? { INTERACTIVE_PENDING: "Donor background paused → A waiting for choice", SCENE_RUNNING: "Donor background paused → A executing", MACRO_RUNNING: d.handbackComplete ? "Donor resumed" : "Donor background ready" }[harness.state] || harness.state : "Not started";
     if (!harness) return;
     if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) {
@@ -8113,7 +8116,7 @@
       });
       $("choices").replaceChildren(...buttons);
     } else if (harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && harness.lastScene) {
-      const a = harness.lastScene.displayFrames.at(-1);
+      const frames = harness.lastScene.displayFrames, a = frames[frames.length - 1];
       if (a) renderA(a, "Donor resumed after same-object handback");
       $("choices").textContent = "Handback complete. Continue donor twice to verify retained donor continuation.";
     }

@@ -1,7 +1,7 @@
 {
   "schema": "V48_G1_FIRST_DOCK_BROWSER_TEST_1",
   "testOnly": true,
-  "rollbackBase": "f318889e0cda0e3d00a2cecd0e6f44dbd5143077",
+  "rollbackBase": "a57e1c58437c26904452650f949f93fbbf94f425",
   "rendererLineage": "78eba35aea15ba519b443c73d9e4c902d07fe2fa",
   "donorSha": "ea35bbd3245af9c822f7db5cb359b119fb60ab33",
   "files": [
@@ -17,18 +17,18 @@
     },
     {
       "path": "app.js",
-      "bytes": 381642,
-      "sha256": "31fc007b22e2976818eab5a35b1b85ecc8a61980d43bd1d51ec1bd6e4affd945"
+      "bytes": 382190,
+      "sha256": "84f5e7d443dc21089b56d5c684f9cd6183cf50b194dc1ee6d0584286d2045d2b"
     },
     {
       "path": "index.html",
-      "bytes": 926,
-      "sha256": "26fda14552033cb179188f2bb5d3f41844b1317f77a91fddf632b28ac14db3eb"
+      "bytes": 1038,
+      "sha256": "006dc9c73ce00e88b6af4b61dbb56d9662a2d1bd0664b99c8899414c174b63d7"
     },
     {
       "path": "style.css",
-      "bytes": 562,
-      "sha256": "74db3c0a9c1781783cf0bc9e3a3e5f952da74d13679ab4864a03a5ba56f1aa8f"
+      "bytes": 697,
+      "sha256": "35dc063b20567b5b1069653d29a7d2502fa0dd3694abd132273123c73273549e"
     }
   ]
 }
