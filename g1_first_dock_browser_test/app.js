@@ -404,8 +404,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       var Canonical = require_canonical_match_state();
       var SUPPORTED = /* @__PURE__ */ new Set(["PASS", "PROGRESSIVE_PASS", "THROUGH_PASS", "SAFE_PASS", "CARRY", "SHOT"]);
       var TERMINALS = /* @__PURE__ */ new Set(["goal", "save", "claim", "block", "corner", "goalKick", "throwIn", "freeKick", "offside"]);
-      var OPEN_PLAY_DECAY = Object.freeze({ minimumSceneTicks: 12, stableOtherOwnerTicks: 8, protagonistDistance: 6 });
-      var SCENE_END_POLICY = Object.freeze({ hardSafetySteps: 160, nearCeilingActionTicks: 12 });
+      var LEGACY_PASS_EPISODE = Object.freeze({ minimumActionSeconds: 0.9, sameTeamContinuationSeconds: 4.4, passDeadlineSeconds: 8, stableOppositionTicks: 5 });
+      var SCENE_END_POLICY = Object.freeze({ hardSafetySteps: 400, hardSafetySeconds: 20 });
       var copy = Canonical.clone;
       function actionFor(choice) {
         if (!choice || !SUPPORTED.has(choice.choiceId || choice.id)) throw new Error("SCENE_NOT_IMPLEMENTED");
@@ -496,8 +496,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         return inspect3.phase !== "play" || inspect3.ball.owner !== null && !inspect3.ball.flight;
       }
       function safetyStepLimit(session, options = {}) {
-        const hard = Math.min(options.maxSteps || SCENE_END_POLICY.hardSafetySteps, SCENE_END_POLICY.hardSafetySteps), lastChoice = session.lastChoiceStep || 0;
-        return lastChoice >= hard - SCENE_END_POLICY.nearCeilingActionTicks ? Math.max(hard, lastChoice + SCENE_END_POLICY.nearCeilingActionTicks) : hard;
+        return Math.max(Number(options.maxSteps) || 0, SCENE_END_POLICY.hardSafetySteps);
       }
       function safeOpenPlayBoundary(inspect3, canonical) {
         return !!canonical && inspectInBounds(inspect3) && inspect3.phase === "play" && inspect3.ball.owner !== null && !inspect3.ball.flight && canonical.ball.mode === "controlled";
@@ -545,7 +544,14 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         const submittedAction = action.targetId == null ? action : { ...action, targetId: aTargetId };
         if (!session.match.submitAction({ playerId: aPlayerId, ...submittedAction })) return { ok: false, code: "A_REJECTED_ACTION" };
         session.submitted = true;
-        session.startEvents = session.match.inspect().eventCount;
+        const before = session.match.inspect();
+        session.startEvents = before.eventCount;
+        session.lastChoiceTime = before.time;
+        session.lastChoiceStep = session.sceneSteps || 0;
+        session.episodeDeadline = before.time + LEGACY_PASS_EPISODE.passDeadlineSeconds;
+        session.oppositionStableTicks = 0;
+        session.teammateReceipt = null;
+        session.postReceiptFrames = [];
         session.match.resume();
         session.evidence = { choiceId: choice.choiceId || choice.id, playerId: choice.playerId, targetId: action.targetId == null ? null : action.targetId, aPlayerId, aTargetId, retainedMatch: true };
         return { ok: true, match: session.match, evidence: session.evidence };
@@ -558,27 +564,33 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         const rawInspect = session.match.inspect(), events = session.match.eventsSince(session.startEvents), observed = terminalFromEvents([...events].reverse());
         const canonical = inspectInBounds(rawInspect) ? canonicalFromA(rawInspect, { scenePlayerIdMapping: session.mapping }) : null;
         if (observed) session.pendingTerminal = observed;
-        const owner = rawInspect.ball.owner, aProtagonistId = session.mapping.aForCanonical(session.protagonistId);
-        const differentControlled = rawInspect.phase === "play" && owner !== null && owner !== session.mapping.aForCanonical(session.protagonistId) && !rawInspect.ball.flight && inspectInBounds(rawInspect);
-        session.differentOwnerStableTicks = differentControlled ? (session.differentOwnerStableTicks || 0) + 1 : 0;
+        const owner = rawInspect.ball.owner, aProtagonistId = session.mapping.aForCanonical(session.protagonistId), protagonist = rawInspect.players.find((p) => p.id === aProtagonistId);
+        const ownerPlayer = owner == null ? null : rawInspect.players.find((p) => p.id === owner);
+        const controlled = rawInspect.phase === "play" && owner !== null && !rawInspect.ball.flight && inspectInBounds(rawInspect);
+        const sameTeamControlled = controlled && owner !== aProtagonistId && ownerPlayer?.team === protagonist?.team;
+        const oppositionControlled = controlled && ownerPlayer?.team !== protagonist?.team;
+        if (sameTeamControlled && !session.teammateReceipt) session.teammateReceipt = { ownerId: session.mapping.canonicalForA(owner), atStep: session.sceneSteps, atTime: rawInspect.time };
+        if (session.teammateReceipt && session.sceneSteps > session.teammateReceipt.atStep) {
+          const previous = session.postReceiptFrames.at(-1);
+          session.postReceiptFrames.push({ tick: rawInspect.tick, ball: { x: rawInspect.ball.x, y: rawInspect.ball.y, owner: rawInspect.ball.owner, mode: rawInspect.ball.mode }, players: rawInspect.players.map((p) => ({ id: p.id, x: p.x, y: p.y })) });
+          if (previous && (previous.ball.x !== rawInspect.ball.x || previous.ball.y !== rawInspect.ball.y || previous.ball.owner !== rawInspect.ball.owner)) session.teammateReceipt.continued = true;
+        }
+        session.oppositionStableTicks = oppositionControlled ? (session.oppositionStableTicks || 0) + 1 : 0;
         const protagonistControlled = rawInspect.phase === "play" && owner === aProtagonistId && !rawInspect.ball.flight && inspectInBounds(rawInspect);
         if (protagonistControlled && session.sceneSteps > (session.lastChoiceStep || 0)) {
           session.match.pause();
           session.submitted = false;
-          return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, differentOwnerStableTicks: 0, choiceReady: true, receipt: { ownerId: session.protagonistId, atStep: session.sceneSteps }, ready: false, evidence: session.evidence };
+          return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, choiceReady: true, receipt: { ownerId: session.protagonistId, atStep: session.sceneSteps }, teammateReceipt: session.teammateReceipt, postReceiptFrames: session.postReceiptFrames.length, ready: false, evidence: session.evidence };
         }
         let terminal = null;
         if (session.pendingTerminal && terminalBoundaryReady(rawInspect, session.pendingTerminal)) terminal = session.pendingTerminal;
-        else if (differentControlled && session.sceneSteps >= OPEN_PLAY_DECAY.minimumSceneTicks && session.differentOwnerStableTicks >= OPEN_PLAY_DECAY.stableOtherOwnerTicks) {
-          const protagonist = rawInspect.players.find((p) => p.id === aProtagonistId);
-          const distance = protagonist ? Math.hypot(protagonist.x - rawInspect.ball.x, protagonist.y - rawInspect.ball.y) : Infinity;
-          if (distance >= OPEN_PLAY_DECAY.protagonistDistance) terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(owner), rule: "settled-other-owner-away-from-protagonist", distance };
-        }
+        else if (oppositionControlled && session.oppositionStableTicks >= LEGACY_PASS_EPISODE.stableOppositionTicks && rawInspect.time >= session.lastChoiceTime + LEGACY_PASS_EPISODE.minimumActionSeconds) terminal = { type: "controlledPossession", ownerId: session.mapping.canonicalForA(owner), rule: "stable-opposition-possession-after-live-continuation" };
+        if (!terminal && rawInspect.time >= session.episodeDeadline && safeOpenPlayBoundary(rawInspect, canonical)) terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(owner), rule: "legacy-pass-episode-timeout", passDeadlineSeconds: LEGACY_PASS_EPISODE.passDeadlineSeconds, continuedAfterTeammateReceipt: !!session.teammateReceipt?.continued };
         if (!terminal && session.sceneSteps >= max && safeOpenPlayBoundary(rawInspect, canonical)) {
-          terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(rawInspect.ball.owner), rule: "cumulative-safety-ceiling-current-open-play", hardSafetySteps: Math.min(options.maxSteps || SCENE_END_POLICY.hardSafetySteps, SCENE_END_POLICY.hardSafetySteps), selectedActionResolutionTicks: session.sceneSteps - (session.lastChoiceStep || 0) };
+          terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(rawInspect.ball.owner), rule: "hard-safety-ceiling-only", hardSafetySteps: SCENE_END_POLICY.hardSafetySteps, selectedActionResolutionTicks: session.sceneSteps - (session.lastChoiceStep || 0) };
         }
         const scene = terminal && canonical ? { ok: true, terminal, canonicalState: canonical, steps: session.sceneSteps, evidence: session.evidence, match: session.match } : null;
-        return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, differentOwnerStableTicks: session.differentOwnerStableTicks || 0, ready: !!scene, scene };
+        return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, oppositionStableTicks: session.oppositionStableTicks || 0, teammateReceipt: session.teammateReceipt, postReceiptFrames: session.postReceiptFrames.length, ready: !!scene, scene };
       }
       function resolve(session, choice, options = {}) {
         if (!session?.submitted) return { ok: false, code: "A_SESSION_NOT_SUBMITTED" };
@@ -601,7 +613,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (!accepted.ok) return { ...accepted, evidence: accepted.evidence || retained.evidence };
         return resolve(retained, choice, options);
       }
-      module.exports = Object.freeze({ SUPPORTED, TERMINALS, OPEN_PLAY_DECAY, SCENE_END_POLICY, makeSceneState, canonicalFromA, buildScenePlayerIdMapping, begin, createRetained, hydrateRetained, inspect: inspect2, submit, step, resolve, run, actionFor, terminalFromEvents, inspectInBounds });
+      module.exports = Object.freeze({ SUPPORTED, TERMINALS, LEGACY_PASS_EPISODE, SCENE_END_POLICY, makeSceneState, canonicalFromA, buildScenePlayerIdMapping, begin, createRetained, hydrateRetained, inspect: inspect2, submit, step, resolve, run, actionFor, terminalFromEvents, inspectInBounds });
     }
   });
 
@@ -700,11 +712,11 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           return { ...this.visibleClock };
         }
         surfaceClock(canonical, source) {
-          if (Number.isFinite(canonical?.clock)) this.visibleClock = { seconds: canonical.clock, mode: source === "scene" ? "LIVE_A_SCENE" : "TIMESTAMP", source };
+          if (Number.isFinite(this.hostClock.seconds)) this.visibleClock = { seconds: this.hostClock.seconds, mode: source === "scene" ? "LIVE_A_SCENE" : "TIMESTAMP", source };
         }
         sceneClockAnchor(canonical, inspect2) {
-          if (!Number.isFinite(canonical?.clock) || !Number.isFinite(inspect2?.time)) throw new Error("SCENE_TIME_ANCHOR_REQUIRED");
-          return Object.freeze({ absoluteClock: canonical.clock, aLocalTime: inspect2.time, aLocalTick: inspect2.tick, localSecondsToMatchSeconds: 1 });
+          if (!Number.isFinite(this.hostClock.seconds) || !Number.isFinite(inspect2?.time)) throw new Error("SCENE_TIME_ANCHOR_REQUIRED");
+          return Object.freeze({ absoluteClock: this.hostClock.seconds, aLocalTime: inspect2.time, aLocalTick: inspect2.tick, localSecondsToMatchSeconds: 1 });
         }
         sceneElapsedSeconds(inspect2, anchor = this.pending?.timeAnchor) {
           if (!anchor || !Number.isFinite(inspect2?.time)) return 0;
@@ -774,8 +786,9 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           this.donor.advance();
           const canonical = this.observe();
           this.lastMacroCanonical = canonical;
+          const fullTime = this.advanceHostClock();
           const importantEvents = this.observeMacroImportantEvents(before, canonical);
-          if (this.advanceHostClock()) return { ok: true, fullTime: true, hostClock: this.hostClockStatus(), visibleClock: this.macroClockStatus(), importantEvents };
+          if (fullTime) return { ok: true, fullTime: true, hostClock: this.hostClockStatus(), visibleClock: this.macroClockStatus(), importantEvents };
           if (importantEvents.length) this.surfaceClock(canonical, "event");
           const trigger = presentTrigger(canonical, this.protagonistId);
           if (trigger) {
@@ -789,9 +802,9 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           const events = [];
           if (typeof this.donor.drainEvents === "function") for (const raw of this.donor.drainEvents() || []) {
             const type = String(raw?.type || raw?.event || "").trim();
-            if (IMPORTANT.has(type)) events.push({ ...raw, type, source: "donor-history" });
+            if (IMPORTANT.has(type)) events.push({ ...raw, type, clock: this.hostClock.seconds, source: "donor-history" });
           }
-          for (let team = 0; team < 2; team++) if ((current.score[team] || 0) > (before.score[team] || 0)) events.push({ type: "goal", team, tick: current.tick, clock: current.clock, source: "score-transition" });
+          for (let team = 0; team < 2; team++) if ((current.score[team] || 0) > (before.score[team] || 0)) events.push({ type: "goal", team, tick: current.tick, clock: this.hostClock.seconds, source: "score-transition" });
           const unique = [];
           const seen = /* @__PURE__ */ new Set();
           for (const event of events) {
@@ -823,8 +836,6 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           if (!accepted.ok) return this.fail(accepted.code);
           if (accepted.match !== this.pending.shownMatch) return this.fail("A_MATCH_IDENTITY_LOST");
           held.sceneSteps = held.sceneSteps || 0;
-          held.lastChoiceStep = held.sceneSteps;
-          held.differentOwnerStableTicks = 0;
           held.pendingTerminal = null;
           this.pending.choice = choice;
           this.pending.frames = this.pending.frames || [];
@@ -836,13 +847,13 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           if (this.state !== STATES.SCENE_RUNNING || !this.pending?.submitted) return { ok: false, code: "SCENE_NOT_RUNNING" };
           const held = this.pending.session;
           if (held.match !== this.pending.shownMatch) return this.fail("A_MATCH_IDENTITY_LOST");
-          const out = AScene.step(held, this.pending.choice, { engine: this.aEngine, ...this.aOptions, maxSteps: 160 });
+          const out = AScene.step(held, this.pending.choice, { engine: this.aEngine, ...this.aOptions, maxSteps: AScene.SCENE_END_POLICY.hardSafetySteps });
           if (!out.ok) return this.fail(out.code, { steps: out.steps || held.sceneSteps, evidence: out.evidence });
           this.pending.frames.push(out.rawInspect);
           this.surfaceSceneClock(out.rawInspect);
           if (out.ready) this.pending.readyScene = out.scene;
           if (out.choiceReady) return this.openRetainedChoice(out);
-          return { ok: true, state: this.state, rawInspect: out.rawInspect, steps: out.steps, differentOwnerStableTicks: out.differentOwnerStableTicks, ready: out.ready, evidence: out.scene?.evidence || held.evidence, visibleClock: this.visibleClockStatus() };
+          return { ok: true, state: this.state, rawInspect: out.rawInspect, steps: out.steps, oppositionStableTicks: out.oppositionStableTicks, teammateReceipt: out.teammateReceipt, postReceiptFrames: out.postReceiptFrames, ready: out.ready, evidence: out.scene?.evidence || held.evidence, visibleClock: this.visibleClockStatus() };
         }
         openRetainedChoice(out) {
           const held = this.pending.session;
@@ -8360,6 +8371,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     await wait(550);
     presenting = false;
     render();
+    scheduleMacro();
   }
   async function choose(c) {
     if (!harness || presenting || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING || c.targetId !== selectedTargetId) return;
@@ -8403,6 +8415,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         lastIdentity = harness.retainedSession?.match || null;
         selectedTargetId = null;
         render();
+        if (final.ok && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING) scheduleMacro();
         return;
       }
     }
@@ -8495,5 +8508,74 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   } });
   if (new URLSearchParams(location.search).get("autostart") === "1") start();
   render();
-  setInterval(macroTick, 120);
+  var macroScheduled = false;
+  function macroScore() {
+    const s = harness?.donor?.readState?.().score || [0, 0];
+    return String(s[0] || 0) + " : " + String(s[1] || 0);
+  }
+  function macroUi() {
+    let p = document.getElementById("macro-panel");
+    if (!p) {
+      p = document.createElement("section");
+      p.id = "macro-panel";
+      p.innerHTML = "<b>경기 진행 중…</b><p>다음 중요 장면이나 나의 선택 상황을 찾고 있습니다.</p>";
+      canvas.before(p);
+    }
+    return p;
+  }
+  var recoveredRender = render;
+  render = function() {
+    recoveredRender();
+    if (!harness) return;
+    const macro = harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && !presenting, full = harness.state === import_hybrid_v48.default.STATES.FULL_TIME, p = macroUi();
+    p.hidden = !macro && !full;
+    canvas.hidden = macro || full;
+    if (full) {
+      $("phase").textContent = "90:00 · 경기 종료";
+      $("boot-status").textContent = "90:00 · 경기 종료 · 최종 스코어 " + macroScore();
+      $("choices").textContent = "경기가 종료되었습니다.";
+    } else if (macro) {
+      $("phase").textContent = "경기 진행 중…";
+      $("boot-status").textContent = "경기 진행 중… · " + macroScore();
+      $("choices").textContent = "다음 장면을 준비하고 있습니다…";
+    }
+  };
+  function scheduleMacro() {
+    if (!macroScheduled && harness && !presenting && !visibleError && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING) {
+      macroScheduled = true;
+      setTimeout(macroTick, 16);
+    }
+  }
+  macroTick = function() {
+    macroScheduled = false;
+    if (!harness || presenting || visibleError || harness.state !== import_hybrid_v48.default.STATES.MACRO_RUNNING) return;
+    const began = performance.now();
+    for (let n = 0; n < 240 && harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && performance.now() - began < 14; n++) {
+      const out = harness.advanceMacro();
+      macroEvents = out.importantEvents || [];
+      if (!out.ok) {
+        visibleError = out.code;
+        break;
+      }
+      if (out.interactive) {
+        lastIdentity = out.aMatch;
+        void presentDock(out);
+        break;
+      }
+      if (macroEvents.length) {
+        void presentEvent(macroEvents[0]);
+        break;
+      }
+    }
+    render();
+    scheduleMacro();
+  };
+  var recoveredStart = start;
+  start = function() {
+    recoveredStart();
+    scheduleMacro();
+  };
+  $("start").onclick = start;
+  render();
+  scheduleMacro();
 })();
