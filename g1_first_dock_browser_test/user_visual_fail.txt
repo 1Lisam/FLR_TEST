@@ -1,0 +1,1 @@
+USER_VISUAL_FAIL: Start first dock button reported inert on the user's actual browser. G2 remains blocked until this G1 surface is fixed and personally retested.
