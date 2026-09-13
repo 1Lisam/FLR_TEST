@@ -3208,7 +3208,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           ctx2.fill();
           ctx2.restore();
         }
-        function draw(inspect2, { protagonistId = null, selectedId = null, selectableIds: selectableIds2 = [], phaseLabel = "" } = {}) {
+        function draw(inspect2, { protagonistId = null, selectedId = null, selectableIds = [], phaseLabel = "" } = {}) {
           if (!inspect2 || !Array.isArray(inspect2.players) || inspect2.players.length !== 22 || !inspect2.ball) throw new Error("FRL_A_RENDERER_INSPECT_REQUIRED");
           pitch();
           inspect2.players.forEach(drawRecoveryArrow);
@@ -3218,7 +3218,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
             ctx2.beginPath();
             ctx2.ellipse(x + 2, y + 4, radius, radius * 0.75, 0, 0, Math.PI * 2);
             ctx2.fill();
-            if (selectableIds2.includes(p.id) && p.id !== selectedId) {
+            if (selectableIds.includes(p.id) && p.id !== selectedId) {
               ctx2.strokeStyle = "#8ee6a8";
               ctx2.lineWidth = 2;
               ctx2.setLineDash([4, 3]);
@@ -8173,17 +8173,69 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   function inspect() {
     return harness?.pending?.session ? import_hybrid_v48.default.ASceneAdapter.inspect(harness.pending.session) : null;
   }
-  function selectableIds() {
-    return harness?.pending?.candidates ? [...new Set(harness.pending.candidates.map((c) => c.targetId))] : [];
+  function exactCandidatePairs() {
+    const pairs = /* @__PURE__ */ new Map();
+    for (const c of harness?.pending?.candidates || []) {
+      const key = String(c.id) + "\\u0000" + String(c.targetId);
+      if (!pairs.has(key)) pairs.set(key, c);
+    }
+    return [...pairs.values()];
+  }
+  function mappingFailure(code) {
+    visibleError = code;
+    return null;
+  }
+  function mappedAId(canonicalId) {
+    const mapping = harness?.pending?.session?.mapping;
+    if (!Number.isInteger(canonicalId) || !mapping) return mappingFailure("G1_CANONICAL_A_MAPPING_MISSING");
+    try {
+      const aId = mapping.aForCanonical(canonicalId);
+      if (!Number.isInteger(aId) || mapping.canonicalForA(aId) !== canonicalId) return mappingFailure("G1_CANONICAL_A_MAPPING_INCONSISTENT");
+      return aId;
+    } catch {
+      return mappingFailure("G1_CANONICAL_A_MAPPING_INCONSISTENT");
+    }
+  }
+  function mappedCanonicalId(aId) {
+    const mapping = harness?.pending?.session?.mapping;
+    if (!Number.isInteger(aId) || !mapping) return mappingFailure("G1_CANONICAL_A_MAPPING_MISSING");
+    try {
+      const canonicalId = mapping.canonicalForA(aId);
+      if (!Number.isInteger(canonicalId) || mapping.aForCanonical(canonicalId) !== aId) return mappingFailure("G1_CANONICAL_A_MAPPING_INCONSISTENT");
+      return canonicalId;
+    } catch {
+      return mappingFailure("G1_CANONICAL_A_MAPPING_INCONSISTENT");
+    }
+  }
+  function selectableAIds() {
+    const ids = [];
+    for (const c of exactCandidatePairs()) {
+      const aId = mappedAId(c.targetId);
+      if (aId == null) return [];
+      if (!ids.includes(aId)) ids.push(aId);
+    }
+    return ids;
+  }
+  function selectedAId() {
+    return selectedTargetId == null ? null : mappedAId(selectedTargetId);
+  }
+  function pointerTarget(targetId) {
+    const a = inspect(), aId = mappedAId(targetId), player = a?.players.find((p) => p.id === aId);
+    if (aId == null || !player) return mappingFailure("G1_CANONICAL_A_MAPPING_INCONSISTENT");
+    return { targetId, aPlayerId: aId, x: 42 + player.x * 7.25, y: 42 + player.y * 7.25 };
   }
   function renderA(frame, label) {
-    renderer.draw(frame, { protagonistId: harness.protagonistId, selectedId: selectedTargetId, selectableIds: presenting ? [] : selectableIds(), phaseLabel: label });
+    const selectable = presenting ? [] : selectableAIds(), selected = selectedAId();
+    if (visibleError) return;
+    renderer.draw(frame, { protagonistId: harness.protagonistId, selectedId: selected, selectableIds: selectable, phaseLabel: label });
   }
   function diagnostics() {
-    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hostClock: harness?.hostClockStatus?.().seconds || 0, fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
+    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, selectedTargetId, candidates: exactCandidatePairs().map((c) => ({ choiceId: c.id, targetId: c.targetId, targetRole: c.targetRole })), donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hostClock: harness?.hostClockStatus?.().seconds || 0, fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
   }
   function render() {
-    const d = diagnostics(), boot = $("boot-status"), a = inspect(), clock = harness?.hostClockStatus?.() || { seconds: 0 };
+    const a = inspect();
+    if (harness?.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && !presenting && a) selectableAIds();
+    const d = diagnostics(), boot = $("boot-status"), clock = harness?.hostClockStatus?.() || { seconds: 0 };
     $("diag").textContent = JSON.stringify(d, null, 2);
     boot.dataset.error = d.error ? "1" : "0";
     if (d.error) boot.textContent = "Match stopped safely: " + d.error;
@@ -8195,13 +8247,15 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     else boot.textContent = "Match in progress · " + CLOCK(clock.seconds) + " · Donor fast-forward";
     $("phase").textContent = !harness ? "Not started" : harness.state === import_hybrid_v48.default.STATES.FULL_TIME ? "Full time" : presenting ? "Important situation" : harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Your decision" : harness.state === import_hybrid_v48.default.STATES.SCENE_RUNNING ? "A scene" : "Match in progress";
     $("authority").textContent = harness?.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING ? "Only the fixed protagonist has the ball. Select a green-ring teammate, then the exact pass." : harness?.state === import_hybrid_v48.default.STATES.MACRO_RUNNING ? "The same Donor simulates continuously. Goals and other important events surface without a user choice." : "No protagonist action is selected automatically.";
-    if (!harness) return;
+    if (!harness || visibleError) return;
     if (harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && !presenting) {
-      if (a) renderA(a, "Retained A · exact choice pending");
-      const actions = selectedTargetId == null ? [] : harness.pending.candidates.filter((c) => c.targetId === selectedTargetId);
+      renderA(a, "Retained A · exact choice pending");
+      const actions = selectedTargetId == null ? [] : exactCandidatePairs().filter((c) => c.targetId === selectedTargetId);
       if (selectedTargetId == null) $("choices").textContent = "Tap/click one green-ring teammate on the pitch.";
       else $("choices").replaceChildren(...actions.map((c) => {
         const b = document.createElement("button");
+        b.dataset.choiceId = c.id;
+        b.dataset.targetId = String(c.targetId);
         b.textContent = c.id.replaceAll("_", " ") + " → " + c.targetRole + " #" + c.targetId;
         b.onclick = () => choose(c);
         return b;
@@ -8332,20 +8386,22 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   }
   canvas.addEventListener("pointerdown", (event) => {
     if (!harness || presenting || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING) return;
-    const a = inspect(), rect = canvas.getBoundingClientRect(), x = (event.clientX - rect.left) * canvas.width / rect.width, y = (event.clientY - rect.top) * canvas.height / rect.height, px = (x - 42) / 7.25, py = (y - 42) / 7.25, allowed = new Set(selectableIds()), hit = a?.players.filter((p) => allowed.has(p.id)).sort((l, r) => Math.hypot(l.x - px, l.y - py) - Math.hypot(r.x - px, r.y - py))[0];
+    const a = inspect(), rect = canvas.getBoundingClientRect(), x = (event.clientX - rect.left) * canvas.width / rect.width, y = (event.clientY - rect.top) * canvas.height / rect.height, px = (x - 42) / 7.25, py = (y - 42) / 7.25, allowed = new Set(selectableAIds()), hit = a?.players.filter((p) => allowed.has(p.id)).sort((l, r) => Math.hypot(l.x - px, l.y - py) - Math.hypot(r.x - px, r.y - py))[0];
     if (hit && Math.hypot(hit.x - px, hit.y - py) <= 3) {
-      selectedTargetId = hit.id;
+      const canonicalId = mappedCanonicalId(hit.id);
+      if (canonicalId == null || mappedAId(canonicalId) !== hit.id) {
+        mappingFailure("G1_CANONICAL_A_MAPPING_INCONSISTENT");
+        render();
+        return;
+      }
+      selectedTargetId = canonicalId;
       render();
     }
   });
   $("seed").value = "496001";
   $("start").onclick = start;
-  window.__V48_G1_FULL_MATCH_LOOP_TEST_ONLY__ = Object.freeze({ status: diagnostics, start, selectTarget(id) {
-    if (!selectableIds().includes(id)) throw Error("G1_TARGET_NOT_SELECTABLE");
-    selectedTargetId = id;
-    render();
-  }, select(choiceId, targetId) {
-    const c = harness?.pending?.candidates.find((x) => x.id === choiceId && x.targetId === targetId);
+  window.__V48_G1_FULL_MATCH_LOOP_TEST_ONLY__ = Object.freeze({ status: diagnostics, start, pointerTarget, select(choiceId, targetId) {
+    const c = exactCandidatePairs().find((x) => x.id === choiceId && x.targetId === targetId);
     if (!c) throw Error("G1_TEST_HOOK_EXACT_CHOICE_NOT_PRESENT");
     selectedTargetId = targetId;
     return choose(c);
