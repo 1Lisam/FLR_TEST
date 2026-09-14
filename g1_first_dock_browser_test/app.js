@@ -495,8 +495,11 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (["save", "claim", "block"].includes(terminal.type)) return inspect3.ball.owner !== null && !inspect3.ball.flight;
         return inspect3.phase !== "play" || inspect3.ball.owner !== null && !inspect3.ball.flight;
       }
+      function choiceElapsedSteps(session) {
+        return Math.max(0, (session.sceneSteps || 0) - (session.lastChoiceStep || 0));
+      }
       function safetyStepLimit(session, options = {}) {
-        return Math.max(Number(options.maxSteps) || 0, SCENE_END_POLICY.hardSafetySteps);
+        return Math.max(Number(options.maxSteps) || 0, SCENE_END_POLICY.hardSafetySteps) + (session.lastChoiceStep || 0);
       }
       function safeOpenPlayBoundary(inspect3, canonical) {
         return !!canonical && inspectInBounds(inspect3) && inspect3.phase === "play" && inspect3.ball.owner !== null && !inspect3.ball.flight && canonical.ball.mode === "controlled";
@@ -586,8 +589,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (session.pendingTerminal && terminalBoundaryReady(rawInspect, session.pendingTerminal)) terminal = session.pendingTerminal;
         else if (oppositionControlled && session.oppositionStableTicks >= LEGACY_PASS_EPISODE.stableOppositionTicks && rawInspect.time >= session.lastChoiceTime + LEGACY_PASS_EPISODE.minimumActionSeconds) terminal = { type: "controlledPossession", ownerId: session.mapping.canonicalForA(owner), rule: "stable-opposition-possession-after-live-continuation" };
         if (!terminal && rawInspect.time >= session.episodeDeadline && safeOpenPlayBoundary(rawInspect, canonical)) terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(owner), rule: "legacy-pass-episode-timeout", passDeadlineSeconds: LEGACY_PASS_EPISODE.passDeadlineSeconds, continuedAfterTeammateReceipt: !!session.teammateReceipt?.continued };
-        if (!terminal && session.sceneSteps >= max && safeOpenPlayBoundary(rawInspect, canonical)) {
-          terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(rawInspect.ball.owner), rule: "hard-safety-ceiling-only", hardSafetySteps: SCENE_END_POLICY.hardSafetySteps, selectedActionResolutionTicks: session.sceneSteps - (session.lastChoiceStep || 0) };
+        if (!terminal && choiceElapsedSteps(session) >= max - (session.lastChoiceStep || 0) && safeOpenPlayBoundary(rawInspect, canonical)) {
+          terminal = { type: "importanceDecay", ownerId: session.mapping.canonicalForA(rawInspect.ball.owner), rule: "hard-safety-ceiling-only", hardSafetySteps: SCENE_END_POLICY.hardSafetySteps, selectedActionResolutionTicks: choiceElapsedSteps(session) };
         }
         const scene = terminal && canonical ? { ok: true, terminal, canonicalState: canonical, steps: session.sceneSteps, evidence: session.evidence, match: session.match } : null;
         return { ok: true, rawInspect, canonicalState: canonical, steps: session.sceneSteps, oppositionStableTicks: session.oppositionStableTicks || 0, teammateReceipt: session.teammateReceipt, postReceiptFrames: session.postReceiptFrames.length, ready: !!scene, scene };
