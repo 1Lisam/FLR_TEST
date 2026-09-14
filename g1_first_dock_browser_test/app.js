@@ -8257,6 +8257,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   var handbackAt = null;
   var donorAdvanceCalls = 0;
   var macroEvents = [];
+  var inputGate = { menuGeneration: 0, armedAt: 0, selectionPointerId: null, actionPointer: null, locked: false, consumed: false, token: null, staleRejectCount: 0, lastReject: null };
   var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   var CLOCK = (x) => String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0");
   function inspect() {
@@ -8269,6 +8270,36 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       if (!pairs.has(key)) pairs.set(key, c);
     }
     return [...pairs.values()];
+  }
+  function choiceToken(c) {
+    return c ? JSON.stringify([c.generation, c.sceneId, c.choiceRevision, c.sourceStateDigest, c.id, c.targetId ?? null]) : null;
+  }
+  function samePendingChoice(c) {
+    const p = harness?.pending;
+    return !!p && p.generation === c?.generation && p.sceneId === c?.sceneId && p.choiceRevision === c?.choiceRevision && p.sourceStateDigest === c?.sourceStateDigest && p.candidates?.some((x) => x.id === c.id && (x.targetId ?? null) === (c.targetId ?? null));
+  }
+  function armChoiceMenu(pointerId, immediate = false) {
+    const c = exactCandidatePairs().find((x) => x.targetId === selectedTargetId) || null;
+    inputGate = { ...inputGate, menuGeneration: inputGate.menuGeneration + 1, armedAt: immediate ? 0 : performance.now() + 130, selectionPointerId: pointerId ?? null, actionPointer: null, locked: false, consumed: false, token: choiceToken(c) };
+  }
+  function canConsumeChoice(c, gesture) {
+    return !!harness && !presenting && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && c.targetId === selectedTargetId && !inputGate.locked && !inputGate.consumed && inputGate.token === choiceToken(c) && samePendingChoice(c) && performance.now() >= inputGate.armedAt && (gesture.source !== "pointer" || gesture.pointerId == null || gesture.pointerId !== inputGate.selectionPointerId);
+  }
+  function recordStaleReject(c, code) {
+    inputGate.staleRejectCount++;
+    inputGate.lastReject = { code, at: Date.now(), submittedToken: choiceToken(c), controllerState: harness?.state || "READY", currentToken: choiceToken((harness?.pending?.candidates || [])[0] || null) };
+  }
+  function recoverStaleReject(c, code) {
+    recordStaleReject(c, code);
+    const same = samePendingChoice(c) && harness?.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING;
+    if (same) {
+      selectedTargetId = c.targetId;
+      armChoiceMenu(null);
+    } else {
+      selectedTargetId = null;
+      inputGate = { ...inputGate, actionPointer: null, locked: false, consumed: false, token: null, selectionPointerId: null };
+    }
+    render();
   }
   function mappingFailure(code) {
     visibleError = code;
@@ -8325,7 +8356,34 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return Number.isFinite(c.seconds) ? CLOCK(c.seconds) : "—";
   }
   function diagnostics() {
-    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, selectedTargetId, candidates: exactCandidatePairs().map((c) => ({ choiceId: c.id, targetId: c.targetId, targetRole: c.targetRole, generation: c.generation, choiceRevision: c.choiceRevision })), donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hiddenMacroClock: harness?.hostClockStatus?.().seconds || 0, visibleClock: visibleTime(), fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
+    return { pageStarted: !!harness, mode: "TEST_ONLY_G1_FULL_MATCH_LOOP", state: harness?.state || "READY", seed: $("seed").value, fixedProtagonistId: harness?.fixedProtagonistId ?? null, protagonistId: harness?.protagonistId ?? null, fixedProtagonistInvariant: !harness || harness.fixedProtagonistId === harness.protagonistId, selectedTargetId, input: { menuGeneration: inputGate.menuGeneration, armed: performance.now() >= inputGate.armedAt, locked: inputGate.locked, consumed: inputGate.consumed, staleRejectCount: inputGate.staleRejectCount, lastReject: inputGate.lastReject }, candidates: exactCandidatePairs().map((c) => ({ choiceId: c.id, targetId: c.targetId, targetRole: c.targetRole, generation: c.generation, choiceRevision: c.choiceRevision })), donorAdvanceCalls, choiceScenes: harness?.handoffCount || 0, importantEvents: macroEvents, hiddenMacroClock: harness?.hostClockStatus?.().seconds || 0, visibleClock: visibleTime(), fullTime: harness?.state === import_hybrid_v48.default.STATES.FULL_TIME, sceneFrameCount, preChoiceFrameCount, retainedAIdentity: !!(harness?.retainedSession && harness.retainedSession.match === lastIdentity), finalFrameRenderedAt, handbackAt, handbackAfterFinalFrame: !!(finalFrameRenderedAt && handbackAt && handbackAt > finalFrameRenderedAt), error: visibleError || harness?.error || null, rendererLineage: renderer.lineage };
+  }
+  function bindChoiceButton(b, c) {
+    b.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!canConsumeChoice(c, { source: "pointer", pointerId: event.pointerId })) {
+        inputGate.actionPointer = null;
+        return;
+      }
+      inputGate.actionPointer = { pointerId: event.pointerId, token: choiceToken(c) };
+    });
+    b.addEventListener("pointerup", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const action = inputGate.actionPointer;
+      inputGate.actionPointer = null;
+      if (!action || action.pointerId !== event.pointerId || action.token !== choiceToken(c)) return;
+      void choose(c, { source: "pointer", pointerId: event.pointerId });
+    });
+    b.addEventListener("pointercancel", () => {
+      inputGate.actionPointer = null;
+    });
+    b.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.detail === 0) void choose(c, { source: "keyboard", pointerId: null });
+    });
   }
   function render() {
     const a = inspect();
@@ -8352,7 +8410,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         b.dataset.choiceId = c.id;
         b.dataset.targetId = String(c.targetId);
         b.textContent = c.id.replaceAll("_", " ") + " → " + c.targetRole + " #" + c.targetId;
-        b.onclick = () => choose(c);
+        bindChoiceButton(b, c);
         return b;
       }));
     } else if (harness.state === import_hybrid_v48.default.STATES.MACRO_RUNNING && !presenting && lastRawFrame) renderA(lastRawFrame, "Final retained A frame · Donor resumed");
@@ -8376,10 +8434,16 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     render();
     scheduleMacro();
   }
-  async function choose(c) {
-    if (!harness || presenting || harness.state !== import_hybrid_v48.default.STATES.INTERACTIVE_PENDING || c.targetId !== selectedTargetId) return;
+  async function choose(c, gesture = { source: "programmatic", pointerId: null }) {
+    if (!canConsumeChoice(c, gesture)) return;
+    inputGate = { ...inputGate, locked: true, consumed: true, actionPointer: null };
+    $("choices").replaceChildren();
     const out = harness.submitAction({ choiceId: c.id, targetId: c.targetId, playerId: harness.fixedProtagonistId, generation: c.generation, sceneId: c.sceneId, choiceRevision: c.choiceRevision, sourceStateDigest: c.sourceStateDigest });
     if (!out.ok) {
+      if (out.code === "STALE_OR_DOUBLE_CHOICE_REJECTED") {
+        recoverStaleReject(c, out.code);
+        return;
+      }
       visibleError = out.code;
       render();
       return;
@@ -8479,6 +8543,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     handbackAt = null;
     donorAdvanceCalls = 0;
     macroEvents = [];
+    inputGate = { menuGeneration: 0, armedAt: 0, selectionPointerId: null, actionPointer: null, locked: false, consumed: false, token: null, staleRejectCount: 0, lastReject: null };
     try {
       create($("seed").value);
       installDonorEventDrain();
@@ -8498,8 +8563,12 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         return;
       }
       selectedTargetId = canonicalId;
+      armChoiceMenu(event.pointerId);
       render();
     }
+  });
+  canvas.addEventListener("pointerup", (event) => {
+    if (inputGate.selectionPointerId === event.pointerId) inputGate.selectionPointerId = null;
   });
   $("seed").value = "496001";
   $("start").onclick = start;
@@ -8507,7 +8576,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     const c = exactCandidatePairs().find((x) => x.id === choiceId && x.targetId === targetId);
     if (!c) throw Error("G1_TEST_HOOK_EXACT_CHOICE_NOT_PRESENT");
     selectedTargetId = targetId;
-    return choose(c);
+    armChoiceMenu(null, true);
+    return choose(c, { source: "test", pointerId: null });
   } });
   if (new URLSearchParams(location.search).get("autostart") === "1") start();
   render();
