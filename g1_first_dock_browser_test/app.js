@@ -448,9 +448,42 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (half === 2) return { 0: -1, 1: 1 };
         throw new Error("A_ATTACK_DIRECTION_HALF_INVALID");
       }
+      var A_ROLE_SLOT = Object.freeze({ GK: 0, LB: 1, LCB: 2, RCB: 3, RB: 4, DM: 5, LCM: 6, RCM: 7, LF: 8, CF: 9, RF: 10 });
+      var SIDE_MATE = Object.freeze({ LB: "RB", RB: "LB", LCB: "RCB", RCB: "LCB", LCM: "RCM", RCM: "LCM", LF: "RF", RF: "LF" });
+      var ROLE_ALIAS = Object.freeze({ LM: "LCM", RM: "RCM", LW: "LF", RW: "RF" });
+      function globalSideRole(role) {
+        const key = String(role || "").toUpperCase();
+        return A_ROLE_SLOT[key] === void 0 ? ROLE_ALIAS[key] || key : key;
+      }
+      function roleSideMap(canonical) {
+        const out = /* @__PURE__ */ new Map();
+        for (const team of [0, 1]) {
+          const squad = canonical.players.filter((p) => p.team === team), generic = { CB: ["LCB", "RCB"], CM: ["LCM", "RCM"], ST: ["LF", "RF"] };
+          for (const p of squad) if (!Object.hasOwn(generic, String(p.role || "").toUpperCase())) out.set(p.id, globalSideRole(p.role));
+          for (const [role, pair] of Object.entries(generic)) {
+            const players = squad.filter((p) => String(p.role || "").toUpperCase() === role).sort((a, b) => a.y - b.y || a.id - b.id);
+            if (players.length === 2) {
+              out.set(players[0].id, pair[0]);
+              out.set(players[1].id, pair[1]);
+            } else for (const p of players) out.set(p.id, globalSideRole(p.role));
+          }
+          const counts = /* @__PURE__ */ new Map();
+          for (const p of squad) {
+            const role = out.get(p.id);
+            if (A_ROLE_SLOT[role] !== void 0) counts.set(role, (counts.get(role) || 0) + 1);
+          }
+          for (const p of squad) if ((counts.get(out.get(p.id)) || 0) > 1) out.set(p.id, String(p.role || "").toUpperCase());
+        }
+        return out;
+      }
+      function sceneRole(canonical, mapping, player, half) {
+        if (canonical.metadata?.attackDirections === void 0) return player.role;
+        const base = mapping.globalSideRoleFor(player.id), directions = directionsForHalf(half), direction = directions[player.team];
+        return direction === 1 ? base : SIDE_MATE[base] || base;
+      }
       function buildScenePlayerIdMapping(canonical, raw, options = {}) {
         Canonical.validate(canonical);
-        const canonicalIds = canonical.players.map((p) => p.id), aIds = raw.players.map((p) => p.id), aSet = new Set(aIds), forward = /* @__PURE__ */ new Map(), reverse = /* @__PURE__ */ new Map(), explicit = options.aPlayerIdForCanonical;
+        const canonicalIds = canonical.players.map((p) => p.id), aIds = raw.players.map((p) => p.id), aSet = new Set(aIds), forward = /* @__PURE__ */ new Map(), reverse = /* @__PURE__ */ new Map(), globalRoles = roleSideMap(canonical), explicit = options.aPlayerIdForCanonical;
         if (explicit != null) for (const id of canonicalIds) forward.set(id, suppliedMap(explicit, id));
         else for (const team of new Set(canonical.players.map((p) => p.team))) {
           const cs = canonical.players.filter((p) => p.team === team), as = raw.players.filter((p) => p.team === team);
@@ -473,16 +506,20 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         }, canonicalForA(id) {
           if (!reverse.has(id)) throw new Error(`A_PLAYER_MAPPING_UNKNOWN:${id}`);
           return reverse.get(id);
+        }, globalSideRoleFor(id) {
+          if (!globalRoles.has(id)) throw new Error(`A_ROLE_SIDE_MAPPING_MISSING:${id}`);
+          return globalRoles.get(id);
         } });
       }
       function makeSceneState(canonical, options = {}) {
         const raw = sceneTemplate(options), mapping = options.scenePlayerIdMapping || buildScenePlayerIdMapping(canonical, raw, options);
+        raw.half = retainedHalf(canonical, raw.half);
         for (const cp of canonical.players) {
           const ap = raw.players.find((p) => p.id === mapping.aForCanonical(cp.id));
           if (!ap) throw new Error(`A_PLAYER_MAPPING_MISSING:${cp.id}`);
-          Object.assign(ap, { x: cp.x, y: cp.y, vx: 0, vy: 0, target: { x: cp.x, y: cp.y }, team: cp.team, role: cp.role || ap.role });
+          const role = sceneRole(canonical, mapping, cp, raw.half), slot = A_ROLE_SLOT[role];
+          Object.assign(ap, { x: cp.x, y: cp.y, vx: 0, vy: 0, target: { x: cp.x, y: cp.y }, team: cp.team, role: role || ap.role, ...slot === void 0 ? {} : { slot } });
         }
-        raw.half = retainedHalf(canonical, raw.half);
         raw.score = [...canonical.score];
         raw.tick = canonical.tick;
         raw.clock = canonical.clock;
@@ -501,7 +538,8 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (!Array.isArray(inspect3.players) || inspect3.players.length !== 22 || new Set(inspect3.players.map((p) => p.id)).size !== 22) throw new Error("A_RETURN_REQUIRES_22_UNIQUE_PLAYERS");
         for (const p of inspect3.players) mapping.canonicalForA(p.id);
         if (inspect3.ball.owner != null) mapping.canonicalForA(inspect3.ball.owner);
-        return Canonical.create({ tick: inspect3.tick, clock: inspect3.clock, phase: inspect3.phase, score: inspect3.score, possessionTeam: inspect3.possession, players: inspect3.players.map((p) => ({ id: mapping.canonicalForA(p.id), team: p.team, role: p.role, x: p.x, y: p.y, held: Math.max(0, inspect3.time - p.controlSince) })), ball: { x: inspect3.ball.x, y: inspect3.ball.y, z: inspect3.ball.z, ownerId: inspect3.ball.owner == null ? null : mapping.canonicalForA(inspect3.ball.owner), mode: inspect3.ball.mode }, metadata: { aVersion: inspect3.version, attackDirections: directionsForHalf(inspect3.half) } });
+        const metadata = { aVersion: inspect3.version, ...[1, 2].includes(inspect3.half) ? { attackDirections: directionsForHalf(inspect3.half) } : {} };
+        return Canonical.create({ tick: inspect3.tick, clock: inspect3.clock, phase: inspect3.phase, score: inspect3.score, possessionTeam: inspect3.possession, players: inspect3.players.map((p) => ({ id: mapping.canonicalForA(p.id), team: p.team, role: p.role, x: p.x, y: p.y, held: Math.max(0, inspect3.time - p.controlSince) })), ball: { x: inspect3.ball.x, y: inspect3.ball.y, z: inspect3.ball.z, ownerId: inspect3.ball.owner == null ? null : mapping.canonicalForA(inspect3.ball.owner), mode: inspect3.ball.mode }, metadata });
       }
       function inspectInBounds(inspect3) {
         const b = inspect3 && inspect3.ball;
@@ -3170,14 +3208,20 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
             if (![1, 2].includes(data.half)) throw new Error("HYDRATE_CURRENT_HALF_INVALID");
             const byId = new Map(data.players.map((p) => [p.id, p]));
             if (byId.size !== 22 || s.players.some((p) => !byId.has(p.id))) throw new Error("HYDRATE_CURRENT_IDENTITY_INVALID");
+            for (const team of [0, 1]) {
+              const slots = data.players.filter((p) => p.team === team).map((p) => p.slot);
+              if (slots.length !== 11 || slots.some((slot) => !Number.isInteger(slot) || slot < 0 || slot > 10) || new Set(slots).size !== 11) throw new Error("HYDRATE_CURRENT_ROLE_SLOT_INVALID");
+            }
             for (const p of s.players) {
               const next = byId.get(p.id);
-              if (!Number.isFinite(next.x) || !Number.isFinite(next.y) || next.x < 0 || next.x > 105 || next.y < 0 || next.y > 68 || next.team !== p.team) throw new Error("HYDRATE_CURRENT_PLAYER_INVALID");
+              if (!Number.isFinite(next.x) || !Number.isFinite(next.y) || next.x < 0 || next.x > 105 || next.y < 0 || next.y > 68 || next.team !== p.team || typeof next.role !== "string") throw new Error("HYDRATE_CURRENT_PLAYER_INVALID");
               p.x = next.x;
               p.y = next.y;
               p.vx = 0;
               p.vy = 0;
               p.target = { x: p.x, y: p.y };
+              p.role = next.role;
+              p.slot = next.slot;
               invalidateCurrentContract(s, p, "EXTERNAL_CURRENT_HYDRATION");
             }
             const b = data.ball;
@@ -3383,7 +3427,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   });
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/intent.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/intent.js
   function handleBottomGKIntent(playerInformation) {
     if (oppositionNearContext(playerInformation, 10, 25)) {
       return [0, 0, 10, 0, 0, 0, 0, 10, 0, 40, 40];
@@ -3397,7 +3441,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return [70, 10, 10, 0, 0, 0, 0, 10, 0, 0, 0];
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/logger.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/logger.js
   var logger = {
     info: (...args) => {
       if (false)
@@ -3411,7 +3455,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   };
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/common/getBallTrajectory.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/common/getBallTrajectory.js
   function getBallTrajectory(thisPOS, newPOS, power) {
     const xMovement = (thisPOS[0] - newPOS[0]) ** 2;
     const yMovement = (Math.floor(thisPOS[1]) - Math.floor(newPOS[1])) ** 2;
@@ -3457,7 +3501,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return trajectory;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/common.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/common.js
   var matchRNG = Math.random;
   function setMatchSeed(seed) {
     matchRNG = function() {
@@ -3587,7 +3631,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return [x, y];
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/playerDefaults.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/playerDefaults.js
   function initializePlayerObject(position) {
     return {
       position,
@@ -3631,7 +3675,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/factories/playerFactory.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/factories/playerFactory.js
   function createPlayer(position) {
     return initializePlayerObject(position);
   }
@@ -3660,7 +3704,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return { ...player, ...patch };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/setVariables.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/setVariables.js
   function resetPlayerPositions(matchDetails) {
     for (const player of matchDetails.kickOffTeam.players) {
       if (player.currentPOS[0] !== "NP") {
@@ -3783,7 +3827,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/event/goal.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/event/goal.js
   function setKickOffTeamGoalScored(matchDetails) {
     const scorer = matchDetails.ball.lastTouch.playerName;
     matchDetails.iterationLog.push(`Goal Scored by - ${scorer} - (${matchDetails.kickOffTeam.name})`);
@@ -3854,7 +3898,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/set-pieces/corners.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/set-pieces/corners.js
   function setTopRightCornerPositions(matchDetails) {
     const { attack, defence } = assignTeamsAndResetPositions(matchDetails);
     const [pitchWidth] = matchDetails.pitchSize;
@@ -3950,7 +3994,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     matchDetails.iterationLog.push(`Corner to - ${attack.name}`);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/set-pieces/restarts.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/set-pieces/restarts.js
   function setLeftKickOffTeamThrowIn(matchDetails, ballIntended) {
     removeBallFromAllPlayers(matchDetails);
     const { kickOffTeam, secondTeam } = matchDetails;
@@ -4112,7 +4156,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     matchDetails.iterationLog.push(`Goal Kick to - ${attack.name}`);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/boundaryHandler.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/boundaryHandler.js
   function resolveBallLocation(matchDetails, kickteamID, ballIntended) {
     const [bXPOS, bYPOS] = ballIntended;
     const [pitchWidth, pitchHeight] = matchDetails.pitchSize;
@@ -4229,7 +4273,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     });
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/freekick.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/freekick.js
   function setOneHundredYPos(matchDetails, attack, defence, side) {
     const isTop = side === "top";
     const [, pitchHeight] = matchDetails.pitchSize;
@@ -4258,7 +4302,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return matchDetails;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/setFreekicks.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/setFreekicks.js
   function setOneHundredToHalfwayYPos(matchDetails, attack, defence, side) {
     return repositionForDeepSetPiece(matchDetails, attack, defence, side);
   }
@@ -4379,7 +4423,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     });
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/stats.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/stats.js
   function recordShotStats(matchDetails, player, isOnTarget) {
     const getStats = (half) => {
       if (half === 0) {
@@ -4401,7 +4445,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     });
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/penaltyArea.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/penaltyArea.js
   function checkPositionInBottomPenaltyBox(position, pitchWidth, pitchHeight) {
     const yPos = isBetween(position[0], pitchWidth / 4 - 5, pitchWidth - pitchWidth / 4 + 5);
     const xPos = isBetween(position[1], pitchHeight - pitchHeight / 6 + 5, pitchHeight);
@@ -4498,7 +4542,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return playerSpace;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/setPieces.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/setPieces.js
   function executePenaltyShot(matchDetails, team, player) {
     player.action = `none`;
     matchDetails.iterationLog.push(`Penalty Taken by: ${player.name}`);
@@ -4678,7 +4722,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/penalty.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/penalty.js
   function calculatePenaltyTarget(pitchSize, player, isOnTarget) {
     const [pitchWidth, pitchHeight] = pitchSize;
     const shotPower = calculatePower(player.skill.strength);
@@ -4694,7 +4738,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return target;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/possession.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/possession.js
   function setGoalieHasBall(matchDetails, thisGoalie) {
     const { kickOffTeam, secondTeam } = matchDetails;
     const team = kickOffTeam.players[0].playerID === thisGoalie.playerID ? kickOffTeam : secondTeam;
@@ -4715,7 +4759,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return matchDetails;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/halftime.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/halftime.js
   function switchSide(matchDetails, team) {
     for (const thisPlayer of team.players) {
       if (!thisPlayer.originPOS) {
@@ -4729,7 +4773,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return matchDetails;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/setPositions.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/setPositions.js
   function keepInBoundaries(matchDetails, kickteamID, ballIntended) {
     return resolveBallLocation(matchDetails, kickteamID, ballIntended);
   }
@@ -4934,7 +4978,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return executeDeepSetPieceSetup(matchDetails, attack, defence, side);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/setBottomFreekicks.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/setBottomFreekicks.js
   function setBottomFreekick(matchDetails) {
     removeBallFromAllPlayers(matchDetails);
     const { kickOffTeam, secondTeam } = matchDetails;
@@ -5019,7 +5063,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     });
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/setTopFreekicks.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/setTopFreekicks.js
   function setTopFreekick(matchDetails) {
     removeBallFromAllPlayers(matchDetails);
     const { kickOffTeam, secondTeam } = matchDetails;
@@ -5096,7 +5140,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     });
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/set-pieces/penalties.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/set-pieces/penalties.js
   function setSetpieceKickOffTeam(matchDetails) {
     const [, pitchHeight] = matchDetails.pitchSize;
     const ballPosition = matchDetails.ball.position;
@@ -5213,7 +5257,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     matchDetails.ball.withTeam = attack.teamID;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/proximity.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/proximity.js
   function getPlayersInDistance(team, player, pitchSize) {
     const [curX, curY] = destructPos(player.currentPOS);
     const [pitchWidth, pitchHeight] = pitchSize;
@@ -5333,14 +5377,14 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return playerInformation;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/utils/assert.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/utils/assert.js
   function assert(condition, message) {
     if (!condition) {
       throw new Error(`[Assertion Failed]: ${message}`);
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/ai/threatAnalysis.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/ai/threatAnalysis.js
   function getAttackingThreatWeights(matchDetails, player, team, opposition) {
     const curPOS = validatePlayerPosition(player.currentPOS);
     const [pitchWidth, pitchHeight] = matchDetails.pitchSize;
@@ -5452,7 +5496,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/intent/utils.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/intent/utils.js
   function calculateShootingThresholds(shootingSkill, pitchHeight) {
     return {
       halfRange: pitchHeight - shootingSkill / 2,
@@ -5501,7 +5545,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return { oppInfo, tmateProximity, oppPos };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/intent/zones.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/intent/zones.js
   function handleGKIntent(zonePressureConfig) {
     const { playerInfo } = zonePressureConfig;
     return resolveZonePressure({
@@ -5554,7 +5598,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return fallbackWeights;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/intent/config.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/intent/config.js
   var STANDARD_SPACE_WEIGHTS = {
     half: [90, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0],
     shot: [50, 0, 20, 0, 0, 0, 0, 30, 0, 0, 0],
@@ -5576,7 +5620,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     fallback: [30, 0, 0, 0, 0, 0, 0, 40, 30, 0, 0]
   };
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/intent/penaltyBox.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/intent/penaltyBox.js
   function handleInPenaltyBox(penaltyBoxContext) {
     const { playerInformation, tmateProximity, currentPOS, pos: pos2, oppCurPos, halfRange, shotRange, pitchHeight } = penaltyBoxContext;
     if (oppositionNearContext(playerInformation, 6, 6)) {
@@ -5646,7 +5690,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     });
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/intentLogic.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/intentLogic.js
   function getAttackingIntentWeights(ctx2) {
     const { matchDetails, player, team, opp: opposition } = ctx2;
     const playerPos = destructPos(player.currentPOS);
@@ -5700,7 +5744,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return handleDefensiveThirdIntent(playerInformation, position);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/playerSelectors.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/playerSelectors.js
   function resolveBestPassOption(playersArray, side, pitchHeight = 1050) {
     const attackingHalfCandidates = playersArray.filter((p) => p.proximity < pitchHeight / 2);
     const tempArray = attackingHalfCandidates.length > 0 ? attackingHalfCandidates : playersArray;
@@ -5728,7 +5772,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/findPossActions.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/findPossActions.js
   function findPossActions(player, matchDetails) {
     const { team, opp: opposition } = getPlayerTeam(player, matchDetails);
     const [ballX, ballY] = matchDetails.ball.position;
@@ -5846,7 +5890,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return goodActions[getRandomNumber(0, goodActions.length - 1)];
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/tackle.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/tackle.js
   function setPostTacklePosition(postTackleConfig) {
     const { matchDetails, winningPlayer: winningPlyr, losingPlayer: losePlayer, increment } = postTackleConfig;
     const [, pitchHeight] = matchDetails.pitchSize;
@@ -5867,7 +5911,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/booking.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/booking.js
   function setFoul(matchDetails, team, player, thatPlayer) {
     matchDetails.iterationLog.push(`Foul against: ${thatPlayer.name}`);
     if (player.stats.tackles.fouls === void 0) {
@@ -5881,7 +5925,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/validation/action.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/validation/action.js
   var BALL_ACTIONS = ["shoot", "throughBall", "pass", "cross", "cleared", "boot", "penalty"];
   var DEFENSIVE_ACTIONS = ["tackle", "intercept", "slide"];
   var MOVEMENT_ACTIONS = ["run", "sprint"];
@@ -5911,7 +5955,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return providedAction;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions.js
   function bottomTeamPlayerHasBall(matchDetails, player, team, opposition) {
     const { position, currentPOS, skill } = player;
     const pos2 = destructPos(currentPOS);
@@ -6025,7 +6069,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return getRandomNumber(1, 99);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/injury.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/injury.js
   function isInjured(x) {
     if (x === 23) {
       return true;
@@ -6040,7 +6084,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/defensiveActions.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/defensiveActions.js
   function handleDefensiveChallenge(challengeConfig) {
     const { player, team, opp: opposition, matchDetails, config } = challengeConfig;
     const { iterationLog, ball } = matchDetails;
@@ -6253,7 +6297,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return setSetpieceSecondTeam(matchDetails);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/ballTrajectory.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/ballTrajectory.js
   function calculateShotTarget(shotConfig) {
     const { player, onTarget, width, height, power } = shotConfig;
     const isTopTeam = player.originPOS[1] < height / 2;
@@ -6336,7 +6380,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return newPosition;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/kickLogic.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/kickLogic.js
   function getRandomKickDirection(side) {
     const horizontal = ["east", "east", "west", "west"];
     const baseTop = ["wait", "north", "north", "north", "north", ...horizontal];
@@ -6413,7 +6457,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return closePlyPos;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/triggers.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/triggers.js
   function ballKicked(matchDetails, team, player) {
     return executeKickAction(matchDetails, team, player);
   }
@@ -6424,7 +6468,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return resolvePassDestination(matchDetails, team, player);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/physics.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/physics.js
   var deflectionStrategies = {
     east: (pos2, p) => [pos2[0] - p / 2, getRandomNumber(pos2[1] - 3, pos2[1] + 3)],
     west: (pos2, p) => [pos2[0] + p / 2, getRandomNumber(pos2[1] - 3, pos2[1] + 3)],
@@ -6465,7 +6509,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     matchDetails.ball.direction = directionMap[key] || matchDetails.ball.direction;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/trajectory.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/trajectory.js
   var mockPlayer = {
     name: "George Johnson",
     shirtNumber: 45,
@@ -6517,13 +6561,10 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return POI;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/teamAi.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/teamAi.js
   function processTeamTactics(closestPlayer, team, opp, matchDetails) {
     const { position: [ballX, ballY] } = matchDetails.ball;
     for (const player of team.players) {
-      if (matchDetails.endIteration === true) {
-        break;
-      }
       if (player.currentPOS[0] === "NP") {
         continue;
       }
@@ -6552,9 +6593,6 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         matchDetails,
         action
       });
-      if (matchDetails.endIteration === true) {
-        break;
-      }
       if (player.hasBall) {
         handleBallPlayerActions({ matchDetails, player, team, opp }, action);
       }
@@ -6633,7 +6671,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     };
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/movement.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/movement.js
   function completeMovement(matchDetails, player, move) {
     const { currentPOS } = player;
     const [oldX, oldY] = destructPos(currentPOS);
@@ -6650,7 +6688,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return [newX, newY];
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/ball.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/ball.js
   function updateInformation(matchDetails, newPosition) {
     if (matchDetails.endIteration === true) {
       return;
@@ -6662,7 +6700,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     setBallPosition(ball, bx, by, 0);
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/ball.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/ball.js
   function setBallMovementMatchDetails(proximityConfig) {
     const { matchDetails, player: thisPlayer, startPos: thisPos, team: thisTeam } = proximityConfig;
     matchDetails.ball.ballOverIterations = [];
@@ -6684,7 +6722,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     matchDetails.ball.withTeam = ``;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/position/offside.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/position/offside.js
   function offsideYPOS(team, side, pitchHeight) {
     const offsideYPOS2 = {
       pos1: 0,
@@ -6775,7 +6813,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return player;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/playerMovement.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/playerMovement.js
   function decideMovement(closestPlayer, team, opp, matchDetails) {
     return processTeamTactics(closestPlayer, team, opp, matchDetails);
   }
@@ -6943,7 +6981,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return [getMove(direction[0]), getMove(direction[1])];
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/ballActionHandler.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/ballActionHandler.js
   var ACTION_STRATEGIES = {
     cleared: ballKicked,
     boot: ballKicked,
@@ -7072,7 +7110,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return result;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/actions/deflections.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/actions/deflections.js
   function resolveDeflection(deflectionConfig) {
     const { power, startPos: thisPOS, defPosition, player: defPlayer, team: defTeam } = deflectionConfig;
     let { matchDetails } = deflectionConfig;
@@ -7133,7 +7171,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return matchDetails;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/collisions.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/collisions.js
   function handleGoalieSave(saveConfig) {
     const { matchDetails, player, ballPos, power, team } = saveConfig;
     const [posX, posY] = destructPos(player.currentPOS);
@@ -7271,7 +7309,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/ballMovement.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/ballMovement.js
   function splitNumberIntoN(num, n) {
     const arrayN = Array.from(new Array(n).keys());
     const splitNumber = [];
@@ -7426,7 +7464,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return newArray;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/ballState.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/ballState.js
   function moveBall(matchDetails) {
     const { ball } = matchDetails;
     if (!ball.ballOverIterations?.length) {
@@ -7461,7 +7499,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return matchDetails;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/lib/validate.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/lib/validate.js
   function validateTeam(team) {
     if (!team.name) {
       throw new Error(`No team name given.`);
@@ -7636,7 +7674,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     }
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/dist/engine.js
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/dist/engine.js
   function initiateGame(team1, team2, pitchDetails) {
     validateArguments(team1, team2, pitchDetails);
     validateTeam(team1);
@@ -7687,7 +7725,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     return matchDetails;
   }
 
-  // ../../flr-v48-1229-9oSGqN/donor/src/init_config/team1.json
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/src/init_config/team1.json
   var team1_default = {
     name: "ThisTeam",
     rating: 88,
@@ -7893,7 +7931,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     ]
   };
 
-  // ../../flr-v48-1229-9oSGqN/donor/src/init_config/team2.json
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/src/init_config/team2.json
   var team2_default = {
     name: "ThatTeam",
     rating: 88,
@@ -8099,7 +8137,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     ]
   };
 
-  // ../../flr-v48-1229-9oSGqN/donor/src/init_config/pitch.json
+  // ../../../home/hong/DevWorker/vendor_cache/footballsim-ea35bbd3245af9c822f7db5cb359b119fb60ab33/src/init_config/pitch.json
   var pitch_default = {
     pitchWidth: 680,
     pitchHeight: 1050,
