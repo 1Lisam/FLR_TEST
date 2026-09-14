@@ -8278,9 +8278,9 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     const p = harness?.pending;
     return !!p && p.generation === c?.generation && p.sceneId === c?.sceneId && p.choiceRevision === c?.choiceRevision && p.sourceStateDigest === c?.sourceStateDigest && p.candidates?.some((x) => x.id === c.id && (x.targetId ?? null) === (c.targetId ?? null));
   }
-  function armChoiceMenu(pointerId, immediate = false) {
+  function armChoiceMenu(pointerId) {
     const c = exactCandidatePairs().find((x) => x.targetId === selectedTargetId) || null;
-    inputGate = { ...inputGate, menuGeneration: inputGate.menuGeneration + 1, armedAt: immediate ? 0 : performance.now() + 130, selectionPointerId: pointerId ?? null, actionPointer: null, locked: false, consumed: false, token: choiceToken(c) };
+    inputGate = { ...inputGate, menuGeneration: inputGate.menuGeneration + 1, armedAt: performance.now(), selectionPointerId: pointerId ?? null, actionPointer: null, locked: false, consumed: false, token: choiceToken(c) };
   }
   function canConsumeChoice(c, gesture) {
     return !!harness && !presenting && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && c.targetId === selectedTargetId && !inputGate.locked && !inputGate.consumed && inputGate.token === choiceToken(c) && samePendingChoice(c) && performance.now() >= inputGate.armedAt && (gesture.source !== "pointer" || gesture.pointerId == null || gesture.pointerId !== inputGate.selectionPointerId);
@@ -8576,7 +8576,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     const c = exactCandidatePairs().find((x) => x.id === choiceId && x.targetId === targetId);
     if (!c) throw Error("G1_TEST_HOOK_EXACT_CHOICE_NOT_PRESENT");
     selectedTargetId = targetId;
-    armChoiceMenu(null, true);
+    armChoiceMenu(null);
     return choose(c, { source: "test", pointerId: null });
   } });
   if (new URLSearchParams(location.search).get("autostart") === "1") start();
