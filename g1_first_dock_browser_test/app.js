@@ -472,7 +472,18 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
             const role = out.get(p.id);
             if (A_ROLE_SLOT[role] !== void 0) counts.set(role, (counts.get(role) || 0) + 1);
           }
-          for (const p of squad) if ((counts.get(out.get(p.id)) || 0) > 1) out.set(p.id, String(p.role || "").toUpperCase());
+          for (const [role, count] of counts) if (count > 1) {
+            const colliding = squad.filter((p) => out.get(p.id) === role);
+            const aliases = colliding.filter((p) => ["LM", "RM", "LW", "RW"].includes(String(p.role || "").toUpperCase()));
+            if (aliases.length === 1) for (const p of colliding) if (p !== aliases[0]) out.set(p.id, String(p.role || "").toUpperCase());
+            else for (const p2 of colliding) out.set(p2.id, String(p2.role || "").toUpperCase());
+          }
+          const sideAliases = squad.filter((p) => ["LM", "RM", "LW", "RW"].includes(String(p.role || "").toUpperCase()));
+          for (const p of sideAliases) out.set(p.id, globalSideRole(p.role));
+          for (const p of squad.filter((p2) => String(p2.role || "").toUpperCase() === "CM")) {
+            const mapped = out.get(p.id);
+            if (sideAliases.some((alias) => out.get(alias.id) === mapped)) out.set(p.id, "CM");
+          }
         }
         return out;
       }
@@ -480,6 +491,33 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
         if (canonical.metadata?.attackDirections === void 0) return player.role;
         const base = mapping.globalSideRoleFor(player.id), directions = directionsForHalf(half), direction = directions[player.team];
         return direction === 1 ? base : SIDE_MATE[base] || base;
+      }
+      function sceneAssignments(canonical, mapping, raw, half) {
+        const assignments = /* @__PURE__ */ new Map();
+        for (const team of [0, 1]) {
+          const squad = canonical.players.filter((p) => p.team === team), occupied = /* @__PURE__ */ new Set(), deferred = [];
+          for (const cp of squad) {
+            const role = sceneRole(canonical, mapping, cp, half), slot = A_ROLE_SLOT[role];
+            if (slot === void 0) {
+              deferred.push({ cp, role });
+              continue;
+            }
+            if (occupied.has(slot)) throw new Error(`A_ROLE_SLOT_COLLISION_UNRESOLVED:${team}:${slot}`);
+            occupied.add(slot);
+            assignments.set(cp.id, { role, slot });
+          }
+          for (const item of deferred) {
+            const ap = raw.players.find((p) => p.id === mapping.aForCanonical(item.cp.id));
+            const free = [...Array(11).keys()].filter((slot2) => !occupied.has(slot2));
+            if (!free.length) throw new Error(`A_ROLE_SLOT_EXHAUSTED:${team}`);
+            const prior = Number.isInteger(ap?.slot) && ap.slot >= 0 && ap.slot <= 10 ? ap.slot : null;
+            const slot = prior != null && free.includes(prior) ? prior : free.sort((a, b) => Math.abs(a - (prior ?? 5)) - Math.abs(b - (prior ?? 5)) || a - b)[0];
+            occupied.add(slot);
+            assignments.set(item.cp.id, { role: item.role, slot });
+          }
+          if (occupied.size !== 11) throw new Error(`A_ROLE_SLOT_INCOMPLETE:${team}`);
+        }
+        return assignments;
       }
       function buildScenePlayerIdMapping(canonical, raw, options = {}) {
         Canonical.validate(canonical);
@@ -514,11 +552,13 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       function makeSceneState(canonical, options = {}) {
         const raw = sceneTemplate(options), mapping = options.scenePlayerIdMapping || buildScenePlayerIdMapping(canonical, raw, options);
         raw.half = retainedHalf(canonical, raw.half);
+        const assignments = sceneAssignments(canonical, mapping, raw, raw.half);
         for (const cp of canonical.players) {
           const ap = raw.players.find((p) => p.id === mapping.aForCanonical(cp.id));
           if (!ap) throw new Error(`A_PLAYER_MAPPING_MISSING:${cp.id}`);
-          const role = sceneRole(canonical, mapping, cp, raw.half), slot = A_ROLE_SLOT[role];
-          Object.assign(ap, { x: cp.x, y: cp.y, vx: 0, vy: 0, target: { x: cp.x, y: cp.y }, team: cp.team, role: role || ap.role, ...slot === void 0 ? {} : { slot } });
+          const assignment = assignments.get(cp.id);
+          if (!assignment) throw new Error(`A_ROLE_SLOT_MAPPING_MISSING:${cp.id}`);
+          Object.assign(ap, { x: cp.x, y: cp.y, vx: 0, vy: 0, target: { x: cp.x, y: cp.y }, team: cp.team, role: assignment.role || ap.role, slot: assignment.slot });
         }
         raw.score = [...canonical.score];
         raw.tick = canonical.tick;
@@ -819,7 +859,12 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
           if (this.protagonistId !== this.fixedProtagonistId) return this.fail("FIXED_PROTAGONIST_ID_MUTATED");
           if (canonical.ball.ownerId !== this.fixedProtagonistId || canonical.ball.mode !== "controlled") return { ok: false, code: "PROTAGONIST_NOT_CURRENT_OWNER" };
           this.donor.pause();
-          const session = this.retainedSession ? AScene.hydrateRetained(this.retainedSession, canonical, { engine: this.aEngine, ...this.aOptions }) : AScene.createRetained(canonical, this.protagonistId, { engine: this.aEngine, ...this.aOptions });
+          let session;
+          try {
+            session = this.retainedSession ? AScene.hydrateRetained(this.retainedSession, canonical, { engine: this.aEngine, ...this.aOptions }) : AScene.createRetained(canonical, this.protagonistId, { engine: this.aEngine, ...this.aOptions });
+          } catch (error) {
+            return this.fail(error?.code || error?.message || "A_SCENE_HANDOFF_EXCEPTION");
+          }
           if (!session.ok) return this.fail(session.code);
           this.retainedSession = session;
           const shown = AScene.inspect(session);
