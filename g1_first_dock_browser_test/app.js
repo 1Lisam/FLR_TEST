@@ -8257,7 +8257,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   var handbackAt = null;
   var donorAdvanceCalls = 0;
   var macroEvents = [];
-  var inputGate = { menuGeneration: 0, armedAt: 0, selectionPointerId: null, actionPointer: null, locked: false, consumed: false, token: null, staleRejectCount: 0, lastReject: null };
+  var inputGate = { menuGeneration: 0, armedAt: 0, selectionPointerId: null, actionPointer: null, locked: false, consumed: false, selectionToken: null, staleRejectCount: 0, lastReject: null };
   var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   var CLOCK = (x) => String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0");
   function inspect() {
@@ -8274,16 +8274,19 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
   function choiceToken(c) {
     return c ? JSON.stringify([c.generation, c.sceneId, c.choiceRevision, c.sourceStateDigest, c.id, c.targetId ?? null]) : null;
   }
+  function selectedTargetToken(c) {
+    return c ? JSON.stringify([c.generation, c.sceneId, c.choiceRevision, c.sourceStateDigest, c.targetId ?? null]) : null;
+  }
   function samePendingChoice(c) {
     const p = harness?.pending;
     return !!p && p.generation === c?.generation && p.sceneId === c?.sceneId && p.choiceRevision === c?.choiceRevision && p.sourceStateDigest === c?.sourceStateDigest && p.candidates?.some((x) => x.id === c.id && (x.targetId ?? null) === (c.targetId ?? null));
   }
   function armChoiceMenu(pointerId) {
     const c = exactCandidatePairs().find((x) => x.targetId === selectedTargetId) || null;
-    inputGate = { ...inputGate, menuGeneration: inputGate.menuGeneration + 1, armedAt: performance.now(), selectionPointerId: pointerId ?? null, actionPointer: null, locked: false, consumed: false, token: choiceToken(c) };
+    inputGate = { ...inputGate, menuGeneration: inputGate.menuGeneration + 1, armedAt: performance.now(), selectionPointerId: pointerId ?? null, actionPointer: null, locked: false, consumed: false, selectionToken: selectedTargetToken(c) };
   }
   function canConsumeChoice(c, gesture) {
-    return !!harness && !presenting && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && c.targetId === selectedTargetId && !inputGate.locked && !inputGate.consumed && inputGate.token === choiceToken(c) && samePendingChoice(c) && performance.now() >= inputGate.armedAt && (gesture.source !== "pointer" || gesture.pointerId == null || gesture.pointerId !== inputGate.selectionPointerId);
+    return !!harness && !presenting && harness.state === import_hybrid_v48.default.STATES.INTERACTIVE_PENDING && c.targetId === selectedTargetId && !inputGate.locked && !inputGate.consumed && inputGate.selectionToken === selectedTargetToken(c) && samePendingChoice(c) && performance.now() >= inputGate.armedAt && (gesture.source !== "pointer" || gesture.pointerId == null || gesture.pointerId !== inputGate.selectionPointerId);
   }
   function recordStaleReject(c, code) {
     inputGate.staleRejectCount++;
@@ -8297,7 +8300,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
       armChoiceMenu(null);
     } else {
       selectedTargetId = null;
-      inputGate = { ...inputGate, actionPointer: null, locked: false, consumed: false, token: null, selectionPointerId: null };
+      inputGate = { ...inputGate, actionPointer: null, locked: false, consumed: false, selectionToken: null, selectionPointerId: null };
     }
     render();
   }
@@ -8543,7 +8546,7 @@ var structuredClone=globalThis.structuredClone||function(value){return JSON.pars
     handbackAt = null;
     donorAdvanceCalls = 0;
     macroEvents = [];
-    inputGate = { menuGeneration: 0, armedAt: 0, selectionPointerId: null, actionPointer: null, locked: false, consumed: false, token: null, staleRejectCount: 0, lastReject: null };
+    inputGate = { menuGeneration: 0, armedAt: 0, selectionPointerId: null, actionPointer: null, locked: false, consumed: false, selectionToken: null, staleRejectCount: 0, lastReject: null };
     try {
       create($("seed").value);
       installDonorEventDrain();
