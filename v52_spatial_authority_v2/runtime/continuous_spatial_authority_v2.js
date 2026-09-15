@@ -40,7 +40,7 @@ function canonicalPlayer(p,writerProvenance={}){
     proposed:{tx:rounded(p?.proposedTx??p?.tx),ty:rounded(p?.proposedTy??p?.ty),facing:rounded(p?.proposedFacing??p?.faceTargetAngle),writer:p?.proposalWriter||null},
     final:{tx:rounded(p?.finalMovementIntent?.targetPoint?.x??p?.tx),ty:rounded(p?.finalMovementIntent?.targetPoint?.y??p?.ty),facing:rounded(p?.faceTargetAngle),writer:p?.finalMovementIntent?.writer||targetWriter,stepId:p?.finalMovementIntent?.stepId||null},
     intent:{type:p?.intent?.type||p?.tacticalTask||p?.action||null,targetId:p?.intent?.targetId||p?.targetId||p?.markTargetId||null,targetPoint:p?.intent?.targetPoint?deep(p.intent.targetPoint):(Number.isFinite(p?.tx)&&Number.isFinite(p?.ty)?{x:rounded(p.tx),y:rounded(p.ty)}:null),reasonCode:p?.intent?.reasonCode||p?.responsibilityReason||null,source:p?.intent?.source||null,epoch:finite(p?.intent?.epoch??p?.responsibilityEpoch),createdAt:finite(p?.intent?.createdAt),expiresAt:finite(p?.intent?.expiresAt??p?.lockTargetUntil),stationaryAllowed:p?.intent?.stationaryAllowed===true},
-    responsibility:{type:p?.responsibility?.type||p?.responsibilityType||null,targetId:p?.responsibility?.targetId||p?.responsibilityTargetId||p?.markTargetId||null,zone:p?.responsibility?.zone||null,goalSideReference:p?.responsibility?.goalSideReference||null,distanceBand:p?.responsibility?.distanceBand||null,epoch:finite(p?.responsibility?.epoch??p?.responsibilityEpoch),reasonCode:p?.responsibility?.reasonCode||p?.responsibilityReason||null},
+    responsibility:{type:p?.responsibility?.type||p?.responsibilityType||null,targetId:p?.responsibility?.targetId||p?.responsibilityTargetId||p?.markTargetId||null,zone:p?.responsibility?.zone||null,goalSideReference:p?.responsibility?.goalSideReference||null,distanceBand:p?.responsibility?.distanceBand||null,lineConnectivity:p?.responsibility?.lineConnectivity?deep(p.responsibility.lineConnectivity):null,epoch:finite(p?.responsibility?.epoch??p?.responsibilityEpoch),reasonCode:p?.responsibility?.reasonCode||p?.responsibilityReason||null},
     action:{type:p?.action||null,tacticalTask:p?.tacticalTask||null,targetId:p?.targetId||p?.markTargetId||null,provenance:p?.actionProvenance||null},
     cooldowns:{nextThink:finite(p?.nextThink),lockTargetUntil:finite(p?.lockTargetUntil),nextChallengeAt:finite(p?.nextChallengeAt),runUntil:finite(p?.runUntil)},contact:p?.contactState?deep(p.contactState):null};
 }
@@ -176,9 +176,16 @@ function activateCoarseState(state,at=0){
 function ballStimulus(state){const b=state.spatial.ball;return{ownerId:b.ownerId||null,x:Number(b.x)||0,y:Number(b.y)||0,mode:b.mode||null,possession:state.possession||null,phase:state.phase||null,revision:Number(state.spatial.stimulusRevision)||0};}
 function stimulusChanged(a,b){return!a||a.ownerId!==b.ownerId||a.mode!==b.mode||a.possession!==b.possession||a.phase!==b.phase||a.revision!==b.revision||Math.hypot((a.x||0)-b.x,(a.y||0)-b.y)>3.25;}
 function clampTargetFromCurrent(player,target,maxDistance=11){const dx=target.x-player.x,dy=target.y-player.y,d=Math.hypot(dx,dy);if(d<=maxDistance)return{x:clamp(target.x,3.5,101.5),y:clamp(target.y,3.5,64.5)};return{x:clamp(player.x+dx*maxDistance/d,3.5,101.5),y:clamp(player.y+dy*maxDistance/d,3.5,64.5)};}
+function coarseDefensiveLineGuide(state,team,owner){
+  // These are live carrier-relative connection points, not formation rails.  A
+  // line is allowed to flex for PRESS/COVER/MARK; the guide only gives released
+  // players a connected route back into the defensive block.
+  const shape=state.structure?.[team]||{},carrier=owner||state.spatial.players.find(p=>p.id===state.spatial.ball.ownerId&&p.team!==team),local=carrier?localPoint(team,carrier.x,carrier.y):{x:52,y:34},lineBias=clamp((Number(shape.lineHeight||50)-50)*.05,-2.5,2.5),transitionDebt=clamp(Number(shape.transitionDebt)||0,0,1),back=clamp(15.5+local.x*.215+lineBias-transitionDebt*2.4,12,39),mid=clamp(back+10.8+local.x*.035-transitionDebt*.8,24,53),front=clamp(mid+11.8+local.x*.025-transitionDebt*.7,38,68);
+  return{schemaVersion:'LIVE_DEFENSIVE_LINE_CONNECTIVITY_1.0',source:'CURRENT_CARRIER_AND_TEAM_STATE',carrierId:carrier?.id||null,carrierLocal:{x:rounded(local.x),y:rounded(local.y)},transitionDebt:rounded(transitionDebt),anchors:{BACK:rounded(back),MID:rounded(mid),FRONT:rounded(front)},gaps:{backToMid:rounded(mid-back),midToFront:rounded(front-mid)},futureOutcomePrecomputed:false};
+}
 function coarseDefensivePlan(state,team){
   const sp=state.spatial,owner=sp.players.find(p=>p.id===sp.ball.ownerId&&p.team!==team),field=sp.players.filter(p=>p.team===team&&p.role!=='GK'),marks=new Map();
-  if(!owner)return{owner:null,pressId:null,coverId:null,marks};
+  if(!owner)return{owner:null,pressId:null,coverId:null,marks,lineGuide:coarseDefensiveLineGuide(state,team,null)};
   const ranked=field.map(p=>({p,d:Math.hypot(p.x-owner.x,p.y-owner.y)})).sort((a,b)=>a.d-b.d||a.p.id.localeCompare(b.p.id));
   let press=ranked[0]?.p||null;
   const ol=localPoint(team,owner.x,owner.y),central=owner.role==='ST'&&Math.abs(ol.y-34)<13&&ol.x<45,wide=Math.abs(ol.y-34)>14;
@@ -188,7 +195,7 @@ function coarseDefensivePlan(state,team){
   const used=new Set([press?.id,cover?.id].filter(Boolean));
   for(const slot of ['LB','RB']){const d=field.find(p=>p.slot===slot&&!used.has(p.id)),threatSlot=slot==='LB'?'RW':'LW',a=sp.players.find(p=>p.team!==team&&p.slot===threatSlot);if(d&&a){const al=localPoint(team,a.x,a.y);if(al.x<57&&Math.abs(al.y-34)>13){marks.set(d.id,a.id);used.add(d.id);}}}
   const st=sp.players.find(p=>p.team!==team&&p.slot==='ST');if(st){const sl=localPoint(team,st.x,st.y),cb=field.filter(p=>p.role==='CB'&&!used.has(p.id)).sort((a,b)=>Math.hypot(a.x-st.x,a.y-st.y)-Math.hypot(b.x-st.x,b.y-st.y))[0];if(cb&&sl.x<50&&Math.abs(sl.y-34)<14)marks.set(cb.id,st.id);}
-  return{owner,pressId:press?.id||null,coverId:cover?.id||null,marks};
+  return{owner,pressId:press?.id||null,coverId:cover?.id||null,marks,lineGuide:coarseDefensiveLineGuide(state,team,owner)};
 }
 function coarseMarkBandPoint(team,player,target){
   const al=localPoint(team,target.x,target.y),pl=localPoint(team,player.x,player.y),band=player.role==='CB'?{min:1.4,ideal:2.0,max:3.0}:player.role==='FB'?{min:1.7,ideal:2.5,max:3.7}:{min:2.1,ideal:3.2,max:4.8},gx=-al.x,gy=34-al.y,gn=Math.hypot(gx,gy)||1,goalSide={x:al.x+gx/gn*band.ideal,y:al.y+gy/gn*band.ideal},laneWeight=player.role==='CB'?.78:player.role==='FB'?.68:.55,slotY=COARSE_SLOT_Y[player.slot]||34;
@@ -208,7 +215,7 @@ function proposalFor(state,player,now){
     if(carrier&&player.id===plan.pressId){const al=localPoint(team,carrier.x,carrier.y),side=Math.sign(local.y-al.y)||((idPhase(player.id)>.5)?1:-1);tx=clamp(al.x-1.35,4,96);ty=clamp(al.y+side*.48,4,64);type='PRESS';reason='CURRENT_CARRIER_USEFUL_SPACE_CLOSE';targetId=carrier.id;responsibility={type:'PRESS',targetId,goalSideReference:{x:team==='HOME'?0:105,y:34}};}
     else if(carrier&&player.id===plan.coverId){const al=localPoint(team,carrier.x,carrier.y),gx=-al.x,gy=34-al.y,n=Math.hypot(gx,gy)||1;tx=clamp(al.x+gx/n*4.4,4,96);ty=clamp(al.y+gy/n*4.4,4,64);type='COVER';reason='PRESS_SUPPORT_DANGEROUS_LANE_PROTECTION';targetId=carrier.id;responsibility={type:'COVER',targetId,goalSideReference:{x:team==='HOME'?0:105,y:34}};}
     else if(plan.marks.has(player.id)){const threat=sp.players.find(p=>p.id===plan.marks.get(player.id)),band=coarseMarkBandPoint(team,player,threat),q=localPoint(team,band.targetPoint.x,band.targetPoint.y);tx=q.x;ty=q.y;type='MARK';reason='GOAL_SIDE_LANE_DISTANCE_RESPONSIBILITY_BAND';targetId=threat.id;responsibility={type:'MARK',targetId,distanceBand:band.distanceBand,goalSideReference:band.goalSideReference,laneReference:band.laneReference};}
-    else{const baseX=role==='CB'?22:role==='FB'?25:role==='CM'?40:role==='WF'?53:57;tx=clamp(baseX+lineBias+(bl.x-52)*.10,12,72);ty=clamp(34+(COARSE_SLOT_Y[slot]-34)*width+(bl.y-34)*.10,6,62);type='RECOVERY';reason='RESPONSIBILITY_RELEASE_SAME_TICK_SHAPE_RECOVERY';responsibility={type:'RECOVERY',targetId:null,goalSideReference:{x:team==='HOME'?0:105,y:34}};}
+    else{const guide=plan.lineGuide,group=role==='CB'||role==='FB'?'BACK':role==='CM'?'MID':'FRONT',roleOffset=role==='FB'?.75:role==='CB'?-0.35:role==='WF'?.55:role==='ST'?.25:0,ballPull=group==='BACK'?.07:group==='MID'?.15:.22;tx=clamp(guide.anchors[group]+roleOffset+(bl.x-guide.carrierLocal.x)*ballPull+wave*.38,12,72);ty=clamp(34+(COARSE_SLOT_Y[slot]-34)*width+(bl.y-34)*(group==='BACK'?.10:group==='MID'?.17:.22)+wave*.35,6,62);type='RECOVERY';reason='LIVE_CARRIER_CONNECTED_LINE_RECOVERY';responsibility={type:'RECOVERY',targetId:null,goalSideReference:{x:team==='HOME'?0:105,y:34},lineConnectivity:{group,guideVersion:guide.schemaVersion,carrierId:guide.carrierId,anchors:guide.anchors}};}
   }else if(role==='FB'&&!inPoss){
     const threatSlot=slot==='RB'?'LW':'RW',threat=sp.players.find(p=>p.team===coarseOther(team)&&p.slot===threatSlot);
     if(threat){const tl=localPoint(team,threat.x,threat.y);tx=clamp(tl.x-2.8,12,82);ty=clamp(tl.y+(34-tl.y)*.14,5,63);type='WIDE_CONTAIN';reason='WIDE_THREAT_CONTAIN';targetId=threat.id;}
@@ -247,7 +254,8 @@ function sealCoarseMovementIntents(state,now){
   sp.movementIntentEpoch=Number(sp.movementIntentEpoch||0)+1;
   const candidates=sp.players.map(p=>{const intent=p.intent||{},type=intent.type||p.tacticalTask||p.action,targetId=intent.targetId||null,responsibility={...(intent.responsibility||{type,targetId}),epoch:Number(intent.epoch||0),reasonCode:intent.reasonCode||null};return{p,type,targetId,targetPoint:{x:p.tx,y:p.ty},responsibility};});
   for(const c of candidates)if(['COVER','MARK','RECOVERY'].includes(c.type))fallbacks[c.p.id]=deep({type:c.type,targetId:c.targetId,targetPoint:c.targetPoint,responsibility:c.responsibility});
-  const carrier=sp.ball.mode==='CONTROLLED'?sp.players.find(p=>p.id===sp.ball.ownerId)||null:null,pressWinnerByTeam={};
+  const carrier=sp.ball.mode==='CONTROLLED'?sp.players.find(p=>p.id===sp.ball.ownerId)||null:null,pressWinnerByTeam={},connectivity={};
+  for(const team of['HOME','AWAY'])connectivity[team]=coarseDefensivePlan(state,team).lineGuide;
   if(carrier)for(const team of['HOME','AWAY']){
     const duplicate=candidates.filter(c=>c.p.team===team&&c.type==='PRESS'&&c.targetId===carrier.id);
     if(duplicate.length>1){const selectedId=coarseDefensivePlan(state,team).pressId;pressWinnerByTeam[team]=duplicate.some(c=>c.p.id===selectedId)?selectedId:duplicate.sort((a,b)=>Math.hypot(a.p.x-carrier.x,a.p.y-carrier.y)-Math.hypot(b.p.x-carrier.x,b.p.y-carrier.y)||a.p.id.localeCompare(b.p.id))[0].p.id;}
@@ -257,7 +265,7 @@ function sealCoarseMovementIntents(state,now){
     c.p.responsibility=deep(selected.responsibility);c.p.responsibilityType=selected.responsibility.type;c.p.responsibilityTargetId=selected.responsibility.targetId||null;c.p.responsibilityReason=selected.responsibility.reasonCode;c.p.responsibilityEpoch=selected.responsibility.epoch;c.p.markTargetId=selected.type==='MARK'?selected.targetId||null:null;
     c.p.finalMovementIntent={schemaVersion:'FINAL_MOVEMENT_INTENT_1.0',stepId,actorId:c.p.id,type:selected.type,targetId:selected.targetId||null,targetPoint:{x:selected.targetPoint.x,y:selected.targetPoint.y},source:'CONTINUOUS_SPATIAL_AUTHORITY_V2_FINAL_ARBITER',writer:'runtime/continuous_spatial_authority_v2.sealCoarseMovementIntents',futureOutcomePrecomputed:false};
   }
-  sp.movementIntentArbiter={schemaVersion:'SINGLE_FINAL_MOVEMENT_ARBITER_1.0',stepId,at:Number(now.toFixed(3)),source:'COARSE_FINAL_ARBITER',finalWriterCountByActor:Object.fromEntries(sp.players.map(p=>[p.id,1])),postArbiterFinalWriterCount:0,futureOutcomePrecomputed:false};return sp.movementIntentArbiter;
+  sp.defensiveConnectivity=connectivity;sp.movementIntentArbiter={schemaVersion:'SINGLE_FINAL_MOVEMENT_ARBITER_1.0',stepId,at:Number(now.toFixed(3)),source:'COARSE_FINAL_ARBITER',finalWriterCountByActor:Object.fromEntries(sp.players.map(p=>[p.id,1])),postArbiterFinalWriterCount:0,defensiveConnectivity:deep(connectivity),futureOutcomePrecomputed:false};return sp.movementIntentArbiter;
 }
 function shouldReevaluate(state,player,now){const i=player.intent;if(!i||now>=Number(i.expiresAt||0)-1e-6)return'INTENT_EXPIRED';if(stimulusChanged(i.stimulus,ballStimulus(state)))return'FOOTBALL_STIMULUS_CHANGED';if(Math.hypot((i.targetPoint?.x??player.tx)-player.x,(i.targetPoint?.y??player.ty)-player.y)<.78)return'TARGET_REACHED';return null;}
 function recordTouch(state,kind,player,at,extra={}){const sp=state.spatial,ball=sp.ball,row={sequence:++sp.touchSequence,at:Number(at.toFixed(3)),kind,playerId:player?.id||null,team:player?.team||null,x:rounded(ball.x),y:rounded(ball.y),...extra};boundedHistory(ball.causalHistory||(ball.causalHistory=[]),row);return row;}
@@ -274,9 +282,27 @@ function tryCausalTurnover(state,at,maxDistance=3.0){
   let best=null,bestD=Infinity;for(const p of sp.players){if(p.team===owner.team||p.role==='GK')continue;const d=Math.hypot(p.x-ball.x,p.y-ball.y);if(d<bestD){best=p;bestD=d;}}
   if(!best||bestD>maxDistance)return null;setControlled(state,best,at,'PRESSURE_TURNOVER_TOUCH');state.phase='TRANSITION';state._v2TransitionUntil=at+2.5;return{player:best,wonFrom:owner,distance:bestD};
 }
+function pressContactCandidates(state){
+  const sp=state.spatial,ball=sp.ball,owner=sp.players.find(p=>p.id===ball.ownerId);if(!owner||ball.mode!=='CONTROLLED')return{owner:null,candidate:null};
+  const candidates=sp.players.filter(p=>p.team!==owner.team&&p.role!=='GK'&&(p.finalMovementIntent?.type==='PRESS'||p.responsibility?.type==='PRESS'||p.intent?.type==='PRESS')).map(p=>({p,d:Math.hypot(p.x-owner.x,p.y-owner.y),relativeSpeed:Math.hypot((p.vx||0)-(owner.vx||0),(p.vy||0)-(owner.vy||0))})).sort((a,b)=>a.d-b.d||a.p.id.localeCompare(b.p.id));
+  return{owner,candidate:candidates[0]||null};
+}
+function pressContactCadence(state,at){
+  const sp=state.spatial,{owner,candidate}=pressContactCandidates(state),now=Number(at),cadence=sp.pressContactCadence||(sp.pressContactCadence={schemaVersion:'CAUSAL_PRESS_CONTACT_CADENCE_1.0',pairKey:null,awaitingRelease:false,released:false,lastAttemptAt:null,nextEligibleAt:null,lastOutcome:null,futureOutcomePrecomputed:false});
+  if(!owner)return{eligible:false,reason:'NO_CONTROLLED_CARRIER',candidate:null,cadence:deep(cadence)};
+  const pairKey=candidate?`${candidate.p.id}>${owner.id}`:null;
+  if(!candidate||candidate.d>1.55){if(cadence.awaitingRelease&&(!pairKey||pairKey===cadence.pairKey))cadence.released=true;return{eligible:false,reason:!candidate?'NO_CURRENT_PRESSER':'PRESS_OUTSIDE_CONTACT_RADIUS',candidate:candidate?{player:candidate.p,distance:candidate.d}:null,cadence:deep(cadence)};}
+  if(cadence.pairKey!==pairKey)return{eligible:true,reason:'NEW_CURRENT_PRESS_PAIR',pairKey,candidate:{player:candidate.p,distance:candidate.d},cadence:deep(cadence)};
+  if(cadence.awaitingRelease&&!cadence.released)return{eligible:false,reason:'SAME_ENGAGEMENT_AWAITING_SEPARATION',pairKey,candidate:{player:candidate.p,distance:candidate.d},cadence:deep(cadence)};
+  if(now<Number(cadence.nextEligibleAt||-Infinity)-1e-6)return{eligible:false,reason:'CONTACT_CADENCE_COOLDOWN',pairKey,candidate:{player:candidate.p,distance:candidate.d},cadence:deep(cadence)};
+  return{eligible:true,reason:cadence.released?'SEPARATED_REENGAGEMENT':'CONTACT_CADENCE_READY',pairKey,candidate:{player:candidate.p,distance:candidate.d},cadence:deep(cadence)};
+}
+function recordPressContactAttempt(state,at,gate,result){
+  const sp=state.spatial,cadence=sp.pressContactCadence||(sp.pressContactCadence={schemaVersion:'CAUSAL_PRESS_CONTACT_CADENCE_1.0',futureOutcomePrecomputed:false}),pairKey=gate?.pairKey||`${result?.player?.id||'UNKNOWN'}>${result?.wonFrom?.id||sp.ball.ownerId||'UNKNOWN'}`;
+  cadence.pairKey=pairKey;cadence.lastAttemptAt=Number(at);cadence.lastOutcome=result?.outcome||null;cadence.nextEligibleAt=Number((Number(at)+.9).toFixed(3));cadence.awaitingRelease=result?.attempted===true&&result.outcome==='RETAIN';cadence.released=!cadence.awaitingRelease;cadence.futureOutcomePrecomputed=false;sp.writerStats.challengeCadenceBlocks=Number(sp.writerStats.challengeCadenceBlocks||0);return cadence;
+}
 function resolveCausalContact(state,at,opts={}){
-  const sp=state.spatial,ball=sp.ball,owner=sp.players.find(p=>p.id===ball.ownerId);if(!owner||ball.mode!=='CONTROLLED')return{attempted:false,outcome:'NO_CONTROLLED_CARRIER'};
-  const candidates=sp.players.filter(p=>p.team!==owner.team&&p.role!=='GK'&&p.intent?.type==='PRESS').map(p=>({p,d:Math.hypot(p.x-owner.x,p.y-owner.y),relativeSpeed:Math.hypot((p.vx||0)-(owner.vx||0),(p.vy||0)-(owner.vy||0))})).sort((a,b)=>a.d-b.d||a.p.id.localeCompare(b.p.id)),c=candidates[0];
+  const sp=state.spatial,ball=sp.ball,{owner,candidate:c}=pressContactCandidates(state);if(!owner||ball.mode!=='CONTROLLED')return{attempted:false,outcome:'NO_CONTROLLED_CARRIER'};
   if(!c||c.d>1.55)return{attempted:false,outcome:'LOW_PRESSURE_CONTROL',nearestPressureDistance:c?.d??null};
   const roll=clamp(Number(opts.roll),0,.999999),secondary=clamp(Number(opts.secondaryRoll??roll*.618+.173),0,.999999),edge=Math.min(owner.y,68-owner.y),control=Math.hypot(owner.vx||0,owner.vy||0),winChance=clamp(.28+(1.55-c.d)*.20+c.relativeSpeed*.018+(control<1.4?.035:0),.22,.58);
   sp.writerStats.challengeAttempts=Number(sp.writerStats.challengeAttempts||0)+1;
@@ -402,5 +428,5 @@ function coarseDiagnostics(state){const sp=state?.spatial||{};return{schemaVersi
 function roundTrip(observation){return JSON.parse(JSON.stringify(observation));}
 function schemaRoundTripEqual(observation){return same(observation,roundTrip(observation));}
 
-return{SCHEMA_VERSION,TRACE_VERSION,FEATURE_FLAG,COARSE_FEATURE_FLAG,COARSE_SCHEMA_VERSION,LEASE_SCHEMA_VERSION,ACTUAL_HISTORY_SCHEMA_VERSION,enabled,coarseEnabled,createObserver,getObserver,observerForBoundary,attachBoundary,createCanonicalObservation,createCoarseSpatial,activateCoarseState,syncBallDerived,advanceCoarseTo,refreshIntents,beginPass,tryCausalTurnover,resolveCausalContact,physicalOwner,adoptHandback,resolutionSnapshot,resolutionContext,coarseDiagnostics,roundTrip,schemaRoundTripEqual,createResolutionRandom,appendActualHistory,createResolutionLease,resolutionLeaseForContext,prepareResolutionLease,acquireResolutionLease,bindResolutionAdapter,releaseResolutionLease,leaseAudit};
+return{SCHEMA_VERSION,TRACE_VERSION,FEATURE_FLAG,COARSE_FEATURE_FLAG,COARSE_SCHEMA_VERSION,LEASE_SCHEMA_VERSION,ACTUAL_HISTORY_SCHEMA_VERSION,enabled,coarseEnabled,createObserver,getObserver,observerForBoundary,attachBoundary,createCanonicalObservation,createCoarseSpatial,activateCoarseState,syncBallDerived,advanceCoarseTo,refreshIntents,beginPass,tryCausalTurnover,pressContactCadence,recordPressContactAttempt,resolveCausalContact,physicalOwner,adoptHandback,resolutionSnapshot,resolutionContext,coarseDiagnostics,roundTrip,schemaRoundTripEqual,createResolutionRandom,appendActualHistory,createResolutionLease,resolutionLeaseForContext,prepareResolutionLease,acquireResolutionLease,bindResolutionAdapter,releaseResolutionLease,leaseAudit};
 });

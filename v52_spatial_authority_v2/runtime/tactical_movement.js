@@ -1165,6 +1165,8 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
       const ol=worldToLocal(team,owner.x,owner.y),gx=-ol.x,gy=34-ol.y,n=Math.hypot(gx,gy)||1,depth=ol.x<22?3.8:4.8;
       desired={x:clamp(ol.x+gx/n*depth,3,96),y:clamp(ol.y+gy/n*depth,4,64)};task='SHOT_LANE_COVER';mode='PROTECTIVE_LANE';sprint=Math.hypot(desired.x-dl.x,desired.y-dl.y)>3.2;rewriteReason='COVER_CURRENT_PROTECTIVE_LANE';
     }else if(r.type==='COVER'){
+      const proposal=m?._defensiveTargetAuthorityContract?.[team]?.shapeProposals?.get(d.id);
+      if(proposal&&Number.isFinite(proposal.x)&&Number.isFinite(proposal.y))desired=worldToLocal(team,proposal.x,proposal.y);
       mode='PROTECTIVE_SHAPE';rewriteReason='COVER_CURRENT_ASSIGNED_LANE';
     }else if(r.type==='RECOVERY'){
       desired.x=clamp(Math.min(desired.x,dl.x-1.25),3,96);desired.y=clamp(lerp(dl.y,desired.y,.65),4,64);task='RECOVERY_CHASE';mode='TURN_RUN';sprint=true;rewriteReason='RECOVERY_GOAL_ORIENTED';
