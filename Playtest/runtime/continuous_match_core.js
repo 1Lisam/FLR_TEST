@@ -38,7 +38,6 @@ function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function subjectName(name){const t=String(name||'선수'),c=t.charCodeAt(t.length-1);if(c>=0xAC00&&c<=0xD7A3)return t+(((c-0xAC00)%28)?'이':'가');return t+'이';}
 function teamDisplayName(team){return team===HOME?'블루팀':'레드팀';}
 function lerp(a,b,t){return a+(b-a)*t;}
-function hypot(x,y){return Math.hypot(x,y);}
 function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
 function norm(x,y){const d=Math.hypot(x,y)||1;return{x:x/d,y:y/d};}
 function other(team){return team===HOME?AWAY:HOME;}
@@ -67,7 +66,6 @@ function teamPlayers(m,team){return m.players.filter(p=>p.team===team);}
 function outfield(m,team){return m.players.filter(p=>p.team===team&&p.role!=='GK');}
 function inPenaltyArea(team,x,y){const l=worldToLocal(team,x,y);return l.x<=16.5&&l.y>=13.84&&l.y<=54.16;}
 function inOppPenaltyArea(team,x,y){return inPenaltyArea(other(team),x,y);}
-function insideField(x,y){return x>=0&&x<=105&&y>=0&&y<=68;}
 function segmentPointDistance(ax,ay,bx,by,px,py){const vx=bx-ax,vy=by-ay,wx=px-ax,wy=py-ay,c1=vx*wx+vy*wy,c2=vx*vx+vy*vy;const t=c2?clamp(c1/c2,0,1):0;const qx=ax+vx*t,qy=ay+vy*t;return Math.hypot(px-qx,py-qy);}
 
 function createPlayers(){
@@ -305,7 +303,6 @@ function rhythmBuildUpAction(m,owner,pre){
   return null;
 }
 function ballCarrierPressureDistance(m,p){let d=nearestOppDistance(m,p);for(const q of outfield(m,other(p.team))){const pairCooling=(q.duelPairCooldownUntil||0)>m.time&&q.duelPairCooldownOwnerId===p.id;if(pairCooling&&dist(p,q)<3.0)d=Math.min(d,0.80);else if((q.duelContainUntil||0)>m.time&&dist(p,q)<2.2)d=Math.min(d,0.65);}return d;}
-function attackersAhead(m,p){return outfield(m,p.team).filter(q=>q.id!==p.id&&dir(p.team)*(q.x-p.x)>1);}
 function laneBlockers(m,a,b,team){return outfield(m,team).filter(p=>segmentPointDistance(a.x,a.y,b.x,b.y,p.x,p.y)<1.15&&dist(a,p)>1.4&&dist(b,p)>1.2).sort((x,y)=>dist(a,x)-dist(a,y));}
 
 

@@ -57,7 +57,7 @@ function install(){
   function prepareForced(){uiOnly=true;forcedMode=true;hideFallback();desc.value='';if(attach){attach.checked=true;attach.disabled=false}modal.hidden=false;setTimeout(()=>desc.focus(),0)}
   function keepButtonAvailable(){if(report.disabled)report.disabled=false}
   keepButtonAvailable();new MutationObserver(keepButtonAvailable).observe(report,{attributes:true,attributeFilter:['disabled']});
-  report.onclick=function(ev){hideFallback();if(forcedReport()){prepareForced();return}uiOnly=false;forcedMode=false;if(attach){attach.disabled=false;attach.checked=true}return originalReport?.call(this,ev)};
+  report.onclick=function(ev){hideFallback();if(forcedReport()){prepareForced();return}if(hasSceneDebug()){uiOnly=false;forcedMode=false;if(attach)attach.disabled=false;return originalReport?.call(this,ev)}prepareUiOnly()};
   submit.onclick=async function(ev){
     if(!uiOnly){if(attach)attach.disabled=false;const result=originalSubmit?.call(this,ev);if(result&&typeof result.then==='function')await result;const fallback=lastMetadataFallback;if(fallback&&Date.now()-fallback.at<5000&&modal.hidden){if(playback)playback.textContent=`버그 등록 완료 · ${fallback.reportId} · 전체 JSON 용량 초과로 상황 요약 저장됨 · GitHub 로그인 불필요`;lastMetadataFallback=null}if(!modal.hidden&&String(playback?.textContent||'').startsWith('자동 등록 실패'))showFallback();return}
     const description=desc.value.trim();if(!description){desc.focus();return}

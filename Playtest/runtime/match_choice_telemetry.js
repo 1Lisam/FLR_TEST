@@ -11,8 +11,6 @@ const LEVEL_NAMES=['ROUTINE','MEANINGFUL','IMPORTANT','DECISIVE'];
 const CHECKPOINTS=[1,3,5];
 const MAX_DECISIONS=160,MAX_CHAINS=60,MAX_EVENTS=100;
 
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-function other(t){return t==='HOME'?'AWAY':'HOME';}
 function blankTeam(){return{HOME:0,AWAY:0};}
 function createState(opts={}){
   return{

@@ -958,71 +958,11 @@ function assignAttack(m,team,ctx){
 // V42 attack-side spacing: arbitrate only a live possessing team's proposed support
 // geometry when it would worsen an already compact aggregate shape. This is a target
 // adjustment, not a formation reset; carrier and active-run intent remain authoritative.
-function applyPossessionRestDefenceArbitration(m,team,ctx){
-  const owner=ctx?.owner,progress=Number(ctx?.progress??worldToLocal(team,m.ball.x,m.ball.y).x),plans=new Map(),rows=[];
-  if(!owner||owner.team!==team||m.ball?.mode!=='CONTROLLED'||progress<55){
-    m._possessionRestDefencePlan={schemaVersion:'POSSESSION_REST_DEFENCE_1.0',team,at:m.time,progress,threats:[],assignments:[],futureOutcomePrecomputed:false};
-    return plans;
-  }
-  const limit=Math.min(55,progress-6);
-  const threats=outfield(m,other(team))
-    .map(a=>({a,l:worldToLocal(team,a.x,a.y)}))
-    .filter(o=>(o.a.role==='ST'&&o.l.x<=limit&&Math.abs(o.l.y-34)<=14)||(o.a.role==='WF'&&o.l.x<=limit&&Math.abs(o.l.y-34)>=14))
-    .map(o=>({...o,kind:o.a.role==='ST'?'CENTRAL':'WIDE',priority:(o.a.role==='ST'?22:16)+(55-o.l.x)}))
-    .sort((a,b)=>b.priority-a.priority||a.a.id.localeCompare(b.a.id));
-  const defenders=outfield(m,team).filter(p=>p.id!==owner.id&&['CB','FB','CM'].includes(p.role)),used=new Set();
-  const localTarget=p=>worldToLocal(team,Number.isFinite(p.tx)?p.tx:p.x,Number.isFinite(p.ty)?p.ty:p.y);
-  const laneOK=(p,t,pl)=>t.kind!=='WIDE'||sideSign(p.slot)===Math.sign(t.l.y-34)||Math.abs(pl.y-t.l.y)<=9;
-  const credible=(p,t)=>{
-    const pl=worldToLocal(team,p.x,p.y),tl=localTarget(p),d=Math.hypot(pl.x-t.l.x,pl.y-t.l.y),lat=Math.abs(pl.y-t.l.y);
-    return pl.x<=t.l.x-.35&&tl.x<=t.l.x-.15&&d<=(t.kind==='WIDE'?15:14)&&lat<=(t.kind==='WIDE'?11:12)&&laneOK(p,t,pl);
-  };
-  const score=(p,t)=>{
-    const pl=worldToLocal(team,p.x,p.y),d=Math.hypot(pl.x-t.l.x,pl.y-t.l.y),lat=Math.abs(pl.y-t.l.y),ahead=Math.max(0,pl.x-t.l.x);
-    let v=d+lat*.16+ahead*1.15;
-    if(t.kind==='CENTRAL')v+=p.role==='CB'?-5:p.role==='CM'?1.5:4;
-    else{
-      const same=sideSign(p.slot)===Math.sign(t.l.y-34);
-      v+=p.role==='FB'?(same?-6:8):p.role==='CM'?(same?-1:2.5):3.8;
-    }
-    if(/OVERLAP_SURGE|UNDERLAP_SURGE|LATE_BOX_ARRIVAL/.test(String(p.tacticalTask||'')))v+=3.5;
-    return v;
-  };
-  for(const t of threats){
-    const existing=defenders.filter(p=>!used.has(p.id)&&credible(p,t)).sort((a,b)=>score(a,t)-score(b,t)||a.id.localeCompare(b.id))[0];
-    if(existing){
-      used.add(existing.id);
-      rows.push({threatId:t.a.id,kind:t.kind,protectorId:existing.id,override:false,reason:'CURRENT_AND_PROPOSED_CREDIBLE_COVER'});
-      continue;
-    }
-    const chosen=defenders.filter(p=>!used.has(p.id)).sort((a,b)=>score(a,t)-score(b,t)||a.id.localeCompare(b.id))[0];
-    if(!chosen){
-      rows.push({threatId:t.a.id,kind:t.kind,protectorId:null,override:false,reason:'NO_AVAILABLE_PROTECTOR'});
-      continue;
-    }
-    const laneY=lane(chosen.slot);
-    const weight=t.kind==='WIDE'?(chosen.role==='FB'?.84:chosen.role==='CM'?.68:.50):(chosen.role==='CB'?.68:.54);
-    const x=clamp(t.l.x-(t.kind==='WIDE'?1.65:1.85),8,72),y=clamp(lerp(laneY,t.l.y,weight),5,63);
-    const task=t.kind==='WIDE'?'COUNTER_WIDE_COVER':'COUNTER_ST_COVER';
-    plans.set(chosen.id,{lx:x,ly:y,task,sprint:Math.hypot(worldToLocal(team,chosen.x,chosen.y).x-x,worldToLocal(team,chosen.x,chosen.y).y-y)>3.0,threatId:t.a.id,kind:t.kind});
-    used.add(chosen.id);
-    rows.push({threatId:t.a.id,kind:t.kind,protectorId:chosen.id,override:true,reason:'CURRENT_UNCOVERED_COUNTER_THREAT',target:{x:Number(x.toFixed(3)),y:Number(y.toFixed(3))}});
-  }
-  for(const p of defenders){
-    const q=plans.get(p.id);if(!q)continue;
-    const w=localToWorld(team,q.lx,q.ly);
-    p.tx=w.x;p.ty=w.y;p.action=p.tacticalTask=q.task;p.sprint=q.sprint;p.possessionRestDefenceThreatId=q.threatId;
-  }
-  m._possessionRestDefencePlan={schemaVersion:'POSSESSION_REST_DEFENCE_1.0',team,at:m.time,progress:Number(progress.toFixed(3)),threats:threats.map(t=>({id:t.a.id,kind:t.kind,localX:Number(t.l.x.toFixed(3)),localY:Number(t.l.y.toFixed(3))})),assignments:rows,futureOutcomePrecomputed:false};
-  return plans;
-}
-
 function arbitrateAttackingTargets(m,team,ctx){
   const owner=ctx?.owner;
   if(!m||!owner||owner.team!==team||m.restart||m.setPieceLive||m.ball?.mode==='LOOSE')return;
   if(['SET_PIECE_LIVE','SET_PIECE_SETUP','GOAL_CELEBRATION'].includes(String(m.phase||'')))return;
   if((m.events||[]).some(e=>m.time-Number(e.t||0)<=1.5&&['SAVE','PARRY','BLOCK','CLEARANCE','CROSS_RECEIVE','HEADER_SHOT','DUEL_CONTACT','DUEL_DEFLECTION'].includes(e.type)))return;
-  applyPossessionRestDefenceArbitration(m,team,ctx);
   const ps=outfield(m,team),localTarget=p=>worldToLocal(team,Number.isFinite(p.tx)?p.tx:p.x,Number.isFinite(p.ty)?p.ty:p.y),localLive=p=>worldToLocal(team,p.x,p.y);
   const shape=rows=>{const central=rows.filter(q=>q.x>=25&&q.x<=82&&Math.abs(q.y-34)<=16).length,seen=new Set(),groups=[];for(let i=0;i<rows.length;i++){if(seen.has(i))continue;const q=[i];let n=0;seen.add(i);while(q.length){const a=q.pop();n++;for(let j=0;j<rows.length;j++)if(!seen.has(j)&&Math.hypot(rows[a].x-rows[j].x,rows[a].y-rows[j].y)<=14){seen.add(j);q.push(j);}}groups.push(n);}let pair=0,count=0;for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){pair+=Math.hypot(rows[i].x-rows[j].x,rows[i].y-rows[j].y);count++;}return{central,cluster:groups.length?Math.max(...groups):0,pairDistance:count?pair/count:0};};
   const live=shape(ps.map(localLive)),proposed=shape(ps.map(localTarget));
@@ -1032,7 +972,7 @@ function arbitrateAttackingTargets(m,team,ctx){
   const activeRun=new Set(['OVERLAP','UNDERLAP','BALANCED_OVERLAP','THIRD_MAN_RUN','FAR_SIDE_RUN','PIN_AND_RUN','INSIDE_CHANNEL','ATTACK_NEAR_POST','ATTACK_BACK_POST','BOX_CHANNEL_RUN','LATE_BOX_ARRIVAL','FB_OVERLAP_SURGE','FB_UNDERLAP_SURGE','ST_RELEASE_RUN','WIDE_RELEASE_OUTLET','SECOND_BALL_SUPPORT','PULL_OFF_FOR_CROSS','ATTACK_OPEN_CHANNEL']);
   const supportTask=/SUPPORT|CONNECT|SCREEN|RECOVER|RECONNECT|PIVOT|HOLD|REST|INVERT|DROP|SECOND_LINE|EDGE/;
   const rolePriority={CB:0,FB:1,CM:2,WF:3};
-  const candidates=ps.filter(p=>p.id!==owner.id&&!String(p.tacticalTask||'').startsWith('COUNTER_')&&!activeRun.has(String(p.tacticalTask||''))&&supportTask.test(String(p.tacticalTask||''))&&['CM','FB','CB','WF'].includes(p.role)).sort((a,b)=>rolePriority[a.role]-rolePriority[b.role]||String(a.id).localeCompare(String(b.id)));
+  const candidates=ps.filter(p=>p.id!==owner.id&&!activeRun.has(String(p.tacticalTask||''))&&supportTask.test(String(p.tacticalTask||''))&&['CM','FB','CB','WF'].includes(p.role)).sort((a,b)=>rolePriority[a.role]-rolePriority[b.role]||String(a.id).localeCompare(String(b.id)));
   const used=[];
   for(const p of candidates){
     const t=localTarget(p);if(t.x<25||t.x>82||Math.abs(t.y-34)>16)continue;
@@ -1225,8 +1165,6 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
       const ol=worldToLocal(team,owner.x,owner.y),gx=-ol.x,gy=34-ol.y,n=Math.hypot(gx,gy)||1,depth=ol.x<22?3.8:4.8;
       desired={x:clamp(ol.x+gx/n*depth,3,96),y:clamp(ol.y+gy/n*depth,4,64)};task='SHOT_LANE_COVER';mode='PROTECTIVE_LANE';sprint=Math.hypot(desired.x-dl.x,desired.y-dl.y)>3.2;rewriteReason='COVER_CURRENT_PROTECTIVE_LANE';
     }else if(r.type==='COVER'){
-      const proposal=m?._defensiveTargetAuthorityContract?.[team]?.shapeProposals?.get(d.id);
-      if(proposal&&Number.isFinite(proposal.x)&&Number.isFinite(proposal.y))desired=worldToLocal(team,proposal.x,proposal.y);
       mode='PROTECTIVE_SHAPE';rewriteReason='COVER_CURRENT_ASSIGNED_LANE';
     }else if(r.type==='RECOVERY'){
       desired.x=clamp(Math.min(desired.x,dl.x-1.25),3,96);desired.y=clamp(lerp(dl.y,desired.y,.65),4,64);task='RECOVERY_CHASE';mode='TURN_RUN';sprint=true;rewriteReason='RECOVERY_GOAL_ORIENTED';

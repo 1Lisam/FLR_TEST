@@ -216,12 +216,6 @@ function proposalFor(state,player,now){
     else if(carrier&&player.id===plan.coverId){const al=localPoint(team,carrier.x,carrier.y),gx=-al.x,gy=34-al.y,n=Math.hypot(gx,gy)||1;tx=clamp(al.x+gx/n*4.4,4,96);ty=clamp(al.y+gy/n*4.4,4,64);type='COVER';reason='PRESS_SUPPORT_DANGEROUS_LANE_PROTECTION';targetId=carrier.id;responsibility={type:'COVER',targetId,goalSideReference:{x:team==='HOME'?0:105,y:34}};}
     else if(plan.marks.has(player.id)){const threat=sp.players.find(p=>p.id===plan.marks.get(player.id)),band=coarseMarkBandPoint(team,player,threat),q=localPoint(team,band.targetPoint.x,band.targetPoint.y);tx=q.x;ty=q.y;type='MARK';reason='GOAL_SIDE_LANE_DISTANCE_RESPONSIBILITY_BAND';targetId=threat.id;responsibility={type:'MARK',targetId,distanceBand:band.distanceBand,goalSideReference:band.goalSideReference,laneReference:band.laneReference};}
     else{const guide=plan.lineGuide,group=role==='CB'||role==='FB'?'BACK':role==='CM'?'MID':'FRONT',roleOffset=role==='FB'?.75:role==='CB'?-0.35:role==='WF'?.55:role==='ST'?.25:0,ballPull=group==='BACK'?.07:group==='MID'?.15:.22;tx=clamp(guide.anchors[group]+roleOffset+(bl.x-guide.carrierLocal.x)*ballPull+wave*.38,12,72);ty=clamp(34+(COARSE_SLOT_Y[slot]-34)*width+(bl.y-34)*(group==='BACK'?.10:group==='MID'?.17:.22)+wave*.35,6,62);type='RECOVERY';reason='LIVE_CARRIER_CONNECTED_LINE_RECOVERY';responsibility={type:'RECOVERY',targetId:null,goalSideReference:{x:team==='HOME'?0:105,y:34},lineConnectivity:{group,guideVersion:guide.schemaVersion,carrierId:guide.carrierId,anchors:guide.anchors}};}
-  }else if(role==='FB'&&!inPoss){
-    const threatSlot=slot==='RB'?'LW':'RW',threat=sp.players.find(p=>p.team===coarseOther(team)&&p.slot===threatSlot);
-    if(threat){const tl=localPoint(team,threat.x,threat.y);tx=clamp(tl.x-2.8,12,82);ty=clamp(tl.y+(34-tl.y)*.14,5,63);type='WIDE_CONTAIN';reason='WIDE_THREAT_CONTAIN';targetId=threat.id;}
-    else{tx=clamp(27+lineBias+(bl.x-52)*.08,16,48);ty=34+(COARSE_SLOT_Y[slot]-34)*width;type='REST_DEFENCE';reason='FULLBACK_REST_BALANCE_REFERENCE';}
-  }else if(role==='CB'&&!inPoss){
-    const threat=sp.players.find(p=>p.team===coarseOther(team)&&p.slot==='ST');if(threat){const tl=localPoint(team,threat.x,threat.y);tx=clamp(tl.x-3.4,13,82);ty=clamp(tl.y+(34-tl.y)*.22,15,53);targetId=threat.id;type='CENTRAL_COVER';reason='CENTRAL_THREAT_GOAL_SIDE_REFERENCE';}
   }else if(role==='ST'&&inPoss){
     tx=clamp(Math.max(local.x+3.3,bl.x+5.8)+wave*1.1,45,94);ty=clamp(34+(bl.y-34)*.16+wave*1.3,19,49);type='FORWARD_RUN';reason='CENTRAL_FORWARD_CONTINUOUS_RUN';
   }else if(role==='WF'&&inPoss){
@@ -233,8 +227,6 @@ function proposalFor(state,player,now){
     const lateral=COARSE_SLOT_Y[slot]||34;tx=clamp(bl.x-(slot==='CM'?5.2:7.2)+wave*1.3,22,86);ty=clamp(lateral+(bl.y-lateral)*.24+wave*.8,7,61);type='SUPPORT';reason='LIVE_BALL_SUPPORT_TRIANGLE';
   }else if(inPoss){
     tx=clamp(local.x+2.8+wave,18,90);ty=clamp(34+(COARSE_SLOT_Y[slot]-34)*width,5,63);type='SUPPORT';reason='LIVE_POSSESSION_SUPPORT';
-  }else{
-    tx=clamp(local.x-(2.6+Math.max(0,bl.x-local.x)*.08),12,86);ty=clamp(local.y+(bl.y-local.y)*.20+wave*.5,6,62);type='RECOVERY';reason='BALL_RELATIVE_DEFENSIVE_RECOVERY';
   }
   let world=worldPoint(team,tx,ty),distance=Math.hypot(world.x-player.x,world.y-player.y);
   // MARK already carries a current target's role-sensitive goal-side/lane/distance

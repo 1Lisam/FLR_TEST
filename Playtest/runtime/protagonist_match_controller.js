@@ -62,7 +62,7 @@ function engineOffsideLine(frame,attTeam,includeGK=false){
   const opp=frame.players.filter(p=>p.team!==attTeam&&(includeGK||p.role!=='GK')).map(p=>p.x).sort((a,b)=>a-b);
   if(opp.length<2)return null;return attTeam==='HOME'?opp[opp.length-2]:opp[1];
 }
-function localX(team,x){return team==='HOME'?x:105-x;}function localY(team,y){return team==='HOME'?y:68-y;}
+function localY(team,y){return team==='HOME'?y:68-y;}
 function trackPassRelease(s){
   const b=s.m.ball;if(b.mode!=='FLIGHT'||b.kind==='SHOT'||!b.intendedReceiverId||!b.lastTouchPlayer||(b.age||0)>.11)return;
   const sig=`${b.lastTouchPlayer}|${b.intendedReceiverId}|${Number(b.originX||b.x).toFixed(2)}|${Number(b.targetX||b.x).toFixed(2)}|${Math.floor(s.m.time*10)}`;

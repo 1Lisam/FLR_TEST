@@ -53,7 +53,6 @@ function selectWallPlayers(m,defTeam,geom,setup,key){
   return selected;
 }
 function setTarget(setup,id,w,task,required=true,sprint=true){if(!id||!w)return;setup.targets[id]={x:w.x,y:w.y,task,required:!!required,sprint:!!sprint};if(required&&!setup.requiredIds.includes(id))setup.requiredIds.push(id);}
-function defendFromAttackLocal(team,p,lx,ly){const own={x:clamp(105-lx,1,104),y:clamp(ly,1,67)};return localToWorld(p.team,own.x,own.y);}
 function keepAttackersAwayFromWall(m,setup,team,geom,wallWorld){
   if(geom.count<3)return;const kickerId=setup.kickerId;
   for(const p of m.players.filter(p=>p.team===team&&p.id!==kickerId)){

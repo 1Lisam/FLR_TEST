@@ -51,7 +51,6 @@ const SCENARIOS={
   }
 };
 
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function p(m,id){return m.playersById[id];}
 function put(m,id,x,y){const q=p(m,id);if(!q)return;q.x=x;q.y=y;q.tx=x;q.ty=y;q.vx=q.vy=0;q.sprint=false;q.hasBall=false;q.action='HOLD_SHAPE';q.tacticalTask='HOLD_SHAPE';q.lockTargetUntil=0;q.runUntil=0;q.nextChallengeAt=0;q.pressCommitUntil=0;q.pressRecoverUntil=0;}
 function control(m,id){for(const q of m.players)q.hasBall=false;const q=p(m,id);q.hasBall=true;q.controlledSince=m.time-0.82;q.lastReceivedAt=m.time-0.82;q.action=q.role==='GK'?'GK_HOLD':'HOLD_BALL';q.tacticalTask=q.action;q.nextThink=m.time+99;m.ball={mode:'CONTROLLED',x:q.x+0.42,y:q.y,z:0,vx:0,vy:0,vz:0,ownerId:q.id,intendedReceiverId:null,kind:'CONTROL',deliveryMode:'GROUND',lastTouchTeam:q.team,lastTouchPlayer:q.id,age:0};m.ballOwner=q.id;m.possession=q.team;m.lastTouchTeam=q.team;m.lastTouchPlayer=q.id;}

@@ -13,7 +13,6 @@ function secondBallPoint(slot,side){return{x:slot==='LCM'?82:slot==='RCM'?88:85,
 // Semantic frame contract: box, wall, mark and second-ball points use the
 // restart team's attacking-goal frame even when the target is a defender.
 // Defender identity selects responsibility, never longitudinal orientation.
-function markerCandidate(defs,attacker,used){const same=defs.filter(d=>!used.has(d.id)&&d.role==='FB'&&sameSideSlot(d.slot,attacker.y));return nearest(same.length?same:defs,attacker,used,['CB','FB','CM']);}
 function normalizeRelationalPlan(m,setup){const plan=setup?.freeKickPlan;if(!plan)return;const team=m.restart.team,defs=m.players.filter(p=>p.team!==team&&p.role!=='GK');
   // Repair the already-built plan at its owner boundary: each unassigned CM
   // owns a different second-ball channel, never one shared coordinate.
