@@ -14,6 +14,14 @@ function metadataSummary(summary,error='FULL_DEBUG_REJECTED_413'){
   const out=summary&&typeof summary==='object'&&!Array.isArray(summary)?{...summary}:{value:summary??null};
   out.captureStatus='METADATA_ONLY';out.captureError=error;out.fullDebugAvailable=false;return out;
 }
+function utf8Size(text){return new TextEncoder().encode(String(text)).byteLength}
+function bytesToBase64(bytes){let out='';const step=0x8000;for(let i=0;i<bytes.length;i+=step)out+=String.fromCharCode(...bytes.subarray(i,Math.min(bytes.length,i+step)));return btoa(out)}
+async function gzipBase64(raw){const source=new Response(new TextEncoder().encode(raw)).body,buffer=await new Response(source.pipeThrough(new CompressionStream('gzip'))).arrayBuffer();return bytesToBase64(new Uint8Array(buffer))}
+async function compressedTransport(payload){
+  if(payload?.debug==null||typeof CompressionStream!=='function'||typeof Response!=='function'||typeof btoa!=='function')return payload;
+  const raw=JSON.stringify(payload.debug);
+  try{return{...payload,debug:null,debugTransport:{encoding:'gzip-base64-v1',data:await gzipBase64(raw),rawSizeBytes:utf8Size(raw)}}}catch(_){return payload}
+}
 function installTransportFallback(){
   if(window.__FLR_BUG_REPORT_METADATA_FALLBACK__)return;
   window.__FLR_BUG_REPORT_METADATA_FALLBACK__=true;
@@ -22,9 +30,10 @@ function installTransportFallback(){
     const target=typeof input==='string'?input:input?.url,ep=endpoint(),method=String(init?.method||'GET').toUpperCase();
     if(!ep||target!==ep||method!=='POST'||typeof init?.body!=='string')return prior(input,init);
     let payload;try{payload=JSON.parse(init.body)}catch{return prior(input,init)}
-    if(!payload||!payload.reportId||!payload.description||payload.debug==null)return prior(input,init);
+    const hasDebug=payload?.debug!=null||payload?.debugTransport?.encoding==='gzip-base64-v1';
+    if(!payload||!payload.reportId||!payload.description||!hasDebug)return prior(input,init);
     const first=await prior(input,init);if(first.status!==413)return first;
-    const retryPayload={...payload,debug:null,summary:metadataSummary(payload.summary)};
+    const retryPayload={...payload,debug:null,debugTransport:null,summary:metadataSummary(payload.summary)};
     const retry=await prior(input,{...init,body:JSON.stringify(retryPayload)});
     if(retry.ok)lastMetadataFallback={reportId:payload.reportId,at:Date.now()};
     return retry;
@@ -41,7 +50,7 @@ function currentStateSummary(state,attachJson){const match=state?.match||{},ball
 async function reportSourceIdentity(forced,summary){const api=window.FLR_REPORTER_SOURCE_IDENTITY;if(!api?.capture)return{schemaVersion:'FLR_V42_REPORTER_SOURCE_IDENTITY_1.0',buildId:'LEGACY_NOT_LOADED',validation:{classification:'LEGACY_NOT_LOADED',evidence:['IDENTITY_HELPER_NOT_LOADED']}};const boundary=forced?.boundary||{},state=forced?.snapshot||forced?.entrySnapshot||boundary.stateSnapshot||{},pending=forced?.pending||null,selected=forced?.selectedChoice||null;return api.capture({matchSecond:summary?.matchSecond??state.time??state.second??boundary.atSecond??null,boundaryIdOrSceneId:boundary.id||boundary.sceneId||boundary.type||null,heroPlayerId:boundary.heroPlayerId||pending?.heroPlayerId||pending?.playerId||null,heroRole:boundary.heroRole||null,pendingChoice:pending?{choiceIds:(pending.options||[]).map(o=>o.id||null),targetIds:(pending.options||[]).map(o=>o.targetId||null)}:null,committedChoice:selected?{choiceId:selected.id||null,targetId:selected.targetId||null}:null,currentStateMarkers:{phase:summary?.phase||state.phase||null,possession:summary?.possession||state.possession||null,ball:summary?.ball||state.ball||null,boundaryReason:boundary.reason||null,forcedScenario:forced?.scenarioKey||forced?.key||null},futureOutcomePrecomputed:false});}
 async function postPayload(url,payload){
   let body;
-  try{body=JSON.stringify(payload)}catch(err){const fallback={...payload,debug:null,summary:metadataSummary(payload.summary,'FULL_DEBUG_SERIALIZE_FAILED')};body=JSON.stringify(fallback);lastMetadataFallback={reportId:payload.reportId,at:Date.now()}}
+  try{body=JSON.stringify(await compressedTransport(payload))}catch(err){const fallback={...payload,debug:null,debugTransport:null,summary:metadataSummary(payload.summary,'FULL_DEBUG_SERIALIZE_FAILED')};body=JSON.stringify(fallback);lastMetadataFallback={reportId:payload.reportId,at:Date.now()}}
   return fetch(url,{method:'POST',headers:{'content-type':'application/json'},body});
 }
 function install(){
