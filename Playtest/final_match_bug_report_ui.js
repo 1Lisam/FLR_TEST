@@ -54,32 +54,33 @@ async function postPayload(url,payload){
   return fetch(url,{method:'POST',headers:{'content-type':'application/json'},body});
 }
 function install(){
+  if(window.__FLR_FINAL_ANONYMOUS_REPORTER_INSTALLED__)return;
+  window.__FLR_FINAL_ANONYMOUS_REPORTER_INSTALLED__=true;
   installTransportFallback();
   const report=$('heroBugReport'),submit=$('heroBugOpenIssue')||$('heroBugSubmit'),modal=$('heroBugModal'),desc=$('heroBugDescription'),attach=$('heroBugAttachJson'),playback=$('heroPlayback');
   if(!report||!submit||!modal||!desc)return;
-  const originalReport=report.onclick,originalSubmit=submit.onclick;
-  let uiOnly=false,forcedMode=false;
-  function hasSceneDebug(){const download=$('heroDownloadScene'),copy=$('heroCopyDebug');return !!((download&&!download.disabled)||(copy&&!copy.disabled))}
+  let forcedMode=false;
   function clearForced(){forcedMode=false;try{delete window.FLR_FINAL_MATCH_FORCED_REPORT}catch(_){window.FLR_FINAL_MATCH_FORCED_REPORT=null}}
   function fallbackLink(){let link=$('heroBugFallbackLink');if(link)return link;link=document.createElement('a');link.id='heroBugFallbackLink';link.className='secondary';link.target='_blank';link.rel='noopener';link.hidden=true;link.textContent='GitHub 수동 등록 열기';link.style.display='inline-flex';link.style.alignItems='center';link.style.textDecoration='none';const actions=modal.querySelector('.bug-actions');actions?.insertBefore(link,actions.firstChild);return link}
   function hideFallback(){const link=fallbackLink();link.hidden=true;link.removeAttribute('href')}
   function showFallback(){const category=$('heroBugCategory')?.value||'기타',priority=$('heroBugPriority')?.value||'3',link=fallbackLink();link.href=fallbackUrl(desc.value.trim(),category,priority);link.hidden=false}
-  function prepareUiOnly(){uiOnly=true;forcedMode=false;hideFallback();desc.value='';if(attach){attach.checked=true;attach.disabled=false}modal.hidden=false;setTimeout(()=>desc.focus(),0)}
-  function prepareForced(){uiOnly=true;forcedMode=true;hideFallback();desc.value='';if(attach){attach.checked=true;attach.disabled=false}modal.hidden=false;setTimeout(()=>desc.focus(),0)}
+  function prepareAnonymous(forced){forcedMode=!!forced;hideFallback();desc.value='';if(attach){attach.checked=true;attach.disabled=false}modal.hidden=false;setTimeout(()=>desc.focus(),0)}
   function keepButtonAvailable(){if(report.disabled)report.disabled=false}
   keepButtonAvailable();new MutationObserver(keepButtonAvailable).observe(report,{attributes:true,attributeFilter:['disabled']});
-  report.onclick=function(ev){hideFallback();if(forcedReport()){prepareForced();return}if(hasSceneDebug()){uiOnly=false;forcedMode=false;if(attach)attach.disabled=false;return originalReport?.call(this,ev)}prepareUiOnly()};
+  // The final reporter exclusively owns both normal and forced submissions.
+  // Do not delegate to the earlier UI handler: its failure path opens GitHub.
+  report.onclick=function(ev){ev?.preventDefault?.();prepareAnonymous(forcedReport())};
   submit.onclick=async function(ev){
-    if(!uiOnly){if(attach)attach.disabled=false;const result=originalSubmit?.call(this,ev);if(result&&typeof result.then==='function')await result;const fallback=lastMetadataFallback;if(fallback&&Date.now()-fallback.at<5000&&modal.hidden){if(playback)playback.textContent=`버그 등록 완료 · ${fallback.reportId} · 전체 JSON 용량 초과로 상황 요약 저장됨 · GitHub 로그인 불필요`;lastMetadataFallback=null}if(!modal.hidden&&String(playback?.textContent||'').startsWith('자동 등록 실패'))showFallback();return}
+    ev?.preventDefault?.();
     const description=desc.value.trim();if(!description){desc.focus();return}
     const category=$('heroBugCategory')?.value||'기타',priority=Number($('heroBugPriority')?.value||3),url=endpoint(),forced=forcedMode?forcedReport():null,currentState=forced?null:currentStateCapture(),attachJson=attach?.checked!==false;
     const ridPrefix=forced?'umt-final-forced':'umt-final-ui',rid=`${ridPrefix}-${crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
     submit.disabled=true;submit.textContent=url?'버그 등록 중…':'등록 서버 확인 중…';
-    try{if(!url)throw new Error('BUG_REPORT_ENDPOINT_MISSING');const summary=forced?forcedSummary(forced,attachJson):currentStateSummary(currentState,attachJson),sourceIdentity=await reportSourceIdentity(forced,summary),payload={reportId:rid,build:sourceIdentity.buildId,step:78,category,priority,description,summary,debug:attachJson?(forced||currentState):null,sourceIdentity,client:{userAgent:navigator.userAgent,href:location.href,uiOnly:!forced,forcedScenario:!!forced}},response=await postPayload(url,payload),json=await response.json().catch(()=>({}));if(!response.ok||!json.ok)throw new Error(json.error||`HTTP ${response.status}`);modal.hidden=true;uiOnly=false;const fullSaved=!!json.hasDebug,metadataFallback=lastMetadataFallback?.reportId===rid,modeText=forced?(fullSaved?'강제 시나리오 JSON 저장됨':attachJson?'전체 JSON 대신 상황 요약 저장됨':'강제 시나리오 상황 요약 저장됨'):(attachJson?(metadataFallback?'현재 상태 요약 저장됨':'현재 상태 JSON 저장됨'):'경기 상황 JSON 미첨부');clearForced();if(attach){attach.disabled=false;attach.checked=true}if(playback)playback.textContent=`버그 등록 완료 · ${json.reportId||rid} · ${modeText} · GitHub 로그인 불필요`;if(lastMetadataFallback?.reportId===rid)lastMetadataFallback=null}
+    try{if(!url)throw new Error('BUG_REPORT_ENDPOINT_MISSING');const summary=forced?forcedSummary(forced,attachJson):currentStateSummary(currentState,attachJson),sourceIdentity=await reportSourceIdentity(forced,summary),payload={reportId:rid,build:sourceIdentity.buildId,step:78,category,priority,description,summary,debug:attachJson?(forced||currentState):null,sourceIdentity,client:{userAgent:navigator.userAgent,href:location.href,uiOnly:!forced,forcedScenario:!!forced}},response=await postPayload(url,payload),json=await response.json().catch(()=>({}));if(!response.ok||!json.ok)throw new Error(json.error||`HTTP ${response.status}`);modal.hidden=true;const fullSaved=!!json.hasDebug,metadataFallback=lastMetadataFallback?.reportId===rid,modeText=forced?(fullSaved?'강제 시나리오 JSON 저장됨':attachJson?'전체 JSON 대신 상황 요약 저장됨':'강제 시나리오 상황 요약 저장됨'):(attachJson?(metadataFallback?'현재 상태 요약 저장됨':'현재 상태 JSON 저장됨'):'경기 상황 JSON 미첨부');clearForced();if(attach){attach.disabled=false;attach.checked=true}if(playback)playback.textContent=`버그 등록 완료 · ${json.reportId||rid} · ${modeText} · GitHub 로그인 불필요`;if(lastMetadataFallback?.reportId===rid)lastMetadataFallback=null}
     catch(err){console.warn('FLR final-match bug report failed',err);showFallback();if(playback)playback.textContent='자동 등록 실패 · 아래 GitHub 수동 등록 링크를 눌러주세요.'}
     finally{submit.disabled=false;submit.textContent='버그 등록'}
   };
-  const cancel=$('heroBugClose')||$('heroBugCancel');cancel?.addEventListener('click',()=>{uiOnly=false;clearForced();hideFallback();if(attach){attach.disabled=false;attach.checked=true}});
+  const cancel=$('heroBugClose')||$('heroBugCancel');cancel?.addEventListener('click',()=>{clearForced();hideFallback();if(attach){attach.disabled=false;attach.checked=true}});
 }
 if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',install,{once:true});else setTimeout(install,0);
 })();
