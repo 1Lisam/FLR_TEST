@@ -6,8 +6,9 @@
 <style>
 body{margin:0;background:#0b1117;color:#eef3f7;font-family:system-ui,sans-serif}.app{max-width:1180px;margin:auto;padding:16px}
 .controls,.status,.panel{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#111b24;border:1px solid #263645;border-radius:10px;padding:12px;margin-bottom:12px}
-button,select{background:#182734;color:#fff;border:1px solid #3d5568;border-radius:7px;padding:8px 10px}.pitch{background:#111b24;border:1px solid #263645;border-radius:10px;padding:10px}
-canvas{width:100%;height:auto;display:block;background:#315b37}.muted{color:#9db0bf}.good{color:#8ee6a7}.warn{color:#ffd38a}
+button,select{background:#182734;color:#fff;border:1px solid #3d5568;border-radius:7px;padding:8px 10px}.pitch{position:relative;background:#111b24;border:1px solid #263645;border-radius:10px;padding:10px}
+canvas{width:100%;height:auto;display:block;background:#315b37}
+.scene-notice{position:absolute;left:50%;top:12%;transform:translateX(-50%);max-width:82%;padding:10px 15px;border:1px solid rgba(218,241,250,.78);border-radius:10px;background:rgba(7,18,24,.90);box-shadow:0 8px 28px rgba(0,0,0,.34);color:#f3fbff;font-size:14px;font-weight:800;line-height:1.3;text-align:center;z-index:21;pointer-events:none;animation:sceneNoticeIn .16s ease-out}@keyframes sceneNoticeIn{from{opacity:0;transform:translate(-50%,-7px)}to{opacity:1;transform:translate(-50%,0)}}@media(max-width:760px){.scene-notice{top:9%;max-width:90%;font-size:12px;padding:8px 10px}}.muted{color:#9db0bf}.good{color:#8ee6a7}.warn{color:#ffd38a}
 #choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;width:100%}#log{max-height:220px;overflow:auto;display:block;width:100%;font-size:14px}
 .row{padding:4px 0;border-bottom:1px solid #20303c}.big{font-weight:700}.tag{padding:3px 7px;border-radius:99px;background:#20303c}
 </style>
@@ -19,7 +20,7 @@ canvas{width:100%;height:auto;display:block;background:#315b37}.muted{color:#9db
 <span id="seed" class="muted"></span>
 </div>
 <div class="status"><span class="tag">Hybrid/V2 사용 안 함</span><span class="tag">P.create 1회</span><span class="tag">결정적 상황만 표시</span><strong id="clock">0'</strong><strong id="score">0 - 0</strong><span id="state">대기</span></div>
-<div class="pitch"><canvas id="pitch" width="1050" height="680"></canvas></div>
+<div class="pitch"><canvas id="pitch" width="1050" height="680"></canvas><div id="sceneNotice" class="scene-notice" hidden>다음 상황까지 진행 중입니다…</div></div>
 <div class="panel"><div id="choices" hidden></div><div id="result" class="big"></div></div>
 <div class="panel"><div id="log"></div></div>
 </main>
