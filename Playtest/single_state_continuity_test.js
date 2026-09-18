@@ -1,7 +1,7 @@
 (function(){'use strict';
 const E=window.FLRPG_CONTINUOUS_CORE,P=window.FLRPG_PROTAGONIST_MATCH_CONTROLLER,$=id=>document.getElementById(id);
-const canvas=$('pitch'),ctx=canvas.getContext('2d');let trial=1,s=null,phase='IDLE',started=false,last=performance.now(),visibleAccumulator=0,eventCursor=0,replay=[],replayStartReal=0,replayStartGame=0,replayEndGame=0,replayKind=null,liveUntil=0,handledGoals=new Set(),searchTimer=null,livePrevFrame=null,liveCurrFrame=null;
-const STEP=.10,VISIBLE_STEP=.05,MAX_HIDDEN_STEPS=4096,CPU_BUDGET_MS=12,UI_STATUS_INTERVAL_MS=250;let lastHiddenUiAt=0;
+const canvas=$('pitch'),ctx=canvas.getContext('2d');let trial=1,s=null,phase='IDLE',started=false,last=performance.now(),visibleAccumulator=0,eventCursor=0,replay=[],replayStartReal=0,replayStartGame=0,replayEndGame=0,replayKind=null,liveUntil=0,handledGoals=new Set(),searchTimer=null,livePrevFrame=null,liveCurrFrame=null,searchWallStarted=0,searchGameStarted=0;
+const STEP=.10,VISIBLE_STEP=.05,MAX_HIDDEN_STEPS=100000,CPU_BUDGET_MS=180,UI_STATUS_INTERVAL_MS=1000;let lastHiddenUiAt=0;
 function seed(){return `SINGLE-V56-${trial}-${$('hero').value}`;}
 function log(t){const d=document.createElement('div');d.className='row';d.textContent=t;$('log').prepend(d);while($('log').children.length>80)$('log').lastChild.remove();}
 function setup(){phase='IDLE';started=false;handledGoals=new Set();eventCursor=0;replay=[];$('choices').hidden=true;$('choices').innerHTML='';$('result').textContent='';s=P.create(seed(),{heroPlayerId:$('hero').value,mode:'DECISIVE_ONLY',replaySeconds:12,fastReplayHistory:true});$('seed').textContent='SEED '+seed();draw(E.snapshot(s.m));meta();$('state').textContent='단일 상태 생성 완료';$('log').innerHTML='';log('경기 상태 생성 1회 · 이후 재생성 없음');}
@@ -46,13 +46,24 @@ function situationLabel(kind,endTime){
   if(kind==='CHOICE')return minute+"분 · 주인공 결정적 선택 상황";
   return minute+"분 · 중요 상황";
 }
-function startReplay(frames,kind,label){if(!frames?.length)return;clearSearchTimer();replay=frames;replayKind=kind;replayStartReal=performance.now()/1000;replayStartGame=frames[0].time;replayEndGame=frames.at(-1).time;phase='REPLAY';$('state').textContent=label||situationLabel(kind,replayEndGame);sceneDiagnostic(frames.at(-1));draw(frames[0]);meta();}
+function finishSearchTiming(kind){
+  if(!searchWallStarted)return;
+  const wall=(performance.now()-searchWallStarted)/1000,game=Math.max(0,s.m.time-searchGameStarted),speed=wall>0?game/wall:0;
+  log('스킵 속도 · '+(game/60).toFixed(1)+'분을 '+wall.toFixed(2)+'초 · 약 '+speed.toFixed(0)+'배속 · '+kind);
+  searchWallStarted=0;
+}
+function startReplay(frames,kind,label){if(!frames?.length)return;clearSearchTimer();finishSearchTiming(kind);replay=frames;replayKind=kind;replayStartReal=performance.now()/1000;replayStartGame=frames[0].time;replayEndGame=frames.at(-1).time;phase='REPLAY';$('state').textContent=label||situationLabel(kind,replayEndGame);sceneDiagnostic(frames.at(-1));draw(frames[0]);meta();}
 function replayTick(now){const elapsed=(now/1000-replayStartReal),target=replayStartGame+elapsed,f=replayFrameAt(target);draw(f);$('clock').textContent=Math.floor(f.time/60+1)+"'";$('score').textContent=f.score.HOME+' - '+f.score.AWAY;if(target>=replayEndGame-.001){if(replayKind==='CHOICE'){showChoices();}else{phase='SEARCHING';$('state').textContent='다음 중요 상황을 준비 중입니다…';meta();scheduleSearch();}}}
 function showChoices(){phase='CHOICE';const box=$('choices');box.innerHTML='';box.hidden=false;$('state').textContent='주인공 선택 · 동일 상태 일시정지';for(const o of s.pending?.options||[]){const b=document.createElement('button');b.textContent=o.label||o.id;b.onclick=()=>choose(o.id,o.targetId||null);box.appendChild(b);}log(`${s.m.time.toFixed(1)}초 · 주인공 선택 발생 · 경기 상태 재생성 없음`);}
 function choose(id,targetId){const r=P.applyChoice(s,id,targetId,{source:'SINGLE_STATE_TEST_UI'});if(!r.ok){log('선택 실패 '+(r.reason||''));return;}$('choices').hidden=true;$('result').textContent='선택: '+id+(targetId?' → '+targetId:'');phase='LIVE_RESULT';visibleAccumulator=0;liveUntil=s.m.time+12;livePrevFrame=liveCurrFrame=currentFrame();$('state').textContent='선택 결과 실제 속도 진행';}
 function processEvents(){const ev=s.m.events||[];while(eventCursor<ev.length){const e=ev[eventCursor++];if(e.type==='GOAL'){const key=e.type+'|'+e.t+'|'+(e.team||'');if(handledGoals.has(key))continue;handledGoals.add(key);log(`${e.t.toFixed(1)}초 · 실제 GOAL 발생 · 같은 상태의 과거 10초 재생`);const frames=recentActual(10,e.t);startReplay(frames,'GOAL',situationLabel('GOAL',e.t));return true;}}return false;}
 function clearSearchTimer(){if(searchTimer!=null){clearTimeout(searchTimer);searchTimer=null;}}
-function scheduleSearch(){if(started&&phase==='SEARCHING'&&searchTimer==null)searchTimer=setTimeout(searchPump,0);}
+function beginSearchTiming(){
+  if(!searchWallStarted){searchWallStarted=performance.now();searchGameStarted=s.m.time;}
+  $('clock').textContent='…';
+  $('state').textContent='다음 중요 상황 계산 중…';
+}
+function scheduleSearch(){if(started&&phase==='SEARCHING'&&searchTimer==null){beginSearchTiming();searchTimer=setTimeout(searchPump,0);}}
 function searchPump(){
   searchTimer=null;
   if(!started||phase!=='SEARCHING')return;
@@ -60,16 +71,16 @@ function searchPump(){
   while(n++<MAX_HIDDEN_STEPS&&performance.now()-began<CPU_BUDGET_MS&&phase==='SEARCHING'){
     P.step(s,STEP);
     if(s.pending){
-      if(s.pending.chained){log(s.m.time.toFixed(1)+'초 · 연속 선택 · 이전 장면에서 그대로 이어짐');showChoices();}
+      if(s.pending.chained){finishSearchTiming('연속 선택');log(s.m.time.toFixed(1)+'초 · 연속 선택 · 이전 장면에서 그대로 이어짐');showChoices();}
       else startReplay(P.latestReplay(s),'CHOICE',situationLabel('CHOICE',s.m.time));
       break;
     }
     if(processEvents())break;
-    if(s.m.completed){phase='COMPLETE';$('state').textContent='경기 종료';log('경기 종료');break;}
+    if(s.m.completed){finishSearchTiming('경기 종료');phase='COMPLETE';$('state').textContent='경기 종료';meta();log('경기 종료');break;}
   }
   const now=performance.now();
   if(phase==='SEARCHING'&&now-lastHiddenUiAt>=UI_STATUS_INTERVAL_MS){
-    lastHiddenUiAt=now;meta();$('state').textContent='다음 중요 상황을 준비 중입니다…';
+    lastHiddenUiAt=now;$('clock').textContent='…';$('state').textContent='다음 중요 상황 계산 중…';
   }
   scheduleSearch();
 }
@@ -100,6 +111,6 @@ function loop(now){
   }
   requestAnimationFrame(loop);
 }
-$('start').onclick=()=>{if(phase==='IDLE'||phase==='COMPLETE'){started=true;phase='SEARCHING';$('state').textContent='다음 중요 상황을 준비 중입니다…';lastHiddenUiAt=0;log('경기 시작 · 결정적 상황까지 화면 없이 동일 상태 고속 진행');scheduleSearch();}};
+$('start').onclick=()=>{if(phase==='IDLE'||phase==='COMPLETE'){started=true;phase='SEARCHING';searchWallStarted=0;searchGameStarted=s.m.time;$('clock').textContent='…';$('state').textContent='다음 중요 상황 계산 중…';lastHiddenUiAt=0;log('경기 시작 · 결정적 상황까지 화면 없이 동일 상태 고속 진행');scheduleSearch();}};
 $('same').onclick=()=>setup();$('new').onclick=()=>{trial++;setup()};$('hero').onchange=setup;setup();requestAnimationFrame(loop);
 })();
