@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLR V56 Cost Breakdown Benchmark</title>
+<style>
+body{margin:0;background:#0b1117;color:#eef3f7;font-family:system-ui,sans-serif}.app{max-width:1120px;margin:auto;padding:18px}
+.panel{background:#111b24;border:1px solid #263645;border-radius:10px;padding:14px;margin:12px 0}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{background:#182734;color:#fff;border:1px solid #3d5568;border-radius:7px;padding:9px 12px}button:disabled{opacity:.5}
+table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:8px;border-bottom:1px solid #263645;text-align:right}th:first-child,td:first-child{text-align:left}
+.muted{color:#9db0bf}.bar{height:8px;background:#1b2a36;border-radius:99px;overflow:hidden}.bar>span{display:block;height:100%;background:#7dd3fc;width:0}
+code{color:#b9d8eb}.note{line-height:1.55}
+</style>
+</head><body><main class="app">
+<h2>FLR · 90분 계산 비용 분해</h2>
+<div class="panel">
+<div class="row"><button id="run">비용 분해 시작</button><button id="stop" disabled>중지</button><span id="state" class="muted">대기</span></div>
+<p class="muted note">동일한 0.1초 진행과 5ms 계산 묶음 제한으로 네 경로를 비교합니다. 화면 렌더링은 모두 꺼져 있습니다. 각 경로는 독립된 동일 seed 경기를 새로 생성합니다.</p>
+<div class="bar"><span id="progress"></span></div>
+</div>
+<div class="panel">
+<table>
+<thead><tr><th>경로</th><th>90분 wall</th><th>순수 계산</th><th>최장 묶음</th><th>steps</th><th>배속</th><th>메모리 Δ</th><th>기록 frames</th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+<div class="panel"><strong>비용 차이</strong><div id="summary" class="muted">측정 전</div></div>
+</main>
+<script src="runtime/match_flow_resolution.js"></script>
+<script src="runtime/tactical_movement.js"></script>
+<script src="runtime/restart_movement.js"></script>
+<script src="runtime/free_kick_templates.js"></script>
+<script src="runtime/free_kick_wall_model.js"></script>
+<script src="runtime/corner_templates.js"></script>
+<script src="runtime/v37_set_piece_liveliness_patch.js"></script>
+<script src="runtime/match_choice_telemetry.js"></script>
+<script src="runtime/attribute_match_adapter.js"></script>
+<script src="runtime/action_candidate_engine.js"></script>
+<script src="runtime/match_academy.js"></script>
+<script src="runtime/aerial_contest.js"></script>
+<script src="runtime/take_on_duel.js"></script>
+<script src="runtime/ball_strike_model.js"></script>
+<script src="runtime/continuous_match_core.js"></script>
+<script src="runtime/v37_match_feel_patch.js"></script>
+<script src="runtime/choice_action_resolver.js"></script>
+<script src="runtime/choice_action_resolver_step38.js"></script>
+<script src="runtime/manager_tendency_adapter.js"></script>
+<script src="runtime/protagonist_match_controller.js"></script>
+<script src="cost_breakdown_benchmark.js"></script>
+</body></html>
