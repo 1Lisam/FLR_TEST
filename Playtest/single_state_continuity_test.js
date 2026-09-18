@@ -1,6 +1,6 @@
 (function(){'use strict';
 const E=window.FLRPG_CONTINUOUS_CORE,P=window.FLRPG_PROTAGONIST_MATCH_CONTROLLER,M=window.FLRPG_MANAGER_TENDENCY_ADAPTER,A=window.FLRPG_ATTRIBUTE_MATCH_ADAPTER,$=id=>document.getElementById(id);
-const canvas=$('pitch'),ctx=canvas.getContext('2d');let sceneNoticeTimer=null;let trial=1,s=null,phase='IDLE',started=false,last=performance.now(),visibleAccumulator=0,eventCursor=0,replay=[],replayStartReal=0,replayStartGame=0,replayEndGame=0,replayKind=null,liveUntil=0,handledGoals=new Set(),searchTimer=null,livePrevFrame=null,liveCurrFrame=null,searchWallStarted=0,searchGameStarted=0,choiceInputLocked=false,activeTab='main',compareRunning=false,compareElapsed=0,compareAccumulator=0,compareStates=[],compareRecording=[],compareReplayFrames=null,compareReplayIndex=0,compareReplayPlaying=false;
+const canvas=$('pitch'),ctx=canvas.getContext('2d');let sceneNoticeTimer=null;let trial=1,s=null,phase='IDLE',started=false,last=performance.now(),visibleAccumulator=0,eventCursor=0,replay=[],replayStartReal=0,replayStartGame=0,replayEndGame=0,replayKind=null,liveUntil=0,handledGoals=new Set(),searchTimer=null,livePrevFrame=null,liveCurrFrame=null,searchWallStarted=0,searchGameStarted=0,choiceInputLocked=false,activeTab='main',compareRunning=false,comparePaused=false,compareElapsed=0,compareAccumulator=0,compareStates=[],compareRecording=[],compareReplayFrames=null,compareReplayIndex=0,compareReplayPlaying=false,compareView='ALL',focusPlayerId='';
 const STEP=.10,VISIBLE_STEP=.05,VISIBLE_SPEED=2.00,MAX_HIDDEN_STEPS=100000,CPU_BUDGET_MS=300,UI_STATUS_INTERVAL_MS=1000;let lastHiddenUiAt=0;
 function seed(){return `SINGLE-V56-${trial}-${$('hero').value}`;}
 function showSceneNotice(text,persistent=false){
@@ -127,13 +127,65 @@ function liveResultTick(){
   }
 }
 
-function drawMini(canvasEl,f){
-  if(!canvasEl||!f)return;const c=canvasEl.getContext('2d'),w=canvasEl.width,h=canvasEl.height,mpx=x=>12+x/105*(w-24),mpy=y=>10+y/68*(h-20);
+
+function compareOptions(){
+  return{
+    trails:!!$('showTrails')?.checked,
+    marks:!!$('showMarks')?.checked,
+    targets:!!$('showTargets')?.checked,
+    speed:Math.max(.25,Number($('compareSpeed')?.value)||1)
+  };
+}
+function playerTone(p){return p.team==='HOME'?(p.role==='GK'?'#7dd3fc':'#2563eb'):(p.role==='GK'?'#fca5a5':'#dc2626');}
+function drawMini(canvasEl,f,index=0,historyRows=[]){
+  if(!canvasEl||!f)return;
+  const c=canvasEl.getContext('2d'),w=canvasEl.width,h=canvasEl.height,mpx=x=>12+x/105*(w-24),mpy=y=>10+y/68*(h-20),opts=compareOptions();
   c.clearRect(0,0,w,h);c.fillStyle='#315b37';c.fillRect(0,0,w,h);c.strokeStyle='rgba(255,255,255,.72)';c.lineWidth=1.5;c.strokeRect(12,10,w-24,h-20);
   c.beginPath();c.moveTo(mpx(52.5),10);c.lineTo(mpx(52.5),h-10);c.stroke();c.beginPath();c.arc(mpx(52.5),mpy(34),20,0,Math.PI*2);c.stroke();
   c.strokeRect(mpx(0),mpy(13.84),mpx(16.5)-mpx(0),mpy(54.16)-mpy(13.84));c.strokeRect(mpx(88.5),mpy(13.84),mpx(105)-mpx(88.5),mpy(54.16)-mpy(13.84));
-  for(const p of f.players||[]){c.beginPath();c.fillStyle=p.team==='HOME'?(p.role==='GK'?'#7dd3fc':'#2563eb'):(p.role==='GK'?'#fca5a5':'#dc2626');c.arc(mpx(p.x),mpy(p.y),p.role==='GK'?4.2:3.7,0,Math.PI*2);c.fill();c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=.7;c.stroke();}
-  const b=f.ball;c.beginPath();c.fillStyle='#fff';c.strokeStyle='#111';c.lineWidth=1;c.arc(mpx(b.x),mpy(b.y),2.8,0,Math.PI*2);c.fill();c.stroke();
+
+  const byId=new Map((f.players||[]).map(p=>[p.id,p]));
+  const focus=focusPlayerId||'';
+
+  if(opts.trails&&historyRows?.length){
+    const cutoff=(historyRows.at(-1)?.t??0)-3;
+    const recent=historyRows.filter(r=>r.t>=cutoff);
+    const ids=focus?[focus]:(f.players||[]).filter(p=>p.role!=='GK').map(p=>p.id);
+    for(const id of ids){
+      const pts=[];
+      for(const row of recent){const fr=row.frames?.[index]?.frame,p=fr?.players?.find(x=>x.id===id);if(p)pts.push(p);}
+      if(pts.length<2)continue;
+      c.beginPath();for(let i=0;i<pts.length;i++){const p=pts[i],x=mpx(p.x),y=mpy(p.y);if(i===0)c.moveTo(x,y);else c.lineTo(x,y);}
+      c.strokeStyle=focus&&id===focus?'rgba(255,235,90,.95)':(pts.at(-1)?.team==='HOME'?'rgba(110,175,255,.24)':'rgba(255,130,130,.24)');
+      c.lineWidth=focus&&id===focus?2.7:1.1;c.stroke();
+    }
+  }
+
+  if(opts.targets){
+    for(const p of f.players||[]){
+      if(p.role==='GK'||!Number.isFinite(p.tx)||!Number.isFinite(p.ty))continue;
+      if(focus&&p.id!==focus)continue;
+      c.beginPath();c.moveTo(mpx(p.x),mpy(p.y));c.lineTo(mpx(p.tx),mpy(p.ty));c.strokeStyle=focus&&p.id===focus?'rgba(255,235,90,.72)':'rgba(255,255,255,.14)';c.lineWidth=focus&&p.id===focus?1.8:.8;c.stroke();
+      c.beginPath();c.arc(mpx(p.tx),mpy(p.ty),focus&&p.id===focus?3.2:1.7,0,Math.PI*2);c.fillStyle=focus&&p.id===focus?'rgba(255,235,90,.9)':'rgba(255,255,255,.40)';c.fill();
+    }
+  }
+
+  if(opts.marks){
+    for(const p of f.players||[]){
+      const tid=p.responsibilityTargetId||p.markTargetId;if(!tid)continue;
+      if(focus&&p.id!==focus&&tid!==focus)continue;
+      const q=byId.get(tid);if(!q)continue;
+      c.beginPath();c.moveTo(mpx(p.x),mpy(p.y));c.lineTo(mpx(q.x),mpy(q.y));c.setLineDash([4,3]);c.strokeStyle=focus&&(p.id===focus||tid===focus)?'rgba(255,235,90,.95)':'rgba(255,210,110,.48)';c.lineWidth=focus&&(p.id===focus||tid===focus)?2.2:1;c.stroke();c.setLineDash([]);
+    }
+  }
+
+  for(const p of f.players||[]){
+    const selected=focus&&p.id===focus;
+    c.beginPath();c.fillStyle=playerTone(p);c.arc(mpx(p.x),mpy(p.y),selected?6.7:(p.role==='GK'?4.2:3.7),0,Math.PI*2);c.fill();
+    c.strokeStyle=selected?'#ffeb5a':'rgba(255,255,255,.9)';c.lineWidth=selected?2.5:.7;c.stroke();
+    if(selected){c.fillStyle='#fffbcc';c.font='bold 10px system-ui';c.textAlign='center';c.fillText(p.slot||p.id,mpx(p.x),mpy(p.y)-9);}
+  }
+  const ball=f.ball;c.beginPath();c.fillStyle='#fff';c.strokeStyle='#111';c.lineWidth=1;c.arc(mpx(ball.x),mpy(ball.y),2.8,0,Math.PI*2);c.fill();c.stroke();
 }
 function createCompareMatch(policy){
   const m=E.createMatch(seed());
@@ -144,39 +196,67 @@ function createCompareMatch(policy){
 function compareSummary(m){
   const f=E.snapshot(m),field=f.players.filter(p=>p.role!=='GK'),stationary=field.filter(p=>Math.hypot(p.vx||0,p.vy||0)<.12&&Math.hypot(f.ball.x-p.x,f.ball.y-p.y)>18).length;
   let nearLinePairs=0;for(const team of ['HOME','AWAY']){const back=field.filter(p=>p.team===team&&(p.role==='CB'||p.role==='FB')).sort((a,b)=>a.x-b.x);for(let i=1;i<back.length;i++)if(Math.abs(back[i].x-back[i-1].x)<.35)nearLinePairs++;}
-  return{f,text:(m.time).toFixed(1)+'초 · '+m.score.HOME+'-'+m.score.AWAY+' · 먼거리 정지 '+stationary+'명 · 같은열 '+nearLinePairs+'쌍'};
+  let focusText='';
+  if(focusPlayerId){const p=f.players.find(x=>x.id===focusPlayerId);if(p)focusText=' · '+p.id+' '+(p.tacticalTask||p.action||'-')+' · '+(p.responsibilityType||'-')+(p.responsibilityTargetId||p.markTargetId?'→'+(p.responsibilityTargetId||p.markTargetId):'');}
+  return{f,text:(m.time).toFixed(1)+'초 · '+m.score.HOME+'-'+m.score.AWAY+' · 먼거리 정지 '+stationary+'명 · 같은열 '+nearLinePairs+'쌍'+focusText};
+}
+function populateFocusPlayers(){
+  const sel=$('focusPlayer');if(!sel||!compareStates[0])return;const keep=focusPlayerId;sel.innerHTML='<option value="">없음</option>';
+  for(const p of E.snapshot(compareStates[0].m).players||[]){const o=document.createElement('option');o.value=p.id;o.textContent=p.team+' · '+(p.slot||p.role)+' · '+p.id;sel.appendChild(o);}
+  sel.value=keep;
+}
+function updateCompareView(){
+  const grid=document.querySelector('.compare-grid');if(!grid)return;grid.classList.toggle('single',compareView!=='ALL');
+  const cards=[...grid.querySelectorAll('.compare-card')];cards.forEach((card,i)=>card.classList.toggle('focused',compareView==='ALL'||compareView===['A','B','C'][i]));
+  document.querySelectorAll('.viewMode').forEach(b=>b.classList.toggle('active',b.dataset.view===compareView));
+}
+function currentHistoryRows(){return compareReplayPlaying&&compareReplayFrames?compareReplayFrames:compareRecording;}
+function renderCompareFrames(rowsOverride=null){
+  const hist=rowsOverride||currentHistoryRows();
+  for(let i=0;i<compareStates.length;i++){
+    const q=compareStates[i];let row=null;
+    if(compareReplayPlaying&&compareReplayFrames?.length)row=compareReplayFrames[compareReplayIndex]?.frames?.[i]||null;
+    if(!row){const sum=compareSummary(q.m);row={frame:sum.f,text:sum.text};}
+    q.lastFrame=row.frame;drawMini(q.canvas,row.frame,i,hist);q.stateEl.textContent=row.text;
+  }
+}
+function focusFromCanvas(q,e){
+  const f=q.lastFrame||E.snapshot(q.m),rect=q.canvas.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*105,y=(e.clientY-rect.top)/rect.height*68;
+  let best=null,bd=999;for(const p of f.players||[]){const d=Math.hypot(p.x-x,p.y-y);if(d<bd){bd=d;best=p;}}
+  if(best&&bd<8){focusPlayerId=best.id;if($('focusPlayer'))$('focusPlayer').value=focusPlayerId;renderCompareFrames();}
 }
 function resetCompare(){
-  compareRunning=false;compareReplayPlaying=false;compareElapsed=0;compareAccumulator=0;compareReplayIndex=0;compareRecording=[];
+  compareRunning=false;compareReplayPlaying=false;comparePaused=false;compareElapsed=0;compareAccumulator=0;compareReplayIndex=0;compareRecording=[];
   const policies=['CURRENT','LOCKED_MARK','ZONAL_RELATION'],ids=['compareA','compareB','compareC'],states=['compareAState','compareBState','compareCState'];
-  compareStates=policies.map((policy,i)=>({policy,m:createCompareMatch(policy),canvas:$(ids[i]),stateEl:$(states[i])}));
-  for(const q of compareStates){const row=compareSummary(q.m);drawMini(q.canvas,row.f);q.stateEl.textContent=row.text;}
-  if($('compareSeed'))$('compareSeed').textContent='SEED '+seed();if($('compareClock'))$('compareClock').textContent='0.0 / 20.0초';if($('compareReplay'))$('compareReplay').disabled=!compareReplayFrames;
+  compareStates=policies.map((policy,i)=>({policy,m:createCompareMatch(policy),canvas:$(ids[i]),stateEl:$(states[i]),lastFrame:null}));
+  for(const q of compareStates)q.canvas.onclick=e=>focusFromCanvas(q,e);
+  populateFocusPlayers();renderCompareFrames([]);
+  if($('compareSeed'))$('compareSeed').textContent='SEED '+seed();if($('compareClock'))$('compareClock').textContent='0.0 / 20.0초';if($('compareReplay'))$('compareReplay').disabled=!compareReplayFrames;if($('comparePause'))$('comparePause').textContent='일시정지';updateCompareView();
 }
 function startCompare(){compareReplayFrames=null;resetCompare();compareRunning=true;if($('compareReplay'))$('compareReplay').disabled=true;}
+function toggleComparePause(){comparePaused=!comparePaused;if($('comparePause'))$('comparePause').textContent=comparePaused?'계속':'일시정지';}
 function compareTick(dt){
-  if(!compareRunning||activeTab!=='compare')return;compareElapsed+=dt;compareAccumulator+=dt;
-  let guard=0;while(compareAccumulator>=.05&&guard++<5){compareAccumulator-=.05;for(const q of compareStates)if(!q.m.completed)E.step(q.m,.05);}
-  const snapshotRow={t:Math.min(20,compareElapsed),frames:[]};for(const q of compareStates){const row=compareSummary(q.m);drawMini(q.canvas,row.f);q.stateEl.textContent=row.text;snapshotRow.frames.push({frame:row.f,text:row.text});}compareRecording.push(snapshotRow);
+  if(!compareRunning||comparePaused||activeTab!=='compare')return;const scaled=dt*compareOptions().speed;compareElapsed+=scaled;compareAccumulator+=scaled;
+  let guard=0;while(compareAccumulator>=.05&&guard++<8){compareAccumulator-=.05;for(const q of compareStates)if(!q.m.completed)E.step(q.m,.05);}
+  const snapshotRow={t:Math.min(20,compareElapsed),frames:[]};for(const q of compareStates){const row=compareSummary(q.m);snapshotRow.frames.push({frame:row.f,text:row.text});}compareRecording.push(snapshotRow);renderCompareFrames(compareRecording);
   if($('compareClock'))$('compareClock').textContent=Math.min(20,compareElapsed).toFixed(1)+' / 20.0초';
   if(compareElapsed>=20){compareRunning=false;compareReplayFrames=compareRecording.slice();if($('compareReplay'))$('compareReplay').disabled=!compareReplayFrames.length;if($('compareClock'))$('compareClock').textContent='20.0 / 20.0초 · 완료';}
 }
 function startCompareReplay(){
   if(!compareReplayFrames?.length)return;
-  compareRunning=false;compareReplayPlaying=true;compareReplayIndex=0;compareElapsed=0;
+  compareRunning=false;compareReplayPlaying=true;comparePaused=false;compareReplayIndex=0;compareElapsed=0;if($('comparePause'))$('comparePause').textContent='일시정지';renderCompareFrames(compareReplayFrames);
 }
 function compareReplayTick(dt){
-  if(!compareReplayPlaying||activeTab!=='compare'||!compareReplayFrames?.length)return;
-  compareElapsed=Math.min(20,compareElapsed+dt);
+  if(!compareReplayPlaying||comparePaused||activeTab!=='compare'||!compareReplayFrames?.length)return;
+  compareElapsed=Math.min(20,compareElapsed+dt*compareOptions().speed);
   while(compareReplayIndex<compareReplayFrames.length-1&&compareReplayFrames[compareReplayIndex+1].t<=compareElapsed+.0001)compareReplayIndex++;
-  const row=compareReplayFrames[compareReplayIndex];
-  for(let i=0;i<compareStates.length;i++){const q=compareStates[i],fr=row.frames[i];if(fr){drawMini(q.canvas,fr.frame);q.stateEl.textContent=fr.text;}}
+  renderCompareFrames(compareReplayFrames);
   if($('compareClock'))$('compareClock').textContent=compareElapsed.toFixed(1)+' / 20.0초 · 다시보기';
   if(compareElapsed>=20){compareReplayPlaying=false;if($('compareClock'))$('compareClock').textContent='20.0 / 20.0초 · 다시보기 완료';}
 }
 function switchTab(name){
   activeTab=name;const main=name==='main';$('mainTab').hidden=!main;$('compareTab').hidden=main;$('tabMain').classList.toggle('active',main);$('tabCompare').classList.toggle('active',!main);
-  if(main){compareRunning=false;if(started&&phase==='SEARCHING')scheduleSearch();}
+  if(main){compareRunning=false;compareReplayPlaying=false;if(started&&phase==='SEARCHING')scheduleSearch();}
   else{clearSearchTimer();resetCompare();}
 }
 
@@ -198,5 +278,5 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 $('start').onclick=()=>{if(phase==='IDLE'||phase==='COMPLETE'){started=true;phase='SEARCHING';searchWallStarted=0;searchGameStarted=s.m.time;$('clock').textContent='…';$('state').textContent='다음 상황까지 진행 중입니다…';lastHiddenUiAt=0;log('경기 시작 · 결정적 상황까지 화면 없이 동일 상태 고속 진행');scheduleSearch();}};
-$('same').onclick=()=>setup();$('new').onclick=()=>{trial++;setup();if(activeTab==='compare')resetCompare();};$('hero').onchange=()=>{setup();if(activeTab==='compare')resetCompare();};$('tabMain').onclick=()=>switchTab('main');$('tabCompare').onclick=()=>switchTab('compare');$('compareStart').onclick=startCompare;$('compareReplay').onclick=startCompareReplay;$('compareReset').onclick=resetCompare;setup();resetCompare();requestAnimationFrame(loop);
+$('same').onclick=()=>setup();$('new').onclick=()=>{trial++;setup();if(activeTab==='compare')resetCompare();};$('hero').onchange=()=>{setup();if(activeTab==='compare')resetCompare();};$('tabMain').onclick=()=>switchTab('main');$('tabCompare').onclick=()=>switchTab('compare');$('compareStart').onclick=startCompare;$('compareReplay').onclick=startCompareReplay;$('comparePause').onclick=toggleComparePause;$('compareReset').onclick=resetCompare;$('focusPlayer').onchange=e=>{focusPlayerId=e.target.value;renderCompareFrames();};for(const id of ['showTrails','showMarks','showTargets'])$(id).onchange=()=>renderCompareFrames();document.querySelectorAll('.viewMode').forEach(b=>b.onclick=()=>{compareView=b.dataset.view;updateCompareView();renderCompareFrames();});setup();resetCompare();requestAnimationFrame(loop);
 })();
