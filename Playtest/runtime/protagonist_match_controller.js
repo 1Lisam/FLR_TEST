@@ -451,6 +451,15 @@ function finalizeResult(s,terminal=null){const tr=s.resultTracker;if(!tr||tr.don
   if(sameTeam){const ep=s.activeEpisode||{id:`EP-${++s.episodeSeq}`,team:h.team,startedAt:tr.startedAt,hardUntil:tr.startedAt+20};ep.team=h.team;ep.lastSceneId=tr.sceneId;ep.lastChoiceAt=tr.startedAt;ep.hardUntil=ep.hardUntil||ep.startedAt+20;ep.until=Math.min(ep.hardUntil,Math.max(ep.until||0,s.m.time+(ownRestart?8.0:6.5)));ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
   else if(s.activeEpisode)s.activeEpisode=null;
   if(s.m.userChoiceControl?.playerId===s.heroPlayerId)s.m.userChoiceControl=null;if(heroOwn){s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;if(h)h.nextThink=Math.max(h.nextThink||0,s.m.time);}s.resultTracker=null;return r;}
+function sameTeamControlledCrossReceive(s,tr){
+  const h=hero(s),b=s.m.ball;if(!h||b?.mode!=='CONTROLLED'||b.ownerId!==h.id||s.m.possession!==h.team)return false;
+  const e=[...(tr.newEvents||[])].reverse().find(x=>x?.type==='CROSS_RECEIVE');
+  // The #1679 incoming-flight guard remains implicit here: this transition is legal only
+  // after physical contact has produced the controlled owner state, never while the cross
+  // is still in FLIGHT. Event metadata is optional on legacy events, so the current owner
+  // is the authoritative receiver identity when actorId/team are absent.
+  return!!e&&Math.abs(Number(e.t)-s.m.time)<=.101&&(!e.actorId||e.actorId===h.id)&&(!e.team||e.team===h.team);
+}
 function updateResultTracker(s){
   const tr=s.resultTracker;if(!tr)return null;
   const presentationDelta=s.m.time-(tr.lastPresentationTime??s.m.time);if(presentationDelta>0&&presentationDelta<=.25)tr.presentationElapsed=(tr.presentationElapsed||0)+presentationDelta;tr.lastPresentationTime=s.m.time;
@@ -512,6 +521,12 @@ function updateResultTracker(s){
     const heroOwn=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
     // Show one coherent attacking tempo instead of ending as soon as the first receiver settles.
     // If the sequence returns to the protagonist, hand the next decision back immediately.
+    if(sameTeamControlledCrossReceive(s,tr)){
+      // R1682: a teammate's cross successfully controlled by the protagonist is not a
+      // terminal result. Keep the current 2D episode and its explicit ownership lock live;
+      // normal chained-choice logic will reopen only from this actual received state.
+      s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;s.resultTracker=null;return null;
+    }
     if(heroOwn&&now>=tr.startedAt+0.75)ready=true;
     else{
       const downstreamShot=[...tr.newEvents].reverse().find(e=>e.t>=tr.startedAt+0.35&&e.type==='SHOT');
