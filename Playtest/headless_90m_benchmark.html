@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLR V56 Headless 90m Benchmark</title>
+<style>
+body{margin:0;background:#0b1117;color:#eef3f7;font-family:system-ui,sans-serif}.app{max-width:980px;margin:auto;padding:18px}
+.panel{background:#111b24;border:1px solid #263645;border-radius:10px;padding:14px;margin:12px 0}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{background:#182734;color:#fff;border:1px solid #3d5568;border-radius:7px;padding:9px 12px}button:disabled{opacity:.5}
+table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:8px;border-bottom:1px solid #263645;text-align:right}th:first-child,td:first-child{text-align:left}
+.muted{color:#9db0bf}.good{color:#8ee6a7}.warn{color:#ffd38a}.bar{height:8px;background:#1b2a36;border-radius:99px;overflow:hidden}.bar>span{display:block;height:100%;background:#7dd3fc;width:0}
+code{color:#b9d8eb}
+</style>
+</head><body><main class="app">
+<h2>FLR · 무렌더링 90분 부하 벤치마크</h2>
+<div class="panel">
+<div class="row">
+<button id="run">전체 측정 시작</button><button id="stop" disabled>중지</button>
+<span id="state" class="muted">대기</span>
+</div>
+<p class="muted">캔버스 렌더링·DOM 경기 갱신 없이 동일 Legacy 경기 상태를 <code>P.step(0.10)</code>으로만 진행합니다. 계산은 짧은 묶음으로 나눠 매 묶음 뒤 브라우저에 제어를 돌려줍니다.</p>
+<div class="bar"><span id="progress"></span></div>
+</div>
+<div class="panel">
+<table>
+<thead><tr><th>시뮬레이션</th><th>wall 시간</th><th>순수 계산</th><th>최장 묶음</th><th>양보 횟수</th><th>steps</th><th>배속</th><th>메모리 Δ</th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+<div class="panel"><strong>판정용 핵심</strong><div id="summary" class="muted">측정 전</div></div>
+</main>
+<script src="runtime/match_flow_resolution.js"></script>
+<script src="runtime/tactical_movement.js"></script>
+<script src="runtime/restart_movement.js"></script>
+<script src="runtime/free_kick_templates.js"></script>
+<script src="runtime/free_kick_wall_model.js"></script>
+<script src="runtime/corner_templates.js"></script>
+<script src="runtime/v37_set_piece_liveliness_patch.js"></script>
+<script src="runtime/match_choice_telemetry.js"></script>
+<script src="runtime/attribute_match_adapter.js"></script>
+<script src="runtime/action_candidate_engine.js"></script>
+<script src="runtime/match_academy.js"></script>
+<script src="runtime/aerial_contest.js"></script>
+<script src="runtime/take_on_duel.js"></script>
+<script src="runtime/ball_strike_model.js"></script>
+<script src="runtime/continuous_match_core.js"></script>
+<script src="runtime/v37_match_feel_patch.js"></script>
+<script src="runtime/choice_action_resolver.js"></script>
+<script src="runtime/choice_action_resolver_step38.js"></script>
+<script src="runtime/manager_tendency_adapter.js"></script>
+<script src="runtime/protagonist_match_controller.js"></script>
+<script src="headless_90m_benchmark.js"></script>
+</body></html>
