@@ -29,6 +29,15 @@ canvas{width:100%;height:auto;display:block;background:#315b37}
 </section>
 <section id="compareTab" hidden>
 <div class="controls">
+<label>강제 검증 상황 <select id="forcedScenario">
+<option value="NATURAL">자연 경기</option>
+<option value="CB_ST_HANDOFF">CB가 ST를 버리는지</option>
+<option value="ST_DROP">ST가 내려올 때 CB 추종</option>
+<option value="WIDE_HANDOFF">측면 WF 마킹 인계</option>
+<option value="CM_RUNNER">상대 CM 2선 침투</option>
+<option value="LINE_PUSH">후방 빌드업 · 라인 상승</option>
+<option value="FAR_OFFBALL">공과 먼 공격진 움직임</option>
+</select></label>
 <button id="compareStart">같은 상황 20초 재생</button>
 <button id="compareReplay" disabled>다시보기</button>
 <button id="comparePause">일시정지</button>
@@ -54,7 +63,7 @@ canvas{width:100%;height:auto;display:block;background:#315b37}
   <div class="compare-card"><div class="compare-title">B · 책임 고정형</div><canvas id="compareB" width="420" height="270"></canvas><div id="compareBState" class="compare-state"></div></div>
   <div class="compare-card"><div class="compare-title">C · 지역 우선형</div><canvas id="compareC" width="420" height="270"></canvas><div id="compareCState" class="compare-state"></div></div>
 </div>
-<div class="panel"><div class="muted">세 화면은 같은 SEED와 같은 시작 상태에서 동시에 진행되며, 오프더볼 정책만 다릅니다. 비교 재생은 관찰하기 쉽도록 1배속입니다.</div></div>
+<div class="panel"><div><strong id="scenarioTitle">자연 경기</strong><div id="scenarioHelp" class="muted">세 화면은 같은 SEED와 같은 시작 상태에서 동시에 진행되며, 오프더볼 정책만 다릅니다.</div></div></div>
 </section>
 </main>
 <script src="runtime/match_flow_resolution.js"></script>
