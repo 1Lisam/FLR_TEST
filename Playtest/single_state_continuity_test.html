@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLR V56 Single-State Continuity Test</title>
+<style>
+body{margin:0;background:#0b1117;color:#eef3f7;font-family:system-ui,sans-serif}.app{max-width:1180px;margin:auto;padding:16px}
+.controls,.status,.panel{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#111b24;border:1px solid #263645;border-radius:10px;padding:12px;margin-bottom:12px}
+button,select{background:#182734;color:#fff;border:1px solid #3d5568;border-radius:7px;padding:8px 10px}.pitch{background:#111b24;border:1px solid #263645;border-radius:10px;padding:10px}
+canvas{width:100%;height:auto;display:block;background:#315b37}.muted{color:#9db0bf}.good{color:#8ee6a7}.warn{color:#ffd38a}
+#choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;width:100%}#log{max-height:220px;overflow:auto;display:block;width:100%;font-size:14px}
+.row{padding:4px 0;border-bottom:1px solid #20303c}.big{font-weight:700}.tag{padding:3px 7px;border-radius:99px;background:#20303c}
+</style>
+</head><body><main class="app">
+<h2>FLR · 단일 경기 상태 연속성 테스트</h2>
+<div class="controls">
+<label>주인공 <select id="hero"><option value="H-ST">ST</option><option value="H-CM">CM</option><option value="H-LCB">CB</option><option value="H-GK">GK</option></select></label>
+<button id="start">경기 시작</button><button id="same">같은 SEED</button><button id="new">새 SEED</button>
+<span id="seed" class="muted"></span>
+</div>
+<div class="status"><span class="tag">Hybrid/V2 사용 안 함</span><span class="tag">P.create 1회</span><strong id="clock">0'</strong><strong id="score">0 - 0</strong><span id="state">대기</span></div>
+<div class="pitch"><canvas id="pitch" width="1050" height="680"></canvas></div>
+<div class="panel"><div id="choices" hidden></div><div id="result" class="big"></div></div>
+<div class="panel"><div id="log"></div></div>
+</main>
+<script src="runtime/match_flow_resolution.js"></script>
+<script src="runtime/tactical_movement.js"></script>
+<script src="runtime/restart_movement.js"></script>
+<script src="runtime/free_kick_templates.js"></script>
+<script src="runtime/free_kick_wall_model.js"></script>
+<script src="runtime/corner_templates.js"></script>
+<script src="runtime/v37_set_piece_liveliness_patch.js"></script>
+<script src="runtime/match_choice_telemetry.js"></script>
+<script src="runtime/attribute_match_adapter.js"></script>
+<script src="runtime/action_candidate_engine.js"></script>
+<script src="runtime/match_academy.js"></script>
+<script src="runtime/aerial_contest.js"></script>
+<script src="runtime/take_on_duel.js"></script>
+<script src="runtime/ball_strike_model.js"></script>
+<script src="runtime/continuous_match_core.js"></script>
+<script src="runtime/v37_match_feel_patch.js"></script>
+<script src="runtime/choice_action_resolver.js"></script>
+<script src="runtime/choice_action_resolver_step38.js"></script>
+<script src="runtime/manager_tendency_adapter.js"></script>
+<script src="runtime/protagonist_match_controller.js"></script>
+<script src="single_state_continuity_test.js"></script>
+</body></html>
