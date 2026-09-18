@@ -353,6 +353,18 @@ function maybeCheckpoint(s){
   s.scenes.push(s.currentScene);if(s.scenes.length>60)s.scenes.shift();s.m._continuousSpatialAuthorityV2?.recordLineage({kind:'CHOICE_FREEZE',writer:'runtime/protagonist_match_controller.maybeCheckpoint',at:s.pending.at,choiceId:s.pending.id,episodeId:s.pending.episodeId||null,replayFrameCount:pre.length,futureOutcomePrecomputed:false});return s.pending;
 }
 function eventKey(e){return`${Number(e.t).toFixed(3)}|${e.type}|${e.text}`;}
+const CORNER_DELIVERY_CONTACTS=new Set(['AERIAL_DUEL','CROSS_RECEIVE','CLEARANCE','HEADER_SHOT','SAVE','PARRY','CHIP_SAVE','CHIP_PARRY','DUEL_DEFLECTION','TACKLE_DEFLECTION']);
+function sameTeamCornerDeliveryAwaiting(s,tr){
+  const kick=tr.newEvents.find(e=>e.type==='CORNER_KICK'),h=hero(s),team=kick?.team||s.m.ball?.lastTouchTeam||s.m.possession;
+  if(!kick||!h||team!==h.team)return false;
+  const delivery=tr.cornerDelivery||(tr.cornerDelivery={kickAt:Number(kick.t),hardCapAt:Number(kick.t)+4.0,firstContestAt:null,endReason:null});
+  const contact=tr.newEvents.find(e=>Number(e.t)>=delivery.kickAt-.001&&CORNER_DELIVERY_CONTACTS.has(e.type));
+  if(contact){delivery.firstContestAt=Number(contact.t);delivery.endReason='FACTUAL_FIRST_CONTEST';return false;}
+  const terminal=tr.newEvents.find(e=>Number(e.t)>=delivery.kickAt-.001&&e.type==='GOAL')||s.m.completed||s.m.ball?.mode==='DEAD'||(s.m.ball?.mode!=='FLIGHT'&&s.m.restart)||(s.m.possession!==team&&['CONTROLLED','LOOSE'].includes(s.m.ball?.mode));
+  if(terminal){delivery.endReason='LEGITIMATE_TERMINAL';return false;}
+  if(s.m.time>=delivery.hardCapAt-.001){delivery.endReason='SAFETY_CAP';return false;}
+  return true;
+}
 function beginResultTracker(s,opt,res,beforeKeys){
   const familyName=opt.family||family(opt.id),now=s.m.time,intentUntil=Number.isFinite(res?.intentUntil)?Number(res.intentUntil):null;
   let minimumUntil=now+0.85,deadline=now+5.2;
@@ -474,7 +486,7 @@ function updateResultTracker(s){
   // later dead-ball outcome is the natural terminal state, not the instant of impact.
   if(isShotChoice(tr.choiceId)&&tr.terminalEvent?.type==='BLOCK'){const later=tr.newEvents.find(e=>e.t>=(tr.terminalAt||0)&&['CORNER','GOAL_KICK','GOAL'].includes(e.type));if(later){tr.terminalEvent=deep(later);tr.terminalAt=Number(later.t);}}
   if(s.m.possession!==tr.startPossession&&tr.possessionChangedAt==null){tr.possessionChangedAt=s.m.time;if(s.m.userChoiceControl?.playerId===s.heroPlayerId&&s.m.userChoiceControl?.mode!=='POST_TACKLE_SETTLE')s.m.userChoiceControl=null;}
-  const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
+  const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId,cornerDeliveryAwaiting=sameTeamCornerDeliveryAwaiting(s,tr);
   let ready=false;
   if(tt==='GOAL'){if(s.m.phase==='GOAL_CELEBRATION')tr.goalCelebrationObserved=true;if(tr.goalCelebrationObserved&&s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))tr.kickoffContinuationObserved=true;ready=!!tr.goalCelebrationObserved&&!!tr.kickoffContinuationObserved;}
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
@@ -520,7 +532,7 @@ function updateResultTracker(s){
       }else ready=now>=tr.startedAt+4.4&&ballSettled;
     }
   }else if(['DELAY','BLOCK_LANE'].includes(tr.choiceId))ready=now>=tr.startedAt+2.2||tr.possessionChangedAt!=null&&now-tr.possessionChangedAt>=1.1;
-  if(ready||(tr.presentationElapsed||0)>=tr.maxPresentationSeconds||s.m.completed)return finalizeResult(s,terminal);
+  if((ready&&!cornerDeliveryAwaiting)||(!cornerDeliveryAwaiting&&(tr.presentationElapsed||0)>=tr.maxPresentationSeconds)||s.m.completed)return finalizeResult(s,terminal);
   return null;
 }
 function applyChoice(s,choiceId,targetId=null,inputMeta={}){
