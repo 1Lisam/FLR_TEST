@@ -10,7 +10,7 @@ function showSceneNotice(text,persistent=false){
 }
 function hideSceneNotice(){clearTimeout(sceneNoticeTimer);const box=$('sceneNotice');if(box)box.hidden=true;}
 function log(t){const d=document.createElement('div');d.className='row';d.textContent=t;$('log').prepend(d);while($('log').children.length>80)$('log').lastChild.remove();}
-function setup(){hideSceneNotice();phase='IDLE';started=false;handledGoals=new Set();eventCursor=0;replay=[];$('choices').hidden=true;$('choices').innerHTML='';$('result').textContent='';s=P.create(seed(),{heroPlayerId:$('hero').value,mode:'DECISIVE_ONLY',replaySeconds:12,fastReplayHistory:true,fastReplayHistoryInterval:.20});$('seed').textContent='SEED '+seed();draw(E.snapshot(s.m));meta();$('state').textContent='단일 상태 생성 완료';$('log').innerHTML='';log('경기 상태 생성 1회 · 이후 재생성 없음');}
+function setup(){hideSceneNotice();phase='IDLE';started=false;handledGoals=new Set();eventCursor=0;replay=[];$('choices').hidden=true;$('choices').innerHTML='';$('result').textContent='';s=P.create(seed(),{heroPlayerId:$('hero').value,mode:'DECISIVE_ONLY',replaySeconds:12,fastReplayHistory:true,fastReplayHistoryInterval:.20});s.m.offBallPolicy=$('offballPolicy')?.value||'CURRENT';$('seed').textContent='SEED '+seed()+' · '+s.m.offBallPolicy;draw(E.snapshot(s.m));meta();$('state').textContent='단일 상태 생성 완료';$('log').innerHTML='';log('경기 상태 생성 1회 · 이후 재생성 없음 · 오프더볼 정책 '+s.m.offBallPolicy);}
 function px(x){return 28+x/105*(canvas.width-56)}function py(y){return 24+y/68*(canvas.height-48)}
 function draw(f){if(!f)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#315b37';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=3;ctx.strokeRect(28,24,canvas.width-56,canvas.height-48);ctx.beginPath();ctx.moveTo(px(52.5),24);ctx.lineTo(px(52.5),canvas.height-24);ctx.stroke();ctx.beginPath();ctx.arc(px(52.5),py(34),50,0,Math.PI*2);ctx.stroke();ctx.strokeRect(px(0),py(13.84),px(16.5)-px(0),py(54.16)-py(13.84));ctx.strokeRect(px(88.5),py(13.84),px(105)-px(88.5),py(54.16)-py(13.84));
  for(const p of f.players||[]){ctx.beginPath();ctx.fillStyle=p.team==='HOME'?(p.role==='GK'?'#7dd3fc':'#2563eb'):(p.role==='GK'?'#fca5a5':'#dc2626');ctx.arc(px(p.x),py(p.y),p.id===$('hero').value?14:10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=p.id===$('hero').value?3:1.5;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 8px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.slot||p.role,px(p.x),py(p.y));}
@@ -30,8 +30,32 @@ function replayFrameAt(target){
   }
   return replay.at(-1);
 }
+function offBallStructureDiagnostic(frame){
+  if(!frame?.players)return;
+  const policy=s?.m?.offBallPolicy||'CURRENT',teams=['HOME','AWAY'];
+  for(const team of teams){
+    const ps=frame.players.filter(p=>p.team===team&&p.role!=='GK');
+    const back=ps.filter(p=>p.role==='CB'||p.role==='FB');
+    if(back.length>=4){
+      const xs=back.map(p=>p.x),spread=Math.max(...xs)-Math.min(...xs),nearSame=back.slice().sort((a,b)=>a.x-b.x);
+      let tiny=0;for(let i=1;i<nearSame.length;i++)if(Math.abs(nearSame[i].x-nearSame[i-1].x)<.35)tiny++;
+      log('구조진단 '+team+' · '+policy+' · 수비4 깊이폭 '+spread.toFixed(2)+'m · 거의 같은 열 쌍 '+tiny);
+    }
+    const stationary=ps.filter(p=>Math.hypot(p.vx||0,p.vy||0)<.12&&Math.hypot((frame.ball?.x||0)-p.x,(frame.ball?.y||0)-p.y)>18);
+    if(stationary.length>=3)log('구조진단 '+team+' · 공과 먼 정지 선수 '+stationary.length+'명 · '+stationary.map(p=>p.slot+':'+(p.tacticalTask||p.action)).join(' | '));
+    const depth={ST:[],WF:[],CM:[],FB:[],CB:[]};
+    for(const p of ps)if(depth[p.role])depth[p.role].push(p.x);
+    const avg=r=>depth[r].length?depth[r].reduce((a,b)=>a+b,0)/depth[r].length:null;
+    const st=avg('ST'),cm=avg('CM');
+    if(st!=null&&cm!=null){
+      const attackDir=team==='HOME'?1:-1,relative=(st-cm)*attackDir;
+      if(relative<-1.5)log('구조진단 '+team+' · 전후관계 역전 가능 · ST가 CM보다 '+Math.abs(relative).toFixed(1)+'m 뒤');
+    }
+  }
+}
 function sceneDiagnostic(frame){
   if(!frame?.players)return;
+  offBallStructureDiagnostic(frame);
   const blueBack=frame.players.filter(p=>p.team==='HOME'&&(p.role==='CB'||p.role==='FB'));
   if(blueBack.length>=4){
     const txs=blueBack.map(p=>Number.isFinite(p.tx)?p.tx:p.x),xs=blueBack.map(p=>p.x),targetSpread=Math.max(...txs)-Math.min(...txs),liveSpread=Math.max(...xs)-Math.min(...xs);
