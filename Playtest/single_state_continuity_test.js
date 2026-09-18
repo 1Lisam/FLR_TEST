@@ -187,11 +187,63 @@ function drawMini(canvasEl,f,index=0,historyRows=[]){
   }
   const ball=f.ball;c.beginPath();c.fillStyle='#fff';c.strokeStyle='#111';c.lineWidth=1;c.arc(mpx(ball.x),mpy(ball.y),2.8,0,Math.PI*2);c.fill();c.stroke();
 }
+const FORCED_SCENARIOS={
+  NATURAL:{title:'자연 경기',help:'강제 배치 없이 같은 SEED의 자연 경기 흐름을 비교합니다.'},
+  CB_ST_HANDOFF:{title:'CB가 ST를 버리는지',help:'HOME LCB가 중앙 ST를 이미 맡은 상태에서 상대 CM이 가까이 들어옵니다. CB가 이유 없이 ST를 버리고 CM으로 갈아타는지 봅니다.'},
+  ST_DROP:{title:'ST가 내려올 때 CB 추종',help:'상대 ST가 중원 쪽으로 내려온 상태입니다. CB가 끝까지 따라가 중앙 수비 공간을 비우는지, 적절한 시점에 인계하는지 봅니다.'},
+  WIDE_HANDOFF:{title:'측면 WF 마킹 인계',help:'상대 RW가 HOME 왼쪽 채널로 침투하고 LB와 LCM이 함께 대응할 수 있는 상황입니다. 중복 마킹·갑작스런 담당 변경을 봅니다.'},
+  CM_RUNNER:{title:'상대 CM 2선 침투',help:'상대 CM이 ST 뒤에서 수비 라인 사이로 들어옵니다. CB가 기존 ST를 버리는지, 미드필더가 침투자를 넘겨받는지 봅니다.'},
+  LINE_PUSH:{title:'후방 빌드업 · 라인 상승',help:'HOME이 후방에서 소유합니다. 공이 올라갈 때 포백이 한 막대처럼 정확히 같이 전진하는지, 각자의 관계에 따라 조금씩 다른 깊이로 올라가는지 봅니다.'},
+  FAR_OFFBALL:{title:'공과 먼 공격진 움직임',help:'한쪽 측면에서 공을 돌리는 동안 반대편 ST/WF와 후방 선수들이 멈추는지, 천천히 위치를 조정하는지 봅니다.'}
+};
+function setPlayerPos(m,id,x,y){
+  const p=m.players.find(q=>q.id===id);if(!p)return null;p.x=x;p.y=y;p.tx=x;p.ty=y;p.vx=0;p.vy=0;p.sprint=false;p.runUntil=0;p.runType=null;p.markTargetId=null;p.responsibilityTargetId=null;p.responsibilityType=null;return p;
+}
+function baselineOpenPlay(m){
+  const pos={
+    'H-GK':[6,34],'H-LB':[24,10],'H-LCB':[22,27],'H-RCB':[22,41],'H-RB':[24,58],
+    'H-LCM':[38,21],'H-CM':[40,34],'H-RCM':[38,47],'H-LW':[54,11],'H-ST':[57,34],'H-RW':[54,57],
+    'A-GK':[99,34],'A-LB':[81,58],'A-LCB':[83,41],'A-RCB':[83,27],'A-RB':[81,10],
+    'A-LCM':[67,47],'A-CM':[65,34],'A-RCM':[67,21],'A-LW':[53,57],'A-ST':[49,34],'A-RW':[53,11]
+  };
+  for(const [id,[x,y]] of Object.entries(pos))setPlayerPos(m,id,x,y);
+  m.restart=null;m.setPieceLive=null;m.goalCelebration=null;m.completed=false;m.phase='OPEN_PLAY';m.time=600;m.nextShape=0;m.transitionUntil=0;
+  m._defenceRoleLocks={};m._defensiveResponsibility={};m._markLocks={};m._transitionWideVacancies={};
+}
+function forcePossession(m,id){
+  const bridge=E.choiceActionBridge?.(),p=m.players.find(q=>q.id===id);if(!p)return;
+  for(const q of m.players)q.hasBall=false;
+  if(bridge?.setControlled)bridge.setControlled(m,p,true);else{p.hasBall=true;m.possession=p.team;m.ball.ownerId=p.id;m.ball.mode='CONTROLLED';m.ball.x=p.x;m.ball.y=p.y;}
+  m.nextShape=0;
+}
+function applyForcedScenario(m,key){
+  if(key==='NATURAL')return;
+  baselineOpenPlay(m);
+  if(key==='CB_ST_HANDOFF'){
+    setPlayerPos(m,'A-ST',31.5,30.5);setPlayerPos(m,'H-LCB',28.8,29.2);setPlayerPos(m,'A-CM',34.0,35.3);setPlayerPos(m,'H-CM',37.8,35.0);setPlayerPos(m,'A-RW',40.5,12.0);
+    const cb=m.players.find(p=>p.id==='H-LCB');if(cb)cb.markTargetId='A-ST';forcePossession(m,'A-RCM');
+  }else if(key==='ST_DROP'){
+    setPlayerPos(m,'A-ST',43.0,34.0);setPlayerPos(m,'H-LCB',35.0,30.0);setPlayerPos(m,'H-RCB',31.5,40.5);setPlayerPos(m,'A-CM',51.0,39.0);setPlayerPos(m,'A-LW',40.0,56.0);
+    const cb=m.players.find(p=>p.id==='H-LCB');if(cb)cb.markTargetId='A-ST';forcePossession(m,'A-CM');
+  }else if(key==='WIDE_HANDOFF'){
+    setPlayerPos(m,'A-RW',31.0,10.5);setPlayerPos(m,'H-LB',29.0,12.0);setPlayerPos(m,'H-LCM',34.5,18.5);setPlayerPos(m,'A-RCM',39.0,20.0);setPlayerPos(m,'A-ST',34.0,32.5);setPlayerPos(m,'H-LCB',27.5,28.5);
+    const lb=m.players.find(p=>p.id==='H-LB');if(lb)lb.markTargetId='A-RW';forcePossession(m,'A-RCM');
+  }else if(key==='CM_RUNNER'){
+    setPlayerPos(m,'A-ST',30.5,34.0);setPlayerPos(m,'H-LCB',27.0,30.0);setPlayerPos(m,'H-RCB',26.5,40.0);setPlayerPos(m,'A-LCM',35.0,29.0);setPlayerPos(m,'H-LCM',38.0,25.0);setPlayerPos(m,'H-CM',38.5,35.5);
+    const cb=m.players.find(p=>p.id==='H-LCB');if(cb)cb.markTargetId='A-ST';forcePossession(m,'A-CM');
+  }else if(key==='LINE_PUSH'){
+    setPlayerPos(m,'H-LB',27.0,10.5);setPlayerPos(m,'H-LCB',24.0,27.5);setPlayerPos(m,'H-RCB',23.0,40.5);setPlayerPos(m,'H-RB',26.0,57.5);setPlayerPos(m,'H-CM',42.0,34.0);setPlayerPos(m,'H-LCM',43.0,22.0);setPlayerPos(m,'H-RCM',41.5,47.0);
+    setPlayerPos(m,'A-ST',57.0,34.0);setPlayerPos(m,'A-LW',58.0,55.0);setPlayerPos(m,'A-RW',59.0,13.0);forcePossession(m,'H-LCB');
+  }else if(key==='FAR_OFFBALL'){
+    setPlayerPos(m,'H-RW',70.0,56.0);setPlayerPos(m,'H-ST',72.0,34.0);setPlayerPos(m,'H-LW',67.0,10.0);setPlayerPos(m,'H-LB',39.0,10.0);setPlayerPos(m,'H-LCB',35.0,27.0);setPlayerPos(m,'H-RCB',34.0,41.0);setPlayerPos(m,'H-RB',40.0,58.0);
+    setPlayerPos(m,'A-LB',48.0,57.0);setPlayerPos(m,'A-LCB',51.0,41.0);setPlayerPos(m,'A-RCB',51.5,27.0);setPlayerPos(m,'A-RB',49.0,11.0);forcePossession(m,'H-LB');
+  }
+}
 function createCompareMatch(policy){
   const m=E.createMatch(seed());
   if(A&&typeof A.assign==='function'){for(const p of m.players)A.assign(m,p.id,A.baseProfile(60));}
   if(M&&typeof M.init==='function')M.init(m,{HOME:'BALANCED',AWAY:'BALANCED'});
-  m.offBallPolicy=policy;return m;
+  m.offBallPolicy=policy;applyForcedScenario(m,$('forcedScenario')?.value||'NATURAL');return m;
 }
 function compareSummary(m){
   const f=E.snapshot(m),field=f.players.filter(p=>p.role!=='GK'),stationary=field.filter(p=>Math.hypot(p.vx||0,p.vy||0)<.12&&Math.hypot(f.ball.x-p.x,f.ball.y-p.y)>18).length;
@@ -227,6 +279,7 @@ function focusFromCanvas(q,e){
 }
 function resetCompare(){
   compareRunning=false;compareReplayPlaying=false;comparePaused=false;compareElapsed=0;compareAccumulator=0;compareReplayIndex=0;compareRecording=[];
+  const skey=$('forcedScenario')?.value||'NATURAL',sc=FORCED_SCENARIOS[skey]||FORCED_SCENARIOS.NATURAL;if($('scenarioTitle'))$('scenarioTitle').textContent=sc.title;if($('scenarioHelp'))$('scenarioHelp').textContent=sc.help;
   const policies=['CURRENT','LOCKED_MARK','ZONAL_RELATION'],ids=['compareA','compareB','compareC'],states=['compareAState','compareBState','compareCState'];
   compareStates=policies.map((policy,i)=>({policy,m:createCompareMatch(policy),canvas:$(ids[i]),stateEl:$(states[i]),lastFrame:null}));
   for(const q of compareStates)q.canvas.onclick=e=>focusFromCanvas(q,e);
@@ -278,5 +331,5 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 $('start').onclick=()=>{if(phase==='IDLE'||phase==='COMPLETE'){started=true;phase='SEARCHING';searchWallStarted=0;searchGameStarted=s.m.time;$('clock').textContent='…';$('state').textContent='다음 상황까지 진행 중입니다…';lastHiddenUiAt=0;log('경기 시작 · 결정적 상황까지 화면 없이 동일 상태 고속 진행');scheduleSearch();}};
-$('same').onclick=()=>setup();$('new').onclick=()=>{trial++;setup();if(activeTab==='compare')resetCompare();};$('hero').onchange=()=>{setup();if(activeTab==='compare')resetCompare();};$('tabMain').onclick=()=>switchTab('main');$('tabCompare').onclick=()=>switchTab('compare');$('compareStart').onclick=startCompare;$('compareReplay').onclick=startCompareReplay;$('comparePause').onclick=toggleComparePause;$('compareReset').onclick=resetCompare;$('focusPlayer').onchange=e=>{focusPlayerId=e.target.value;renderCompareFrames();};for(const id of ['showTrails','showMarks','showTargets'])$(id).onchange=()=>renderCompareFrames();document.querySelectorAll('.viewMode').forEach(b=>b.onclick=()=>{compareView=b.dataset.view;updateCompareView();renderCompareFrames();});setup();resetCompare();requestAnimationFrame(loop);
+$('same').onclick=()=>setup();$('new').onclick=()=>{trial++;setup();if(activeTab==='compare')resetCompare();};$('hero').onchange=()=>{setup();if(activeTab==='compare')resetCompare();};$('tabMain').onclick=()=>switchTab('main');$('tabCompare').onclick=()=>switchTab('compare');$('compareStart').onclick=startCompare;$('compareReplay').onclick=startCompareReplay;$('comparePause').onclick=toggleComparePause;$('compareReset').onclick=resetCompare;$('forcedScenario').onchange=()=>{compareReplayFrames=null;resetCompare();};$('focusPlayer').onchange=e=>{focusPlayerId=e.target.value;renderCompareFrames();};for(const id of ['showTrails','showMarks','showTargets'])$(id).onchange=()=>renderCompareFrames();document.querySelectorAll('.viewMode').forEach(b=>b.onclick=()=>{compareView=b.dataset.view;updateCompareView();renderCompareFrames();});setup();resetCompare();requestAnimationFrame(loop);
 })();
