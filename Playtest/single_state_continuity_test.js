@@ -1,10 +1,16 @@
 (function(){'use strict';
 const E=window.FLRPG_CONTINUOUS_CORE,P=window.FLRPG_PROTAGONIST_MATCH_CONTROLLER,$=id=>document.getElementById(id);
-const canvas=$('pitch'),ctx=canvas.getContext('2d');let trial=1,s=null,phase='IDLE',started=false,last=performance.now(),visibleAccumulator=0,eventCursor=0,replay=[],replayStartReal=0,replayStartGame=0,replayEndGame=0,replayKind=null,liveUntil=0,handledGoals=new Set(),searchTimer=null,livePrevFrame=null,liveCurrFrame=null,searchWallStarted=0,searchGameStarted=0,choiceInputLocked=false;
+const canvas=$('pitch'),ctx=canvas.getContext('2d');let sceneNoticeTimer=null;let trial=1,s=null,phase='IDLE',started=false,last=performance.now(),visibleAccumulator=0,eventCursor=0,replay=[],replayStartReal=0,replayStartGame=0,replayEndGame=0,replayKind=null,liveUntil=0,handledGoals=new Set(),searchTimer=null,livePrevFrame=null,liveCurrFrame=null,searchWallStarted=0,searchGameStarted=0,choiceInputLocked=false;
 const STEP=.10,VISIBLE_STEP=.05,VISIBLE_SPEED=2.00,MAX_HIDDEN_STEPS=100000,CPU_BUDGET_MS=300,UI_STATUS_INTERVAL_MS=1000;let lastHiddenUiAt=0;
 function seed(){return `SINGLE-V56-${trial}-${$('hero').value}`;}
+function showSceneNotice(text,persistent=false){
+  const box=$('sceneNotice');if(!box)return;
+  clearTimeout(sceneNoticeTimer);box.textContent=text;box.hidden=false;
+  if(!persistent)sceneNoticeTimer=setTimeout(()=>{box.hidden=true;},900);
+}
+function hideSceneNotice(){clearTimeout(sceneNoticeTimer);const box=$('sceneNotice');if(box)box.hidden=true;}
 function log(t){const d=document.createElement('div');d.className='row';d.textContent=t;$('log').prepend(d);while($('log').children.length>80)$('log').lastChild.remove();}
-function setup(){phase='IDLE';started=false;handledGoals=new Set();eventCursor=0;replay=[];$('choices').hidden=true;$('choices').innerHTML='';$('result').textContent='';s=P.create(seed(),{heroPlayerId:$('hero').value,mode:'DECISIVE_ONLY',replaySeconds:12,fastReplayHistory:true,fastReplayHistoryInterval:.20});$('seed').textContent='SEED '+seed();draw(E.snapshot(s.m));meta();$('state').textContent='단일 상태 생성 완료';$('log').innerHTML='';log('경기 상태 생성 1회 · 이후 재생성 없음');}
+function setup(){hideSceneNotice();phase='IDLE';started=false;handledGoals=new Set();eventCursor=0;replay=[];$('choices').hidden=true;$('choices').innerHTML='';$('result').textContent='';s=P.create(seed(),{heroPlayerId:$('hero').value,mode:'DECISIVE_ONLY',replaySeconds:12,fastReplayHistory:true,fastReplayHistoryInterval:.20});$('seed').textContent='SEED '+seed();draw(E.snapshot(s.m));meta();$('state').textContent='단일 상태 생성 완료';$('log').innerHTML='';log('경기 상태 생성 1회 · 이후 재생성 없음');}
 function px(x){return 28+x/105*(canvas.width-56)}function py(y){return 24+y/68*(canvas.height-48)}
 function draw(f){if(!f)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#315b37';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=3;ctx.strokeRect(28,24,canvas.width-56,canvas.height-48);ctx.beginPath();ctx.moveTo(px(52.5),24);ctx.lineTo(px(52.5),canvas.height-24);ctx.stroke();ctx.beginPath();ctx.arc(px(52.5),py(34),50,0,Math.PI*2);ctx.stroke();ctx.strokeRect(px(0),py(13.84),px(16.5)-px(0),py(54.16)-py(13.84));ctx.strokeRect(px(88.5),py(13.84),px(105)-px(88.5),py(54.16)-py(13.84));
  for(const p of f.players||[]){ctx.beginPath();ctx.fillStyle=p.team==='HOME'?(p.role==='GK'?'#7dd3fc':'#2563eb'):(p.role==='GK'?'#fca5a5':'#dc2626');ctx.arc(px(p.x),py(p.y),p.id===$('hero').value?14:10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=p.id===$('hero').value?3:1.5;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 8px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.slot||p.role,px(p.x),py(p.y));}
@@ -52,9 +58,9 @@ function finishSearchTiming(kind){
   log('스킵 속도 · '+(game/60).toFixed(1)+'분을 '+wall.toFixed(2)+'초 · 약 '+speed.toFixed(0)+'배속 · '+kind);
   searchWallStarted=0;
 }
-function startReplay(frames,kind,label){if(!frames?.length)return;clearSearchTimer();finishSearchTiming(kind);replay=frames;replayKind=kind;replayStartReal=performance.now()/1000;replayStartGame=frames[0].time;replayEndGame=frames.at(-1).time;phase='REPLAY';$('state').textContent=label||situationLabel(kind,replayEndGame);sceneDiagnostic(frames.at(-1));draw(frames[0]);meta();}
+function startReplay(frames,kind,label){if(!frames?.length)return;clearSearchTimer();finishSearchTiming(kind);showSceneNotice(label||situationLabel(kind,frames.at(-1)?.time),false);replay=frames;replayKind=kind;replayStartReal=performance.now()/1000;replayStartGame=frames[0].time;replayEndGame=frames.at(-1).time;phase='REPLAY';$('state').textContent=label||situationLabel(kind,replayEndGame);sceneDiagnostic(frames.at(-1));draw(frames[0]);meta();}
 function replayTick(now){const elapsed=(now/1000-replayStartReal)*VISIBLE_SPEED,target=replayStartGame+elapsed,f=replayFrameAt(target);draw(f);$('clock').textContent=Math.floor(f.time/60+1)+"'";$('score').textContent=f.score.HOME+' - '+f.score.AWAY;if(target>=replayEndGame-.001){if(replayKind==='CHOICE'){showChoices();}else{phase='SEARCHING';$('state').textContent='다음 상황까지 진행 중입니다…';meta();scheduleSearch();}}}
-function showChoices(){phase='CHOICE';choiceInputLocked=false;const box=$('choices');box.replaceChildren();box.hidden=false;box.style.display='grid';$('state').textContent='주인공 선택 · 동일 상태 일시정지';for(const o of s.pending?.options||[]){const b=document.createElement('button');b.textContent=o.label||o.id;b.onclick=()=>choose(o.id,o.targetId||null);box.appendChild(b);}log(`${s.m.time.toFixed(1)}초 · 주인공 선택 발생 · 경기 상태 재생성 없음`);}
+function showChoices(){hideSceneNotice();phase='CHOICE';choiceInputLocked=false;const box=$('choices');box.replaceChildren();box.hidden=false;box.style.display='grid';$('state').textContent='주인공 선택 · 동일 상태 일시정지';for(const o of s.pending?.options||[]){const b=document.createElement('button');b.textContent=o.label||o.id;b.onclick=()=>choose(o.id,o.targetId||null);box.appendChild(b);}log(`${s.m.time.toFixed(1)}초 · 주인공 선택 발생 · 경기 상태 재생성 없음`);}
 function choose(id,targetId){if(choiceInputLocked)return;choiceInputLocked=true;const box=$('choices');box.hidden=true;box.style.display='none';box.replaceChildren();const r=P.applyChoice(s,id,targetId,{source:'SINGLE_STATE_TEST_UI'});if(!r.ok){choiceInputLocked=false;log('선택 실패 '+(r.reason||''));showChoices();return;}$('result').textContent='선택: '+id+(targetId?' → '+targetId:'');phase='LIVE_RESULT';visibleAccumulator=0;liveUntil=s.m.time+12;livePrevFrame=liveCurrFrame=currentFrame();$('state').textContent='선택 결과 2배속 진행';}
 function processEvents(){const ev=s.m.events||[];while(eventCursor<ev.length){const e=ev[eventCursor++];if(e.type==='GOAL'){const key=e.type+'|'+e.t+'|'+(e.team||'');if(handledGoals.has(key))continue;handledGoals.add(key);log(`${e.t.toFixed(1)}초 · 실제 GOAL 발생 · 같은 상태의 과거 10초 재생`);const frames=recentActual(10,e.t);startReplay(frames,'GOAL',situationLabel('GOAL',e.t));return true;}}return false;}
 function clearSearchTimer(){if(searchTimer!=null){clearTimeout(searchTimer);searchTimer=null;}}
@@ -62,6 +68,7 @@ function beginSearchTiming(){
   if(!searchWallStarted){searchWallStarted=performance.now();searchGameStarted=s.m.time;}
   $('clock').textContent='…';
   $('state').textContent='다음 상황까지 진행 중입니다…';
+  showSceneNotice('다음 상황까지 진행 중입니다…',true);
 }
 function scheduleSearch(){if(started&&phase==='SEARCHING'&&searchTimer==null){beginSearchTiming();searchTimer=setTimeout(searchPump,0);}}
 function searchPump(){
@@ -76,7 +83,7 @@ function searchPump(){
       break;
     }
     if(processEvents())break;
-    if(s.m.completed){finishSearchTiming('경기 종료');phase='COMPLETE';$('state').textContent='경기 종료';meta();log('경기 종료');break;}
+    if(s.m.completed){finishSearchTiming('경기 종료');hideSceneNotice();phase='COMPLETE';$('state').textContent='경기 종료';meta();log('경기 종료');break;}
   }
   const now=performance.now();
   if(phase==='SEARCHING'&&now-lastHiddenUiAt>=UI_STATUS_INTERVAL_MS){
