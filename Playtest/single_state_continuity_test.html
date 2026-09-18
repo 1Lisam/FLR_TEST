@@ -12,13 +12,13 @@ canvas{width:100%;height:auto;display:block;background:#315b37}.muted{color:#9db
 .row{padding:4px 0;border-bottom:1px solid #20303c}.big{font-weight:700}.tag{padding:3px 7px;border-radius:99px;background:#20303c}
 </style>
 </head><body><main class="app">
-<h2>FLR · 단일 경기 상태 연속성 테스트</h2>
+<h2>FLR · 결정적 상황 연속 경기 테스트</h2>
 <div class="controls">
 <label>주인공 <select id="hero"><option value="H-ST">ST</option><option value="H-CM">CM</option><option value="H-LCB">CB</option><option value="H-GK">GK</option></select></label>
 <button id="start">경기 시작</button><button id="same">같은 SEED</button><button id="new">새 SEED</button>
 <span id="seed" class="muted"></span>
 </div>
-<div class="status"><span class="tag">Hybrid/V2 사용 안 함</span><span class="tag">P.create 1회</span><strong id="clock">0'</strong><strong id="score">0 - 0</strong><span id="state">대기</span></div>
+<div class="status"><span class="tag">Hybrid/V2 사용 안 함</span><span class="tag">P.create 1회</span><span class="tag">결정적 상황만 표시</span><strong id="clock">0'</strong><strong id="score">0 - 0</strong><span id="state">대기</span></div>
 <div class="pitch"><canvas id="pitch" width="1050" height="680"></canvas></div>
 <div class="panel"><div id="choices" hidden></div><div id="result" class="big"></div></div>
 <div class="panel"><div id="log"></div></div>
