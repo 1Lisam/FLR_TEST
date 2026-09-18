@@ -497,6 +497,12 @@ function updateResultTracker(s){
   if(s.m.possession!==tr.startPossession&&tr.possessionChangedAt==null){tr.possessionChangedAt=s.m.time;if(s.m.userChoiceControl?.playerId===s.heroPlayerId&&s.m.userChoiceControl?.mode!=='POST_TACKLE_SETTLE')s.m.userChoiceControl=null;}
   const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId,cornerDeliveryAwaiting=sameTeamCornerDeliveryAwaiting(s,tr);
   let ready=false;
+  // R1693 actual path: SHOT -> BLOCK -> CORNER -> CORNER_KICK -> CROSS_RECEIVE.
+  // A same-team controlled reception by the protagonist keeps the live 2D episode regardless
+  // of the original choice family. This runs before SHOT/CORNER terminal handling.
+  if(sameTeamControlledCrossReceive(s,tr)){
+    s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;s.resultTracker=null;return null;
+  }
   if(tt==='GOAL'){if(s.m.phase==='GOAL_CELEBRATION')tr.goalCelebrationObserved=true;if(tr.goalCelebrationObserved&&s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))tr.kickoffContinuationObserved=true;ready=!!tr.goalCelebrationObserved&&!!tr.kickoffContinuationObserved;}
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
     const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY';
@@ -521,12 +527,6 @@ function updateResultTracker(s){
     const heroOwn=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
     // Show one coherent attacking tempo instead of ending as soon as the first receiver settles.
     // If the sequence returns to the protagonist, hand the next decision back immediately.
-    if(sameTeamControlledCrossReceive(s,tr)){
-      // R1682: a teammate's cross successfully controlled by the protagonist is not a
-      // terminal result. Keep the current 2D episode and its explicit ownership lock live;
-      // normal chained-choice logic will reopen only from this actual received state.
-      s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;s.resultTracker=null;return null;
-    }
     if(heroOwn&&now>=tr.startedAt+0.75)ready=true;
     else{
       const downstreamShot=[...tr.newEvents].reverse().find(e=>e.t>=tr.startedAt+0.35&&e.type==='SHOT');
