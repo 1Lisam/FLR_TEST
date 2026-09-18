@@ -143,9 +143,13 @@ function createInitialIntent(player){return{type:'REEVALUATE',targetId:null,targ
 function createCoarseSpatial(){
   const players=[];
   for(const team of['HOME','AWAY'])for(const slot of COARSE_SLOTS){
-    const role=COARSE_ROLE[slot],baseX=COARSE_BASE_X[role],kickoffX=role==='WF'?49:role==='ST'?45:baseX,w=worldPoint(team,kickoffX,COARSE_SLOT_Y[slot]),target=worldPoint(team,baseX,COARSE_SLOT_Y[slot]);
-    const p={id:`${team==='HOME'?'H':'A'}-${slot}`,team,slot,role,x:w.x,y:w.y,vx:0,vy:0,tx:w.x,ty:w.y,bodyAngle:team==='HOME'?0:Math.PI,faceTargetAngle:team==='HOME'?0:Math.PI,action:'MATCH_START_SHAPE',tacticalTask:'MATCH_START_SHAPE',markTargetId:null,responsibilityReason:'MATCH_START',responsibilityEpoch:0,responsibilityOwnerId:null,responsibilityTargetId:null};
-    p.intent=createInitialIntent(p);if(role==='WF'||role==='ST'){p.intent.type='KICKOFF_RELEASE';p.intent.targetPoint=target;p.intent.reasonCode='KICKOFF_RELEASE_TO_ATTACK_SHAPE';p.intent.stationaryAllowed=false;}players.push(p);
+    const role=COARSE_ROLE[slot],baseX=COARSE_BASE_X[role],
+      kickoffX=role==='WF'?47:role==='ST'?48:Math.min(baseX,48),
+      w=worldPoint(team,kickoffX,COARSE_SLOT_Y[slot]);
+    const p={id:`${team==='HOME'?'H':'A'}-${slot}`,team,slot,role,x:w.x,y:w.y,vx:0,vy:0,tx:w.x,ty:w.y,bodyAngle:team==='HOME'?0:Math.PI,faceTargetAngle:team==='HOME'?0:Math.PI,action:'MATCH_START_LIVE',tacticalTask:'MATCH_START_LIVE',markTargetId:null,responsibilityReason:'MATCH_START_LIVE',responsibilityEpoch:0,responsibilityOwnerId:null,responsibilityTargetId:null};
+    // Do not give attackers a pre-drawn formation destination. The first live integrator
+    // reevaluation derives movement from the current ball/opponent/responsibility state.
+    p.intent=createInitialIntent(p);p.intent.expiresAt=0;p.intent.transitionCause='MATCH_START_LIVE';players.push(p);
   }
   const owner=players.find(p=>p.id==='H-CM');owner.x=owner.tx=50.4;owner.y=owner.ty=34;
   const ball={mode:'CONTROLLED',kind:'CONTROL',x:owner.x,y:owner.y,z:0,vx:0,vy:0,vz:0,ownerId:owner.id,intendedReceiverId:null,lastTouchTeam:'HOME',lastTouchPlayerId:owner.id,team:'HOME',lane:'CENTER',progress:.48,causalHistory:[{at:0,kind:'KICKOFF_CONTROL',playerId:owner.id,team:'HOME',x:owner.x,y:owner.y}]};
