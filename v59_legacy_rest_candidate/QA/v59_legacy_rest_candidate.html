@@ -1,0 +1,20 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FLR V59 Legacy REST 통합 시각 테스트</title><style>
+body{margin:0;background:#101820;color:#eef;font:14px system-ui}.bar{position:sticky;top:0;z-index:2;background:#17232d;padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.bar button,.bar select{font:inherit;padding:7px 10px}.info,.check,#meta{padding:8px 12px}.info{background:#0d151c}.check{line-height:1.7}canvas{display:block;margin:0 auto 12px;border:1px solid #456;background:#285b36;max-width:100%;height:auto}code{color:#ffe56a}</style></head><body>
+<div class="bar"><strong>V59 Legacy REST 통합 후보</strong><label>SEED <select id="seed"><option>V58-REST-01</option><option>V58-REST-02</option><option>V58-REST-03</option><option>V58-REST-04</option></select></label><button id="start">시작/다시 시작</button><button id="pause">일시정지</button><button id="resume">계속</button><label>속도 <select id="speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option><option value="4">4x</option></select></label><label><input id="targets" type="checkbox"> 목표선 표시</label></div>
+<div class="info">Source <code>3851942c246409944a1e6bb076d3f18448caed7b</code> · Legacy only · #1858~#1864 누적 후보 · 내부 QA/Chromium과 사용자 실제 화면 판정은 별개 · USER VISUAL PASS는 아직 아님</div>
+<div class="check"><strong>최종 확인 포인트:</strong><br>
+① <strong>REST-01</strong> 약 70~76초: HOME/파랑 RB가 약 5초 멈춰 서서 AWAY/빨강 LW에게 뚫리는 현상이 다시 보이는지.<br>
+② <strong>REST-02</strong> 약 205~210초: 실제 깊은 위치 프리킥의 준비→킥→오픈플레이 전환이 축구답게 이어지는지. 이 프리킥은 공격지역 crossing FK가 아니라 기본 재개 배치 대상임.<br>
+③ <strong>REST-03</strong> 0~140초: 풀백이 이유 없이 너무 올라간 뒤 급하게 되돌아오는 장면이나 LCB/RCB가 부자연스럽게 자리교환하는 장면이 있는지.<br>
+④ <strong>REST-04</strong> 약 118~125초: AWAY/빨강 RW가 중앙 SHOT_LANE_COVER로 빨려 들어가 측면을 통째로 비우는 현상이 다시 보이는지.<br>
+⑤ <strong>전체</strong>: 숫자보다 실제 축구처럼 보이는지가 우선. 라인·폭·깊이, 마킹/커버, 공격 전개와 수비 복귀, 공을 받기 전후 움직임에서 이상하면 SEED와 시간을 기록.</div>
+<div id="meta">준비 중…</div><canvas id="qaPitch" width="1260" height="820"></canvas>
+<script src="../runtime/match_flow_resolution.js"></script><script src="../runtime/tactical_movement.js"></script><script src="../runtime/restart_movement.js"></script><script src="../runtime/free_kick_templates.js"></script><script src="../runtime/free_kick_wall_model.js"></script><script src="../runtime/corner_templates.js"></script><script src="../runtime/v37_set_piece_liveliness_patch.js"></script><script src="../runtime/match_choice_telemetry.js"></script><script src="../runtime/attribute_match_adapter.js"></script><script src="../runtime/action_candidate_engine.js"></script><script src="../runtime/match_academy.js"></script><script src="../runtime/aerial_contest.js"></script><script src="../runtime/take_on_duel.js"></script><script src="../runtime/ball_strike_model.js"></script><script src="../runtime/continuous_match_core.js"></script><script src="../runtime/manager_tendency_adapter.js"></script><script src="v58_frame_tick_visual_qa_page.js"></script>
+<script>
+(()=>{const seedEl=document.querySelector('#seed'),speedEl=document.querySelector('#speed'),targets=document.querySelector('#targets');let timer=null,paused=true;
+function init(){if(timer)clearInterval(timer);window.FLR_V57_FRAME_TICK_QA.init({mode:'LEGACY_EXECUTE',scenario:'NATURAL',seed:seedEl.value,seconds:300,fps:20,showTargets:targets.checked,fixture:{kind:'NATURAL'}});paused=false;schedule();}
+function step(){if(paused)return;try{window.FLR_V57_FRAME_TICK_QA.step();}catch(e){document.querySelector('#meta').textContent='ERROR: '+e.message;paused=true;}}
+function schedule(){if(timer)clearInterval(timer);timer=setInterval(step,Math.max(12,50/Number(speedEl.value||1)));}
+document.querySelector('#start').onclick=init;document.querySelector('#pause').onclick=()=>paused=true;document.querySelector('#resume').onclick=()=>{paused=false;schedule();};speedEl.onchange=schedule;seedEl.onchange=init;targets.onchange=init;
+window.addEventListener('load',()=>{const t=setInterval(()=>{if(window.FLR_V57_FRAME_TICK_QA?.engineReady?.()){clearInterval(t);init();}},50);});})();
+</script></body></html>
