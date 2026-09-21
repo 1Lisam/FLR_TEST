@@ -79,7 +79,7 @@ function setControlledLegacy(m,p,snap=true,receiveMeta=null){
   const prevPoss=m.possession;for(const q of m.players)q.hasBall=false;
   if(!p){m.ball.ownerId=null;return;}
   releaseLooseBallArbitration(m,'CONTROLLED');
-  const bx=m.ball.x,by=m.ball.y;delete p.movingReceiveApproach;p.hasBall=true;p.controlledSince=m.time;
+  const bx=m.ball.x,by=m.ball.y,movingApproach=p.movingReceiveApproach;delete p.movingReceiveApproach;p.hasBall=true;p.controlledSince=m.time;
   const flow=!!receiveMeta?.flow&&p.role!=='GK';
   // A generic control is not necessarily a team-mate reception. Tackles, loose-ball wins,
   // goalkeeper catches and restarts all call setControlled(). Only a real same-team flight
@@ -113,6 +113,11 @@ function setControlledLegacy(m,p,snap=true,receiveMeta=null){
     // decide fastest; aerial/pressured receptions need a little longer to settle.
     const pressure=nearestOppDistance(m,p),settle=delivery==='AERIAL'?(0.70+m.r()*0.22):pressure<1.55?(0.56+m.r()*0.20):kind==='THROUGH'?(0.34+m.r()*0.15):(0.53+m.r()*0.18);
     p.lockTargetUntil=m.time+Math.min(settle,0.62);p.nextThink=m.time+settle;p.receiveFlowUntil=p.nextThink;
+    // Only the receiver that was already moving through an eligible open ground-pass meeting
+    // point carries this continuity token. To-feet, aerial and pressured settle receptions keep
+    // their established fixed first-touch behaviour.
+    if(movingApproach&&delivery==='GROUND'&&receptionPressure>=2.25&&sp>.35){p.movingReceptionFlow={sourceId:movingApproach.sourceId,directionX:movingApproach.directionX,directionY:movingApproach.directionY,until:p.receiveFlowUntil};}
+    else delete p.movingReceptionFlow;
     m.stats.flowReceives=(m.stats.flowReceives||0)+1;if(delivery==='AERIAL')m.stats.flowAerialReceives=(m.stats.flowAerialReceives||0)+1;else m.stats.flowGroundReceives=(m.stats.flowGroundReceives||0)+1;
     m.stats.maxFlowReceiveDelay=Math.max(m.stats.maxFlowReceiveDelay||0,settle);
   }
@@ -528,6 +533,34 @@ function extendUserCarryWaypoint(m,p){
   const pressure=ballCarrierPressureDistance(m,p),ext=clamp(1.65+remainTime*2.05+(pressure>2.8?.55:0),1.65,4.1),nx=clamp(l.x+dx/n*ext,4,96.2),ny=clamp(l.y+dy/n*ext,4,64),w=localToWorld(p.team,nx,ny);
   p.tx=w.x;p.ty=w.y;p.sprint=p.sprint&&pressure>2.0;m.stats.userCarryWaypointContinuityExtensions=(m.stats.userCarryWaypointContinuityExtensions||0)+1;return true;
 }
+function maintainMovingReceptionContinuity(m,p){
+  // This is deliberately a current-state target proposal, not a prediction of the pass result.
+  // It is only available to the already selected intended receiver while the recorded ball is
+  // still in flight, and then only through that receiver's existing first-touch settle window.
+  const approach=p.movingReceiveApproach;
+  if(approach&&m.ball.mode==='FLIGHT'&&m.ball.intendedReceiverId===p.id&&m.time<(approach.expiresAt||0)){
+    const ballSpeed=Math.hypot(m.ball.vx||0,m.ball.vy||0);
+    const meeting={x:Number(approach.meetingX),y:Number(approach.meetingY)};
+    if(ballSpeed>.15&&Number.isFinite(meeting.x)&&Number.isFinite(meeting.y)){
+      const runnerSpeed=Math.hypot(p.vx||0,p.vy||0),runnerProgress=(p.x-meeting.x)*approach.directionX+(p.y-meeting.y)*approach.directionY,ballProgress=(m.ball.x-meeting.x)*approach.directionX+(m.ball.y-meeting.y)*approach.directionY,ballAlong=m.ball.vx*approach.directionX+m.ball.vy*approach.directionY;
+      // Estimate only the current ball/runner convergence along the already committed pass
+      // line. This keeps the target ahead until physical contact without forecasting whether
+      // the receiver will actually control the ball.
+      const closing=Math.max(.20,ballAlong-Math.min(runnerSpeed,ballAlong-.20)),contactEta=clamp((runnerProgress-ballProgress+.35)/closing,0,.95);
+      const runway=clamp(Math.max(.52,ballProgress+ballAlong*contactEta+.20,runnerProgress+.34),.52,1.25);
+      p.tx=clamp(meeting.x+approach.directionX*runway,1,104);p.ty=clamp(meeting.y+approach.directionY*runway,1,67);
+      approach.liveRunway=runway;
+    }
+    return;
+  }
+  const flow=p.movingReceptionFlow;
+  if(!flow||m.ball.mode!=='CONTROLLED'||m.ball.ownerId!==p.id||p.action!=='FIRST_TOUCH_FLOW'||m.time>=(p.receiveFlowUntil||0))return;
+  const remaining=Math.max(0,(p.receiveFlowUntil||m.time)-m.time),speed=Math.hypot(p.vx||0,p.vy||0);
+  const dx=p.tx-p.x,dy=p.ty-p.y,heading=speed>.35?norm(p.vx,p.vy):(Math.hypot(dx,dy)>.08?norm(dx,dy):{x:flow.directionX,y:flow.directionY});
+  const continuation=clamp(Math.max(.48,speed*(remaining+.14)),.48,1.65);
+  p.tx=clamp(p.x+heading.x*continuation,1,104);p.ty=clamp(p.y+heading.y*continuation,1,67);
+  flow.liveContinuation=continuation;
+}
 function prepareMovementIntentTargets(m){
   for(const p of m.players){
     // Current-state corrections are proposals until the final arbiter seals this
@@ -537,6 +570,7 @@ function prepareMovementIntentTargets(m){
       const progressDelta=dir(p.team)*((p.tx??p.x)-p.x);
       if(progressDelta<-.28){p.tx=clamp(p.x+dir(p.team)*.95,1,104);p.ty=clamp(p.y+(p.ty-p.y)*.20,1,67);}
     }
+    maintainMovingReceptionContinuity(m,p);
     extendUserCarryWaypoint(m,p);
   }
 }
@@ -564,6 +598,13 @@ function movePlayers(m,dt){
     const final=p.finalMovementIntent?.stepId===m.movementIntentArbiter?.stepId?p.finalMovementIntent:null;
     const targetX=final?.targetPoint?.x??p.tx,targetY=final?.targetPoint?.y??p.ty;
     const dx=targetX-p.x,dy=targetY-p.y,d=Math.hypot(dx,dy),scanFacing=onBallScanFacingTarget(m,p);
+    const receptionRunwayActive=!!p.movingReceiveApproach&&m.ball.mode==='FLIGHT'&&m.ball.intendedReceiverId===p.id&&m.time<(p.movingReceiveApproach.expiresAt||0);
+    if(d<0.02&&receptionRunwayActive){
+      // Retain a tiny live stride at the end of the rolling runway. The next ball update still
+      // decides contact; this only prevents the integrator's generic arrival snap from drawing
+      // a frozen receiver for a 0.05s flight tick.
+      const liveSpeed=Math.hypot(p.vx,p.vy);if(liveSpeed>.001){const stride=Math.min(liveSpeed*dt,.035);p.x=clamp(p.x+p.vx/liveSpeed*stride,.8,104.2);p.y=clamp(p.y+p.vy/liveSpeed*stride,.8,67.2);}continue;
+    }
     if(d<0.02){
       p.vx=0;p.vy=0;
       const stationaryFacing=Number.isFinite(p.faceTargetAngle)?p.faceTargetAngle:scanFacing;
@@ -593,7 +634,7 @@ function movePlayers(m,dt){
     if(finalThirdPaceMode&&(p.hasBall||p.sprint)){const arrivalScale=clamp(d/1.35,0.12,1);desired=Math.min(desired,Math.sqrt(Math.max(0,2*a*d))*0.88,vmax*arrivalScale);}
     const tvx=n.x*desired,tvy=n.y*desired;
     const dvx=tvx-p.vx,dvy=tvy-p.vy,dv=Math.hypot(dvx,dvy),maxDv=a*dt*(0.58+0.42*turnMoveScale),sc=dv>maxDv?maxDv/(dv||1):1;p.vx+=dvx*sc;p.vy+=dvy*sc;
-    const mx=p.vx*dt,my=p.vy*dt,travel=Math.hypot(mx,my);if(travel>=d){p.x=targetX;p.y=targetY;p.vx=p.vy=0;}else{const restartThrower=!!(m.restart&&m.restart.kind==='THROW_IN'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&p.tacticalTask==='THROW_IN_THROWER');const cornerKicker=!!(m.restart&&m.restart.kind==='CORNER'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&['SETUP','SET_HOLD','RUN_UP'].includes(m.restart.stage)&&['CORNER_KICKER_RUNUP_START','CORNER_RUN_UP'].includes(p.tacticalTask));p.x=clamp(p.x+mx,cornerKicker?-1.2:0.8,cornerKicker?106.2:104.2);p.y=clamp(p.y+my,cornerKicker?-1.2:restartThrower?-1.2:0.8,cornerKicker?69.2:restartThrower?69.2:67.2);}
+    const mx=p.vx*dt,my=p.vy*dt,travel=Math.hypot(mx,my);if(travel>=d){p.x=targetX;p.y=targetY;if(!receptionRunwayActive)p.vx=p.vy=0;}else{const restartThrower=!!(m.restart&&m.restart.kind==='THROW_IN'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&p.tacticalTask==='THROW_IN_THROWER');const cornerKicker=!!(m.restart&&m.restart.kind==='CORNER'&&m.restart.setup&&m.restart.setup.kickerId===p.id&&['SETUP','SET_HOLD','RUN_UP'].includes(m.restart.stage)&&['CORNER_KICKER_RUNUP_START','CORNER_RUN_UP'].includes(p.tacticalTask));p.x=clamp(p.x+mx,cornerKicker?-1.2:0.8,cornerKicker?106.2:104.2);p.y=clamp(p.y+my,cornerKicker?-1.2:restartThrower?-1.2:0.8,cornerKicker?69.2:restartThrower?69.2:67.2);}
     if(p.hasBall&&['CARRY_FORWARD','DRIBBLE_EVADE','COMMITTED_BOX_CARRY','TAKE_ON'].includes(p.action)){m.stats.carryDistance=(m.stats.carryDistance||0)+travel;if(p.action==='TAKE_ON')m.stats.takeOnDistance=(m.stats.takeOnDistance||0)+travel;}
   }
   if(authorityTrace)authorityTrace.observeMutation({writer:'runtime/continuous_match_core.movePlayers.integrator',before:integratorBefore,after:m,families:['player_actual','player_targets']});
@@ -1421,12 +1462,12 @@ function executePass(m,owner,target,kind,option=null,actionReason=null,actionMet
   const receiverSpeed=targetSpeed,receivePassDirection=norm(receiveTp.x-owner.x,receiveTp.y-owner.y),runAlignment=receiverSpeed>0.01?((target.vx||0)*receivePassDirection.x+(target.vy||0)*receivePassDirection.y)/receiverSpeed:0,forwardPass=dir(owner.team)*(receiveTp.x-owner.x),ballEta=pd/Math.max(speed,0.1),runnerEta=dist(target,receiveTp)/Math.max(receiverSpeed,1.0);
   // A runway is credible only when the runner and ball are due at the meeting zone together.
   // If the runner would arrive much earlier, settling for an under-led pass remains natural.
-  const movingGroundReceive=['PASS','LONG_PASS'].includes(kind)&&deliveryMode==='GROUND'&&forwardPass>=5.0&&receiverSpeed>=1.35&&runAlignment>=0.55&&runnerEta>=ballEta-0.30&&runnerEta<=ballEta+0.25;
+  const movingGroundReceive=['PASS','LONG_PASS'].includes(kind)&&deliveryMode==='GROUND'&&forwardPass>=5.0&&receiverSpeed>=1.35&&runAlignment>=0.55&&runnerEta<=ballEta+0.38;
   if(movingGroundReceive){
     // Keep the runway inside the ordinary ground-control envelope. A larger extension would
     // turn a slightly led receive into an overrun and manufacture a loose ball instead.
     const runway=0.35;
-    target.movingReceiveApproach={sourceId:owner.id,flightKind:kind,expiresAt:receiveLockUntil,directionX:target.vx/receiverSpeed,directionY:target.vy/receiverSpeed,runway};
+    target.movingReceiveApproach={sourceId:owner.id,flightKind:kind,expiresAt:receiveLockUntil,directionX:target.vx/receiverSpeed,directionY:target.vy/receiverSpeed,meetingX:receiveTp.x,meetingY:receiveTp.y,runway};
     target.tx=clamp(receiveTp.x+target.movingReceiveApproach.directionX*runway,1,104);target.ty=clamp(receiveTp.y+target.movingReceiveApproach.directionY*runway,1,67);
   }else{
     delete target.movingReceiveApproach;target.tx=receiveTp.x;target.ty=receiveTp.y;
