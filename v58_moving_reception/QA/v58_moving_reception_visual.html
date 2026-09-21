@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLR V58 이동 수신 연속성 테스트</title>
+<style>
+body{margin:0;background:#101820;color:#eef;font:14px system-ui}
+.bar{position:sticky;top:0;z-index:2;background:#17232d;padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,select,label{font:inherit}button,select{padding:7px 10px}
+.info,.check,#status,#meta{padding:8px 12px}.info{background:#0d151c}.check{line-height:1.65}
+#qaPitch{display:block;margin:0 auto 14px;border:1px solid #456;background:#285b36;max-width:100%;height:auto}
+code{color:#ffe56a}
+</style></head>
+<body>
+<div class="bar">
+  <strong>V58 이동 수신 집중 테스트</strong>
+  <button id="start">시작/다시 시작</button>
+  <button id="pause">일시정지</button>
+  <button id="resume">계속</button>
+  <label>속도 <select id="speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option></select></label>
+  <label><input id="targets" type="checkbox"> 목표선 표시(재시작 시 적용)</label>
+</div>
+<div class="info">
+Source <code>eb3743a1d64ab54d784709c8e3add0b3a7544d63</code> · Legacy only · 실제 <code>executePass → FLIGHT → 접촉 → FIRST_TOUCH_FLOW</code> 경로 사용 · USER VISUAL PASS는 아직 아님
+</div>
+<div class="check">
+<strong>이 화면에서 볼 것:</strong>
+① 흰 공의 노란 강조 링과 이동 방향이 잘 보이는가
+② H-LCM이 보낸 전진 땅볼 패스를 H-ST가 달리면서 받는가
+③ H-ST가 공이 오기 전에 완전히 멈춰 서서 기다렸다가 다시 출발하는가
+④ 접촉 뒤 FIRST_TOUCH_FLOW로 움직임이 자연스럽게 이어지는가
+<br><strong>주의:</strong> 다른 선수들은 이 3초짜리 수신 장면을 방해하지 않도록 멀리 치워둔 QA 배치입니다. 전체 대형은 평가 대상이 아닙니다.
+</div>
+<div id="status">준비 중…</div><div id="meta"></div>
+<canvas id="qaPitch" width="1260" height="820"></canvas>
+
+<script src="../runtime/match_flow_resolution.js"></script>
+<script src="../runtime/tactical_movement.js"></script>
+<script src="../runtime/restart_movement.js"></script>
+<script src="../runtime/free_kick_templates.js"></script>
+<script src="../runtime/free_kick_wall_model.js"></script>
+<script src="../runtime/corner_templates.js"></script>
+<script src="../runtime/v37_set_piece_liveliness_patch.js"></script>
+<script src="../runtime/match_choice_telemetry.js"></script>
+<script src="../runtime/attribute_match_adapter.js"></script>
+<script src="../runtime/action_candidate_engine.js"></script>
+<script src="../runtime/match_academy.js"></script>
+<script src="../runtime/aerial_contest.js"></script>
+<script src="../runtime/take_on_duel.js"></script>
+<script src="../runtime/ball_strike_model.js"></script>
+<script src="../runtime/continuous_match_core.js"></script>
+<script src="../runtime/manager_tendency_adapter.js"></script>
+<script src="v58_frame_tick_visual_qa_page.js"></script>
+<script>
+(()=>{
+  const status=document.querySelector('#status'),speedEl=document.querySelector('#speed'),targets=document.querySelector('#targets');
+  let timer=null,paused=true,startSim=600,last=null;
+  const speed=()=>Number(speedEl.value||1);
+  function update(row){
+    last=row;
+    const p=row?.players?.find(x=>x.id==='H-ST');
+    const sp=p?Math.hypot(Number(p.vx)||0,Number(p.vy)||0):0;
+    status.textContent=`t=${row?.simTime?.toFixed?.(2)??'-'} · ball=${row?.ball?.mode||'-'} · H-ST speed=${sp.toFixed(2)} · action=${p?.responsibility?.action||'-'}`;
+    if(row?.simTime>=startSim+3.05)pause();
+  }
+  function tick(){
+    if(paused)return;
+    try{update(window.FLR_V57_FRAME_TICK_QA.step());}
+    catch(e){status.textContent='ERROR: '+e.message;pause();}
+  }
+  function schedule(){
+    if(timer)clearInterval(timer);
+    timer=setInterval(tick,Math.max(12,50/speed()));
+  }
+  function start(){
+    if(timer)clearInterval(timer);
+    const init=window.FLR_V57_FRAME_TICK_QA.init({
+      mode:'LEGACY_EXECUTE',scenario:'MOVING_RECEPTION',seed:'V58-MOVING-RECEIVE-USER',
+      fps:20,seconds:3,showTargets:targets.checked,focusPlayer:'H-ST',fixture:{kind:'MOVING_RECEPTION'}
+    });
+    startSim=Number(init.time||600);paused=false;status.textContent='시작됨';schedule();
+  }
+  function pause(){paused=true;}
+  function resume(){if(last?.simTime>=startSim+3.05)return start();paused=false;schedule();}
+  document.querySelector('#start').onclick=start;
+  document.querySelector('#pause').onclick=pause;
+  document.querySelector('#resume').onclick=resume;
+  speedEl.onchange=schedule;
+  window.addEventListener('load',()=>{const wait=setInterval(()=>{if(window.FLR_V57_FRAME_TICK_QA?.engineReady?.()){clearInterval(wait);start();}},50);});
+})();
+</script>
+</body></html>
