@@ -1,0 +1,11 @@
+{
+  "gameplaySource": "f95a6f02aebb367934a2ab0b37ef1f8cbda25825",
+  "numericProofIssues": [
+    2046
+  ],
+  "internalRenderIssues": [
+    2047,
+    2048
+  ],
+  "userVisualPass": false
+}
