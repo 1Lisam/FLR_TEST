@@ -1185,6 +1185,19 @@ function responsibilityTypeFor(p,pressId,coverId,currentProposal=null){
   return'ZONE';
 }
 function currentDefensiveThreats(m,team,owner){const rows=[];for(const a of outfield(m,other(team))){const l=worldToLocal(team,a.x,a.y),central=Math.abs(l.y-34)<=13.5,wide=Math.abs(l.y-34)>=15,vacancy=transitionWideVacancyForThreat(m,team,a.id);let material=false,kind='ZONE',priority=0,reason='CURRENT_ZONE_SAFE';if(owner&&a.id===owner.id){material=true;kind='BALL';priority=100;reason='CURRENT_BALL_PRESSURE';}else if(a.role==='ST'&&central&&l.x<=55){material=true;kind='CENTRAL';priority=82-l.x*.35;reason='DANGEROUS_CENTRAL_FORWARD';}else if(['WF','FB'].includes(a.role)&&wide&&(l.x<=49||vacancy)){material=true;kind='WIDE';priority=68-l.x*.30;reason=vacancy?'VACATED_WIDE_CHANNEL_TRANSITION_OUTLET':'DANGEROUS_WIDE_OR_HALFSPACE_RUN';}else if(['CM','WF'].includes(a.role)&&central&&l.x<=38){material=true;kind='CENTRAL_RUNNER';priority=62-l.x*.25;reason='DANGEROUS_CENTRAL_RUNNER';}rows.push({id:a.id,role:a.role,kind,material,priority,reason,localX:Number(l.x.toFixed(3)),localY:Number(l.y.toFixed(3))});}return rows.sort((a,b)=>b.priority-a.priority||a.id.localeCompare(b.id));}
+function materialSameSideWideThreat(m,d){
+  const side=sideSign(d.slot),preferred=sameSideWideThreat(m,d.team,d.slot);
+  if(!side)return null;
+  // Use the same current-position materiality as WIDE responsibility. A winger
+  // who has moved inside cannot reserve the FB, but a wide opposing FB can.
+  const candidates=[preferred,...outfield(m,other(d.team))].filter(Boolean);
+  return candidates.find(a=>{
+    if(!['WF','FB'].includes(a.role))return false;
+    const l=worldToLocal(d.team,a.x,a.y);
+    return Math.sign(l.y-34)===side&&Math.abs(l.y-34)>=15&&
+      (l.x<=49||!!transitionWideVacancyForThreat(m,d.team,a.id));
+  })||null;
+}
 function roleEligibleForThreat(m,d,threat){
   if(!d||!threat||threat.kind==='BALL')return true;
   if(!wallFullbackMayTakeDuty(m,d,null,threat,'MARK'))return false;
@@ -1198,14 +1211,11 @@ function roleEligibleForThreat(m,d,threat){
     // This prevents a front-line player from becoming a sticky deep man-marker.
     return threat.localX>40&&dl.x>40&&(!side||!ownSide||side===ownSide);
   }
+  // Central strikers and runners share the same flank guard. A material wide
+  // outlet reserves its natural FB; the normal wide/cover planner chooses how
+  // that FB responds, without installing a mark or overriding a live press.
+  if(d.role==='FB'&&['CENTRAL','CENTRAL_RUNNER'].includes(threat.kind)&&materialSameSideWideThreat(m,d))return false;
   if(threat.kind==='CENTRAL'){
-    // A full-back may tuck onto a central striker only when his own wide channel is not
-    // carrying a material threat. If the same-side winger is still dangerous, preserve
-    // the full-back for that lane and let CB/CM own the central striker.
-    if(d.role==='FB'){
-      const wide=sameSideWideThreat(m,d.team,d.slot),wl=wide?worldToLocal(d.team,wide.x,wide.y):null;
-      if(wide&&wl&&['WF','FB'].includes(wide.role)&&(wl.x<=49||transitionWideVacancyForThreat(m,d.team,wide.id))&&Math.abs(wl.y-34)>=15)return false;
-    }
     // A central striker inside the defensive third belongs to the back line.
     if(threat.localX<=34)return d.role==='CB'||d.role==='FB';
     return ['CB','FB','CM'].includes(d.role);
@@ -1222,8 +1232,8 @@ function reconcileDefensiveResponsibilities(m,team,owner){
   const coverId=liveCover?.team===team&&liveCover.id!==pressId&&wallFullbackMayTakeDuty(m,liveCover,owner,null,'BALL')?liveCover.id:null;
   if(lock.pressId&&!pressId)lock.pressId=null;if(lock.coverId&&!coverId)lock.coverId=null;
   const prior=m._defensiveResponsibility?.[team]||null,threats=currentDefensiveThreats(m,team,owner),byThreat=new Map(),records={};if(pressId&&owner&&m.ball?.mode==='CONTROLLED'&&m.ball.ownerId===owner.id)byThreat.set(owner.id,[pressId]);
-  const wallHandoff=defenders.some(d=>!!protectedWallFullback(m,d)),used=new Set([pressId,wallHandoff?coverId:null].filter(Boolean));
-  const priorOwnerFor=tid=>prior?.threats?.find(t=>t.id===tid)?.owners?.find(id=>id!==pressId&&(!wallHandoff||id!==coverId))||null;
+  const used=new Set([pressId,coverId].filter(Boolean));
+  const priorOwnerFor=tid=>prior?.threats?.find(t=>t.id===tid)?.owners?.find(id=>id!==pressId&&id!==coverId)||null;
   for(const threat of threats.filter(t=>t.material&&t.kind!=='BALL')){
     const a=playerById(m,threat.id);if(!a)continue;
     let chosen=null,previous=priorOwnerFor(threat.id),vacancy=['LB','RB'].map(slot=>activeTransitionWideVacancy(m,team,slot)).find(v=>v?.threatId===threat.id&&v.handoffOwnerId),priorPlayer=previous?playerById(m,previous):null,priorRecord=previous?prior?.records?.[previous]:null;
