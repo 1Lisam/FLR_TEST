@@ -22,10 +22,8 @@ function choose(m,ps,used,roles,target,plan,key,reserveStructural=0){
   candidates=available.filter(p=>!(reserveStructural&&structural(p)&&structuralLeft<=reserveStructural&&available.some(q=>!structural(q))));
  let pool=candidates.length?candidates:available;
  if(key.startsWith('TARGET_')){
-  // Keep the centre-backs as a spine while any attacking or midfield actor can
-  // fill the danger role. Full-backs and then centre-backs are emergencies only.
-  if(pool.some(p=>['ST','WF','CM'].includes(p.role)))pool=pool.filter(p=>['ST','WF','CM'].includes(p.role));
-  else if(pool.some(p=>p.role==='FB'))pool=pool.filter(p=>p.role==='FB');
+  // Ordinary danger roles never spend a rest defender to fill an empty slot.
+  pool=pool.filter(p=>['ST','WF','CM'].includes(p.role));
  }
  const scored=pool.map(p=>{const rank=roles.indexOf(p.role),travel=distance(p,target),congestion=key==='TARGET_CENTRAL'?corridorPenalty(m,p,target):0,lane=lanePenalty(p,key),score=rank*14+travel*.48+congestion+lane;return{p,rank,travel,congestion,lane,score};}).sort((a,b)=>a.score-b.score||a.rank-b.rank||a.congestion-b.congestion||a.travel-b.travel||a.p.id.localeCompare(b.p.id));
  let pick=scored[0];if(!pick)return null;
@@ -120,23 +118,25 @@ function build(m,s){const r=m.restart;if(!r||r.kind!=='FREE_KICK'||s.freeKickPla
   // their danger channels before using a midfielder as central cover.
   let st,wf1,wf2;
   if(atk.some(p=>p.role==='ST'&&!used.has(p.id))){
-   st=pick('TARGET_CENTRAL',['ST','WF','CM','FB','CB'],91,34,4);
-   if(kicker?.role==='WF'&&side(kicker)==='L'){wf2=pick('TARGET_FAR',['WF','ST','CM','FB','CB'],92,42,4);wf1=pick('TARGET_NEAR',['WF','ST','CM','FB','CB'],89,26,4);}
-   else{wf1=pick('TARGET_NEAR',['WF','ST','CM','FB','CB'],89,26,4);wf2=pick('TARGET_FAR',['WF','ST','CM','FB','CB'],92,42,4);}
+   st=pick('TARGET_CENTRAL',['ST','WF','CM'],91,34,4);
+   if(kicker?.role==='WF'&&side(kicker)==='L'){wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);}
+   else{wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);}
   }else{
-   if(kicker?.role==='WF'&&side(kicker)==='L'){wf2=pick('TARGET_FAR',['WF','ST','CM','FB','CB'],92,42,4);wf1=pick('TARGET_NEAR',['WF','ST','CM','FB','CB'],89,26,4);}
-   else{wf1=pick('TARGET_NEAR',['WF','ST','CM','FB','CB'],89,26,4);wf2=pick('TARGET_FAR',['WF','ST','CM','FB','CB'],92,42,4);}
-   st=pick('TARGET_CENTRAL',['ST','WF','CM','FB','CB'],91,34,4);
+   if(kicker?.role==='WF'&&side(kicker)==='L'){wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);}
+   else{wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);}
+   st=pick('TARGET_CENTRAL',['ST','WF','CM'],91,34,4);
   }
-  const rd1=pick('REST_DEFENCE_1',['CB','FB','CM'],60,27),rd2=pick('REST_DEFENCE_2',['CB','FB','CM'],55,41),sb1=pick('SECOND_BALL_1',['CM','FB','CB'],83,28),sb2=pick('SECOND_BALL_2',['CM','FB','CB'],81,41);
+  const rd1=pick('REST_DEFENCE_1',['CB','FB','CM'],60,27),rd2=pick('REST_DEFENCE_2',['CB','FB','CM'],55,41),sb1=pick('SECOND_BALL_1',['CM','WF'],83,28),sb2=pick('SECOND_BALL_2',['CM','WF'],81,41);
   const wallCount=R.previewFreeKickWall?.(m,s)?.count||0;
   const centralY=wallCount>=4&&f==='DIRECT_SHOT_CLOSE'&&st?.role==='WF'?(side(st)==='L'?28.5:39.5):(f==='INDIRECT_DELIVERY'||f==='WIDE_DIRECT_DELIVERY')&&wallCount<=1?31.5:34;
   add(short,shortTarget.x,shortTarget.y,'SHORT_OPTION');add(st,91,centralY,'TARGET_CENTRAL',true);add(wf1,shoulders?.near.x??89,shoulders?.near.y??26,'TARGET_NEAR',true);add(wf2,shoulders?.far.x??92,shoulders?.far.y??42,'TARGET_FAR',true);add(rd1,60,27,'REST_DEFENCE_1');add(rd2,55,41,'REST_DEFENCE_2');add(sb1,83,28,'SECOND_BALL_1');add(sb2,81,41,'SECOND_BALL_2');}
  for(const p of atk)if(!plan.roles[p.id])add(p,p.role==='CB'?53:58,side(p)==='L'?24:side(p)==='R'?44:34,'REST_DEFENCE_SUPPORT');const ownGk=m.players.find(p=>p.team===team&&p.role==='GK');if(ownGk)put(s,plan,ownGk,world(team,5,34),'ATTACK_GK');
  defend(m,s,plan,defs,team,f,lp);
  preserveLineBands(m,s,new Set(plan.defensiveWallIds));
+ const tactics=root.FLRPG_TACTICS||(typeof require==='function'?require('./tactical_movement.js'):null);
+ tactics?.prepareAttackingSetPieceRestDefence(m,s,plan);
  const gk=m.players.find(p=>p.team===def&&p.role==='GK');if(gk)put(s,plan,gk,world(team,102,34),'GK_COMPLEMENT',true);plan.complete=true;return s;}
 function launch(m,s){const p=s?.freeKickPlan;if(!p||p.launched||m.restart?.stage!=='APPROACH')return;p.launched=true;p.stage='APPROACH';for(const [id,role] of Object.entries(p.roles)){const t=s.targets[id];if(!t||role==='KICKER'||role.includes('REST')||role.includes('SECOND_BALL')||role==='COUNTER_OUTLET'||role==='GK_COMPLEMENT'||role==='BOX_ZONE'||role==='MARK_CONTEST'||role==='WIDE_EDGE_CLEARANCE')continue;t.task=`FREE_KICK_${role}_RUN`;t.sprint=true;}}
 function apply(m,s){if(!s||m.restart?.kind!=='FREE_KICK')return s;build(m,s);launch(m,s);return s;}
-const begin=R.begin.bind(R),assign=R.assign.bind(R);R.begin=m=>apply(m,begin(m));R.assign=m=>{const x=assign(m);apply(m,m.restart?.setup);return x;};R.FREE_KICK_TEMPLATE_VERSION=VERSION;R.__v59FreeKickTemplates=true;
+const begin=R.begin.bind(R),assign=R.assign.bind(R);R.begin=m=>{if(!m.restart?.setup)delete m.attackingSetPieceRestDefence;return apply(m,begin(m));};R.assign=m=>{const x=assign(m);apply(m,m.restart?.setup);return x;};R.FREE_KICK_TEMPLATE_VERSION=VERSION;R.__v59FreeKickTemplates=true;
 })(typeof globalThis!=='undefined'?globalThis:this);

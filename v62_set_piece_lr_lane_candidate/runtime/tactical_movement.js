@@ -1778,8 +1778,11 @@ function preserveHybridEntryContinuity(m){
 // in continuous_match_core's live physics path.
 function looseBallCandidates(m,team){
   const rushKeeperId=m.ball.rushBlock?.keeperId,protectedKeeper=!!rushKeeperId&&m.ball.age<(m.ball.rushBlock.recoveryUntil-m.ball.rushBlock.contactAt);
+  const rest=m.attackingSetPieceRestDefence,protect=rest?.team===team&&m.possession===team&&!m.restart;
+  const restResponder=protect?attackingSetPieceRestResponder(m,rest):null;
   return teamPlayers(m,team).filter(p=>{
     if(protectedKeeper&&p.id===rushKeeperId)return false;
+    if(protect&&['CB','FB'].includes(p.role)&&/^REST_DEFENCE/.test(rest.roles[p.id]||''))return p.id===restResponder?.id;
     if(p.role!=='GK')return true;
     const b=worldToLocal(team,m.ball.x,m.ball.y);
     return b.x<18&&Math.abs(b.y-34)<23&&dist(p,m.ball)<11;
@@ -1841,6 +1844,7 @@ function assignLooseBallArbitration(m){
     const wallState=reconcileDefensiveResponsibilities(m,poss,null);
     executeDefensiveResponsibilityMotion(m,poss,null,wallState);
   }
+  preserveAttackingSetPieceRestDefence(m);
 }
 
 
@@ -1869,7 +1873,7 @@ function assign(m){
     for(const p of outfield(m,poss))if(p._defensiveFacingAuthority){p.faceTargetAngle=null;delete p._defensiveFacingAuthority;}
     m._lastTacticalPossession=poss;
   }
-  if(m.ball?.mode==='LOOSE'){observe('assignLooseBallArbitration',()=>assignLooseBallArbitration(m));const defTeam=other(poss);observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,poss));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,defTeam));observe('handoffFreeKickWallFullbacks',()=>handoffFreeKickWallFullbacks(m));m.tactical={...(m.tactical||{}),defensiveResponsibility:m.defensiveResponsibility};return;}
+  if(m.ball?.mode==='LOOSE'){observe('assignLooseBallArbitration',()=>assignLooseBallArbitration(m));const defTeam=other(poss);observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,poss));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,defTeam));observe('handoffFreeKickWallFullbacks',()=>handoffFreeKickWallFullbacks(m));observe('preserveAttackingSetPieceRestDefence',()=>preserveAttackingSetPieceRestDefence(m));m.tactical={...(m.tactical||{}),defensiveResponsibility:m.defensiveResponsibility};return;}
   const owner=playerById(m,m.ball.ownerId),ctx={owner};
   observe('assignAttack',()=>assignAttack(m,poss,ctx));observe('separateRecoveringMidfieldFromStriker',()=>separateRecoveringMidfieldFromStriker(m,poss));observe('enforceAttackingCarrierLane',()=>enforceAttackingCarrierLane(m,poss));const defTeam=other(poss),authorityContract=beginDefensiveTargetAuthorityContract(m,defTeam);if(authorityContract)authorityContract.collecting=true;observe('assignDefence',()=>assignDefence(m,defTeam,ctx));if(authorityContract)authorityContract.collecting=false;
   // These are the complete adjacent pre-reconciliation defensive target-writer family.
@@ -1881,6 +1885,7 @@ function assign(m){
   observe('targetSeparation',()=>collectDefensiveHelperProposals(m,defTeam,'targetSeparation',()=>targetSeparation(m)));
   observe('enforceActualDefenderCrowdExit',()=>collectDefensiveHelperProposals(m,defTeam,'enforceActualDefenderCrowdExit',()=>enforceActualDefenderCrowdExit(m,defTeam,owner)));
   const responsibility=observe('reconcileDefensiveResponsibilities',()=>reconcileDefensiveResponsibilities(m,defTeam,owner));observe('arbitrateDefensiveTargetAuthority',()=>arbitrateDefensiveTargetAuthority(m,defTeam,responsibility));observe('enforceWideLaneHierarchy',()=>enforceWideLaneHierarchy(m,poss));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,poss));observe('preserveHybridEntryContinuity',()=>preserveHybridEntryContinuity(m));observe('executeDefensiveResponsibilityMotion',()=>executeDefensiveResponsibilityMotion(m,defTeam,owner,responsibility));observe('applyRelationshipDepthStagger',()=>applyRelationshipDepthStagger(m,poss));observe('applyRelationshipDepthStagger',()=>applyRelationshipDepthStagger(m,defTeam));observe('enforceFullbackWideContainBeforeBeaten',()=>enforceFullbackWideContainBeforeBeaten(m,defTeam,owner));observe('enforceRoleAnchorRecoveryReferences',()=>enforceRoleAnchorRecoveryReferences(m,defTeam));observe('handoffFreeKickWallFullbacks',()=>handoffFreeKickWallFullbacks(m));
+  observe('preserveAttackingSetPieceRestDefence',()=>preserveAttackingSetPieceRestDefence(m));
   m.tactical={
     formation:{HOME:FORMATION,AWAY:FORMATION},
     profile:{HOME:PROFILES.HOME.id,AWAY:PROFILES.AWAY.id},
@@ -1889,6 +1894,86 @@ function assign(m){
   };
 }
 
+// Setup provenance survives the existing live-window's first contact. It is
+// released by current possession/recycling, never by a new countdown or a
+// delivery's intended receiver/landing point.
+function prepareAttackingSetPieceRestDefence(m,setup,plan){
+  const team=m.restart.team,roles={...plan.roles};
+  const state={team,kind:m.restart.kind,createdAt:setup.createdAt,
+    restartLocal:worldToLocal(team,m.restart.x,m.restart.y),roles};
+  const points=Object.fromEntries(Object.entries(setup.targets).map(([id,t])=>[id,worldToLocal(team,t.x,t.y)]));
+  const shape=attackingSetPieceRestShape(m,state,points,true);
+  for(const [id,q] of Object.entries(shape)){
+    const t=setup.targets[id],p=playerById(m,id);if(!t)continue;
+    const role=p.role==='FB'?`REST_DEFENCE_FLANK_${sideSign(p.slot)<0?'LEFT':'RIGHT'}`:roles[id];
+    const w=localToWorld(team,q.x,q.y);
+    Object.assign(t,w,{task:`${state.kind}_${role}_HOLD`,sprint:false});
+    plan.roles[id]=roles[id]=role;p.markTargetId=null;
+  }
+  m.attackingSetPieceRestDefence=state;
+}
+function attackingSetPieceRestShape(m,state,points,setup=false){
+  const {team,roles}=state,ps=outfield(m,team),at=p=>points[p.id]||worldToLocal(team,p.x,p.y);
+  const mids=ps.filter(p=>/^(EDGE_|SECOND_BALL_|SECOND_WAVE_)/.test(roles[p.id]||''));
+  const secondLine=mids.length?Math.min(...mids.map(p=>at(p).x)):state.restartLocal.x;
+  const ball=setup?state.restartLocal:worldToLocal(team,m.ball.x,m.ball.y);
+  const outlets=outfield(m,other(team)).map(p=>({p,q:at(p)})).filter(v=>v.q.x<secondLine);
+  const counterLine=outlets.length?Math.min(...outlets.map(v=>v.q.x)):secondLine-12;
+  const backs=ps.filter(p=>p.role==='CB'&&/^REST_DEFENCE/.test(roles[p.id]||''));
+  const shape={};
+  for(const cb of backs){
+    const q=at(cb),sg=sideSign(cb.slot),stagger=sg===(ball.y<34?-1:1)?0:3;
+    // Keep a staggered CB spine counter-side of the present outlet. Live
+    // geometry follows the ball/CM line, rather than retaining setup x.
+    shape[cb.id]={x:clamp(Math.min(setup?q.x:ball.x-24,secondLine-12,counterLine-4)-stagger,5,72),y:clamp(q.y,sg<0?23:35,sg<0?33:45)};
+  }
+  for(const fb of ps.filter(p=>p.role==='FB'&&/^REST_DEFENCE/.test(roles[p.id]||''))){
+    const sg=sideSign(fb.slot);if(!sg)continue;
+    const cb=backs.find(p=>sideSign(p.slot)===sg)||backs[0];if(!cb)continue;
+    const c=shape[cb.id],current=at(cb);
+    const outlet=outlets.filter(v=>sg*(v.q.y-34)>0).sort((a,b)=>dist(a.q,at(fb))-dist(b.q,at(fb))||a.p.id.localeCompare(b.p.id))[0];
+    const wide=outlet?.q,mid=mids.slice().sort((a,b)=>dist(at(a),at(fb))-dist(at(b),at(fb)))[0];
+    const rail=c.y+sg*9,connection=mid?(at(mid).y-rail)*.12:0;
+    const y=clamp(rail+connection+(wide?(wide.y-rail)*.18:0),sg<0?9:46,sg<0?22:59);
+    shape[fb.id]={x:clamp(Math.min(c.x+3+(sg===(ball.y<34?-1:1)?1.5:0),current.x+4.8,secondLine-8,wide?wide.x-3.2:102),5,78),y};
+  }
+  return shape;
+}
+function preserveAttackingSetPieceRestDefence(m){
+  const state=m.attackingSetPieceRestDefence;if(!state)return;
+  if(m.restart){
+    if(m.restart.setup?.createdAt!==state.createdAt||m.restart.team!==state.team)delete m.attackingSetPieceRestDefence;
+    return;
+  }
+  const {team,roles}=state,ball=worldToLocal(team,m.ball.x,m.ball.y),owner=m.ball.mode==='CONTROLLED'?playerById(m,m.ball.ownerId):null;
+  const ps=outfield(m,team),mids=ps.filter(p=>p.id!==owner?.id&&/^(EDGE_|SECOND_BALL_|SECOND_WAVE_)/.test(roles[p.id]||''));
+  const secondLine=mids.length?Math.min(...mids.map(p=>worldToLocal(team,p.x,p.y).x)):state.restartLocal.x;
+  if(m.completed||m.ball.mode==='DEAD'||m.possession!==team||(owner&&(owner.team!==team||ball.x<secondLine-2||['CB','FB'].includes(owner.role)))){
+    delete m.attackingSetPieceRestDefence;return;
+  }
+  const points=Object.fromEntries(m.players.map(p=>[p.id,worldToLocal(team,p.x,p.y)]));
+  const shape=attackingSetPieceRestShape(m,state,points);
+  // Only one actual nearby playable-ball responder may leave the shell. A
+  // distant intended destination conveys no authority to a rest defender.
+  const responder=attackingSetPieceRestResponder(m,state);
+  for(const [id,q] of Object.entries(shape)){
+    const p=playerById(m,id);if(p.id===responder?.id){
+      applyTarget(p,ball.x,ball.y,'SET_PIECE_SECOND_BALL_RESPONSE',true,m);p.markTargetId=null;continue;
+    }
+    // These are final attacking targets, after support, spacing and continuity
+    // writers; defending responsibility and the wall handoff remain untouched.
+    delete p._shapeContinuityIntent;p.markTargetId=null;
+    applyTarget(p,q.x,q.y,p.role==='FB'?'SET_PIECE_FLANK_REST_DEFENCE':'SET_PIECE_CB_REST_DEFENCE',dist(p,localToWorld(team,q.x,q.y))>4,m);
+  }
+}
+function attackingSetPieceRestResponder(m,state){
+  if(!['FLIGHT','LOOSE'].includes(m.ball.mode)||(m.ball.z||0)>2.4)return null;
+  const ps=outfield(m,state.team),nearest=ps.slice().sort((a,b)=>dist(a,m.ball)-dist(b,m.ball)||a.id.localeCompare(b.id))[0];
+  if(!nearest||!['FB','CB'].includes(nearest.role)||!/^REST_DEFENCE/.test(state.roles[nearest.id]||'')||dist(nearest,m.ball)>4.5)return null;
+  const ball=worldToLocal(state.team,m.ball.x,m.ball.y);
+  const cover=ps.filter(p=>p.id!==nearest.id&&/^REST_DEFENCE/.test(state.roles[p.id]||'')&&worldToLocal(state.team,p.x,p.y).x<ball.x-3);
+  return cover.some(p=>p.role==='CB')&&cover.some(p=>p.role==='FB')?nearest:null;
+}
 function describe(team,m=null){return{...profile(m,team)};}
-return{assign,assignLooseBallArbitration,describe,PROFILES,FORMATION,phaseFromProgress,reconcileDefensiveResponsibilities,currentDefensiveThreats,executeDefensiveResponsibilityMotion,capInvertedFullbackForWideThreat,enforceFullbackWideContainBeforeBeaten};
+return{assign,assignLooseBallArbitration,describe,PROFILES,FORMATION,phaseFromProgress,reconcileDefensiveResponsibilities,currentDefensiveThreats,executeDefensiveResponsibilityMotion,capInvertedFullbackForWideThreat,enforceFullbackWideContainBeforeBeaten,prepareAttackingSetPieceRestDefence};
 });

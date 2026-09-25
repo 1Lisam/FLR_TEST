@@ -83,13 +83,18 @@ function build(m,s){
  const first=[take(a,u,['ST'])],waveY=top?[28,34,41]:[40,34,27],wideAvailable=a.filter(p=>p.role==='WF'&&!u.has(p.id));
  if(wideAvailable.length>=2){const pair=takePair(a,u,['WF'],t,[{x:96,y:waveY[1]},{x:95,y:waveY[2]}]);first.push(...pair);}else{first.push(takeLane(a,u,['WF'],t,{x:96,y:waveY[1]}),null);}
  const secondY=top?[26,42]:[42,26],edgeY=top?[24,44]:[44,24];
- const second=short?[takeLane(a,u,['CM'],t,{x:91,y:secondY[0]})]:takePair(a,u,['CM'],t,[{x:91,y:secondY[0]},{x:89,y:secondY[1]}]);
- const edge=takePair(a,u,['CM','FB'],t,[{x:84,y:edgeY[0]},{x:81,y:edgeY[1]}]);
+ // Keep the arrival wave for a short pattern too; its separate short option
+ // can use a fullback while the remaining back and CB spine protect the counter.
+ const second=takePair(a,u,['CM'],t,[{x:91,y:secondY[0]},{x:89,y:secondY[1]}]);
+ const edge=takePair(a,u,['CM','WF'],t,[{x:84,y:edgeY[0]},{x:81,y:edgeY[1]}]);
  const rest=takePair(a,u,['CB','FB'],t,[{x:62,y:27},{x:54,y:41}]);
  const sp=short?takeLane(a,u,['CM','WF','FB'],t,{x:98,y:top?11:57}):null;
  add(sp,98,top?11:57,'SHORT_OPTION');first.forEach((p,i)=>add(p,97-i,top?[28,34,41][i]:[40,34,27][i],`FIRST_WAVE_${i}`,true));second.forEach((p,i)=>add(p,91-i*2,top?[26,42][i]:[42,26][i],`SECOND_WAVE_${i}`,true));edge.forEach((p,i)=>add(p,84-i*3,top?[24,44][i]:[44,24][i],`EDGE_${i}`));rest.forEach((p,i)=>add(p,62-i*8,[27,41][i],`REST_DEFENCE_${i}`));
  let z=0;for(const p of a)if(!plan.roles[p.id]){const lane=side(p)==='L'?24:side(p)==='R'?44:34;add(p,58+(z++%2)*6,lane,'REST_DEFENCE_SUPPORT');}put(s,m.players.find(p=>p.team===t&&p.role==='GK'),L(t,5,34),'ATTACK_GK');
- defend(m,s,ds,t,top,short,first.concat(second).filter(Boolean));preserveLineBands(m,s);put(s,m.players.find(p=>p.team===d&&p.role==='GK'),L(t,102,34),'GK_SET',true);plan.complete=true;return s;
+ defend(m,s,ds,t,top,short,first.concat(second).filter(Boolean));preserveLineBands(m,s);
+ // Share setup and live rest-defence geometry with the tactical authority.
+ const tactics=root.FLRPG_TACTICS||(typeof require==='function'?require('./tactical_movement.js'):null);
+ tactics?.prepareAttackingSetPieceRestDefence(m,s,plan);put(s,m.players.find(p=>p.team===d&&p.role==='GK'),L(t,102,34),'GK_SET',true);plan.complete=true;return s;
 }
 // This wrapper still refreshes the other actors during SET_HOLD; restart_movement
 // preserves the kicker's wait task until the core enters RUN_UP.
