@@ -1254,6 +1254,38 @@ function fullbackWideZone(m,d,a){
   return{targetLocal:{x,y},anchorLocal:anchor,cbId:cb?.id||null,cbLocal,cbAnchorLocal:cbAnchor,
     threatId:a.id,currentThreatLocal:wide,forwardLimit,forwardOffset:4.8,standOff:3.2};
 }
+// Central midfield ownership is structural, not a nearest-body fallback. These
+// distances reuse the protective-cover stagger (4.8), current lane-cover width
+// (8.5), and existing ownership handoff radius (16.5); no restart clock is used.
+function fullbackCentralBand(m,d){
+  const bl=worldToLocal(d.team,m.ball.x,m.ball.y),pr=profile(m,d.team);
+  const anchorLocal=defendingBlockAnchors(pr,bl.x,bl.y,d.slot,'FB');
+  const cbSlot=d.slot==='LB'?'LCB':'RCB',cb=outfield(m,d.team).find(p=>p.slot===cbSlot);
+  const cbLocal=cb?worldToLocal(d.team,cb.x,cb.y):defendingBlockAnchors(pr,bl.x,bl.y,cbSlot,'CB');
+  const forwardLimit=Math.min(anchorLocal.x,cbLocal.x)+4.8;
+  return{anchorLocal,cbId:cb?.id||null,cbLocal,forwardLimit,forwardOffset:4.8,
+    targetLocal:{x:clamp(Math.min(anchorLocal.x,forwardLimit),2.5,102.5),y:anchorLocal.y}};
+}
+function currentCentralMidfielder(m,team,a){
+  return !!a&&a.team!==team&&['CM','WF'].includes(a.role)&&
+    !(m.ball?.mode==='CONTROLLED'&&m.ball.ownerId===a.id)&&Math.abs(worldToLocal(team,a.x,a.y).y-34)<=13.5;
+}
+function fullbackCentralEmergency(m,d,a){
+  const band=fullbackCentralBand(m,d),al=worldToLocal(d.team,a.x,a.y);
+  const midfield=outfield(m,d.team).filter(p=>p.role==='CM').map(p=>worldToLocal(d.team,p.x,p.y).x);
+  const midfieldLine=midfield.length?Math.min(...midfield):band.anchorLocal.x;
+  // The penalty box or a runner already inside the back line AND behind the
+  // current midfield can justify a tuck. Ordinary second-wave space cannot.
+  const deep=al.x<=16.5||(al.x<=Math.min(band.anchorLocal.x,band.cbLocal.x)-4.8&&al.x<=midfieldLine-4.8);
+  const goalSideCoverIds=outfield(m,d.team).filter(p=>{
+    if(!['CM','CB'].includes(p.role))return false;
+    const q=worldToLocal(d.team,p.x,p.y);
+    return q.x<=al.x+1.5&&Math.abs(q.y-al.y)<=8.5&&dist(p,a)<=16.5;
+  }).map(p=>p.id);
+  const sameHalf=Math.abs(al.y-34)<=4.8||Math.sign(al.y-34)===sideSign(d.slot);
+  return{allowed:deep&&sameHalf&&al.x<=band.forwardLimit&&dist(d,a)<=16.5&&!goalSideCoverIds.length,
+    reason:'CURRENT_DEEP_RUNNER_WITHOUT_CENTRAL_COVER',currentRunnerLocal:al,midfieldLine,goalSideCoverIds,band};
+}
 function roleEligibleForThreat(m,d,threat){
   if(!d||!threat||threat.kind==='BALL')return true;
   if(!wallFullbackMayTakeDuty(m,d,null,threat,'MARK'))return false;
@@ -1276,7 +1308,12 @@ function roleEligibleForThreat(m,d,threat){
     if(threat.localX<=34)return d.role==='CB'||d.role==='FB';
     return ['CB','FB','CM'].includes(d.role);
   }
-  if(threat.kind==='CENTRAL_RUNNER')return ['CM','CB','FB'].includes(d.role);
+  if(threat.kind==='CENTRAL_RUNNER'){
+    const a=playerById(m,threat.id);if(!a)return false;
+    if(d.role==='FB')return fullbackCentralEmergency(m,d,a).allowed;
+    const dl=worldToLocal(d.team,d.x,d.y);
+    return ['CM','CB'].includes(d.role)&&dist(d,a)<=16.5&&dl.x<=threat.localX+4.8;
+  }
   if(threat.kind==='WIDE')return ['FB','CM','CB'].includes(d.role)&&(d.role!=='FB'||sideSign(d.slot)===Math.sign(threat.localY-34));
   return ['CB','FB','CM'].includes(d.role);
 }
@@ -1291,11 +1328,27 @@ function reconcileDefensiveResponsibilities(m,team,owner){
   const prior=m._defensiveResponsibility?.[team]||null,threats=currentDefensiveThreats(m,team,owner),byThreat=new Map(),records={};if(pressId&&owner&&m.ball?.mode==='CONTROLLED'&&m.ball.ownerId===owner.id)byThreat.set(owner.id,[pressId]);
   const looseResponder=m.ball?.mode==='LOOSE'&&m.looseBallArbitration?.teams?.[team]?.updatedAt===m.time?m.looseBallArbitration.teams[team].primaryId:null;
   const used=new Set([pressId,coverId,looseResponder].filter(Boolean));
+  const centralReleased=new Set();
+  for(const d of defenders.filter(p=>p.role==='FB')){
+    const previous=prior?.records?.[d.id];
+    const ids=[d.markTargetId,previous?.targetId,m._markLocks?.[team]?.pairs?.[d.id],d.beatenRecoveryTargetId];
+    const stale=ids.some(id=>{const a=playerById(m,id);return currentCentralMidfielder(m,team,a)&&!fullbackCentralEmergency(m,d,a).allowed;});
+    const ordinary=threats.some(t=>t.material&&t.kind==='CENTRAL_RUNNER'&&!fullbackCentralEmergency(m,d,playerById(m,t.id)).allowed);
+    const returning=previous?.reason==='FULLBACK_CENTRAL_DUTY_RELEASE'&&dist(d,localToWorld(team,fullbackCentralBand(m,d).targetLocal.x,fullbackCentralBand(m,d).targetLocal.y))>2;
+    if(stale||ordinary||returning){centralReleased.add(d.id);delete d._shapeContinuityIntent;}
+    if(stale){d.markTargetId=null;delete m._markLocks?.[team]?.pairs?.[d.id];}
+  }
   const priorOwnerFor=tid=>prior?.threats?.find(t=>t.id===tid)?.owners?.find(id=>id!==pressId&&id!==coverId)||null;
   for(const threat of threats.filter(t=>t.material&&t.kind!=='BALL')){
     const a=playerById(m,threat.id);if(!a)continue;
     let chosen=null,previous=priorOwnerFor(threat.id),vacancy=['LB','RB'].map(slot=>activeTransitionWideVacancy(m,team,slot)).find(v=>v?.threatId===threat.id&&v.handoffOwnerId),priorPlayer=previous?playerById(m,previous):null,priorRecord=previous?prior?.records?.[previous]:null;
     const lockedPrevious=policy==='LOCKED_MARK'&&priorPlayer&&priorPlayer.team===team&&!used.has(priorPlayer.id)&&dist(priorPlayer,a)<=18.5&&roleEligibleForThreat(m,priorPlayer,threat)&&m.time<Math.max(Number(priorRecord?.holdUntil)||0,Number(priorRecord?.assignmentAt||0)+2.2);
+    if(threat.kind==='CENTRAL_RUNNER'){
+      // CM -> suitable CB -> emergency FB. Prior, explicit and vacancy owners
+      // cannot outrank current structural eligibility, nor spend the COVER body.
+      const rank={CM:0,CB:1,FB:2};
+      chosen=defenders.filter(d=>!used.has(d.id)&&roleEligibleForThreat(m,d,threat)).sort((x,y)=>rank[x.role]-rank[y.role]||eligibleOwnerScore(m,team,x,a,threat)-eligibleOwnerScore(m,team,y,a,threat)||x.id.localeCompare(y.id))[0]||null;
+    }
     if(threat.kind==='WIDE'&&!vacancy)chosen=defenders.find(d=>d.role==='FB'&&!used.has(d.id)&&roleEligibleForThreat(m,d,threat))||null;
     if(!chosen&&lockedPrevious)chosen=priorPlayer;
     const handoff=vacancy&&playerById(m,vacancy.handoffOwnerId);if(!chosen&&handoff&&handoff.team===team&&!used.has(handoff.id)&&roleEligibleForThreat(m,handoff,threat))chosen=handoff;
@@ -1305,6 +1358,9 @@ function reconcileDefensiveResponsibilities(m,team,owner){
     if(chosen){used.add(chosen.id);byThreat.set(threat.id,[chosen.id]);chosen.markTargetId=threat.id;}
   }
   for(const d of defenders){let targetId=null;for(const[tid,ids]of byThreat)if(ids.includes(d.id)){targetId=tid;break;}
+    // A losing explicit central proposal is not a second ownership channel.
+    // In particular, the required COVER player must not retain a marker flag.
+    if(d.markTargetId!==targetId&&currentCentralMidfielder(m,team,playerById(m,d.markTargetId)))d.markTargetId=null;
     const wall=protectedWallFullback(m,d),loosePrimary=looseResponder===d.id;
     const flightContact=(wall||(d.role==='FB'&&targetId))&&m.ball?.mode==='FLIGHT'&&dist(d,m.ball)<=2.05&&(Number(m.ball.z)||0)<=(m.ball.kind==='CROSS'?3.5:1.45);
     const wallRecovery=wall&&!loosePrimary&&!flightContact&&d.id!==pressId&&d.id!==coverId&&!targetId;
@@ -1313,12 +1369,13 @@ function reconcileDefensiveResponsibilities(m,team,owner){
     const urgency=d.role==='FB'&&threat?.kind==='WIDE'?fullbackWideUrgency(m,d,attacker):null;
     const zonal=d.role==='FB'&&threat?.kind==='WIDE'&&!loosePrimary&&!flightContact&&!urgency&&d.id!==pressId&&d.id!==coverId;
     const previous=prior?.records?.[d.id]||null;
+    const centralRelease=centralReleased.has(d.id)&&!targetId&&!wall&&!loosePrimary&&!flightContact&&d.id!==pressId&&d.id!==coverId;
     const zoneRelease=d.role==='FB'&&!loosePrimary&&!flightContact&&!targetId&&d.id!==pressId&&d.id!==coverId&&!wall&&
       (previous?.type==='CONTAIN'||(previous?.reason==='FULLBACK_WIDE_ZONE_RELEASE'&&
         dist(d,localToWorld(team,d._defensivePursuitIntent?.localX??0,d._defensivePursuitIntent?.localY??34))>2))&&!materialSameSideWideThreat(m,d);
-    if(zonal||zoneRelease)d.markTargetId=null;
-    if(zonal||zoneRelease){delete d._shapeContinuityIntent;delete m._markLocks?.[team]?.pairs?.[d.id];}
-    const type=zonal?'CONTAIN':zoneRelease?'RECOVERY':wallRecovery||loosePrimary||flightContact?'RECOVERY':responsibilityTypeFor(d,pressId,coverId,m._defensiveTargetAuthorityContract?.[team]?.shapeProposals?.get(d.id)),reason=zonal?'FULLBACK_WIDE_ZONAL_CONTROL':zoneRelease?'FULLBACK_WIDE_ZONE_RELEASE':wallRecovery?'FREE_KICK_WALL_ROLE_RECOVERY':loosePrimary?'PRIMARY_LOOSE_BALL_CHASE':flightContact?'CURRENT_FLIGHT_CONTACT':d.id===pressId?'PRIMARY_BALL_PRESSURE':targetId?(threats.find(t=>t.id===targetId)?.reason||'EXPLICIT_THREAT_OWNER'):d.id===coverId?'PRIMARY_PRESS_COVER':/FB_WEAK_SIDE_TUCK/.test(String(d.tacticalTask||''))?'WEAK_SIDE_WIDE_ZONE_RETAINED':'EXPLICIT_TEAM_SHAPE_ZONE',changed=!previous||previous.type!==type||previous.targetId!==targetId||previous.reason!==reason,assignmentAt=changed?m.time:previous.assignmentAt,handoff=changed&&previous?{fromOwnerId:previous.ownerId||d.id,fromTargetId:previous.targetId||null,reason:previous.targetId&&targetId?'THREAT_OR_ROLE_THRESHOLD_CROSSED':previous.targetId?'EXPLICIT_RELEASE_TO_COVER':'ATOMIC_CURRENT_STATE_ASSIGNMENT',at:m.time}:null;records[d.id]={ownerId:d.id,type,targetId,reason,assignmentAt,epoch:changed?(Number(previous?.epoch)||0)+1:(previous.epoch||1),previousOwnerId:handoff?.fromOwnerId||previous?.previousOwnerId||null,previousTargetId:handoff?.fromTargetId??previous?.previousTargetId??null,handoffReason:handoff?.reason||null,holdUntil:changed?m.time+(policy==='LOCKED_MARK'?2.2:RESPONSIBILITY_HOLD_SECONDS):(previous.holdUntil||m.time),futureOutcomePrecomputed:false};if(zonal)records[d.id].wideZone=fullbackWideZone(m,d,attacker);if(urgency)records[d.id].wideUrgency={reason:urgency,ballLocal:worldToLocal(team,m.ball.x,m.ball.y),ballMode:m.ball.mode,ballHeight:Number(m.ball.z)||0,distanceToThreat:dist(attacker,m.ball),distanceToDefender:dist(d,m.ball)};d.responsibilityType=type;d.responsibilityTargetId=targetId;d.responsibilityReason=reason;d.responsibilityAssignmentAt=assignmentAt;d.responsibilityEpoch=records[d.id].epoch;d.responsibilityHandoffReason=records[d.id].handoffReason;}
+    if(zonal||zoneRelease||centralRelease)d.markTargetId=null;
+    if(zonal||zoneRelease||centralRelease){delete d._shapeContinuityIntent;delete m._markLocks?.[team]?.pairs?.[d.id];}
+    const type=zonal?'CONTAIN':centralRelease?'RECOVERY':zoneRelease?'RECOVERY':wallRecovery||loosePrimary||flightContact?'RECOVERY':responsibilityTypeFor(d,pressId,coverId,m._defensiveTargetAuthorityContract?.[team]?.shapeProposals?.get(d.id)),reason=zonal?'FULLBACK_WIDE_ZONAL_CONTROL':centralRelease?'FULLBACK_CENTRAL_DUTY_RELEASE':zoneRelease?'FULLBACK_WIDE_ZONE_RELEASE':wallRecovery?'FREE_KICK_WALL_ROLE_RECOVERY':loosePrimary?'PRIMARY_LOOSE_BALL_CHASE':flightContact?'CURRENT_FLIGHT_CONTACT':d.id===pressId?'PRIMARY_BALL_PRESSURE':targetId?(threats.find(t=>t.id===targetId)?.reason||'EXPLICIT_THREAT_OWNER'):d.id===coverId?'PRIMARY_PRESS_COVER':/FB_WEAK_SIDE_TUCK/.test(String(d.tacticalTask||''))?'WEAK_SIDE_WIDE_ZONE_RETAINED':'EXPLICIT_TEAM_SHAPE_ZONE',changed=!previous||previous.type!==type||previous.targetId!==targetId||previous.reason!==reason,assignmentAt=changed?m.time:previous.assignmentAt,handoff=changed&&previous?{fromOwnerId:previous.ownerId||d.id,fromTargetId:previous.targetId||null,reason:previous.targetId&&targetId?'THREAT_OR_ROLE_THRESHOLD_CROSSED':previous.targetId?'EXPLICIT_RELEASE_TO_COVER':'ATOMIC_CURRENT_STATE_ASSIGNMENT',at:m.time}:null;records[d.id]={ownerId:d.id,type,targetId,reason,assignmentAt,epoch:changed?(Number(previous?.epoch)||0)+1:(previous.epoch||1),previousOwnerId:handoff?.fromOwnerId||previous?.previousOwnerId||null,previousTargetId:handoff?.fromTargetId??previous?.previousTargetId??null,handoffReason:handoff?.reason||null,holdUntil:changed?m.time+(policy==='LOCKED_MARK'?2.2:RESPONSIBILITY_HOLD_SECONDS):(previous.holdUntil||m.time),futureOutcomePrecomputed:false};if(centralRelease)records[d.id].centralBand=fullbackCentralBand(m,d);if(d.role==='FB'&&threat?.kind==='CENTRAL_RUNNER')records[d.id].centralEmergency=fullbackCentralEmergency(m,d,attacker);if(zonal)records[d.id].wideZone=fullbackWideZone(m,d,attacker);if(urgency)records[d.id].wideUrgency={reason:urgency,ballLocal:worldToLocal(team,m.ball.x,m.ball.y),ballMode:m.ball.mode,ballHeight:Number(m.ball.z)||0,distanceToThreat:dist(attacker,m.ball),distanceToDefender:dist(d,m.ball)};d.responsibilityType=type;d.responsibilityTargetId=targetId;d.responsibilityReason=reason;d.responsibilityAssignmentAt=assignmentAt;d.responsibilityEpoch=records[d.id].epoch;d.responsibilityHandoffReason=records[d.id].handoffReason;}
   const threatRows=threats.map(t=>{const owners=byThreat.get(t.id)||[];return{...t,owners,coverage:owners.length?'EXPLICIT_OWNER':t.material?'UNOWNED':'EXPLICIT_ZONE_SAFE',zoneReason:owners.length?null:(t.material?null:t.reason)};}),unowned=threatRows.filter(t=>t.material&&!t.owners.length),duplicates=threatRows.filter(t=>t.owners.length>1),pressOwners=defenders.filter(d=>PRESS_TASKS.has(String(d.tacticalTask||''))).map(d=>d.id),diagnostics={unownedThreatIds:unowned.map(t=>t.id),duplicateThreats:duplicates.map(t=>({threatId:t.id,owners:t.owners})),duplicatePressureOwnerIds:pressOwners.filter(id=>id!==pressId)};
   const state={schemaVersion:'DEFENSIVE_RESPONSIBILITY_1.0',team,phase:String(m.phase||''),at:m.time,primaryPressureOwnerId:pressId,primaryPressureTargetId:owner?.id||null,coverOwnerId:coverId,records,threats:threatRows,diagnostics,futureOutcomePrecomputed:false};m._defensiveResponsibility=m._defensiveResponsibility||{};m._defensiveResponsibility[team]=state;m.defensiveResponsibility=state;m._testOnlyCausalLedger?.responsibilityReconciled(m,state);return state;
 }
@@ -1364,7 +1421,7 @@ function arbitrateDefensiveWaypointSet(m,team,state,planned){
   const arbitrationActive=worsens||nearThresholdActivation;
   const deferred=[],spaced=[];
   if(arbitrationActive){
-    const candidates=planned.filter(p=>p.r.type!=='CONTAIN'&&p.r.reason!=='FULLBACK_WIDE_ZONE_RELEASE'&&p.r.reason!=='FREE_KICK_WALL_ROLE_RECOVERY'&&Math.hypot(p.chosen.x-p.previous.x,p.chosen.y-p.previous.y)>.35).sort((a,b)=>urgency(a)-urgency(b)||a.d.id.localeCompare(b.d.id));
+    const candidates=planned.filter(p=>p.r.type!=='CONTAIN'&&p.r.reason!=='FULLBACK_WIDE_ZONE_RELEASE'&&p.r.reason!=='FULLBACK_CENTRAL_DUTY_RELEASE'&&p.r.reason!=='FREE_KICK_WALL_ROLE_RECOVERY'&&Math.hypot(p.chosen.x-p.previous.x,p.chosen.y-p.previous.y)>.35).sort((a,b)=>urgency(a)-urgency(b)||a.d.id.localeCompare(b.d.id));
     for(const p of candidates){
       const u=urgency(p),canDefer=u<280;if(!canDefer)continue;
       const from={x:p.chosen.x,y:p.chosen.y};p.chosen={x:p.previous.x,y:p.previous.y};p.sprint=false;p.arbitration='BASE_WAYPOINT_DEFERRED';deferred.push({playerId:p.d.id,from,to:p.chosen,urgency:u,responsibility:p.r.reason,targetId:p.r.targetId||null});
@@ -1434,6 +1491,9 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
     if(r.type==='CONTAIN'&&target){
       desired={...r.wideZone.targetLocal};task='FB_WIDE_ZONE_CONTAIN';mode='RELATIONAL_WIDE_ZONE';
       sprint=Math.hypot(desired.x-dl.x,desired.y-dl.y)>3.2;rewriteReason='FULLBACK_CURRENT_CHANNEL_AND_BACK_LINE';
+    }else if(r.type==='RECOVERY'&&r.reason==='FULLBACK_CENTRAL_DUTY_RELEASE'){
+      desired={...r.centralBand.targetLocal};task='FB_RETURN_TO_ROLE';mode='ROLE_ANCHOR_RETURN';
+      sprint=Math.hypot(desired.x-dl.x,desired.y-dl.y)>3.2;rewriteReason='FULLBACK_CENTRAL_HANDOFF_BACK_LINE';
     }else if(r.type==='RECOVERY'&&r.reason==='FULLBACK_WIDE_ZONE_RELEASE'){
       const bl=worldToLocal(team,m.ball.x,m.ball.y);
       desired=defendingBlockAnchors(profile(m,team),bl.x,bl.y,d.slot,'FB');
@@ -1484,7 +1544,7 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
     const prior=d._defensivePursuitIntent,epochChanged=!prior||Number(prior.epoch)!==Number(r.epoch),phaseChanged=prior&&prior.phase!==String(m.phase||''),loose=m.ball?.mode==='LOOSE';
     let chosen={...desired},continuity='EPOCH_RESET';
     if(r.type==='CONTAIN')continuity='CURRENT_WIDE_ZONE_RELATION';
-    else if(r.reason==='FREE_KICK_WALL_ROLE_RECOVERY')continuity='CURRENT_ROLE_ANCHOR';
+    else if(r.reason==='FREE_KICK_WALL_ROLE_RECOVERY'||r.reason==='FULLBACK_CENTRAL_DUTY_RELEASE')continuity='CURRENT_ROLE_ANCHOR';
     else if(!epochChanged&&!phaseChanged&&!loose){
       const delta=Math.hypot(desired.x-prior.localX,desired.y-prior.localY),attackerCut=target&&Math.abs(Number(target.vy||0))>3.6;
       if(delta<=.62){chosen={x:prior.localX,y:prior.localY};continuity='TRIVIAL_REWRITE_RETAINED';}
@@ -1509,6 +1569,9 @@ function executeDefensiveResponsibilityMotion(m,team,owner,state){
     a.separationReason=b.separationReason='DISTINCT_RESPONSIBILITY_TARGET_SEPARATION';
   }
   for(const p of planned){
+    // Separation and retained waypoints cannot re-author an abandoned central
+    // chase. Recovery uses the current own-flank anchor within the CB band.
+    if(p.r.reason==='FULLBACK_CENTRAL_DUTY_RELEASE')p.chosen={...p.r.centralBand.targetLocal};
     if(p.markBand&&p.r.targetId){
       const target=playerById(m,p.r.targetId),al=target?worldToLocal(team,target.x,target.y):null;
       if(al){
