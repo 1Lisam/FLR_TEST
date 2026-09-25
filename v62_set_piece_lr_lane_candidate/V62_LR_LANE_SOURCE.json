@@ -1,0 +1,12 @@
+{
+  "gameplaySource": "649e4739f2dfe1c734a00c928fdf64c38484447b",
+  "implementationIssue": 2053,
+  "internalRenderIssue": 2054,
+  "scenarios": [
+    "WALL_DIRECT",
+    "NO_WALL_INDIRECT",
+    "CORNER_TOP",
+    "CORNER_BOTTOM"
+  ],
+  "userVisualPass": false
+}
