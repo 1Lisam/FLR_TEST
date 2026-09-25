@@ -72,7 +72,9 @@ function defend(m,s,plan,defs,team,f,lp){
  const structuralMarks=available.filter(p=>p.role==='CB'||p.role==='FB').length+Math.max(0,available.filter(p=>p.role==='CM').length-1);
  for(const a of danger.slice(0,Math.max(1,structuralMarks))){
   const at=local(team,a.target.x,a.target.y),mark={x:clamp(at.x+1.2,88,99),y:at.y};
-  const rank=p=>p.role==='CB'?0:p.role==='FB'?1:p.role==='CM'?2:p.role==='WF'?3:4;
+  // Keep the backs outside the centre-backs when a midfielder can take the
+  // central third mark. The centre-backs still own the primary danger pair.
+  const rank=p=>p.role==='CB'?0:p.role==='CM'?1:p.role==='FB'?2:p.role==='WF'?3:4;
   const candidates=available.filter(p=>!used.has(p.id)).sort((a,b)=>{
    const ownSide=mark.y<33.5?'R':mark.y>34.5?'L':null;
    const score=p=>rank(p)*100+(ownSide&&side(p)&&side(p)!==ownSide?40:0)+distance(p,world(team,mark.x,mark.y))*.35;
@@ -88,6 +90,25 @@ function defend(m,s,plan,defs,team,f,lp){
   else if(p.role==='WF')add(p,79,lane==='L'?54:14,'WIDE_EDGE_CLEARANCE');
   else if(p.role==='ST')add(p,f.startsWith('DEEP')?clamp(lp.x-4,40,58):52,34,'COUNTER_OUTLET');
   else add(p,82,34,'DEFENSIVE_SECOND_BALL');
+ }
+}
+function preserveLineBands(m,s,wallIds){
+ for(const team of [HOME,other(HOME)]){
+  const bySlot=slot=>m.players.find(p=>p.team===team&&p.slot===slot);
+  const ownTarget=p=>{const t=p&&s.targets[p.id];return t&&local(team,t.x,t.y);};
+  const setY=(p,y)=>{const t=s.targets[p.id],v=local(team,t.x,t.y),w=world(team,v.x,y);t.y=w.y;};
+  for(const [left,right] of [['LCB','RCB'],['LCM','RCM']]){
+   const l=bySlot(left),r=bySlot(right),a=ownTarget(l),b=ownTarget(r);
+   if(a&&!wallIds.has(l.id)&&a.y>33.5)setY(l,33.5);
+   if(b&&!wallIds.has(r.id)&&b.y<34.5)setY(r,34.5);
+  }
+  for(const [fbSlot,cbSlot,sign] of [['LB','LCB',-1],['RB','RCB',1]]){
+   const fb=bySlot(fbSlot),cb=bySlot(cbSlot),f=ownTarget(fb),c=ownTarget(cb);
+   if(!f||wallIds.has(fb.id))continue;
+   const limit=c&&!wallIds.has(cb.id)?c.y+sign*.5:sign<0?33.5:34.5;
+   if(sign<0&&f.y>limit)setY(fb,limit);
+   if(sign>0&&f.y<limit)setY(fb,limit);
+  }
  }
 }
 function build(m,s){const r=m.restart;if(!r||r.kind!=='FREE_KICK'||s.freeKickPlan)return s;const team=r.team,def=other(team),lp=local(team,r.x,r.y),k=type(r),f=family(lp,k),restartMode=f.startsWith('DEEP')?'QUICK_RESTART':'SETTLED_RESTART',plan=s.freeKickPlan={version:VERSION,freeKickType:k,family:f,restartMode,geometry:f.startsWith('DEEP')?'DEEP_QUICK_CONTINUITY':'FREE_KICK_SPATIAL_BASELINE',roles:{},principalRunnerIds:[],stage:'SETTLE',launched:false,allocation:{model:'V60_CURRENT_STATE_ROLE_ROUTE',roles:{}}};s.restartMode=restartMode;
@@ -113,6 +134,7 @@ function build(m,s){const r=m.restart;if(!r||r.kind!=='FREE_KICK'||s.freeKickPla
   add(short,shortTarget.x,shortTarget.y,'SHORT_OPTION');add(st,91,centralY,'TARGET_CENTRAL',true);add(wf1,shoulders?.near.x??89,shoulders?.near.y??26,'TARGET_NEAR',true);add(wf2,shoulders?.far.x??92,shoulders?.far.y??42,'TARGET_FAR',true);add(rd1,60,27,'REST_DEFENCE_1');add(rd2,55,41,'REST_DEFENCE_2');add(sb1,83,28,'SECOND_BALL_1');add(sb2,81,41,'SECOND_BALL_2');}
  for(const p of atk)if(!plan.roles[p.id])add(p,p.role==='CB'?53:58,side(p)==='L'?24:side(p)==='R'?44:34,'REST_DEFENCE_SUPPORT');const ownGk=m.players.find(p=>p.team===team&&p.role==='GK');if(ownGk)put(s,plan,ownGk,world(team,5,34),'ATTACK_GK');
  defend(m,s,plan,defs,team,f,lp);
+ preserveLineBands(m,s,new Set(plan.defensiveWallIds));
  const gk=m.players.find(p=>p.team===def&&p.role==='GK');if(gk)put(s,plan,gk,world(team,102,34),'GK_COMPLEMENT',true);plan.complete=true;return s;}
 function launch(m,s){const p=s?.freeKickPlan;if(!p||p.launched||m.restart?.stage!=='APPROACH')return;p.launched=true;p.stage='APPROACH';for(const [id,role] of Object.entries(p.roles)){const t=s.targets[id];if(!t||role==='KICKER'||role.includes('REST')||role.includes('SECOND_BALL')||role==='COUNTER_OUTLET'||role==='GK_COMPLEMENT'||role==='BOX_ZONE'||role==='MARK_CONTEST'||role==='WIDE_EDGE_CLEARANCE')continue;t.task=`FREE_KICK_${role}_RUN`;t.sprint=true;}}
 function apply(m,s){if(!s||m.restart?.kind!=='FREE_KICK')return s;build(m,s);launch(m,s);return s;}

@@ -59,6 +59,13 @@ function selectWallPlayers(m,defTeam,geom,setup,key){
   if(selected.length<geom.count){for(const p of candidates.filter(p=>reserved.has(p.id)).sort((a,b)=>score(a)-score(b))){if(selected.includes(p))continue;selected.push(p);if(selected.length>=geom.count)break;}}
   return selected;
 }
+function wallSideOrder(players,team){
+  // The wall is laid out in the defenders' attacking frame. Selection order
+  // reflects proximity to the ball and has no left/right meaning. Slot side
+  // wins over a temporarily displaced player's current position.
+  const side=p=>p.slot?.startsWith('L')?-1:p.slot?.startsWith('R')?1:0;
+  return [...players].sort((a,b)=>side(a)-side(b)||worldToLocal(team,a.x,a.y).y-worldToLocal(team,b.x,b.y).y||a.id.localeCompare(b.id));
+}
 // Read-only preview lets the surrounding template leave the actual wall players
 // out of its mark/edge allocation. The wall model remains the sole selector.
 R.previewFreeKickWall=function(m,setup){
@@ -76,10 +83,13 @@ function keepAttackersAwayFromWall(m,setup,team,geom,wallWorld){
 }
 function repair(m,setup){
   const r=m?.restart;if(!r||r.kind!=='FREE_KICK'||!setup||!setup.targets)return setup;
-  const team=r.team,defTeam=other(team),lp=worldToLocal(team,r.x,r.y),count=wallCountFor(lp,r),geom=wallGeometry(m,team,count),key=planKey(r,count),wallPlayers=selectWallPlayers(m,defTeam,geom,setup,key),wallIds=new Set(wallPlayers.map(p=>p.id));
+  const team=r.team,defTeam=other(team),lp=worldToLocal(team,r.x,r.y),count=wallCountFor(lp,r),geom=wallGeometry(m,team,count),key=planKey(r,count),wallPlayers=wallSideOrder(selectWallPlayers(m,defTeam,geom,setup,key),defTeam),wallIds=new Set(wallPlayers.map(p=>p.id));
   // This wrapper owns legal wall/GK geometry only; the template layer owns all other roles.
   const oldRequired=new Set(setup.requiredIds||[]);setup.requiredIds=[...oldRequired].filter(id=>!m.players.some(p=>p.id===id&&p.team===defTeam&&wallIds.has(id)));
-  const wallWorld=[];wallPlayers.forEach((p,i)=>{const w=localToWorld(team,geom.points[i].x,geom.points[i].y);wallWorld.push(w);setTarget(setup,p.id,w,'FREE_KICK_WALL',true,true);p.markTargetId=null;});
+  // The defending team faces the opposite way, so its local y order reverses
+  // the restart team's wall geometry order.
+  const wallPoints=[...geom.points].sort((a,b)=>b.y-a.y);
+  const wallWorld=[];wallPlayers.forEach((p,i)=>{const w=localToWorld(team,wallPoints[i].x,wallPoints[i].y);wallWorld.push(w);setTarget(setup,p.id,w,'FREE_KICK_WALL',true,true);p.markTargetId=null;});
   const gk=m.players.find(p=>p.team===defTeam&&p.role==='GK');if(gk)setTarget(setup,gk.id,localToWorld(team,geom.gk.x,geom.gk.y),'FREE_KICK_GK_COMPLEMENT',true,true);
   keepAttackersAwayFromWall(m,setup,team,geom,wallWorld);
   const gkWorld=localToWorld(team,geom.gk.x,geom.gk.y);setup.freeKickWall={version:VERSION,planKey:key,count,defendingTeam:defTeam,ball:{x:r.x,y:r.y},distanceToGoal:Number(geom.distanceToGoal.toFixed(2)),lateral:Number(geom.lateral.toFixed(2)),wallPlayerIds:[...wallIds],wallPoints:wallWorld.map(w=>({x:Number(w.x.toFixed(3)),y:Number(w.y.toFixed(3))})),gkTarget:{x:Number(gkWorld.x.toFixed(3)),y:Number(gkWorld.y.toFixed(3))},minDistance:9.15,attackerWallClearance:count>=3?1:0,wallReady:false};
