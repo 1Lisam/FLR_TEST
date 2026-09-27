@@ -1,142 +1,51 @@
 (function(root){'use strict';
-const R=root&&root.FLRPG_RESTART_MOVEMENT;if(!R||R.__v59FreeKickTemplates)return;
-const VERSION='V59-STANDARD-FREE-KICK-BASELINE-1.0',HOME='HOME',other=t=>t===HOME?'AWAY':HOME;
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),local=(t,x,y)=>t===HOME?{x,y}:{x:105-x,y:68-y},world=(t,x,y)=>t===HOME?{x,y}:{x:105-x,y:68-y};
-const player=(m,id)=>m.playersById?.[id]||m.players.find(p=>p.id===id);
-const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),structural=p=>['CB','FB','CM'].includes(p.role);
-const side=p=>/^(?:L|R)/.test(p.slot||'')?p.slot[0]:null;
-function lanePenalty(p,key){
- const wanted=/_1$/.test(key)||key==='TARGET_NEAR'?'L':/_2$/.test(key)||key==='TARGET_FAR'?'R':null;
- return wanted&&side(p)&&side(p)!==wanted?18:0;
+const R=root&&root.FLRPG_RESTART_MOVEMENT;if(!R||R.__v37FreeKickTemplates)return;
+const VERSION='V37-FREE-KICK-TEMPLATES-1.0',clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),other=t=>t==='HOME'?'AWAY':'HOME';
+const local=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y},world=(team,x,y)=>team==='HOME'?{x,y}:{x:105-x,y:68-y};
+function hash(s){let h=2166136261>>>0;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function player(m,id){return m.playersById?.[id]||m.players.find(p=>p.id===id)||null;}
+function profile(m,team){const p=m.managerProfiles?.[team];return typeof p==='object'&&p?p:{};}
+function choose(m,team,names,kind){const p=profile(m,team),h=hash(`${m.seed}|${m.restart.setupStartedAt}|${team}|${kind}`),pick=h%names.length,scores=names.map((name,i)=>({name,score:(i===pick?1:0)+((h>>>((i%4)*7))&31)/1000}));for(const x of scores){if(kind==='ATTACK'){if(p.directness>.62&&['NEAR_RUN','FAR_POST_RELEASE'].includes(x.name))x.score+=.32;if(p.directness>.62&&x.name==='SHORT_RESTART')x.score-=.35;if(p.attacking>.62&&x.name==='SECOND_BALL_DELIVERY')x.score-=.16;}else{if(p.transition>.62&&x.name==='COUNTER_READY')x.score+=.30;if((p.lineHeight>.60||p.pressing>.65)&&x.name==='HOLD_LINE')x.score+=.22;}}return scores.sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))[0].name;}
+function add(setup,p,w,task,required=false,sprint=false,role){if(!p)return;setup.targets[p.id]={x:clamp(w.x,1,104),y:clamp(w.y,1,67),task,required,sprint};if(required&&!setup.requiredIds.includes(p.id))setup.requiredIds.push(p.id);setup.freeKickPlan.roles[p.id]=role;}
+function nearest(players,point,used,roles){const q=players.filter(p=>!used.has(p.id)&&(!roles||roles.includes(p.role))).map(p=>({p,d:Math.hypot(p.x-point.x,p.y-point.y)})).sort((a,b)=>a.d-b.d)[0]?.p||null;if(q)used.add(q.id);return q;}
+function sameSideSlot(slot,y){const side=y<34?-1:1;return (slot==='LB'||slot==='LCM'||slot==='LW')?side<0:(slot==='RB'||slot==='RCM'||slot==='RW')?side>0:false;}
+function secondBallPoint(slot,side){return{x:slot==='LCM'?82:slot==='RCM'?88:85,y:slot==='LCM'?27:slot==='RCM'?41:side<0?30:38};}
+// Semantic frame contract: box, wall, mark and second-ball points use the
+// restart team's attacking-goal frame even when the target is a defender.
+// Defender identity selects responsibility, never longitudinal orientation.
+function markerCandidate(defs,attacker,used){const same=defs.filter(d=>!used.has(d.id)&&d.role==='FB'&&sameSideSlot(d.slot,attacker.y));return nearest(same.length?same:defs,attacker,used,['CB','FB','CM']);}
+function normalizeRelationalPlan(m,setup){const plan=setup?.freeKickPlan;if(!plan)return;const team=m.restart.team,defs=m.players.filter(p=>p.team!==team&&p.role!=='GK');
+  // Repair the already-built plan at its owner boundary: each unassigned CM
+  // owns a different second-ball channel, never one shared coordinate.
+  let cmIndex=0;for(const [id,role] of Object.entries(plan.roles||{})){if(!/^SECOND_BALL_DEFENCE/.test(role))continue;const d=player(m,id),spot=secondBallPoint(d?.slot||'CM',cmIndex++%2?-1:1);if(setup.targets[id]){setup.targets[id].x=world(team,spot.x,spot.y).x;setup.targets[id].y=world(team,spot.x,spot.y).y;}plan.targetsByResponsibility=plan.targetsByResponsibility||{};plan.targetsByResponsibility[id]=`${d?.slot||'CM'}_SECOND_BALL_CHANNEL`;}
+  // A wide runner is normally a same-side FB responsibility when one is
+  // plausible; retain one marker and leave the rest as line/cover roles.
+  for(const [aid,arole] of Object.entries(plan.roles||{})){if(!/^(PRIMARY|SECONDARY|DECOY)_RUNNER$/.test(arole))continue;const a=player(m,aid);if(!a||a.role!=='WF')continue;const fb=defs.find(d=>d.role==='FB'&&sameSideSlot(d.slot,a.y)&&!/^TRACK_RUNNER$/.test(plan.roles[d.id]||''));if(!fb||fb.markTargetId===a.id)continue;const old=defs.find(d=>d.markTargetId===a.id);if(old){old.markTargetId=null;plan.roles[old.id]='LINE_ZONE';if(setup.targets[old.id])setup.targets[old.id].task='FREE_KICK_LINE_HOLD';}fb.markTargetId=a.id;plan.roles[fb.id]='TRACK_RUNNER';if(setup.targets[fb.id]){const al=local(team,a.x,a.y),w=world(team,clamp(al.x+1.3,82,99),clamp(al.y+(al.y<34?.55:-.55),7,61));setup.targets[fb.id].x=w.x;setup.targets[fb.id].y=w.y;setup.targets[fb.id].task='FREE_KICK_TRACK_RUNNER_HOLD';}}
 }
-function type(r){return String(r.freeKickType||'DIRECT').toUpperCase()==='INDIRECT'?'INDIRECT':'DIRECT';}
-function family(lp,k){if(lp.x<58)return`DEEP_${k}`;if(lp.y<=18||lp.y>=50)return k==='DIRECT'?'WIDE_DIRECT_DELIVERY':'INDIRECT_DELIVERY';if(k==='INDIRECT')return'INDIRECT_DELIVERY';const d=Math.hypot(105-lp.x,34-lp.y);return d<=22?'DIRECT_SHOT_CLOSE':d<=30?'DIRECT_SHOT_MID':'DIRECT_LONG_DELIVERY';}
-function corridorPenalty(m,p,target){
- const dx=target.x-p.x,dy=target.y-p.y,len=Math.hypot(dx,dy);if(len<.1)return 0;let penalty=0;
- for(const q of m.players){if(q.id===p.id||q.team!==p.team||q.role==='GK')continue;const progress=((q.x-p.x)*dx+(q.y-p.y)*dy)/(len*len);if(progress<.025||progress>.16)continue;const lateral=Math.abs((q.x-p.x)*dy-(q.y-p.y)*dx)/len;if(lateral>=3)continue;penalty+=(3-lateral)*1.35*8.2;
- }
- return penalty;
-}
-function choose(m,ps,used,roles,target,plan,key,reserveStructural=0){
- const available=ps.filter(p=>!used.has(p.id)&&roles.includes(p.role)),structuralLeft=available.filter(structural).length,
-  candidates=available.filter(p=>!(reserveStructural&&structural(p)&&structuralLeft<=reserveStructural&&available.some(q=>!structural(q))));
- let pool=candidates.length?candidates:available;
- if(key.startsWith('TARGET_')){
-  // Ordinary danger roles never spend a rest defender to fill an empty slot.
-  pool=pool.filter(p=>['ST','WF','CM'].includes(p.role));
- }
- const scored=pool.map(p=>{const rank=roles.indexOf(p.role),travel=distance(p,target),congestion=key==='TARGET_CENTRAL'?corridorPenalty(m,p,target):0,lane=lanePenalty(p,key),score=rank*14+travel*.48+congestion+lane;return{p,rank,travel,congestion,lane,score};}).sort((a,b)=>a.score-b.score||a.rank-b.rank||a.congestion-b.congestion||a.travel-b.travel||a.p.id.localeCompare(b.p.id));
- let pick=scored[0];if(!pick)return null;
- // A feasible same-role route keeps its player's own left/right identity.
- const wanted=/_1$/.test(key)||key==='TARGET_NEAR'?'L':/_2$/.test(key)||key==='TARGET_FAR'?'R':null;
- if(wanted&&side(pick.p)&&side(pick.p)!==wanted){const same=scored.filter(x=>x.p.role===pick.p.role&&side(x.p)===wanted&&x.travel<=70&&x.travel<=pick.travel+35)[0];if(same)pick=same;}
- used.add(pick.p.id);
- const preferred=scored.filter(x=>x.rank===0)[0];plan.allocation.roles[key]={actorId:pick.p.id,role:pick.p.role,rank:pick.rank,distance:Number(pick.travel.toFixed(3)),corridorPenalty:Number(pick.congestion.toFixed(3)),lanePenalty:pick.lane,score:Number(pick.score.toFixed(3)),rationale:pick.rank?'fallback_current_route_feasibility':'preferred_role_route_feasible',preferredCandidate:preferred&&{actorId:preferred.p.id,role:preferred.p.role,distance:Number(preferred.travel.toFixed(3)),corridorPenalty:Number(preferred.congestion.toFixed(3)),score:Number(preferred.score.toFixed(3))}};
- return pick.p;
-}
-function put(s,plan,p,w,role,required=false){if(!p)return;const formationRun=/^(?:TARGET_|SECOND_BALL_|SHORT_OPTION)/.test(role);s.targets[p.id]={x:clamp(w.x,1,104),y:clamp(w.y,1,67),task:`FREE_KICK_${role}_HOLD`,required,sprint:formationRun};if(required)s.requiredIds.push(p.id);plan.roles[p.id]=role;}
-function wallShoulders(m,s,team){
- const wall=R.previewFreeKickWall?.(m,s);if(!wall||wall.count<3)return null;
- const points=wall.wallPoints.map(q=>local(team,q.x,q.y)).sort((a,b)=>a.y-b.y),low=points[0],high=points[points.length-1];
- const shoulderGap=wall.count>=4?3.4:1.35,behindWall=wall.count>=4?.6:1.2;
- return{near:{x:clamp(low.x-behindWall,1,104),y:clamp(low.y-shoulderGap,1,67)},far:{x:clamp(high.x-behindWall,1,104),y:clamp(high.y+shoulderGap,1,67)}};
-}
-function outsideWallCorridor(mark,wall,ball,team,defender){
- if(!wall||wall.count<3)return mark;
- const points=wall.wallPoints.map(q=>local(team,q.x,q.y)),b=local(team,ball.x,ball.y);
- const centre={x:points.reduce((n,q)=>n+q.x,0)/points.length,y:points.reduce((n,q)=>n+q.y,0)/points.length};
- const length=distance(b,centre),ux=(centre.x-b.x)/length,uy=(centre.y-b.y)/length,px=-uy,py=ux;
- const along=(mark.x-b.x)*ux+(mark.y-b.y)*uy,lateral=(mark.x-b.x)*px+(mark.y-b.y)*py;
- const shoulder=Math.max(...points.map(q=>Math.abs((q.x-centre.x)*px+(q.y-centre.y)*py)));
- if(along<.5||along>length+.15||Math.abs(lateral)>shoulder+.85)return mark;
- const preferred=side(defender)==='L'?1:side(defender)==='R'?-1:lateral<0?-1:1;
- const sign=Math.abs(lateral)>.25?Math.sign(lateral):preferred;
- const offset=sign*(shoulder+1.15)-lateral;
- return{x:clamp(mark.x+px*offset,1,104),y:clamp(mark.y+py*offset,1,67)};
-}
-function defend(m,s,plan,defs,team,f,lp){
- const wall=R.previewFreeKickWall?.(m,s),wallIds=new Set(wall?.wallPlayerIds||[]),available=defs.filter(p=>!wallIds.has(p.id)),used=new Set();
- plan.defensiveWallIds=[...wallIds];
- const add=(p,x,y,role,required=false,markId=null)=>{
-  if(!p)return;
-  const adjusted=outsideWallCorridor({x,y},wall,m.restart,team,p);let w=world(team,adjusted.x,adjusted.y);
-  // Coverage is a separate layer from the legal wall, even when a mark happens
-  // to be near it. Move only the template target; wall geometry stays untouched.
-  for(const q of wall?.wallPoints||[]){const d=distance(w,q);if(d>=2.2)continue;let dx=w.x-q.x,dy=w.y-q.y,n=Math.hypot(dx,dy);if(n<.01){dx=team===HOME?1:-1;dy=0;n=1;}w={x:clamp(w.x+dx/n*(2.25-d),1,104),y:clamp(w.y+dy/n*(2.25-d),1,67)};}
-  p.markTargetId=markId;put(s,plan,p,w,role,required);used.add(p.id);
- };
- const danger=Object.entries(plan.roles).filter(([,role])=>role.startsWith('TARGET_')).map(([id])=>({id,target:s.targets[id]})).filter(a=>a.target)
-  .sort((a,b)=>Math.abs(local(team,b.target.x,b.target.y).y-34)-Math.abs(local(team,a.target.x,a.target.y).y-34)||a.id.localeCompare(b.id));
- const structuralMarks=available.filter(p=>p.role==='CB'||p.role==='FB').length+Math.max(0,available.filter(p=>p.role==='CM').length-1);
- for(const a of danger.slice(0,Math.max(1,structuralMarks))){
-  const at=local(team,a.target.x,a.target.y),mark={x:clamp(at.x+1.2,88,99),y:at.y};
-  // Keep the backs outside the centre-backs when a midfielder can take the
-  // central third mark. The centre-backs still own the primary danger pair.
-  const rank=p=>p.role==='CB'?0:p.role==='CM'?1:p.role==='FB'?2:p.role==='WF'?3:4;
-  const candidates=available.filter(p=>!used.has(p.id)).sort((a,b)=>{
-   const ownSide=mark.y<33.5?'R':mark.y>34.5?'L':null;
-   const score=p=>rank(p)*100+(ownSide&&side(p)&&side(p)!==ownSide?40:0)+distance(p,world(team,mark.x,mark.y))*.35;
-   return score(a)-score(b)||a.id.localeCompare(b.id);
-  });
-  add(candidates[0],mark.x,mark.y,'MARK_CONTEST',true,a.id);
- }
- const remaining=available.filter(p=>!used.has(p.id)).sort((a,b)=>a.id.localeCompare(b.id));
- for(const p of remaining){
-  const lane=side(p)==='L'?'L':side(p)==='R'?'R':'C';
-  if(p.role==='CB'||p.role==='FB')add(p,93,p.role==='CB'?(lane==='L'?43:lane==='R'?25:34):(lane==='L'?47:lane==='R'?21:34),'BOX_ZONE');
-  else if(p.role==='CM')add(p,83,lane==='L'?42:lane==='R'?26:34,'DEFENSIVE_SECOND_BALL');
-  else if(p.role==='WF')add(p,79,lane==='L'?54:14,'WIDE_EDGE_CLEARANCE');
-  else if(p.role==='ST')add(p,f.startsWith('DEEP')?clamp(lp.x-4,40,58):52,34,'COUNTER_OUTLET');
-  else add(p,82,34,'DEFENSIVE_SECOND_BALL');
- }
-}
-function preserveLineBands(m,s,wallIds){
- for(const team of [HOME,other(HOME)]){
-  const bySlot=slot=>m.players.find(p=>p.team===team&&p.slot===slot);
-  const ownTarget=p=>{const t=p&&s.targets[p.id];return t&&local(team,t.x,t.y);};
-  const setY=(p,y)=>{const t=s.targets[p.id],v=local(team,t.x,t.y),w=world(team,v.x,y);t.y=w.y;};
-  for(const [left,right] of [['LCB','RCB'],['LCM','RCM']]){
-   const l=bySlot(left),r=bySlot(right),a=ownTarget(l),b=ownTarget(r);
-   if(a&&!wallIds.has(l.id)&&a.y>33.5)setY(l,33.5);
-   if(b&&!wallIds.has(r.id)&&b.y<34.5)setY(r,34.5);
+function build(m,setup){const r=m.restart;if(!r||r.kind!=='FREE_KICK'||setup.freeKickPlan)return setup;const team=r.team,def=other(team),lp=local(team,r.x,r.y);if(lp.x<58)return setup;const attackTemplate=choose(m,team,['NEAR_RUN','FAR_POST_RELEASE','CENTRAL_LINE_BREAK','SHORT_RESTART','SECOND_BALL_DELIVERY'],'ATTACK'),defenceTemplate=choose(m,def,['HOLD_LINE','DROP_AND_DEFEND_SPACE','PLAYER_TRACK','HYBRID_LINE_TRACK','COUNTER_READY'],'DEFENCE');setup.freeKickPlan={version:VERSION,eventKey:`${team}|${r.x.toFixed(2)}|${r.y.toFixed(2)}|${setup.createdAt}`,attackTemplate,defenceTemplate,roles:{},stage:'SETTLE',launched:false,launchAt:null};const plan=setup.freeKickPlan,atk=m.players.filter(p=>p.team===team),defs=m.players.filter(p=>p.team===def),used=new Set([setup.kickerId]),side=lp.y<34?-1:1,kicker=player(m,setup.kickerId);if(kicker)plan.roles[kicker.id]='KICKER';const runners=[];for(const role of ['ST','WF','WF']){const p=nearest(atk,{x:r.x+12*(team==='HOME'?1:-1),y:r.y},used,[role]);if(p)runners.push(p);}const primary=runners[0],secondary=runners[1],decoy=runners[2],edge=nearest(atk,{x:r.x,y:r.y},used,['CM']),short=attackTemplate==='SHORT_RESTART'?nearest(atk,{x:r.x,y:r.y},used,['CM','FB','WF']):null,rest=atk.filter(p=>p.id!==setup.kickerId&&!used.has(p.id)&&['CB','FB'].includes(p.role)).slice(0,2);const zones={near:{x:93,y:side<0?27:41},central:{x:94,y:34},far:{x:96,y:side<0?45:23},edge:{x:84,y:34},short:{x:clamp(lp.x-3,58,82),y:clamp(lp.y+side*5,8,60)}};const order=attackTemplate==='NEAR_RUN'?['near','central','far']:attackTemplate==='FAR_POST_RELEASE'?['far','central','near']:attackTemplate==='CENTRAL_LINE_BREAK'?['central','near','far']:attackTemplate==='SECOND_BALL_DELIVERY'?['central','far','near']:['central','near','far'];[[primary,'PRIMARY_RUNNER',order[0]],[secondary,'SECONDARY_RUNNER',order[1]],[decoy,'DECOY_RUNNER',order[2]]].forEach(([p,role,z])=>{if(p)add(setup,p,world(team,zones[z].x,zones[z].y),`FREE_KICK_${role}_HOLD`,false,false,role);});if(edge)add(setup,edge,world(team,zones.edge.x,zones.edge.y),'FREE_KICK_SECOND_BALL_EDGE_HOLD',false,false,'SECOND_BALL_EDGE');if(short)add(setup,short,world(team,zones.short.x,zones.short.y),'FREE_KICK_SHORT_OPTION_HOLD',false,false,'SHORT_OPTION');rest.forEach((p,i)=>add(setup,p,world(team,69-i*5,i?47:21),`FREE_KICK_REST_DEFENCE_${i+1}_HOLD`,false,false,`REST_DEFENCE_${i+1}`));const defUsed=new Set(),lineX=defenceTemplate==='DROP_AND_DEFEND_SPACE'?88:94,markers=[],danger=[primary,secondary].filter(Boolean);for(const a of danger){const d=nearest(defs,a,defUsed,['CB','FB','CM']);if(d)markers.push([d,a]);}for(const [d,a] of markers){const al=local(team,a.tx,a.ty),markX=clamp(al.x+1.3,82,99),markY=clamp(al.y+(al.y<34?.55:-.55),7,61),track=defenceTemplate==='PLAYER_TRACK'||defenceTemplate==='HYBRID_LINE_TRACK';add(setup,d,world(team,track?markX:lineX,track?markY:al.y),track?'FREE_KICK_TRACK_RUNNER_HOLD':'FREE_KICK_LINE_HOLD',true,false,track?'TRACK_RUNNER':'LINE_ZONE');d.markTargetId=track?a.id:null;}for(const d of defs.filter(p=>!defUsed.has(p.id)&&p.role!=='GK')){let role='LINE_ZONE',x=lineX,y=local(team,d.x,d.y).y,task='FREE_KICK_LINE_HOLD';if(d.role==='CM'){role='SECOND_BALL_DEFENCE';x=86;y=34;task='FREE_KICK_SECOND_BALL_DEFENCE_HOLD';}if(defenceTemplate==='COUNTER_READY'&&d.role==='ST'){role='COUNTER_OUTLET';x=62;y=34;task='FREE_KICK_COUNTER_OUTLET_HOLD';}add(setup,d,world(team,x,y),task,false,false,role);}return setup;}
+  function launch(m,setup){const plan=setup?.freeKickPlan,r=m.restart;if(!plan||!r||r.stage!=='APPROACH'||plan.launched)return;plan.launched=true;plan.stage='APPROACH';plan.launchAt=m.time;for(const [id,role] of Object.entries(plan.roles)){const p=player(m,id),t=setup.targets[id];if(!p||!t||role==='KICKER'||role.startsWith('REST_DEFENCE')||role==='SECOND_BALL_EDGE'||role==='COUNTER_OUTLET'||role==='SECOND_BALL_DEFENCE')continue;t.task=`FREE_KICK_${role}_RUN`;t.sprint=true;}for(const [id,role] of Object.entries(plan.roles)){const p=player(m,id),t=setup.targets[id];if(!p||!t)continue;if(role==='KICKER'){p.tx=r.x;p.ty=r.y;p.action='FREE_KICK_APPROACH';p.tacticalTask='FREE_KICK_APPROACH';p.sprint=false;continue;}p.tx=t.x;p.ty=t.y;p.action=t.task;p.tacticalTask=t.task;p.sprint=!!t.sprint;p.markTargetId=role==='TRACK_RUNNER'?p.markTargetId:null;}}
+ // COUNTER_READY is the one defensive exception: its ST is an outlet toward
+ // the defending team's attacking half, so correct the inherited target in
+ // the defender frame after restart-relative normalization.
+ function normalizeCounterOutlet(m,setup){const plan=setup?.freeKickPlan;if(!plan)return;const def=other(m.restart.team);for(const [id,role] of Object.entries(plan.roles||{})){if(role!=='COUNTER_OUTLET')continue;const p=player(m,id),t=setup.targets[id];if(!p||!t)continue;const w=world(def,62,34);t.x=w.x;t.y=w.y;t.task='FREE_KICK_COUNTER_OUTLET_HOLD';}}
+ function apply(m,setup){if(!setup||m.restart?.kind!=='FREE_KICK')return setup;build(m,setup);normalizeRelationalPlan(m,setup);normalizeCounterOutlet(m,setup);launch(m,setup);const r=m.restart,k=player(m,setup.kickerId);if(k&&r?.stage==='APPROACH'){k.tx=r.x;k.ty=r.y;k.action='FREE_KICK_APPROACH';k.tacticalTask='FREE_KICK_APPROACH';k.sprint=false;}return setup;}
+const begin=R.begin.bind(R),assign=R.assign.bind(R),debug=R.debugSummary?.bind(R);R.begin=function(m){return apply(m,begin(m));};R.assign=function(m){const ok=assign(m);apply(m,m.restart?.setup);return ok;};if(debug)R.debugSummary=function(m){const d=debug(m);if(d&&m.restart?.setup?.freeKickPlan)d.freeKickPlan=m.restart.setup.freeKickPlan;return d;};R.FREE_KICK_TEMPLATE_VERSION=VERSION;R.__v37FreeKickTemplates=true;
+  function finalizedTrackTargets(m,setup){
+    const plan=setup?.freeKickPlan;if(!plan)return;
+    for(const [id,role] of Object.entries(plan.roles||{})){
+      if(role!=='TRACK_RUNNER')continue;
+      const defender=player(m,id),attacker=player(m,defender?.markTargetId),at=attacker&&setup.targets[attacker.id];
+      if(!defender||!at)continue;
+      const al=local(m.restart.team,at.x,at.y),markX=clamp(al.x+1.3,82,99),markY=clamp(al.y+(al.y<34?.55:-.55),7,61),t=setup.targets[id];
+      if(t){t.x=world(m.restart.team,markX,markY).x;t.y=world(m.restart.team,markX,markY).y;}
+    }
   }
-  for(const [fbSlot,cbSlot,sign] of [['LB','LCB',-1],['RB','RCB',1]]){
-   const fb=bySlot(fbSlot),cb=bySlot(cbSlot),f=ownTarget(fb),c=ownTarget(cb);
-   if(!f||wallIds.has(fb.id))continue;
-   const limit=c&&!wallIds.has(cb.id)?c.y+sign*.5:sign<0?33.5:34.5;
-   if(sign<0&&f.y>limit)setY(fb,limit);
-   if(sign>0&&f.y<limit)setY(fb,limit);
+  function withoutWallLaunch(fn,m){
+    const setup=m?.restart?.setup,roles=setup?.freeKickPlan?.roles,ids=setup?.freeKickWall?.wallPlayerIds||[],saved={};
+    for(const id of ids){if(roles&&Object.prototype.hasOwnProperty.call(roles,id)){saved[id]=roles[id];roles[id]='SECOND_BALL_DEFENCE';}}
+    const out=fn(m);if(roles)Object.assign(roles,saved);return out;
   }
- }
-}
-function build(m,s){const r=m.restart;if(!r||r.kind!=='FREE_KICK'||s.freeKickPlan)return s;const team=r.team,def=other(team),lp=local(team,r.x,r.y),k=type(r),f=family(lp,k),restartMode=f.startsWith('DEEP')?'QUICK_RESTART':'SETTLED_RESTART',plan=s.freeKickPlan={version:VERSION,freeKickType:k,family:f,restartMode,geometry:f.startsWith('DEEP')?'DEEP_QUICK_CONTINUITY':'FREE_KICK_SPATIAL_BASELINE',roles:{},principalRunnerIds:[],stage:'SETTLE',launched:false,allocation:{model:'V60_CURRENT_STATE_ROLE_ROUTE',roles:{}}};s.restartMode=restartMode;
- const kicker=player(m,s.kickerId),kt=s.targets[s.kickerId];s.targets={};s.requiredIds=[];if(kicker&&kt){s.targets[kicker.id]=kt;s.requiredIds.push(kicker.id);plan.roles[kicker.id]='KICKER';}
- if(restartMode==='QUICK_RESTART'){plan.complete=false;return s;}
- const atk=m.players.filter(p=>p.team===team&&p.role!=='GK'),defs=m.players.filter(p=>p.team===def&&p.role!=='GK'),used=new Set([s.kickerId]),add=(p,x,y,role,req=false)=>put(s,plan,p,world(team,x,y),role,req),pick=(key,roles,x,y,reserve=0)=>choose(m,atk,used,roles,world(team,x,y),plan,key,reserve),shoulders=f==='DIRECT_SHOT_CLOSE'&&Math.abs(lp.y-34)<=9?wallShoulders(m,s,team):null;
- {const shortTarget={x:clamp(lp.x-6,6,96),y:clamp(lp.y+(lp.y<34?7:-7),7,61)},short=(f==='INDIRECT_DELIVERY'||f==='WIDE_DIRECT_DELIVERY')?pick('SHORT_OPTION',['CM','WF','FB'],shortTarget.x,shortTarget.y):null;
-  // When the striker takes the kick, keep both available wide forwards in
-  // their danger channels before using a midfielder as central cover.
-  let st,wf1,wf2;
-  if(atk.some(p=>p.role==='ST'&&!used.has(p.id))){
-   st=pick('TARGET_CENTRAL',['ST','WF','CM'],91,34,4);
-   if(kicker?.role==='WF'&&side(kicker)==='L'){wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);}
-   else{wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);}
-  }else{
-   if(kicker?.role==='WF'&&side(kicker)==='L'){wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);}
-   else{wf1=pick('TARGET_NEAR',['WF','ST','CM'],89,26,4);wf2=pick('TARGET_FAR',['WF','ST','CM'],92,42,4);}
-   st=pick('TARGET_CENTRAL',['ST','WF','CM'],91,34,4);
-  }
-  const rd1=pick('REST_DEFENCE_1',['CB','FB','CM'],60,27),rd2=pick('REST_DEFENCE_2',['CB','FB','CM'],55,41),sb1=pick('SECOND_BALL_1',['CM','WF'],83,28),sb2=pick('SECOND_BALL_2',['CM','WF'],81,41);
-  const wallCount=R.previewFreeKickWall?.(m,s)?.count||0;
-  const centralY=wallCount>=4&&f==='DIRECT_SHOT_CLOSE'&&st?.role==='WF'?(side(st)==='L'?28.5:39.5):(f==='INDIRECT_DELIVERY'||f==='WIDE_DIRECT_DELIVERY')&&wallCount<=1?31.5:34;
-  add(short,shortTarget.x,shortTarget.y,'SHORT_OPTION');add(st,91,centralY,'TARGET_CENTRAL',true);add(wf1,shoulders?.near.x??89,shoulders?.near.y??26,'TARGET_NEAR',true);add(wf2,shoulders?.far.x??92,shoulders?.far.y??42,'TARGET_FAR',true);add(rd1,60,27,'REST_DEFENCE_1');add(rd2,55,41,'REST_DEFENCE_2');add(sb1,83,28,'SECOND_BALL_1');add(sb2,81,41,'SECOND_BALL_2');}
- for(const p of atk)if(!plan.roles[p.id])add(p,p.role==='CB'?53:58,side(p)==='L'?24:side(p)==='R'?44:34,'REST_DEFENCE_SUPPORT');const ownGk=m.players.find(p=>p.team===team&&p.role==='GK');if(ownGk)put(s,plan,ownGk,world(team,5,34),'ATTACK_GK');
- defend(m,s,plan,defs,team,f,lp);
- preserveLineBands(m,s,new Set(plan.defensiveWallIds));
- const tactics=root.FLRPG_TACTICS||(typeof require==='function'?require('./tactical_movement.js'):null);
- tactics?.prepareAttackingSetPieceRestDefence(m,s,plan);
- const gk=m.players.find(p=>p.team===def&&p.role==='GK');if(gk)put(s,plan,gk,world(team,102,34),'GK_COMPLEMENT',true);plan.complete=true;return s;}
-function launch(m,s){const p=s?.freeKickPlan;if(!p||p.launched||m.restart?.stage!=='APPROACH')return;p.launched=true;p.stage='APPROACH';for(const [id,role] of Object.entries(p.roles)){const t=s.targets[id];if(!t||role==='KICKER'||role.includes('REST')||role.includes('SECOND_BALL')||role==='COUNTER_OUTLET'||role==='GK_COMPLEMENT'||role==='BOX_ZONE'||role==='MARK_CONTEST'||role==='WIDE_EDGE_CLEARANCE')continue;t.task=`FREE_KICK_${role}_RUN`;t.sprint=true;}}
-function apply(m,s){if(!s||m.restart?.kind!=='FREE_KICK')return s;build(m,s);launch(m,s);return s;}
-const begin=R.begin.bind(R),assign=R.assign.bind(R);R.begin=m=>{if(!m.restart?.setup)delete m.attackingSetPieceRestDefence;return apply(m,begin(m));};R.assign=m=>{const x=assign(m);apply(m,m.restart?.setup);return x;};R.FREE_KICK_TEMPLATE_VERSION=VERSION;R.__v59FreeKickTemplates=true;
+  const wrappedBegin=R.begin,wrappedAssign=R.assign;
+  R.begin=function(m){const out=wrappedBegin(m);finalizedTrackTargets(m,out);return out;};
+  R.assign=function(m){const out=withoutWallLaunch(wrappedAssign,m),setup=m?.restart?.setup;finalizedTrackTargets(m,setup);return out;};
 })(typeof globalThis!=='undefined'?globalThis:this);
