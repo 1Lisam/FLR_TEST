@@ -1,0 +1,244 @@
+{
+  "schemaVersion": "V40_CROSS_REPO_DEPLOY_1.0",
+  "mode": "cross-repo",
+  "sourceRepo": "1Lisam/FLR_DEV",
+  "sourceSHA": "a541b327a0edd3d018ab444594ad3ff31e71ef99",
+  "targetRepo": "1Lisam/FLR_TEST",
+  "targetBaseSHA": "33691c24d5764bc7200033c1bfb35c72c9019d16",
+  "baseCommit": "33691c24d5764bc7200033c1bfb35c72c9019d16",
+  "changedFiles": [
+    "QA/v63_wbs2_user_visual/README.md",
+    "QA/v63_wbs2_user_visual/focus.html",
+    "QA/v63_wbs2_user_visual/focus_bootstrap.js",
+    "QA/v63_wbs2_user_visual/index.html",
+    "QA/v63_wbs2_user_visual/natural.html",
+    "QA/v63_wbs2_user_visual/natural_bootstrap.js",
+    "final_match_bug_report_ui.js",
+    "in_pitch_choice_ui.js",
+    "live_hybrid_session_v02.js",
+    "live_v06_scene_authority_browser.js",
+    "reporter_source_identity.js",
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/continuous_spatial_authority_v2.js",
+    "runtime/corner_templates.js",
+    "runtime/free_kick_templates.js",
+    "runtime/free_kick_wall_model.js",
+    "runtime/manager_tendency_adapter.js",
+    "runtime/match_choice_telemetry.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/restart_movement.js",
+    "runtime/tactical_movement.js",
+    "runtime/take_on_duel.js",
+    "runtime/v37_set_piece_liveliness_patch.js",
+    "step71_hybrid_v06_ui.js"
+  ],
+  "removedFiles": [],
+  "payloadManifest": {
+    "files": [
+      {
+        "path": "QA/v63_wbs2_user_visual/README.md",
+        "sha256": "8e2969a17befda17a13139c87e89f9e081e0817e5984fdcbe46596b2bad5df95",
+        "bytes": 2001
+      },
+      {
+        "path": "QA/v63_wbs2_user_visual/focus.html",
+        "sha256": "b62f4b362886d98c9f8d49d990087b7e1244065879dae23ca58661673bbf78d9",
+        "bytes": 10749
+      },
+      {
+        "path": "QA/v63_wbs2_user_visual/focus_bootstrap.js",
+        "sha256": "17c6c0a66a6d94429f17b9d4e54be90fb1536cc937dbd89c0f0f1a4f7beb61d5",
+        "bytes": 2109
+      },
+      {
+        "path": "QA/v63_wbs2_user_visual/index.html",
+        "sha256": "0ca5d4ce07c86808561f61ab9eb4e5993b35530135e08db58593314ebf8c2dad",
+        "bytes": 1300
+      },
+      {
+        "path": "QA/v63_wbs2_user_visual/natural.html",
+        "sha256": "ee0aaf6bb8ab158421f510ab489e411f2239400acedac3746ed90c85e2729f57",
+        "bytes": 10698
+      },
+      {
+        "path": "QA/v63_wbs2_user_visual/natural_bootstrap.js",
+        "sha256": "8a8f5957ff39903e7476964e7322837bc60bff6617694eb33a8faed2dd10bb28",
+        "bytes": 1550
+      },
+      {
+        "path": "bug_report_config.js",
+        "sha256": "0cf5bcbd123ebacb929dbefdc66ca7eba80122b86ed313dfbdd76a036efad91d",
+        "bytes": 567
+      },
+      {
+        "path": "final_match_bug_report_ui.js",
+        "sha256": "589c810eb80f664a88d99737751d8e8cd51393d9cda16f157c098267be34819a",
+        "bytes": 12600
+      },
+      {
+        "path": "full_time_presentation.js",
+        "sha256": "beefe840ff0ac96ad9f0a133d7dd19ae655f522f3e1aba4f8d6f72b470e29ae1",
+        "bytes": 1644
+      },
+      {
+        "path": "in_pitch_choice_ui.js",
+        "sha256": "dffd4d43b0e75672f43b26dcccca57fe1fc316506345c417ad84803435f634c4",
+        "bytes": 15716
+      },
+      {
+        "path": "live_hybrid_session_v02.js",
+        "sha256": "a3684755abd810952f7d47f7dfecfb4166f09d37556dda45d4d2a0a3bfa3d299",
+        "bytes": 43457
+      },
+      {
+        "path": "live_v06_scene_authority_browser.js",
+        "sha256": "27a1ba9de37a119a1594418fc8324a9a0986afc5c1686528a79ed56f69cf641e",
+        "bytes": 31423
+      },
+      {
+        "path": "reporter_source_identity.js",
+        "sha256": "1a79831d14d29926e64f750e5d6b6f848a2ecd91443eac3b55127d8acd045c74",
+        "bytes": 9094
+      },
+      {
+        "path": "runtime/action_candidate_engine.js",
+        "sha256": "26b80c564b1b02bd9a3ec801cacbfd78235d7dd7b75897c9668c1bd5455baf53",
+        "bytes": 9277
+      },
+      {
+        "path": "runtime/aerial_contest.js",
+        "sha256": "e4de9c1f5e9c24d036a639443b92bfe5e277d0c5d89f53e273064b1adb58d760",
+        "bytes": 1726
+      },
+      {
+        "path": "runtime/attribute_match_adapter.js",
+        "sha256": "fa62c7ba112952472c8ea52fc75501aef8ea8219d1200abccc3b478c52217417",
+        "bytes": 5167
+      },
+      {
+        "path": "runtime/ball_strike_model.js",
+        "sha256": "d6efa289c0e34cf8cbce36bb944dc09e5fddee02c98b8ef3b8eff11a5872166e",
+        "bytes": 6624
+      },
+      {
+        "path": "runtime/choice_action_resolver.js",
+        "sha256": "990a4ebb9b6d1e940ff08faaa9e8847c583be10c01e442c0aec66e2cfda7edf5",
+        "bytes": 7856
+      },
+      {
+        "path": "runtime/choice_action_resolver_step38.js",
+        "sha256": "3efb736f6171590649b6e1fa9f2ee07375fc2bd2fbd78bc1f79c56f79931f44b",
+        "bytes": 7949
+      },
+      {
+        "path": "runtime/continuous_match_core.js",
+        "sha256": "e1a72bb00661c138d6cc98fc7c6a050f6cd7f865c144e7a2e23a702332afa93d",
+        "bytes": 319498
+      },
+      {
+        "path": "runtime/continuous_spatial_authority_v2.js",
+        "sha256": "84c73b776b329f655342e492a10f4e1bd0f820547b14d27eabb05c0c9745bb93",
+        "bytes": 67880
+      },
+      {
+        "path": "runtime/corner_templates.js",
+        "sha256": "20d84f3091482a69d87eb4eedd9d55f8f79d054f9a400d9c5ff668eb69952d3b",
+        "bytes": 8641
+      },
+      {
+        "path": "runtime/free_kick_templates.js",
+        "sha256": "6e433eaaece308457b4b6ecf47a281bd91ab8ff713f4309a4c6abbdefd899666",
+        "bytes": 13406
+      },
+      {
+        "path": "runtime/free_kick_wall_model.js",
+        "sha256": "2127d64ca57f7023be3c49b5ea489788f490981ce1c668cf63649e708b95dbda",
+        "bytes": 10391
+      },
+      {
+        "path": "runtime/manager_tendency_adapter.js",
+        "sha256": "f4e534bb1c4af370c59e85f4a8b08c89ea60b96b8648a58f9a769e59cda2a680",
+        "bytes": 14000
+      },
+      {
+        "path": "runtime/match_academy.js",
+        "sha256": "678152ed6ae3107fa4032eeadce3864507d113df6a479e6db279d858928d3062",
+        "bytes": 3770
+      },
+      {
+        "path": "runtime/match_choice_telemetry.js",
+        "sha256": "6c875d527e6394565548098bb91bff29ce16c74851fc64b08054eb649b59a9b7",
+        "bytes": 14000
+      },
+      {
+        "path": "runtime/match_flow_resolution.js",
+        "sha256": "a7177331523130c8604cb8fa2714702e61ecdae5832ecd3efef01f6a80da3551",
+        "bytes": 13494
+      },
+      {
+        "path": "runtime/protagonist_match_controller.js",
+        "sha256": "ed4b3e3f2f160f8133c2499b9286449d8580598f78659d4a5f97b92ee180e13e",
+        "bytes": 87659
+      },
+      {
+        "path": "runtime/restart_movement.js",
+        "sha256": "2c52e458199cfefcde65032cb155bd594c684d81065db97c126f90406a3887b6",
+        "bytes": 32445
+      },
+      {
+        "path": "runtime/step38_test.css",
+        "sha256": "c0537abe518ffc9e778d401a9eb9ed77e0176beec71158fe3cf47ee634431ae2",
+        "bytes": 2515
+      },
+      {
+        "path": "runtime/tactical_movement.js",
+        "sha256": "9dfd6700b81cb7056e7f91f15be395856c2a2595b9f70114f816f84ff40787d9",
+        "bytes": 171281
+      },
+      {
+        "path": "runtime/take_on_duel.js",
+        "sha256": "0fda708e61580fb97d91cb9f96e19e9fe3e08191edf48938e9be15e03302cc0e",
+        "bytes": 1000
+      },
+      {
+        "path": "runtime/technical_test.css",
+        "sha256": "aa2d4293448c2e20c2d02fe7fe5300b5aeae7fd28021d1407ab265809014ba2b",
+        "bytes": 21827
+      },
+      {
+        "path": "runtime/v37_match_feel_patch.js",
+        "sha256": "b5b301cffaa880664f9af93260777430f2b8a9f6ab8178fe3a9dbecfe78690d5",
+        "bytes": 7682
+      },
+      {
+        "path": "runtime/v37_set_piece_liveliness_patch.js",
+        "sha256": "fe41e1e1fb63ef1468428e2977cf56f10fe4a15c8f764fd8016b8ca3a8b4b0f5",
+        "bytes": 2915
+      },
+      {
+        "path": "scene_debug_export.js",
+        "sha256": "46477d1dec35bedc06c76b9b28821bb0db4f11df522dec42d6eecfe44a791b22",
+        "bytes": 1979
+      },
+      {
+        "path": "step71_hybrid_v06_ui.js",
+        "sha256": "e896d2d3c507df449e41553206eb43bd651ffe2e8e4e4bafb68a755530e6a8a0",
+        "bytes": 67382
+      }
+    ]
+  },
+  "payloadManifestSha256": "d9308722e60af6252016c4fae6b54bf67fa28dc2b8caaa14f3950d0a7b16c778",
+  "validationStatus": "USER_VISUAL_RETEST_ALLOWED_WITH_INTERNAL_RENDER_BLOCKED",
+  "deploymentClass": "FLR_TEST_USER_VISUAL_CANDIDATE",
+  "testOnly": true,
+  "technicalStatus": "NON_RENDER_GATES_PASS",
+  "integratedTechnicalStatus": "UNVERIFIED",
+  "internalRenderedStatus": "BLOCKED_ENVIRONMENT",
+  "userVisualStatus": "NOT_EVALUATED",
+  "internalRenderBlocker": "CHROMIUM_SANDBOX_OPERATION_NOT_PERMITTED",
+  "step79Started": false,
+  "commitMessage": "Deploy V63 WBS2 user visual candidate (TEST_ONLY)",
+  "fromBuild": "V63_WBS2_C5_INTERNAL_RENDER_BLOCKED",
+  "toBuild": "V63_WBS2_USER_VISUAL_CANDIDATE"
+}

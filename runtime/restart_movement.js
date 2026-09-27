@@ -7,6 +7,11 @@
 
 const HOME='HOME',AWAY='AWAY';
 const VERSION='V36-RESTART-MOVEMENT-1.0-SET-PIECE-SHAPE-REPAIR';
+// A settled delivery may begin only after each authored attacking HOLD actor
+// has actually arrived.  Group coverage below remains useful diagnostic
+// evidence, but cannot stand in for this individual causal arrival check.
+const SETTLED_FORMATION_ARRIVAL_TOLERANCE=1.5;
+const SETTLED_FORMATION_STABLE_DWELL=0.45;
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function lerp(a,b,t){return a+(b-a)*t;}
 function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
@@ -67,7 +72,7 @@ function target(setup,id,w,task,required=true,sprint=true){
 }
 function applyTargets(m,setup){
   if(!setup)return false;
-  for(const [id,t] of Object.entries(setup.targets)){const p=playerById(m,id);if(!p)continue;if(id===setup.kickerId&&m.restart&&['RUN_UP','APPROACH'].includes(m.restart.stage)){setWorldTarget(p,{x:m.restart.x,y:m.restart.y},m.restart.stage==='RUN_UP'?'CORNER_RUN_UP':'RESTART_APPROACH',false);continue;}setWorldTarget(p,t,t.task,t.sprint&&dist(p,t)>2.4);}
+  for(const [id,t] of Object.entries(setup.targets)){const p=playerById(m,id);if(!p)continue;if(id===setup.kickerId&&m.restart?.kind==='CORNER'&&m.restart.stage==='SET_HOLD')continue;if(id===setup.kickerId&&m.restart&&['RUN_UP','APPROACH'].includes(m.restart.stage)){setWorldTarget(p,{x:m.restart.x,y:m.restart.y},m.restart.stage==='RUN_UP'?'CORNER_RUN_UP':'RESTART_APPROACH',false);continue;}setWorldTarget(p,t,t.task,t.sprint&&dist(p,t)>2.4);}
   setup.lastAssignedAt=m.time;return true;
 }
 function localSlotTarget(team,p,lx,ly){return localToWorld(team,clamp(lx,1,104),clamp(ly,1,67));}
@@ -212,11 +217,19 @@ function buildPenalty(m,setup){
   for(const p of defenders){let q;if(p.role==='GK')q=[104.1,34];else q=[87.4,p.slot==='LB'?18:p.slot==='RB'?50:p.slot==='LCB'?28:p.slot==='RCB'?40:p.slot==='LW'?22:p.slot==='RW'?46:34];target(setup,p.id,opponentSlotTarget(team,p,q[0],q[1]),p.role==='GK'?'PENALTY_GK_SET':'PENALTY_DEFENCE_WAIT',true,true);}
   return setup;
 }
+function buildTemplateSetPieceKicker(m,setup){
+  const r=m.restart,team=r.team,kicker=nearestForTarget(outfield(m,team),{x:r.x,y:r.y},'SET_PIECE',new Set());if(!kicker)return null;setup.kickerId=kicker.id;
+  const lp=worldToLocal(team,r.x,r.y);
+  if(r.kind==='CORNER'){const top=lp.y<34,runup=localToWorld(team,Math.max(105.45,lp.x+1.55),top?-0.72:68.72);target(setup,kicker.id,runup,'CORNER_KICKER_RUNUP_START',true,true);setup.cornerRunup={start:runup,ball:{x:r.x,y:r.y},outsideInvariant:'CORNER_KICKER_ORIGIN_OUTSIDE_PRE_CONTACT'};return setup;}
+  const approach=localToWorld(team,Math.max(1,lp.x-1.45),lp.y);target(setup,kicker.id,approach,'FREE_KICK_KICKER_READY',true,true);setup.restartApproach={start:approach,ball:{x:r.x,y:r.y}};return setup;
+}
 function ensurePlan(m){
   const setup=freshSetup(m);if(!setup)return null;if(Object.keys(setup.targets).length)return setup;
   if(setup.kind==='GOAL_KICK')return buildGoalKick(m,setup);
-  if(setup.kind==='CORNER')return buildCorner(m,setup);
-  if(setup.kind==='FREE_KICK'||setup.kind==='OFFSIDE')return buildFreeKick(m,setup);
+  // Templates own the complete CORNER/FREE_KICK geometry; lifecycle owns only
+  // their kicker approach and later application/readiness.
+  if(setup.kind==='CORNER'||setup.kind==='FREE_KICK')return buildTemplateSetPieceKicker(m,setup);
+  if(setup.kind==='OFFSIDE')return buildFreeKick(m,setup);
   if(setup.kind==='PENALTY')return buildPenalty(m,setup);
   if(setup.kind==='THROW_IN')return buildThrowIn(m,setup);
   return setup;
@@ -240,15 +253,83 @@ function hasWrongEndRequiredTarget(m,setup){
     const own=dist(t,p.team===restartTeam?restartGoal:defGoal),otherGoal=dist(t,p.team===restartTeam?defGoal:restartGoal);if(own>otherGoal)return true;}
   return false;
 }
+// Set-piece templates describe football functions, not merely a list of
+// waypoints.  A settled delivery waits for the few causal layers that make
+// the delivery meaningful; a quick restart deliberately has no such wait.
+function settledFormationArrival(m,setup,plan){
+  const family=setup.kind==='FREE_KICK'
+    ?/^(?:TARGET_|SECOND_BALL_|REST_DEFENCE(?:_|$)|SHORT_OPTION$)/
+    :/^(?:FIRST_WAVE_|SECOND_WAVE_|EDGE_|REST_DEFENCE(?:_|$)|SHORT_OPTION$)/;
+  const actors=[];
+  for(const [id,role] of Object.entries(plan.roles)){
+    const p=playerById(m,id),t=setup.targets[id];
+    // Kicker approach/run-up has its own lifecycle.  Goalkeeper-only roles
+    // belong to the existing defensive/GK legality paths, not this attacking
+    // pre-delivery arrival gate.  REST_DEFENCE_SUPPORT is included only when
+    // it still owns an authored HOLD target.
+    if(id===setup.kickerId||p?.team!==setup.team||p?.role==='GK'||!t||!family.test(role))continue;
+    if(role==='REST_DEFENCE_SUPPORT'&&!/_HOLD$/.test(String(t.task||'')))continue;
+    actors.push({id,role,distance:dist(p,t)});
+  }
+  const readyCount=actors.filter(a=>a.distance<=SETTLED_FORMATION_ARRIVAL_TOLERANCE).length;
+  return{ready:actors.length>0&&readyCount===actors.length,tolerance:SETTLED_FORMATION_ARRIVAL_TOLERANCE,readyCount,total:actors.length,actors};
+}
+function formationReadiness(m,setup,forced){
+  const plan=setup.kind==='FREE_KICK'?setup.freeKickPlan:setup.kind==='CORNER'?setup.cornerPlan:null;
+  const restartMode=plan?.restartMode||setup.restartMode||(setup.kind==='CORNER'?'SETTLED_RESTART':null);
+  if(restartMode==='QUICK_RESTART')return{applicable:true,restartMode,ready:true,tolerance:0,groups:{quickKickerOnly:true},arrival:null};
+  if(!plan?.roles||!['FREE_KICK','CORNER'].includes(setup.kind))return{applicable:false,restartMode,ready:true,tolerance:0,groups:{},arrival:null};
+  const tolerance=forced?6.0:5.3,close=pattern=>Object.entries(plan.roles).filter(([id,role])=>{
+    const p=playerById(m,id),t=setup.targets[id];return p?.team===setup.team&&pattern.test(role)&&!!t&&dist(p,t)<=tolerance;
+  }).length,available=pattern=>Object.entries(plan.roles).some(([id,role])=>playerById(m,id)?.team===setup.team&&pattern.test(role)&&!!setup.targets[id]),arrival=settledFormationArrival(m,setup,plan);
+  // Sample the same authored actors on every readiness check. Repeated checks
+  // within one tick cannot advance the timer; an exit clears the whole streak.
+  if(arrival.ready){
+    if(setup.formationStableSince==null)setup.formationStableSince=m.time;
+    setup.formationStableDuration=Math.min(SETTLED_FORMATION_STABLE_DWELL,Math.max(0,m.time-setup.formationStableSince));
+  }else{setup.formationStableSince=null;setup.formationStableDuration=0;}
+  const stableReady=arrival.ready&&setup.formationStableDuration+1e-9>=SETTLED_FORMATION_STABLE_DWELL;
+  let groups;
+  if(setup.kind==='FREE_KICK'){
+    const primary=close(/^TARGET_/),secondBall=close(/^SECOND_BALL_/),restDefence=close(/^REST_DEFENCE(?:_|$)/),shortOption=close(/^SHORT_OPTION$/),hasShort=available(/^SHORT_OPTION$/);
+    groups={primary,primaryRequired:3,secondBall,secondBallRequired:1,restDefence,restDefenceRequired:1,shortOption,shortOptionRequired:hasShort?1:0};
+    return{applicable:true,restartMode,ready:primary>=3&&secondBall>=1&&restDefence>=1&&(!hasShort||shortOption>=1)&&stableReady,tolerance,groups,arrival};
+  }
+  const primary=close(/^(?:FIRST_WAVE|SECOND_WAVE)_/),edge=close(/^EDGE_/),restDefence=close(/^REST_DEFENCE(?:_|$)/);
+  groups={primary,primaryRequired:4,edge,edgeRequired:1,restDefence,restDefenceRequired:1};
+  return{applicable:true,restartMode,ready:primary>=4&&edge>=1&&restDefence>=1&&stableReady,tolerance,groups,arrival};
+}
+function refreshFormationTiming(m,setup){
+  if(setup.formationTimingConfigured||!['FREE_KICK','CORNER'].includes(setup.kind))return;
+  const plan=setup.kind==='FREE_KICK'?setup.freeKickPlan:setup.cornerPlan;if(!plan?.roles)return;
+  const mode=plan.restartMode||setup.restartMode||(setup.kind==='CORNER'?'SETTLED_RESTART':null);if(!mode)return;
+  setup.restartMode=mode;
+  if(mode==='QUICK_RESTART'){
+    setup.minReadyAt=setup.createdAt+0.55;setup.maxReadyAt=setup.createdAt+3.90;setup.formationTimingConfigured=true;return;
+  }
+  const criticalEntries=Object.entries(plan.roles).filter(([id,role])=>{
+    const p=playerById(m,id);return p?.team===setup.team&&(/^(?:TARGET_|SECOND_BALL_|REST_DEFENCE|SHORT_OPTION|FIRST_WAVE_|SECOND_WAVE_|EDGE_)/.test(role));
+  });
+  // These are the small set of actors whose actual arrival is now causal to
+  // a settled restart.  They may run to the authored area, but remain on the
+  // ordinary movement path; no coordinate is advanced here.
+  for(const [id,role] of criticalEntries){const t=setup.targets[id];if(t&&/^(?:TARGET_|SECOND_BALL_|SHORT_OPTION|FIRST_WAVE_|SECOND_WAVE_|EDGE_)/.test(role))t.sprint=true;}
+  const critical=criticalEntries.map(([id])=>{const p=playerById(m,id),t=setup.targets[id];return p&&t?dist(p,t):0;});
+  const furthest=Math.max(0,...critical);
+  setup.minReadyAt=Math.max(setup.minReadyAt,setup.createdAt+3.20);
+  setup.maxReadyAt=setup.createdAt+clamp(5.6+furthest*.34,9.4,13.2);
+  setup.formationTimingConfigured=true;
+}
 function readiness(m){
   const r=m.restart,setup=ensurePlan(m);if(!r||!setup)return{ready:false,ratio:0,kickerReady:false,forced:false};
+  refreshFormationTiming(m,setup);
   const kicker=playerById(m,setup.kickerId),kickerTarget=setup.targets[setup.kickerId];
   // APPROACH is measured against the live ball target, not the earlier settle point.
   const approachToBall=setup.kind==='FREE_KICK'&&r.stage==='APPROACH';
   const kickerReady=!!(kicker&&(approachToBall?dist(kicker,{x:r.x,y:r.y})<=0.95:(kickerTarget&&dist(kicker,kickerTarget)<=0.95)));
   let facingReady=true;if(setup.kind==='GOAL_KICK'&&kicker&&setup.goalKickPlan?.targetPoint){const a=Math.atan2(setup.goalKickPlan.targetPoint.y-kicker.y,setup.goalKickPlan.targetPoint.x-kicker.x);kicker.faceTargetAngle=a;facingReady=Math.abs(angleDiff(Number.isFinite(kicker.bodyAngle)?kicker.bodyAngle:a,a))<=0.20;}
   let readyN=0,total=0;for(const id of setup.requiredIds){const p=playerById(m,id),t=setup.targets[id];if(!p||!t)continue;total++;if(dist(p,t)<=2.65)readyN++;}
-  const ratio=total?readyN/total:1,forced=m.time>=setup.maxReadyAt,wrongEndRequiredTarget=hasWrongEndRequiredTarget(m,setup),requiredRatio=setup.kind==='CORNER'?0.90:setup.kind==='PENALTY'?0.90:0.72,ready=kickerReady&&facingReady&&!wrongEndRequiredTarget&&((m.time>=setup.minReadyAt&&ratio>=requiredRatio)||forced);setup.readyRatio=ratio;return{ready,ratio,kickerReady,facingReady,forced,wrongEndRequiredTarget,requiredRatio,stage:r.stage||'SETUP',kickerPosition:kicker?{x:Number(kicker.x.toFixed(3)),y:Number(kicker.y.toFixed(3))}:null,kickerTarget:kickerTarget?{x:Number(kickerTarget.x.toFixed(3)),y:Number(kickerTarget.y.toFixed(3))}:null,kickerDistance:kicker?(approachToBall?dist(kicker,{x:r.x,y:r.y}):kickerTarget?dist(kicker,kickerTarget):null):null,elapsed:m.time-setup.createdAt,minReadyAt:setup.minReadyAt,maxReadyAt:setup.maxReadyAt};
+  const principalRunnerIds=setup.kind==='FREE_KICK'?setup.freeKickPlan?.principalRunnerIds||[]:[],principalRunnersReady=principalRunnerIds.every(id=>{const p=playerById(m,id),t=setup.targets[id];return!!(p&&t&&dist(p,t)<=2.65);}),ratio=total?readyN/total:1,forced=m.time>=setup.maxReadyAt,wrongEndRequiredTarget=hasWrongEndRequiredTarget(m,setup),requiredRatio=setup.kind==='CORNER'?0.90:setup.kind==='PENALTY'?0.90:0.72,formation=formationReadiness(m,setup,forced),timeReady=m.time>=setup.minReadyAt,legacyReady=(timeReady&&ratio>=requiredRatio)||forced,formationGate=formation.applicable?timeReady&&formation.ready:legacyReady,ready=kickerReady&&facingReady&&!wrongEndRequiredTarget&&principalRunnersReady&&formationGate;setup.readyRatio=ratio;setup.formationReady=formation.ready;setup.formationGroups=formation.groups;setup.formationArrival=formation.arrival;return{ready,ratio,kickerReady,facingReady,forced,wrongEndRequiredTarget,principalRunnerIds,principalRunnersReady,requiredRatio,restartMode:formation.restartMode,formationReady:formation.ready,formationTolerance:formation.tolerance,formationGroups:formation.groups,formationArrival:formation.arrival,formationStableSince:setup.formationStableSince??null,formationStableDuration:setup.formationStableDuration||0,stage:r.stage||'SETUP',kickerPosition:kicker?{x:Number(kicker.x.toFixed(3)),y:Number(kicker.y.toFixed(3))}:null,kickerTarget:kickerTarget?{x:Number(kickerTarget.x.toFixed(3)),y:Number(kickerTarget.y.toFixed(3))}:null,kickerDistance:kicker?(approachToBall?dist(kicker,{x:r.x,y:r.y}):kickerTarget?dist(kicker,kickerTarget):null):null,elapsed:m.time-setup.createdAt,minReadyAt:setup.minReadyAt,maxReadyAt:setup.maxReadyAt};
 }
 function isReady(m){return readiness(m).ready;}
 function kickerId(m){const s=ensurePlan(m);return s?.kickerId||null;}
@@ -283,12 +364,12 @@ function updateGoalKickFlight(m){
   for(const t of gp.targets){const q=playerById(m,t.id);if(!q)continue;setWorldTarget(q,t.pt,t.task,true);q.lockTargetUntil=gp.until;}
   gp.applied=true;return true;
 }
-function debugSummary(m){const s=ensurePlan(m),rd=readiness(m);return s?{version:VERSION,kind:s.kind,team:s.team,kickerId:s.kickerId,targetCount:Object.keys(s.targets).length,requiredCount:s.requiredIds.length,readyRatio:Number(rd.ratio.toFixed(3)),kickerReady:rd.kickerReady,ready:rd.ready,forced:rd.forced}:null;}
+function debugSummary(m){const s=ensurePlan(m),rd=readiness(m);return s?{version:VERSION,kind:s.kind,team:s.team,kickerId:s.kickerId,targetCount:Object.keys(s.targets).length,requiredCount:s.requiredIds.length,readyRatio:Number(rd.ratio.toFixed(3)),restartMode:rd.restartMode||s.restartMode||null,formationReady:rd.formationReady,formationGroups:rd.formationGroups,kickerReady:rd.kickerReady,ready:rd.ready,forced:rd.forced}:null;}
 function cornerKickerOutsideStart(m){
   const r=m.restart,s=r?.setup;if(!r||!s||s.kind!=='CORNER'||!s.cornerRunup?.start)return false;
   const p=s.targets[s.kickerId];if(!p)return false;
   const l=worldToLocal(s.team,p.x,p.y),cornerTop=worldToLocal(s.team,r.x,r.y).y<34;
   return l.x>105&&((cornerTop&&l.y<0)||(!cornerTop&&l.y>68));
 }
-return{VERSION,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,cornerKickerOutsideStart,counterOutletTarget,debugSummary};
+return{VERSION,SETTLED_FORMATION_ARRIVAL_TOLERANCE,SETTLED_FORMATION_STABLE_DWELL,begin,assign,isReady,readiness,hasWrongEndRequiredTarget,kickerId,chooseThrowPlan,chooseGoalKickPlan,beginGoalKickFlight,updateGoalKickFlight,cornerKickerOutsideStart,counterOutletTarget,debugSummary};
 });
