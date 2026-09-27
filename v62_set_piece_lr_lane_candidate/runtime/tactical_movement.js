@@ -338,6 +338,12 @@ function attackTask(m,p,ctx){
       else x=clamp(progress-22,49,60);
       // During deep build-up the pivot may drop close to the centre-backs instead of being trapped in a static midfield band.
       if(progress<22)x=clamp(progress+11,24,36);
+      // After the wall wins possession, the pivot stays within one support lane
+      // of the advancing 8s until their actual positions reconnect the midfield.
+      if(m._wallAttackReconnect?.team===p.team){
+        const eights=teamPlayers(m,p.team).filter(q=>q.slot==='LCM'||q.slot==='RCM');
+        if(eights.length===2)x=Math.min(x,Math.max(...eights.map(q=>worldToLocal(p.team,q.x,q.y).x))+10);
+      }
       const surgeSide=ctx.fullbackSurge&&ctx.fullbackSurgeSlot==='LB'?-1:ctx.fullbackSurge&&ctx.fullbackSurgeSlot==='RB'?1:0;
       if(surgeSide&&(phase==='FINAL_THIRD'||phase==='CHANCE'))x=clamp(x-1.2,24,60);
       const y=clamp(lerp(34,by,phase==='BUILD_UP'?0.18:0.08)+surgeSide*2.2,18,50);
@@ -429,7 +435,12 @@ function attackTask(m,p,ctx){
     }
     if(!ss&&progress>48){const wanted=Math.max(front+5,progress+8),safeX=safeForwardLocal(m,p,wanted),x=releaseForwardLocal(m,p,wanted),y=34+sg*(18.5*pr.wingerWidth),runAlive=x>local.x+.85,over=local.x-safeX,marginalShoulder=over>.18&&over<=1.55,recover=over>1.55;return{lx:runAlive?x:recover?safeX:marginalShoulder?Math.min(local.x,safeX+1.35):Math.max(local.x,x),ly:y,task:runAlive?'FAR_SIDE_RUN':recover?'FAR_SIDE_RECOVER':marginalShoulder?'FAR_SIDE_SHOULDER':'FAR_SIDE_HOLD',sprint:runAlive||recover};}
     if(ss&&progress>66&&pr.width<1){return{lx:safeForwardLocal(m,p,Math.max(front+2,progress+4)),ly:34+sg*17.0,task:'INSIDE_CHANNEL',sprint:true};}
-    return{lx:safeForwardLocal(m,p,Math.max(front,progress+4)),ly:targetWide,task:ss?'WIDE_COMBINE':'HOLD_WIDTH',sprint:ss&&progress>52};
+    const targetX=safeForwardLocal(m,p,Math.max(front,progress+4));
+    // A winger released from a defensive free-kick wall is still physically deep
+    // when the team wins the ball. Rejoin the live outlet lane at running pace.
+    const wallReconnect=m._wallAttackReconnect?.team===p.team&&m._wallAttackReconnect.wallIds.includes(p.id)&&
+      Math.hypot(targetX-local.x,targetWide-local.y)>8;
+    return{lx:targetX,ly:targetWide,task:wallReconnect?'WALL_OUTLET_RECONNECT':ss?'WIDE_COMBINE':'HOLD_WIDTH',sprint:wallReconnect||ss&&progress>52};
   }
   if(p.role==='ST'){
     if(progress<38)return{lx:safeForwardLocal(m,p,Math.max(front,progress+9)),ly:lerp(34,by,0.05),task:'CONNECT_CENTRE',sprint:false};
@@ -1850,6 +1861,15 @@ function assignLooseBallArbitration(m){
 
 function assign(m){
   if(!m||m.completed)return;
+  const wallRegain=m.setPieceWallRecovery;
+  const wallRegainOwner=m.ball?.mode==='CONTROLLED'&&playerById(m,m.ball.ownerId);
+  if(wallRegain?.wallIds?.some(id=>playerById(m,id)?.role==='WF')&&
+    wallRegainOwner?.team===wallRegain.team&&m._lastTacticalPossession!==wallRegain.team&&
+    !m.restart&&m.time<wallRegain.until){
+    m._wallAttackReconnect={team:wallRegain.team,wallIds:[...(wallRegain.wallIds||[])],until:m.time+5,futureOutcomePrecomputed:false};
+  }
+  if(m._wallAttackReconnect&&(m.time>=m._wallAttackReconnect.until||m.restart||
+    m.possession!==m._wallAttackReconnect.team))delete m._wallAttackReconnect;
   if(m.setPieceWallRecovery&&(m.time>=m.setPieceWallRecovery.until||m.restart||
     (m.ball?.mode==='CONTROLLED'&&playerById(m,m.ball.ownerId)?.team===m.setPieceWallRecovery.team)))delete m.setPieceWallRecovery;
   const ledger=m._testOnlyCausalLedger;

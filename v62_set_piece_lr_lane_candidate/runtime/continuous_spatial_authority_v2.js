@@ -210,7 +210,20 @@ function proposalFor(state,player,now){
   const team=player.team,inPoss=state.possession===team,slot=player.slot,role=player.role,sp=state.spatial,ball=sp.ball,local=localPoint(team,player.x,player.y),bl=localPoint(team,ball.x,ball.y),shape=state.structure?.[team]||{width:50,lineHeight:50,transitionDebt:0};
   const width=clamp(Number(shape.width||50)/50,.76,1.24),lineBias=clamp((Number(shape.lineHeight||50)-50)*.05,-2.5,2.5),wave=Math.sin(now*.71+idPhase(player.id)*Math.PI*2),attackStep=role==='ST'?5.4:role==='WF'?4.8:role==='FB'?3.8:3.2;
   let tx=local.x,ty=local.y,type='LIVE_SPACE',reason='LIVE_SPACE_OCCUPATION',targetId=null,stationaryAllowed=false,responsibility=null;
-  if(role==='GK'){
+  const looseChaser=ball.mode==='LOOSE'?sp.players.filter(p=>p.team===team&&p.role!=='GK')
+    .sort((a,b)=>Math.hypot(a.x-ball.x,a.y-ball.y)-Math.hypot(b.x-ball.x,b.y-ball.y)||a.id.localeCompare(b.id))[0]:null;
+  if(player===looseChaser){
+    // An unowned ball needs a physical recovery, not possession support shape.
+    // One nearest outfielder per team contests it; the others keep their roles.
+    tx=bl.x;ty=bl.y;type='RECOVER_LOOSE';reason='CURRENT_LOOSE_BALL_CONTEST';
+  }else if(ball.mode==='FLIGHT'&&ball.kind==='PASS'&&ball.intendedReceiverId===player.id){
+    // Receive the actual incoming trajectory before resuming role support/run
+    // duties. Otherwise the intended receiver runs away from his own pass.
+    const speed2=ball.vx*ball.vx+ball.vy*ball.vy,
+      along=speed2>0?Math.max(0,((player.x-ball.x)*ball.vx+(player.y-ball.y)*ball.vy)/speed2):0,
+      intercept=localPoint(team,ball.x+ball.vx*along,ball.y+ball.vy*along);
+    tx=intercept.x;ty=intercept.y;type='RECEIVE';reason='CURRENT_PASS_TRAJECTORY';targetId=ball.lastTouchPlayerId;
+  }else if(role==='GK'){
     tx=clamp(5.5+bl.x*.025,5.2,9.2);ty=34+(bl.y-34)*.10;type='GK_COVER';reason='GK_GOAL_COVER_REFERENCE';stationaryAllowed=Math.hypot(tx-local.x,ty-local.y)<.55;
   }else if(player.id===ball.ownerId){
     tx=clamp(local.x+attackStep,4,98);ty=clamp(local.y+(34-local.y)*.10+wave*.9,5,63);type='BALL_CARRY';reason='PHYSICAL_CONTROLLED_BALL_ADVANCE';
@@ -262,15 +275,15 @@ function sealCoarseMovementIntents(state,now){
   }
   sp.defensiveConnectivity=connectivity;sp.movementIntentArbiter={schemaVersion:'SINGLE_FINAL_MOVEMENT_ARBITER_1.0',stepId,at:Number(now.toFixed(3)),source:'COARSE_FINAL_ARBITER',finalWriterCountByActor:Object.fromEntries(sp.players.map(p=>[p.id,1])),postArbiterFinalWriterCount:0,defensiveConnectivity:deep(connectivity),futureOutcomePrecomputed:false};return sp.movementIntentArbiter;
 }
-function shouldReevaluate(state,player,now){const i=player.intent;if(!i||now>=Number(i.expiresAt||0)-1e-6)return'INTENT_EXPIRED';if(stimulusChanged(i.stimulus,ballStimulus(state)))return'FOOTBALL_STIMULUS_CHANGED';if(Math.hypot((i.targetPoint?.x??player.tx)-player.x,(i.targetPoint?.y??player.ty)-player.y)<.78)return'TARGET_REACHED';return null;}
+function shouldReevaluate(state,player,now){if(state.spatial.ball.mode==='LOOSE')return'CURRENT_LOOSE_CONTEST';const i=player.intent;if(!i||now>=Number(i.expiresAt||0)-1e-6)return'INTENT_EXPIRED';if(stimulusChanged(i.stimulus,ballStimulus(state)))return'FOOTBALL_STIMULUS_CHANGED';if(Math.hypot((i.targetPoint?.x??player.tx)-player.x,(i.targetPoint?.y??player.ty)-player.y)<.78)return'TARGET_REACHED';return null;}
 function recordTouch(state,kind,player,at,extra={}){const sp=state.spatial,ball=sp.ball,row={sequence:++sp.touchSequence,at:Number(at.toFixed(3)),kind,playerId:player?.id||null,team:player?.team||null,x:rounded(ball.x),y:rounded(ball.y),...extra};boundedHistory(ball.causalHistory||(ball.causalHistory=[]),row);return row;}
 function setControlled(state,player,at,kind='CAUSAL_TOUCH'){
-  const sp=state.spatial,ball=sp.ball,prior=ball.ownerId||null;ball.mode='CONTROLLED';ball.kind='CONTROL';ball.ownerId=player.id;ball.intendedReceiverId=null;ball.vx=Number(player.vx)||0;ball.vy=Number(player.vy)||0;ball.vz=0;ball.z=0;ball.lastTouchTeam=player.team;ball.lastTouchPlayerId=player.id;state.possession=player.team;if(prior!==player.id)sp.writerStats.causalOwnerChanges++;recordTouch(state,kind,player,at,{previousOwnerId:prior});sp.stimulusRevision++;syncBallDerived(state);return player;
+  const sp=state.spatial,ball=sp.ball,prior=ball.ownerId||null;ball.mode='CONTROLLED';ball.kind='CONTROL';ball.ownerId=player.id;ball.intendedReceiverId=null;ball.coarseReleasePending=false;ball.vx=Number(player.vx)||0;ball.vy=Number(player.vy)||0;ball.vz=0;ball.z=0;ball.lastTouchTeam=player.team;ball.lastTouchPlayerId=player.id;state.possession=player.team;if(prior!==player.id)sp.writerStats.causalOwnerChanges++;recordTouch(state,kind,player,at,{previousOwnerId:prior});sp.stimulusRevision++;syncBallDerived(state);return player;
 }
 function beginPass(state,targetId,at){
-  const sp=state.spatial,ball=sp.ball,owner=sp.players.find(p=>p.id===ball.ownerId),target=sp.players.find(p=>p.id===targetId);if(!owner||!target||target.team!==owner.team)return null;
+  const sp=state.spatial,ball=sp.ball,owner=sp.players.find(p=>p.id===ball.ownerId),target=sp.players.find(p=>p.id===targetId);if(ball.mode!=='CONTROLLED'||!owner||!target||target===owner||target.team!==owner.team)return null;
   ball.x=owner.x;ball.y=owner.y;const aimX=clamp(target.x+(Number(target.vx)||0)*.65,1,104),aimY=clamp(target.y+(Number(target.vy)||0)*.65,1,67),dx=aimX-ball.x,dy=aimY-ball.y,d=Math.hypot(dx,dy);if(d<1.5)return null;
-  const speed=clamp(12+d*.12,12,19);ball.mode='FLIGHT';ball.kind='PASS';ball.ownerId=null;ball.intendedReceiverId=target.id;ball.vx=dx/d*speed;ball.vy=dy/d*speed;ball.z=0;ball.vz=0;ball.lastTouchTeam=owner.team;ball.lastTouchPlayerId=owner.id;recordTouch(state,'PASS_RELEASE',owner,at,{targetId:target.id});sp.stimulusRevision++;syncBallDerived(state);return{owner,target,distance:d};
+  const speed=clamp(12+d*.12,12,19);ball.mode='FLIGHT';ball.kind='PASS';ball.ownerId=null;ball.intendedReceiverId=target.id;ball.vx=dx/d*speed;ball.vy=dy/d*speed;ball.z=0;ball.vz=0;ball.lastTouchTeam=owner.team;ball.lastTouchPlayerId=owner.id;ball.coarseReleasePending=true;recordTouch(state,'PASS_RELEASE',owner,at,{targetId:target.id});sp.stimulusRevision++;syncBallDerived(state);return{owner,target,distance:d};
 }
 function tryCausalTurnover(state,at,maxDistance=3.0){
   const sp=state.spatial,ball=sp.ball,owner=sp.players.find(p=>p.id===ball.ownerId);if(!owner||ball.mode!=='CONTROLLED')return null;
@@ -312,7 +325,10 @@ function integrateBall(state,dt,now){
   if(ball.mode==='CONTROLLED'){
     const owner=sp.players.find(p=>p.id===ball.ownerId);if(owner){ball.vx=owner.vx;ball.vy=owner.vy;ball.x=owner.x;ball.y=owner.y;ball.z=0;ball.vz=0;}else{ball.mode='LOOSE';ball.ownerId=null;ball.intendedReceiverId=null;}
   }else if(ball.mode==='FLIGHT'){
-    ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.x=clamp(ball.x,.3,104.7);ball.y=clamp(ball.y,.3,67.7);const intended=sp.players.find(p=>p.id===ball.intendedReceiverId),candidates=sp.players.map(p=>({p,d:Math.hypot(p.x-ball.x,p.y-ball.y)})).filter(x=>x.d<1.45||(x.p===intended&&x.d<2.15)).sort((a,b)=>a.d-b.d);if(candidates.length)setControlled(state,candidates[0].p,now,candidates[0].p===intended?'PASS_RECEIVE_TOUCH':'PASS_INTERCEPTION_TOUCH');else{ball.vx*=Math.pow(.985,dt);ball.vy*=Math.pow(.985,dt);if((ball.x<=.31||ball.x>=104.69||ball.y<=.31||ball.y>=67.69)||Math.hypot(ball.vx,ball.vy)<2.2){ball.mode='LOOSE';ball.kind='LOOSE';ball.ownerId=null;ball.intendedReceiverId=null;sp.stimulusRevision++;}}
+    // Ignore the releasing player's initial contact envelope until the ball
+    // leaves it; this is separation, not a timed immunity or a pass outcome.
+    const releaser=ball.coarseReleasePending?sp.players.find(p=>p.id===ball.lastTouchPlayerId):null;
+    ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.x=clamp(ball.x,.3,104.7);ball.y=clamp(ball.y,.3,67.7);const intended=sp.players.find(p=>p.id===ball.intendedReceiverId),candidates=sp.players.filter(p=>p!==releaser).map(p=>({p,d:Math.hypot(p.x-ball.x,p.y-ball.y)})).filter(x=>x.d<1.45||(x.p===intended&&x.d<2.15)).sort((a,b)=>a.d-b.d);if(releaser&&Math.hypot(releaser.x-ball.x,releaser.y-ball.y)>1.45)ball.coarseReleasePending=false;if(candidates.length)setControlled(state,candidates[0].p,now,candidates[0].p===intended?'PASS_RECEIVE_TOUCH':'PASS_INTERCEPTION_TOUCH');else{ball.vx*=Math.pow(.985,dt);ball.vy*=Math.pow(.985,dt);if((ball.x<=.31||ball.x>=104.69||ball.y<=.31||ball.y>=67.69)||Math.hypot(ball.vx,ball.vy)<2.2){ball.mode='LOOSE';ball.kind='LOOSE';ball.ownerId=null;ball.intendedReceiverId=null;sp.stimulusRevision++;}}
   }else{
     ball.x=clamp(ball.x+ball.vx*dt,.3,104.7);ball.y=clamp(ball.y+ball.vy*dt,.3,67.7);ball.vx*=Math.pow(.72,dt);ball.vy*=Math.pow(.72,dt);let best=null,bestD=1.25;for(const p of sp.players){const d=Math.hypot(p.x-ball.x,p.y-ball.y);if(d<bestD){best=p;bestD=d;}}if(best)setControlled(state,best,now,'LOOSE_BALL_RECOVERY_TOUCH');
   }
@@ -320,7 +336,9 @@ function integrateBall(state,dt,now){
 }
 function advanceCoarseTo(session,end,opts={}){
   const state=session.state,sp=activateCoarseState(state,state.second),cadence=Number(session.coarseCadence)||.5,target=Number(end);if(target<Number(sp.time)-1e-6)throw new Error('V2_COARSE_TIME_REVERSAL');
-  while(Number(sp.time)<target-1e-6){if(opts.heroPlayerId&&sp.ball.mode==='CONTROLLED'&&sp.ball.ownerId===opts.heroPlayerId)break;const dt=Math.min(cadence,target-Number(sp.time)),now=Number(sp.time);for(const p of sp.players){const cause=shouldReevaluate(state,p,now);if(cause)commitIntent(state,p,proposalFor(state,p,now),now,cause);}sealCoarseMovementIntents(state,now);for(const p of sp.players){const targetPoint=p.finalMovementIntent.targetPoint,dx=targetPoint.x-p.x,dy=targetPoint.y-p.y,d=Math.hypot(dx,dy),maxSpeed=p.role==='GK'?4.8:p.role==='CB'?6.2:p.role==='FB'?7.2:p.role==='ST'||p.role==='WF'?7.8:7.0,accel=p.role==='GK'?5.0:7.2,desired=Math.min(maxSpeed,Math.sqrt(Math.max(0,2*accel*d))),dvx=d?dx/d*desired-p.vx:-p.vx,dvy=d?dy/d*desired-p.vy:-p.vy,change=Math.hypot(dvx,dvy),limit=accel*dt;if(change>limit){p.vx+=dvx/change*limit;p.vy+=dvy/change*limit;}else{p.vx+=dvx;p.vy+=dvy;}let nx=p.x+p.vx*dt,ny=p.y+p.vy*dt;if(d>0&&Math.hypot(nx-p.x,ny-p.y)>=d){nx=targetPoint.x;ny=targetPoint.y;p.vx=0;p.vy=0;}p.x=clamp(nx,2.5,102.5);p.y=clamp(ny,2.5,65.5);if(Math.hypot(p.vx,p.vy)>.03)p.bodyAngle=Math.atan2(p.vy,p.vx);sp.writerStats.actualIntegratorWrites++;}
+  // A 12-19 m/s pass moves 6-9.5 m in the ordinary .5 s step, skipping
+  // receiver/interceptor contact envelopes. Substep only live ball flight.
+  while(Number(sp.time)<target-1e-6){if(opts.heroPlayerId&&sp.ball.mode==='CONTROLLED'&&sp.ball.ownerId===opts.heroPlayerId)break;const dt=Math.min(cadence,sp.ball.mode==='FLIGHT'?.1:cadence,target-Number(sp.time)),now=Number(sp.time);for(const p of sp.players){const cause=shouldReevaluate(state,p,now);if(cause)commitIntent(state,p,proposalFor(state,p,now),now,cause);}sealCoarseMovementIntents(state,now);for(const p of sp.players){const targetPoint=p.finalMovementIntent.targetPoint,dx=targetPoint.x-p.x,dy=targetPoint.y-p.y,d=Math.hypot(dx,dy),maxSpeed=p.role==='GK'?4.8:p.role==='CB'?6.2:p.role==='FB'?7.2:p.role==='ST'||p.role==='WF'?7.8:7.0,accel=p.role==='GK'?5.0:7.2,desired=Math.min(maxSpeed,Math.sqrt(Math.max(0,2*accel*d))),dvx=d?dx/d*desired-p.vx:-p.vx,dvy=d?dy/d*desired-p.vy:-p.vy,change=Math.hypot(dvx,dvy),limit=accel*dt;if(change>limit){p.vx+=dvx/change*limit;p.vy+=dvy/change*limit;}else{p.vx+=dvx;p.vy+=dvy;}let nx=p.x+p.vx*dt,ny=p.y+p.vy*dt;if(d>0&&Math.hypot(nx-p.x,ny-p.y)>=d){nx=targetPoint.x;ny=targetPoint.y;p.vx=0;p.vy=0;}p.x=clamp(nx,2.5,102.5);p.y=clamp(ny,2.5,65.5);if(Math.hypot(p.vx,p.vy)>.03)p.bodyAngle=Math.atan2(p.vy,p.vx);sp.writerStats.actualIntegratorWrites++;}
     const next=Number((Number(sp.time)+dt).toFixed(3));integrateBall(state,dt,next);sp.parentStateId=sp.stateId;sp.stateId=`CV2${String(++session.coarseStateCounter).padStart(7,'0')}`;sp.time=next;state.second=next;state.minute=next/60;state._v2LastIntegratedPriorState=opts.priorStateLabel||null;if(typeof opts.record==='function')opts.record(opts.eventId||null);
   }
   return sp;
