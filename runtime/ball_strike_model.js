@@ -14,6 +14,7 @@ function groundDragFor(distance,arrival,initialSpeed){
   return Number(((lo+hi)/2).toFixed(4));
 }
 function passPlan(ctx={}){
+  if(ctx.physicsProfile==='OPEN_PLAY_LOB_V1')return openPlayLobPlan(ctx);
   const kind=String(ctx.kind||'PASS'),d=Math.max(0.1,Number(ctx.distance)||1),mode=ctx.deliveryMode==='AERIAL'?'AERIAL':'GROUND';
   const pressure=Number(ctx.pressure)||99,targetSpeed=Number(ctx.targetSpeed)||0,forward=Number(ctx.forward)||0,targetLeadDistance=Math.max(0,Number(ctx.targetLeadDistance)||0);
   const passSkill=clamp(Number(ctx.passSkill)||60,1,100),quality=(passSkill-60)/100;
@@ -45,6 +46,22 @@ function passPlan(ctx={}){
   if(mode==='GROUND'&&pressure<1.55&&kind!=='CUTBACK')speed=clamp(speed+0.6,8.5,22.0);
   const groundDragK=mode==='GROUND'&&kind==='THROUGH'?groundDragFor(d,arrival,speed):null;
   return{style,speed:Number(speed.toFixed(3)),loft:Number(loft.toFixed(3)),arrival:Number(arrival.toFixed(3)),groundDragK};
+}
+// Pure current-state intent only. No RNG, player stepping or reception prediction.
+function openPlayLobPlan(ctx){
+  const o=ctx.origin,t=ctx.target;
+  if(!o||!t||![o.x,o.y,o.z,t.x,t.y,t.vx,t.vy].every(Number.isFinite)||o.z<0)return null;
+  const leadScale=Math.min(1,4/Math.max(0.001,Math.hypot(t.vx,t.vy)));
+  const aim={x:clamp(t.x+t.vx*leadScale,0,105),y:clamp(t.y+t.vy*leadScale,0,68)};
+  const distance=Math.hypot(aim.x-o.x,aim.y-o.y),arrival=clamp(1.1+distance/50,1.25,1.9);
+  const vx=(aim.x-o.x)/arrival,vy=(aim.y-o.y)/arrival,vz=(4.905*arrival*arrival-o.z)/arrival;
+  if(distance<3||distance>40||Math.hypot(vx,vy)>26||vz<=0||vz>10)return null;
+  const skill=clamp(Number(ctx.passSkill)||60,1,100),control=clamp(Number(ctx.ballControl)||60,1,100);
+  const pressure=clamp((3-(Number.isFinite(ctx.pressure)?ctx.pressure:99))/3,0,1);
+  const movement=clamp((Number(ctx.sourceSpeed)||0)/8,0,1),misalignment=clamp(Math.abs(Number(ctx.misalignment)||0)/Math.PI,0,1);
+  const difficulty=(200-skill-control)/200+pressure*.35+movement*.15+misalignment*.25;
+  return{physicsProfile:'OPEN_PLAY_LOB_V1',style:'OPEN_PLAY_LOB',aim,arrival,vx,vy,vz,
+    error:{azimuth:clamp(.015+difficulty*.06,.015,.10),horizontal:clamp(.025+difficulty*.10,.025,.18),vertical:clamp(.025+difficulty*.08,.025,.15)}};
 }
 function shotPlan(ctx={}){
   const d=Number(ctx.dGoal)||18,oneVOne=!!ctx.oneVOne,open=!!ctx.openWindow,centrality=Math.abs(Number(ctx.centrality)||0),pressure=Number(ctx.pressure)||2;

@@ -1,4 +1,6 @@
 (function(root){'use strict';
+// Capacity applies to each target menu page; all exact variants remain reachable.
+const MENU_PAGE_CAPACITY=6;
 const API_VERSION='V42-SOL2-IN-PITCH-CHOICE-0.5-RECOMMENDATION';
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function resolveAnchorId(option,heroId,playerIds){
@@ -76,16 +78,16 @@ function createController(cfg){
   function commitChoice(o,anchorId,generation,inputKind){
     if(locked||generation!==menuGeneration||performance.now()<menuArmAt)return;
     const gestureId=`IP-${generation}-${Math.round(performance.now()*1000)}`;
-    cfg.onChoose(o.id,o.targetId,{source:'USER_UI_CLICK_IN_PITCH',anchorPlayerId:anchorId,confirmedAction:true,actionGestureId:gestureId,inputKind});
+    cfg.onChoose(o.id,o.targetId,{source:'USER_UI_CLICK_IN_PITCH',anchorPlayerId:anchorId,confirmedAction:true,actionGestureId:gestureId,pendingChoiceId:pending?.id,inputKind});
   }
-  function buildMenu(anchorId,options){
+  function buildMenu(anchorId,options,page=0){
     menu.innerHTML='';menuGeneration++;const generation=menuGeneration;menuArmAt=performance.now()+130;resetPointerCommit();
     const player=(snapshot?.players||[]).find(p=>p.id===anchorId),hero=(snapshot?.players||[]).find(p=>p.id===heroId());
-    const title=make('div','in-pitch-choice-title');title.textContent=player?(player.id===heroId()?`내 선수 · ${player.slot||player.role}`:(hero&&player.team===hero.team?`같은 팀 ${player.slot||player.role}`:`상대 ${player.slot||player.role}`)):'선택';menu.appendChild(title);
+    const title=make('div','in-pitch-choice-title');title.textContent=player?(player.id===heroId()?`내 선수 · ${player.slot||player.role}`:(hero&&player.team===hero.team?`같은 팀 ${player.slot||player.role}`:`상대 ${player.slot||player.role}`)):'선택';title.textContent+=` · ${anchorId}`;title.style.whiteSpace='normal';menu.appendChild(title);
     const grid=make('div','in-pitch-choice-grid');
-    for(const o of options){
+    for(const o of options.slice(page*MENU_PAGE_CAPACITY,(page+1)*MENU_PAGE_CAPACITY)){
       const b=make('button',`in-pitch-choice-option${o.recommended?' recommended':''}`);b.type='button';b.setAttribute('role','menuitem');const tip=o.tooltip||o.hint||'';
-      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.dataset.recommended=o.recommended?'true':'false';b.textContent=shortLabel(o);if(o.recommended){const badge=make('span','in-pitch-choice-recommended-label');badge.textContent='추천';b.appendChild(badge);}
+      b.dataset.choiceId=o.id||'';b.dataset.targetId=o.targetId||'';b.dataset.tooltip=tip;b.dataset.recommended=o.recommended?'true':'false';b.textContent=shortLabel(o);b.setAttribute('aria-label',`${o.label||o.id} · ${o.targetId||anchorId}`);b.title=tip;if(o.recommended){const badge=make('span','in-pitch-choice-recommended-label');badge.textContent='추천';b.appendChild(badge);}
       b.addEventListener('mouseenter',()=>showTooltipFor(b,tip));b.addEventListener('mouseleave',hideTooltip);b.addEventListener('focus',()=>showTooltipFor(b,tip));b.addEventListener('blur',hideTooltip);
       b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();if(locked||generation!==menuGeneration||performance.now()<menuArmAt){resetPointerCommit();return;}pointerCommit={pointerId:ev.pointerId,generation,choiceId:o.id,targetId:o.targetId||null,button:b};});
       b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();const c=pointerCommit;resetPointerCommit();if(!c||c.pointerId!==ev.pointerId||c.generation!==generation||c.button!==b)return;commitChoice(o,anchorId,generation,ev.pointerType||'pointer');});
@@ -95,6 +97,14 @@ function createController(cfg){
       grid.appendChild(b);
     }
     menu.appendChild(grid);
+    if(options.length>MENU_PAGE_CAPACITY){
+      const pages=Math.ceil(options.length/MENU_PAGE_CAPACITY),nav=make('div','in-pitch-choice-pages');
+      for(const [text,next] of [['이전',page-1],['다음',page+1]]){
+        const b=make('button','in-pitch-choice-page');b.type='button';b.textContent=`${text} (${page+1}/${pages})`;
+        b.disabled=next<0||next>=pages;b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();if(!locked){buildMenu(anchorId,options,next);positionMenu(anchorId);}});nav.appendChild(b);
+      }
+      menu.appendChild(nav);
+    }
   }
   function avoidanceSegments(anchorId,options){
     if(!snapshot)return[];const players=snapshot.players||[],hero=players.find(p=>p.id===heroId()),anchor=players.find(p=>p.id===anchorId);if(!hero||!anchor)return[];
@@ -111,6 +121,7 @@ function createController(cfg){
   }
   function positionMenu(anchorId){
     if(menu.hidden||!snapshot)return;const p=(snapshot.players||[]).find(x=>x.id===anchorId);if(!p)return;
+    const stageSize=stage.getBoundingClientRect();menu.style.boxSizing='border-box';menu.style.maxWidth=`${Math.max(0,stageSize.width-16)}px`;menu.style.maxHeight=`${Math.max(0,stageSize.height-16)}px`;menu.style.overflowY='auto';
     const g=getGroups().find(x=>x.anchorId===anchorId),pt=project(p),stageRect=stage.getBoundingClientRect(),bounds={left:8,top:8,right:stageRect.width-8,bottom:stageRect.height-8},size={width:menu.offsetWidth||180,height:menu.offsetHeight||80};
     const blockers=[...targets.querySelectorAll('.in-pitch-target')].filter(e=>e.dataset.playerId!==anchorId).map(e=>{const r=e.getBoundingClientRect();return{left:r.left-stageRect.left,top:r.top-stageRect.top,right:r.right-stageRect.left,bottom:r.bottom-stageRect.top};});
     const place=choosePlacement(pt,size,bounds,blockers,avoidanceSegments(anchorId,g?.options||[]));menu.style.left=`${place.left}px`;menu.style.top=`${place.top}px`;
@@ -137,7 +148,7 @@ function createController(cfg){
     for(const g of getGroups()){
       const p=players.get(g.anchorId);if(!p)continue;const pt=project(p),b=make('button','in-pitch-target');b.type='button';b.dataset.playerId=p.id;b.setAttribute('aria-label',`${p.slot||p.role} 선택지 보기`);b.style.left=`${pt.x}px`;b.style.top=`${pt.y}px`;
       const ring=make('span','in-pitch-target-ring'),dot=make('span','in-pitch-target-dot');b.append(ring,dot);
-      b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();if(locked)return;selectTarget(p.id)});b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();});targets.appendChild(b);
+      b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();if(locked)return;selectTarget(p.id)});b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();if(ev.detail===0&&!locked)selectTarget(p.id)});targets.appendChild(b);
     }
   }
   function update(nextSnapshot){snapshot=nextSnapshot||snapshot;if(rootEl.hidden||!pending||!snapshot)return;renderRunArrows();renderTargets();if(selectedId){const exists=getGroups().some(g=>g.anchorId===selectedId);if(exists){[...targets.querySelectorAll('.in-pitch-target')].find(e=>e.dataset.playerId===selectedId)?.classList.add('selected');positionMenu(selectedId)}else hideMenu(true)}}
@@ -149,5 +160,5 @@ function createController(cfg){
   window.addEventListener('resize',()=>{if(!rootEl.hidden&&snapshot)update(snapshot)});
   return{show,hide,update,selectTarget,setLocked,state};
 }
-const api={version:API_VERSION,resolveAnchorId,groupOptions,choosePlacement,createController};root.FLRPG_IN_PITCH_CHOICE_UI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+const api={version:API_VERSION,MENU_PAGE_CAPACITY,resolveAnchorId,groupOptions,choosePlacement,createController};root.FLRPG_IN_PITCH_CHOICE_UI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

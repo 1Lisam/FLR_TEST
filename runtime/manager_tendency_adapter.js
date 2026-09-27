@@ -60,9 +60,11 @@ function maybeDecisionBias(m,team){
     if(m.r()<p){B.executePass(m,owner,safe.p,'PASS',safe);mt.forcedSafePasses[team]++;mt.lastDecisionAt[team]=m.time;}
   }
 }
-function choosePresser(ps,owner,team,pr){
+function liveResponsibility(m,p){const state=m.defensiveResponsibility,r=state?.team===p.team?state.records?.[p.id]:null,intent=p._defensivePursuitIntent;return!!(r&&['PRESS','MARK','COVER','RECOVERY'].includes(r.type)&&intent&&Number(intent.epoch)===Number(r.epoch)&&intent.type===r.type&&(intent.targetId||null)===(r.targetId||null)&&r.motion?.actualTarget)}
+function currentPressureAuthority(m,team,owner){const state=m.defensiveResponsibility,id=state?.team===team&&state.primaryPressureTargetId===owner?.id?state.primaryPressureOwnerId:null,p=id?B.playerById(m,id):null;return!!(p&&liveResponsibility(m,p)&&state.records[id].type==='PRESS')}
+function choosePresser(m,ps,owner,team,pr){
   const ballL=local(team,owner.x,owner.y),highZone=ballL.x>52;
-  return ps.filter(p=>p.role!=='GK').map(p=>{
+  return ps.filter(p=>p.role!=='GK'&&!liveResponsibility(m,p)).map(p=>{
     const d=B.dist(p,owner),pl=local(team,p.x,p.y),gap=ballL.x-pl.x;let penalty=0;
     if(p.role==='CB'&&highZone)penalty=pr.pressing>.72?5.5:9.0;
     else if(p.role==='FB'&&highZone)penalty=2.0;
@@ -88,7 +90,7 @@ function applyLaneScreen(m,team,owner,presser,pr){
   if(pr.pressing<.72)return;
   const mt=m.managerTelemetry,opts=B.passOptions(m,owner).filter(o=>o.block===0&&o.forward>2&&o.open>1.2).sort((a,b)=>b.score-a.score||b.forward-a.forward);
   const target=opts[0]?.p;if(!target)return;
-  const ps=B.teamPlayers(m,team).filter(p=>p.role!=='GK'&&p.id!==presser?.id&&p.role!=='CB');
+  const ps=B.teamPlayers(m,team).filter(p=>p.role!=='GK'&&p.id!==presser?.id&&p.role!=='CB'&&!liveResponsibility(m,p));
   if(!ps.length)return;
   const mx=owner.x+(target.x-owner.x)*.48,my=owner.y+(target.y-owner.y)*.48;
   const screen=ps.map(p=>({p,d:Math.hypot(p.x-mx,p.y-my)})).sort((a,b)=>a.d-b.d)[0];
@@ -127,8 +129,8 @@ function applyLiveDefensiveTendencies(m,team){
   // This adapter keeps only current-state defensive tendencies that must react between shape refreshes.
   if(!poss&&ballOwner&&ballOwner.team!==team){
     const ballL=local(team,ballOwner.x,ballOwner.y),mayPress=pr.pressing>.70||ballL.x<55;
-    if(mayPress){
-      const picked=choosePresser(ps,ballOwner,team,pr),presser=picked?.p;
+    if(mayPress&&!currentPressureAuthority(m,team,ballOwner)){
+      const picked=choosePresser(m,ps,ballOwner,team,pr),presser=picked?.p;
       if(presser){
         const ol=local(team,ballOwner.x,ballOwner.y),pl=local(team,presser.x,presser.y),dist=B.dist(presser,ballOwner),commit=clamp((pr.pressing-.28)/.72,0,1),beaten=pl.x>ol.x+0.85;
         const lat=clamp(pl.y-ol.y,-1.8,1.8),shoulder=stableManagerPressSide(m,team,presser,ballOwner,lat);

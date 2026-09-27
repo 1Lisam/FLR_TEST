@@ -18,6 +18,7 @@ const MODES={
   // STEP40 V0.1 compatibility alias. New UI no longer emits PLAYER_FOCUS.
   PLAYER_FOCUS:{id:'PLAYER_FOCUS',label:'내 플레이 보기',presentation:'HIGHLIGHT',threshold:0,minGap:0.8,description:'PLAYER_ALL compatibility alias'}
 };
+const lobPendingAuthority=new WeakMap();
 const B=()=>E.choiceActionBridge(),C=()=>E.choiceStateBridge(),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash32=s=>{let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;};
 const deep=v=>v==null?v:JSON.parse(JSON.stringify(v));
@@ -30,8 +31,20 @@ function leanFrame(m){
     ball:{mode:snap.ball.mode,x:Number(snap.ball.x.toFixed(3)),y:Number(snap.ball.y.toFixed(3)),z:Number((snap.ball.z||0).toFixed(3)),vx:Number((snap.ball.vx||0).toFixed(3)),vy:Number((snap.ball.vy||0).toFixed(3)),vz:Number((snap.ball.vz||0).toFixed(3)),ownerId:snap.ball.ownerId||null,intendedReceiverId:snap.ball.intendedReceiverId||null,kind:snap.ball.kind||null,lastTouchTeam:snap.ball.lastTouchTeam||null,lastTouchPlayer:snap.ball.lastTouchPlayer||null,strikeStyle:snap.ball.strikeStyle||null,shotTeam:snap.ball.shotTeam||null,shotTargetY:Number.isFinite(snap.ball.shotTargetY)?Number(snap.ball.shotTargetY.toFixed(3)):null,age:Number((snap.ball.age||0).toFixed(3))},
     players:snap.players.map(p=>({id:p.id,name:p.name,team:p.team,role:p.role,slot:p.slot,x:Number(p.x.toFixed(3)),y:Number(p.y.toFixed(3)),vx:Number((p.vx||0).toFixed(3)),vy:Number((p.vy||0).toFixed(3)),tx:Number((p.tx||p.x).toFixed(3)),ty:Number((p.ty||p.y).toFixed(3)),action:p.action||null,tacticalTask:p.tacticalTask||null,markTargetId:p.markTargetId||null,hasBall:!!p.hasBall,bodyAngle:p.bodyAngle,faceTargetAngle:p.faceTargetAngle}))};
 }
-function pushHistory(s){
-  const f=leanFrame(s.m),last=s.history[s.history.length-1];
+function fastReplayFrame(m){
+  const ev=[...(m.events||[])].reverse().find(e=>e&&e.type!=='USER_CHOICE'&&e.text);
+  return{
+    time:Number(m.time.toFixed(2)),score:{...m.score},phase:m.phase||null,possession:m.possession,
+    restart:m.restart?deep(m.restart):null,
+    lastEvent:ev?{t:Number((ev.t||m.time).toFixed(2)),type:ev.type||null,text:ev.text}:null,
+    ball:{mode:m.ball.mode,x:Number(m.ball.x.toFixed(3)),y:Number(m.ball.y.toFixed(3)),z:Number((m.ball.z||0).toFixed(3)),vx:Number((m.ball.vx||0).toFixed(3)),vy:Number((m.ball.vy||0).toFixed(3)),vz:Number((m.ball.vz||0).toFixed(3)),ownerId:m.ball.ownerId||null,intendedReceiverId:m.ball.intendedReceiverId||null,kind:m.ball.kind||null,lastTouchTeam:m.ball.lastTouchTeam||null,lastTouchPlayer:m.ball.lastTouchPlayer||null,strikeStyle:m.ball.strikeStyle||null,shotTeam:m.ball.shotTeam||null,shotTargetY:Number.isFinite(m.ball.shotTargetY)?Number(m.ball.shotTargetY.toFixed(3)):null,age:Number((m.ball.age||0).toFixed(3))},
+    players:m.players.map(p=>({id:p.id,name:p.name,team:p.team,role:p.role,slot:p.slot,x:Number(p.x.toFixed(3)),y:Number(p.y.toFixed(3)),vx:Number((p.vx||0).toFixed(3)),vy:Number((p.vy||0).toFixed(3)),tx:Number((p.tx??p.x).toFixed(3)),ty:Number((p.ty??p.y).toFixed(3)),action:p.action||null,tacticalTask:p.tacticalTask||null,markTargetId:p.markTargetId||null,hasBall:!!p.hasBall,bodyAngle:p.bodyAngle,faceTargetAngle:p.faceTargetAngle}))
+  };
+}
+function pushHistory(s,force=false){
+  const last=s.history[s.history.length-1],interval=s.fastReplayHistory?Math.max(.10,Number(s.fastReplayHistoryInterval)||.20):0;
+  if(!force&&interval>0&&last&&s.m.time-last.time<interval-.001)return;
+  const f=s.fastReplayHistory?fastReplayFrame(s.m):leanFrame(s.m);
   if(s.actualHistory){f.actualOrigin=true;f.historySchemaVersion='CONTINUOUS_ACTUAL_HISTORY_1.0';f.historyOrigin='ACTUAL_HIGH_RES_STEP';f.synthetic=false;f.resimulated=false;f.reconstructed=false;}
   if(!last||Math.abs(last.time-f.time)>.025)s.history.push(f);else if(!s.actualHistory)s.history[s.history.length-1]=f;
   const cutoff=s.m.time-(s.actualHistory?(Number(s.actualHistoryRetentionSeconds)||45):(s.replaySeconds+1.0));while(s.history.length>1&&s.history[0].time<cutoff-.001)s.history.shift();
@@ -62,7 +75,7 @@ function engineOffsideLine(frame,attTeam,includeGK=false){
   const opp=frame.players.filter(p=>p.team!==attTeam&&(includeGK||p.role!=='GK')).map(p=>p.x).sort((a,b)=>a-b);
   if(opp.length<2)return null;return attTeam==='HOME'?opp[opp.length-2]:opp[1];
 }
-function localX(team,x){return team==='HOME'?x:105-x;}function localY(team,y){return team==='HOME'?y:68-y;}
+function localY(team,y){return team==='HOME'?y:68-y;}
 function trackPassRelease(s){
   const b=s.m.ball;if(b.mode!=='FLIGHT'||b.kind==='SHOT'||!b.intendedReceiverId||!b.lastTouchPlayer||(b.age||0)>.11)return;
   const sig=`${b.lastTouchPlayer}|${b.intendedReceiverId}|${Number(b.originX||b.x).toFixed(2)}|${Number(b.targetX||b.x).toFixed(2)}|${Math.floor(s.m.time*10)}`;
@@ -77,8 +90,8 @@ function create(seed='step40',opts={}){
   const heroPlayerId=opts.heroPlayerId||'H-ST',mode=normalizeMode(opts.mode||'PLAYER_ALL'),m=E.createMatch(seed,{telemetry:{focusPlayerId:heroPlayerId},...(opts.resolutionRandom?{resolutionRandom:opts.resolutionRandom}:{}),...(opts.authorityV2Observer?{authorityV2Observer:opts.authorityV2Observer,continuousSpatialAuthorityV2Trace:true}:{})});m.protagonistControllerId=heroPlayerId;
   if(A){for(const p of m.players)A.assign(m,p.id,A.baseProfile(60));if(opts.heroAbilityProfile)A.assign(m,heroPlayerId,opts.heroAbilityProfile);}
   if(M&&typeof M.init==='function')M.init(m,opts.managerProfiles||{HOME:'BALANCED',AWAY:'BALANCED'});
-  const actualHistory=Array.isArray(opts.actualHistory)?opts.actualHistory:null,s={version:VERSION,seed,m,heroPlayerId,mode,pending:null,lastPauseAt:-99,lastPauseControlledSince:-999,lastChoiceAt:-99,lastChoice:null,pauses:[],autoResolved:0,modeThreshold:MODES[mode].threshold,futureOutcomePrecomputed:false,replaySeconds:clamp(Number(opts.replaySeconds)||10,6,12),history:actualHistory||[],actualHistory,actualHistoryLineageId:opts.actualHistoryLineageId||null,passReleases:[],lastPassReleaseSig:null,scenes:[],currentScene:null,resultTracker:null,lastResult:null,choiceHistory:[],forceNextChoice:false,forceFromSceneId:null,activeEpisode:null,episodeSeq:0,appearanceStatus:opts.appearanceStatus==='SUBSTITUTE'?'SUBSTITUTE':'STARTER',performance:{rating:6.5,recklessFailures:0,substitutionPressure:0,managerUsageTrustDelta:0,lastImpact:null,history:[]}};
-  if(!opts.deferInitialHistory)pushHistory(s);return s;
+  const actualHistory=Array.isArray(opts.actualHistory)?opts.actualHistory:null,s={version:VERSION,seed,m,heroPlayerId,mode,pending:null,lastPauseAt:-99,lastPauseControlledSince:-999,lastChoiceAt:-99,lastChoice:null,pauses:[],autoResolved:0,modeThreshold:MODES[mode].threshold,futureOutcomePrecomputed:false,replaySeconds:clamp(Number(opts.replaySeconds)||10,6,12),history:actualHistory||[],actualHistory,actualHistoryLineageId:opts.actualHistoryLineageId||null,fastReplayHistory:opts.fastReplayHistory===true,fastReplayHistoryInterval:clamp(Number(opts.fastReplayHistoryInterval)||.20,.10,.50),passReleases:[],lastPassReleaseSig:null,scenes:[],currentScene:null,resultTracker:null,lastResult:null,choiceHistory:[],forceNextChoice:false,forceFromSceneId:null,activeEpisode:null,episodeSeq:0,appearanceStatus:opts.appearanceStatus==='SUBSTITUTE'?'SUBSTITUTE':'STARTER',performance:{rating:6.5,recklessFailures:0,substitutionPressure:0,managerUsageTrustDelta:0,lastImpact:null,history:[]}};
+  if(!opts.deferInitialHistory)pushHistory(s,true);return s;
 }
 function hero(s){return B().playerById(s.m,s.heroPlayerId);}
 function onBallImportance(f){
@@ -101,8 +114,8 @@ function defendingImportance(f){
   if(attackX>=86)v+=.07;if((f.role==='CB'||f.role==='FB')&&attackX>=78)v+=.025;
   return clamp(v,0,1);
 }
-function isShotChoice(id){return['SHOT','DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(id);}function isPassChoice(id){return['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','ONE_TOUCH_PASS','HEADER_PASS'].includes(id);}function family(id){if(isShotChoice(id))return'슈팅';if(['CARRY','TAKE_ON'].includes(id))return'돌파';if(['EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(id))return'크로스';if(isPassChoice(id))return'패스';if(['TACKLE','DELAY','BLOCK_LANE'].includes(id))return'수비';return'볼 유지';}
-function targetDisplay(c){return c?.meta?.targetSlot?`같은 팀 ${c.meta.targetSlot}`:(c.targetName||null)}function labelFor(c){const target=targetDisplay(c),t=target?` → ${target}`:'';const shotLabel=c.id==='SHOT'?(c.meta?.turningRequired?'터닝 슛':c.meta?.longRange?'중거리 슛':'슈팅'):'슈팅';return({SHOT:shotLabel,DIRECT_SHOT:'논스톱 슈팅',VOLLEY_SHOT:'발리 슈팅',HEADER_SHOT:'헤더 슈팅',ONE_TOUCH_PASS:'원터치 패스',HEADER_PASS:'헤더 패스',TRAP_CONTROL:'트래핑 후 컨트롤',CARRY:'공간 전진',TAKE_ON:'1대1 돌파',THROUGH_PASS:'공간 침투 패스',PROGRESSIVE_PASS:'발밑 전진 패스',AVAILABLE_PASS:'전진 패스',EARLY_CROSS:'얼리 크로스',DEEP_CROSS:'크로스',CUTBACK:'컷백',SWITCH_PASS:'전환 패스',SAFE_PASS:'안전한 패스',RECYCLE:'재순환',SHORT_DISTRIBUTION:'짧은 빌드업',LONG_DISTRIBUTION:'전방 롱 배급',HOLD:'볼 지키기',TURN_BACK:'방향 전환'}[c.id]||c.id)+t;}
+function isShotChoice(id){return['SHOT','DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(id);}function isPassChoice(id){return['LOB_PASS','THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE','SHORT_DISTRIBUTION','LONG_DISTRIBUTION','ONE_TOUCH_PASS','HEADER_PASS'].includes(id);}function family(id){if(isShotChoice(id))return'슈팅';if(['CARRY','TAKE_ON'].includes(id))return'돌파';if(['EARLY_CROSS','DEEP_CROSS','CUTBACK'].includes(id))return'크로스';if(isPassChoice(id))return'패스';if(['TACKLE','DELAY','BLOCK_LANE'].includes(id))return'수비';return'볼 유지';}
+function targetDisplay(c){return c?.meta?.targetSlot?`같은 팀 ${c.meta.targetSlot}`:(c.targetName||null)}function labelFor(c){const target=targetDisplay(c),t=target?` → ${target}`:'';const shotLabel=c.id==='SHOT'?(c.meta?.turningRequired?'터닝 슛':c.meta?.longRange?'중거리 슛':'슈팅'):'슈팅';return({LOB_PASS:'로빙 패스',SHOT:shotLabel,DIRECT_SHOT:'논스톱 슈팅',VOLLEY_SHOT:'발리 슈팅',HEADER_SHOT:'헤더 슈팅',ONE_TOUCH_PASS:'원터치 패스',HEADER_PASS:'헤더 패스',TRAP_CONTROL:'트래핑 후 컨트롤',CARRY:'공간 전진',TAKE_ON:'1대1 돌파',THROUGH_PASS:'공간 침투 패스',PROGRESSIVE_PASS:'발밑 전진 패스',AVAILABLE_PASS:'전진 패스',EARLY_CROSS:'얼리 크로스',DEEP_CROSS:'크로스',CUTBACK:'컷백',SWITCH_PASS:'전환 패스',SAFE_PASS:'안전한 패스',RECYCLE:'재순환',SHORT_DISTRIBUTION:'짧은 빌드업',LONG_DISTRIBUTION:'전방 롱 배급',HOLD:'볼 지키기',TURN_BACK:'방향 전환'}[c.id]||c.id)+t;}
 function riskFor(c,f){if(c.id==='TAKE_ON')return f.pressure<1.8?'높음':'보통';if(['DIRECT_SHOT','VOLLEY_SHOT','HEADER_SHOT'].includes(c.id))return'높음';if(['ONE_TOUCH_PASS','HEADER_PASS'].includes(c.id))return'보통';if(c.id==='TRAP_CONTROL')return f.pressure<1.5?'높음':'낮음';if(c.id==='SHOT')return c.meta?.turningRequired?'높음':c.meta?.longRange?'높음':(f.shot?.blockers??0)>=1?'높음':f.shot?.openWindow?'보통':(f.shot?.dGoal??99)>15?'높음':'보통';if(c.id==='THROUGH_PASS')return'보통';if(c.id==='AVAILABLE_PASS')return c.meta?.contested?'높음':'보통';if(c.id==='CUTBACK'||c.id==='DEEP_CROSS')return'보통';if(c.id==='SAFE_PASS'||c.id==='RECYCLE')return'낮음';if(c.id==='HOLD')return f.pressure<1.5?'높음':'낮음';return'보통';}
 function tooltipFor(c,f){
   const shownTarget=targetDisplay(c),target=shownTarget?` (${shownTarget})`:'';let intent='현재 공간을 이용해 공격을 이어갑니다.',related='볼 컨트롤, 판단',gain='공격을 이어갈 수 있음',loss='공 소유를 잃거나 공격 속도가 끊길 수 있음';
@@ -115,6 +128,7 @@ function tooltipFor(c,f){
   else if(c.id==='SHOT'){if(c.meta?.turningRequired){intent='골문을 등지거나 옆으로 둔 상태에서 몸을 돌려 터닝 슛을 시도합니다.';related='골 결정력, 볼 컨트롤, 민첩성';gain='몸을 돌려 직접 마무리할 수 있음';loss='회전 시간이 필요하고 정면 슈팅보다 정확도와 타이밍이 불리함';}else{intent='현재 보이는 슈팅 길로 직접 마무리를 시도합니다.';related='골 결정력, 슈팅 기술';gain='득점 또는 세컨드볼/세트피스 가능';loss='골키퍼 선방, 수비 블록, 빗나감 가능';}}
   else if(c.id==='TAKE_ON'){intent='앞의 수비수를 직접 제치고 다음 공간으로 진입합니다.';related='드리블, 민첩성, 가속';gain='수비 라인을 깨고 더 좋은 찬스를 만들 수 있음';loss='태클에 막히거나 공이 길어질 수 있음';}
   else if(c.id==='CARRY'){intent='수비수에게 직접 1대1 승부를 걸기보다, 열려 있는 공간으로 공을 직접 운반합니다.';related='드리블, 볼 컨트롤, 가속';gain='빈 공간을 전진하며 다음 선택을 만들 수 있음';loss='공간이 닫히기 전에 판단하지 못하면 압박을 받을 수 있음';}
+  else if(c.id==='LOB_PASS'){intent=`동료${target}의 현재 움직임을 짧게 반영해 공을 띄워 보냅니다.`;related='패스, 볼 컨트롤';gain='지상 패스길 위로 공을 보낼 수 있음';loss='압박과 킥 오차, 공중 경합으로 연결에 실패할 수 있음';}
   else if(c.id==='THROUGH_PASS'){intent=`전방 동료${target}의 발이 아니라, 달려갈 앞 공간으로 공을 먼저 보냅니다.`;related='시야, 패스, 타이밍';gain='수비 라인 뒤 공간에서 달리며 바로 다음 플레이를 만들 수 있음';loss='패스가 너무 길거나 타이밍이 어긋나면 차단되거나 오프사이드가 선언될 수 있음';}
   else if(c.id==='PROGRESSIVE_PASS'){intent=`전방 동료${target}의 현재 발밑/받기 쉬운 지점에 직접 연결해 공격 위치를 앞으로 옮깁니다.`;related='시야, 패스';gain='소유를 유지하면서 전진한 위치에서 다음 플레이를 만들 수 있음';loss='받는 선수가 바로 압박받으면 전진 효과가 줄어들 수 있음';}
   else if(c.id==='AVAILABLE_PASS'){intent=`패스 길 자체는 열려 있는 동료${target}에게 연결합니다.`;related='패스, 시야, 판단';gain='압박받는 동료라도 현재 존재하는 패스 선택을 사용할 수 있음';loss=c.meta?.contested?'받는 순간 수비 압박/경합으로 공을 잃을 위험이 큼':'연결 후 바로 압박을 받을 수 있음';}
@@ -129,7 +143,7 @@ function tooltipFor(c,f){
 }
 function onBallOptions(frame){
   const displayCandidate=c=>{const slot=c.meta?.targetSlot||frame?._frame?.opts?.find(o=>o.p?.id===c.targetId)?.p?.slot||null,meta={...(c.meta||{}),...(slot?{targetSlot:slot}:{})},x={...c,meta};return{...x,targetName:targetDisplay(x)||c.targetName};};
-  const ranked=(frame.candidates||[]).filter(c=>c.id!=='TURN_BACK').map(displayCandidate),top=ranked[0]?.score??0,out=[];
+  const ranked=(frame.candidates||[]).filter(c=>c.id!=='TURN_BACK'&&c.id!=='LOB_PASS').map(displayCandidate),top=ranked[0]?.score??0,out=[];
   if(frame.role==='GK'){
     const short=ranked.find(c=>['PROGRESSIVE_PASS','SAFE_PASS','SWITCH_PASS','RECYCLE'].includes(c.id)&&c.targetId);
     const prefix=frame.team==='HOME'?'H':'A',longTargetId=`${prefix}-ST`;
@@ -246,7 +260,7 @@ function defensiveOptions(frame){
 function onBallOptionsV42(frame){
   if(frame.role==='GK')return onBallOptions(frame);
   const passIds=new Set(['THROUGH_PASS','PROGRESSIVE_PASS','AVAILABLE_PASS','SWITCH_PASS','SAFE_PASS','RECYCLE']);
-  const ranked=(frame.candidates||[]).filter(c=>c.id!=='TURN_BACK').map(c=>{const slot=c.meta?.targetSlot||frame?._frame?.opts?.find(o=>o.p?.id===c.targetId)?.p?.slot||null,x={...c,meta:{...(c.meta||{}),...(slot?{targetSlot:slot}:{})}};return{...x,targetName:targetDisplay(x)||c.targetName};});
+  const ranked=(frame.candidates||[]).filter(c=>c.id!=='TURN_BACK'&&c.id!=='LOB_PASS').map(c=>{const slot=c.meta?.targetSlot||frame?._frame?.opts?.find(o=>o.p?.id===c.targetId)?.p?.slot||null,x={...c,meta:{...(c.meta||{}),...(slot?{targetSlot:slot}:{})}};return{...x,targetName:targetDisplay(x)||c.targetName};});
   const lifecycle=[...(frame.candidateLifecycle||[]).map(deep)],byTarget=new Map(),nonTarget=[];
   for(const c of ranked){
     if(c.targetId&&passIds.has(c.id)){if(!byTarget.has(c.targetId))byTarget.set(c.targetId,[]);byTarget.get(c.targetId).push(c);}
@@ -274,6 +288,14 @@ function onBallOptionsV42(frame){
   selected.sort((a,b)=>(b.score||0)-(a.score||0));
   const best=selected[0]||null;
   const out=selected.map(c=>{const recommended=c===best,meta={...(c.meta||{}),recommendationReason:recommended?'HIGHEST_CURRENT_STATE_UTILITY':null};const row={id:c.id,targetId:c.targetId||null,targetName:c.targetName||null,family:family(c.id),label:labelFor(c),meta,recommended,recommendationReason:recommended?'HIGHEST_CURRENT_STATE_UTILITY':null};row.hint=tooltipFor(c,frame);row.tooltip=row.hint;lifecycle.push({stage:'VISIBLE_OPTION_SELECTION',candidateId:c.id,targetId:c.targetId||null,included:true,reason:recommended?'VISIBLE_RECOMMENDED_ANNOTATION':'VISIBLE_NON_RECOMMENDED'});return row;});
+  // Six is a per-target menu page capacity, never a global target/variant quota.
+  // Preserve all existing feet/through/self floors and their recommendation order.
+  for(const c of (frame.candidates||[]).filter(c=>c.id==='LOB_PASS')){
+    const row={id:c.id,targetId:c.targetId,targetName:targetDisplay(c)||c.targetName,family:'패스',
+      label:labelFor(c),meta:deep(c.meta),recommended:false,recommendationReason:null};
+    row.hint=tooltipFor(c,frame);row.tooltip=row.hint;out.push(row);
+    lifecycle.push({stage:'VISIBLE_OPTION_SELECTION',candidateId:c.id,targetId:c.targetId,included:true,reason:'DISTINCT_LOB_VARIANT'});
+  }
   frame.candidateLifecycle=lifecycle;return out;
 }
 function incomingImportance(f){const ids=new Set((f.candidates||[]).map(c=>c.id));let v=.44+clamp((Number(f.localX||0)-52)/70,0,1)*.24;if(ids.has('DIRECT_SHOT')||ids.has('VOLLEY_SHOT'))v+=.25;if(ids.has('HEADER_SHOT'))v+=.30;if((f.contactZ||0)>.8)v+=.05;if((f.pressure||99)<1.7)v+=.05;return clamp(v,0,1);}
@@ -347,12 +369,29 @@ function maybeCheckpoint(s){
   const episodeChain=episodeContinuation(s,f);if(f.kind!=='RESTART'&&q.importance<def.threshold&&!episodeChain)return null;if(f.kind==='ON_BALL'&&!readyForOnBallPause(s,f,q.importance))return null;if(f.kind==='INCOMING_BALL'&&!readyForIncomingPause(s,f,q.importance))return null;if(f.kind==='DEFENDING'&&!readyForDefPause(s,f,q.importance))return null;
   // The exact stopped current frame belongs to the real rolling history. This captures no
   // future and performs no restore/re-simulation; playback can therefore converge exactly.
-  pushHistory(s);q.candidateLifecycle=q.candidateLifecycle||[];q.candidateLifecycle.push({stage:'CHECKPOINT_ELIGIBILITY',included:true,reason:f.kind==='INCOMING_BALL'?'FLIGHT_DECISION_ACTIONABLE':'VISIBLE_DECISION_ACTIONABLE',ballMode:s.m.ball.mode,eta:Number.isFinite(f.eta)?f.eta:null});const h=hero(s),id=`STEP40-${s.pauses.length+1}`,chained=!!s.forceNextChoice||episodeChain,continuationFromSceneId=s.forceFromSceneId||(episodeChain?s.activeEpisode?.lastSceneId:null)||null,pre=causalReplayFrames(s,s.replaySeconds),episodeId=chained?(s.activeEpisode?.id||continuationFromSceneId||id):(s.activeEpisode?.id||id);if(h?.pendingShot){h.pendingShot=null;h.faceTargetAngle=null;h.lockTargetUntil=0;if(h.action==='TURNING_SHOT_PREP'){h.action='HOLD_BALL';h.tacticalTask='HOLD_BALL';}}const visibleSnapshot=E.snapshot(s.m);if(s.choiceBoundarySpatial&&!s.choiceBoundarySpatial.C)s.choiceBoundarySpatial.C=deep(visibleSnapshot);s.m.protagonistInteractiveEpisode={active:true,playerId:s.heroPlayerId,episodeId,sceneId:id,armedAt:s.m.time};s.pending={id,episodeId,at:Number(s.m.time.toFixed(2)),minute:Number((s.m.time/60).toFixed(2)),kind:f.kind,importance:q.importance,options:q.options,state:{phase:visibleSnapshot.phase,score:{...s.m.score},ball:{mode:s.m.ball.mode,ownerId:s.m.ball.ownerId},player:{id:h.id,role:h.role,x:Number(h.x.toFixed(2)),y:Number(h.y.toFixed(2))}},candidateLifecycle:deep(q.candidateLifecycle),futureOutcomePrecomputed:false,replayFrames:pre,chained,continuationFromSceneId};s.forceNextChoice=false;s.forceFromSceneId=null;
+  pushHistory(s,true);q.candidateLifecycle=q.candidateLifecycle||[];q.candidateLifecycle.push({stage:'CHECKPOINT_ELIGIBILITY',included:true,reason:f.kind==='INCOMING_BALL'?'FLIGHT_DECISION_ACTIONABLE':'VISIBLE_DECISION_ACTIONABLE',ballMode:s.m.ball.mode,eta:Number.isFinite(f.eta)?f.eta:null});const h=hero(s),id=`STEP40-${s.pauses.length+1}`,chained=!!s.forceNextChoice||episodeChain,continuationFromSceneId=s.forceFromSceneId||(episodeChain?s.activeEpisode?.lastSceneId:null)||null,pre=causalReplayFrames(s,s.replaySeconds),episodeId=chained?(s.activeEpisode?.id||continuationFromSceneId||id):(s.activeEpisode?.id||id);if(h?.pendingShot){h.pendingShot=null;h.faceTargetAngle=null;h.lockTargetUntil=0;if(h.action==='TURNING_SHOT_PREP'){h.action='HOLD_BALL';h.tacticalTask='HOLD_BALL';}}const visibleSnapshot=E.snapshot(s.m);if(s.choiceBoundarySpatial&&!s.choiceBoundarySpatial.C)s.choiceBoundarySpatial.C=deep(visibleSnapshot);s.m.protagonistInteractiveEpisode={active:true,playerId:s.heroPlayerId,episodeId,sceneId:id,armedAt:s.m.time};s.pending={id,episodeId,at:Number(s.m.time.toFixed(2)),minute:Number((s.m.time/60).toFixed(2)),kind:f.kind,importance:q.importance,options:q.options,state:{phase:visibleSnapshot.phase,score:{...s.m.score},ball:{mode:s.m.ball.mode,ownerId:s.m.ball.ownerId},player:{id:h.id,role:h.role,x:Number(h.x.toFixed(2)),y:Number(h.y.toFixed(2))}},candidateLifecycle:deep(q.candidateLifecycle),futureOutcomePrecomputed:false,replayFrames:pre,chained,continuationFromSceneId};s.forceNextChoice=false;s.forceFromSceneId=null;
+  const lobOptions=s.pending.options.filter(o=>o.id==='LOB_PASS');
+  if(lobOptions.length){
+    lobPendingAuthority.set(s.pending,{owner:h,targets:new Map(lobOptions.map(o=>[o.targetId,s.m.playersById[o.targetId]]))});
+    for(const o of lobOptions){Object.freeze(o.meta);Object.freeze(o);}
+  }
   s.lastPauseAt=s.m.time;s.lastPauseControlledSince=h?.controlledSince??-999;s.pauses.push({id,at:s.pending.at,minute:s.pending.minute,kind:s.pending.kind,importance:s.pending.importance,options:s.pending.options.map(x=>({...x})),futureOutcomePrecomputed:false});
   s.currentScene={schemaVersion:'FLR_DEBUG_SCENE_0.1',controllerVersion:VERSION,seed:s.seed,mode:normalizeMode(s.mode),heroPlayerId:s.heroPlayerId,sceneId:id,episodeId,continuationFromSceneId,checkpointAt:s.pending.at,replayWindowSeconds:s.replaySeconds,checkpointState:deep(s.pending.state),checkpointInspect:sanitizeFrameForScene(q),choiceCandidateLifecycle:deep(q.candidateLifecycle||[]),choiceBoundarySpatial:s.choiceBoundarySpatial?deep(s.choiceBoundarySpatial):null,availableOptions:s.pending.options.map(deep),preFrames:pre,preEvents:s.m.events.filter(e=>e.t>=(pre[0]?.time??(s.m.time-s.replaySeconds))-.001).map(deep),passReleases:s.passReleases.filter(x=>x.at>=s.m.time-s.replaySeconds-.001).map(deep),choice:null,postFrames:[],postEvents:[],result:null};
   s.scenes.push(s.currentScene);if(s.scenes.length>60)s.scenes.shift();s.m._continuousSpatialAuthorityV2?.recordLineage({kind:'CHOICE_FREEZE',writer:'runtime/protagonist_match_controller.maybeCheckpoint',at:s.pending.at,choiceId:s.pending.id,episodeId:s.pending.episodeId||null,replayFrameCount:pre.length,futureOutcomePrecomputed:false});return s.pending;
 }
 function eventKey(e){return`${Number(e.t).toFixed(3)}|${e.type}|${e.text}`;}
+const CORNER_DELIVERY_CONTACTS=new Set(['AERIAL_DUEL','CROSS_RECEIVE','CLEARANCE','HEADER_SHOT','SAVE','PARRY','CHIP_SAVE','CHIP_PARRY','DUEL_DEFLECTION','TACKLE_DEFLECTION']);
+function sameTeamCornerDeliveryAwaiting(s,tr){
+  const kick=tr.newEvents.find(e=>e.type==='CORNER_KICK'),h=hero(s),team=kick?.team||s.m.ball?.lastTouchTeam||s.m.possession;
+  if(!kick||!h||team!==h.team)return false;
+  const delivery=tr.cornerDelivery||(tr.cornerDelivery={kickAt:Number(kick.t),hardCapAt:Number(kick.t)+4.0,firstContestAt:null,endReason:null});
+  const contact=tr.newEvents.find(e=>Number(e.t)>=delivery.kickAt-.001&&CORNER_DELIVERY_CONTACTS.has(e.type));
+  if(contact){delivery.firstContestAt=Number(contact.t);delivery.endReason='FACTUAL_FIRST_CONTEST';return false;}
+  const terminal=tr.newEvents.find(e=>Number(e.t)>=delivery.kickAt-.001&&e.type==='GOAL')||s.m.completed||s.m.ball?.mode==='DEAD'||(s.m.ball?.mode!=='FLIGHT'&&s.m.restart)||(s.m.possession!==team&&['CONTROLLED','LOOSE'].includes(s.m.ball?.mode));
+  if(terminal){delivery.endReason='LEGITIMATE_TERMINAL';return false;}
+  if(s.m.time>=delivery.hardCapAt-.001){delivery.endReason='SAFETY_CAP';return false;}
+  return true;
+}
 function beginResultTracker(s,opt,res,beforeKeys){
   const familyName=opt.family||family(opt.id),now=s.m.time,intentUntil=Number.isFinite(res?.intentUntil)?Number(res.intentUntil):null;
   let minimumUntil=now+0.85,deadline=now+5.2;
@@ -439,6 +478,15 @@ function finalizeResult(s,terminal=null){const tr=s.resultTracker;if(!tr||tr.don
   if(sameTeam){const ep=s.activeEpisode||{id:`EP-${++s.episodeSeq}`,team:h.team,startedAt:tr.startedAt,hardUntil:tr.startedAt+20};ep.team=h.team;ep.lastSceneId=tr.sceneId;ep.lastChoiceAt=tr.startedAt;ep.hardUntil=ep.hardUntil||ep.startedAt+20;ep.until=Math.min(ep.hardUntil,Math.max(ep.until||0,s.m.time+(ownRestart?8.0:6.5)));ep.lostAt=null;s.activeEpisode=ep;if(s.currentScene)s.currentScene.episodeId=ep.id;}
   else if(s.activeEpisode)s.activeEpisode=null;
   if(s.m.userChoiceControl?.playerId===s.heroPlayerId)s.m.userChoiceControl=null;if(heroOwn){s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;if(h)h.nextThink=Math.max(h.nextThink||0,s.m.time);}s.resultTracker=null;return r;}
+function sameTeamControlledCrossReceive(s,tr){
+  const h=hero(s),b=s.m.ball;if(!h||b?.mode!=='CONTROLLED'||b.ownerId!==h.id||s.m.possession!==h.team)return false;
+  const e=[...(tr.newEvents||[])].reverse().find(x=>x?.type==='CROSS_RECEIVE');
+  // The #1679 incoming-flight guard remains implicit here: this transition is legal only
+  // after physical contact has produced the controlled owner state, never while the cross
+  // is still in FLIGHT. Event metadata is optional on legacy events, so the current owner
+  // is the authoritative receiver identity when actorId/team are absent.
+  return!!e&&Math.abs(Number(e.t)-s.m.time)<=.101&&(!e.actorId||e.actorId===h.id)&&(!e.team||e.team===h.team);
+}
 function updateResultTracker(s){
   const tr=s.resultTracker;if(!tr)return null;
   const presentationDelta=s.m.time-(tr.lastPresentationTime??s.m.time);if(presentationDelta>0&&presentationDelta<=.25)tr.presentationElapsed=(tr.presentationElapsed||0)+presentationDelta;tr.lastPresentationTime=s.m.time;
@@ -474,8 +522,14 @@ function updateResultTracker(s){
   // later dead-ball outcome is the natural terminal state, not the instant of impact.
   if(isShotChoice(tr.choiceId)&&tr.terminalEvent?.type==='BLOCK'){const later=tr.newEvents.find(e=>e.t>=(tr.terminalAt||0)&&['CORNER','GOAL_KICK','GOAL'].includes(e.type));if(later){tr.terminalEvent=deep(later);tr.terminalAt=Number(later.t);}}
   if(s.m.possession!==tr.startPossession&&tr.possessionChangedAt==null){tr.possessionChangedAt=s.m.time;if(s.m.userChoiceControl?.playerId===s.heroPlayerId&&s.m.userChoiceControl?.mode!=='POST_TACKLE_SETTLE')s.m.userChoiceControl=null;}
-  const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId;
+  const now=s.m.time,terminal=tr.terminalEvent,tt=terminal?.type||null,age=terminal?now-Number(tr.terminalAt||now):0,ballSettled=s.m.ball.mode==='CONTROLLED'||!!s.m.restart||s.m.ball.mode==='DEAD',heroOwnNow=s.m.ball.mode==='CONTROLLED'&&s.m.ball.ownerId===s.heroPlayerId,cornerDeliveryAwaiting=sameTeamCornerDeliveryAwaiting(s,tr);
   let ready=false;
+  // R1693 actual path: SHOT -> BLOCK -> CORNER -> CORNER_KICK -> CROSS_RECEIVE.
+  // A same-team controlled reception by the protagonist keeps the live 2D episode regardless
+  // of the original choice family. This runs before SHOT/CORNER terminal handling.
+  if(sameTeamControlledCrossReceive(s,tr)){
+    s.forceNextChoice=true;s.forceFromSceneId=tr.sceneId;s.resultTracker=null;return null;
+  }
   if(tt==='GOAL'){if(s.m.phase==='GOAL_CELEBRATION')tr.goalCelebrationObserved=true;if(tr.goalCelebrationObserved&&s.m.phase!=='GOAL_CELEBRATION'&&(!s.m.restart||s.m.restart.kind!=='KICKOFF'))tr.kickoffContinuationObserved=true;ready=!!tr.goalCelebrationObserved&&!!tr.kickoffContinuationObserved;}
   else if(['GOAL_KICK','CORNER','THROW_IN','OFFSIDE','FOUL'].includes(tt)){
     const ratio=Number(s.m.restart?.setup?.readyRatio||0),br=s.m.restart?.ballReturn,ballReady=!br||br.phase==='SETUP_READY';
@@ -520,7 +574,10 @@ function updateResultTracker(s){
       }else ready=now>=tr.startedAt+4.4&&ballSettled;
     }
   }else if(['DELAY','BLOCK_LANE'].includes(tr.choiceId))ready=now>=tr.startedAt+2.2||tr.possessionChangedAt!=null&&now-tr.possessionChangedAt>=1.1;
-  if(ready||(tr.presentationElapsed||0)>=tr.maxPresentationSeconds||s.m.completed)return finalizeResult(s,terminal);
+  // Bounced/redirected LOOSE descendants also retain this controller and lease.
+  // A presentation deadline cannot turn live physics into a completed result.
+  if(E.lobContinuationRequired(s.m))return null;
+  if((ready&&!cornerDeliveryAwaiting)||(!cornerDeliveryAwaiting&&(tr.presentationElapsed||0)>=tr.maxPresentationSeconds)||s.m.completed)return finalizeResult(s,terminal);
   return null;
 }
 function applyChoice(s,choiceId,targetId=null,inputMeta={}){
@@ -530,6 +587,12 @@ function applyChoice(s,choiceId,targetId=null,inputMeta={}){
   // separate, explicit action-button gesture. Merely selecting/focusing a player or opening
   // the menu can never be interpreted as SHOT/PASS/CARRY.
   if(inputSource==='USER_UI_CLICK_IN_PITCH'&&inputMeta?.confirmedAction!==true)return{ok:false,reason:'IN_PITCH_ACTION_NOT_EXPLICITLY_CONFIRMED'};
+  if(choiceId==='LOB_PASS'){
+    if(inputMeta.pendingChoiceId!=null&&inputMeta.pendingChoiceId!==s.pending.id)return{ok:false,reason:'STALE_PENDING_CHOICE'};
+    const authority=lobPendingAuthority.get(s.pending);
+    if(targetId==null||s.pending.kind!=='ON_BALL'||!authority||authority.owner!==s.m.playersById[s.heroPlayerId]||
+        !authority.targets.has(targetId)||authority.targets.get(targetId)!==s.m.playersById[targetId])return{ok:false,reason:'LOB_PENDING_TUPLE_INVALID'};
+  }
   const same=s.pending.options.filter(o=>o.id===choiceId);let opt=null;
   if(targetId!=null){opt=same.find(o=>o.targetId===targetId)||null;if(!opt)return{ok:false,reason:'CHOICE_TARGET_NOT_AVAILABLE',requestedTargetId:targetId};}
   else{if(same.length>1&&same.some(o=>o.targetId!=null))return{ok:false,reason:'AMBIGUOUS_CHOICE_TARGET'};opt=same[0]||null;}
@@ -572,6 +635,5 @@ function episodeReplay(s,episodeId){
 function episodeDebug(s,episodeId){const scenes=episodeScenes(s,episodeId);if(!scenes.length)return null;return{schemaVersion:'FLR_DEBUG_EPISODE_0.1',controllerVersion:VERSION,seed:s.seed,mode:normalizeMode(s.mode),heroPlayerId:s.heroPlayerId,episodeId,startedAt:scenes[0]?.preFrames?.[0]?.time??scenes[0]?.checkpointAt,endedAt:scenes[scenes.length-1]?.postFrames?.at?.(-1)?.time??scenes[scenes.length-1]?.checkpointAt,scenes,frames:episodeReplay(s,episodeId)};}
 function debugSummary(s){const sc=s.currentScene;if(!sc)return'저장된 선택 장면이 없습니다.';const lines=[`FLR DEBUG ${sc.sceneId}`,`seed=${sc.seed}`,`mode=${sc.mode}`,`hero=${sc.heroPlayerId}`,`checkpoint=${sc.checkpointAt}s (${(sc.checkpointAt/60).toFixed(2)}m)`,`kind=${sc.checkpointInspect?.kind} importance=${s.pauses.find(p=>p.id===sc.sceneId)?.importance??'-'}`,`phase=${sc.checkpointState?.phase} ball=${sc.checkpointState?.ball?.mode}/${sc.checkpointState?.ball?.ownerId||'-'}`];if(sc.choice)lines.push(`choice=${sc.choice.id}${sc.choice.targetName?` -> ${sc.choice.targetName}`:''}`);if(sc.result)lines.push(`result=${sc.result.code} | ${sc.result.headline} | ${sc.result.detail}`);if(sc.passReleases?.length){const p=sc.passReleases[sc.passReleases.length-1];lines.push(`lastPass=${p.sourceId}->${p.targetId} ballX=${p.ballX} targetX=${p.targetX} engineLine=${p.engineOffsideLine} referenceLine=${p.referenceSecondLastOpponentLine} engineWouldFlag=${p.engineWouldFlag}`);}return lines.join('\n');}
 function summary(s){return{version:VERSION,seed:s.seed,mode:normalizeMode(s.mode),heroPlayerId:s.heroPlayerId,time:Number(s.m.time.toFixed(1)),score:{...s.m.score},pauseCount:s.pauses.length,autoResolved:s.autoResolved,userChoiceCount:(s.m.userChoiceLog||[]).length,pending:!!s.pending,resultActive:!!s.resultTracker,lastResult:s.lastResult?deep(s.lastResult):null,pauses:s.pauses.map(p=>({at:p.at,kind:p.kind,importance:p.importance,choices:p.options.map(o=>o.id)})),performance:deep(s.performance),appearanceStatus:s.appearanceStatus,futureOutcomePrecomputed:false};}
-const STEP4_EXTERNAL_CONTACT_AUTHORITY='OPPONENT_CONTACT_MAY_CHANGE_POSSESSION_WITHOUT_SELECTING_PROTAGONIST_ACTION';
-return{VERSION,MODES,STEP4_EXTERNAL_CONTACT_AUTHORITY,create,inspect,maybeCheckpoint,applyChoice,step,runAuto,summary,autoPick,latestReplay,latestDebugScene,sceneHistory,sceneById,episodeScenes,episodeReplay,episodeDebug,debugSummary,finalizeResult,normalizeMode,__test:{onBallOptionsV42,readyForIncomingPause,resultNarrative,updateResultTracker}};
+return{VERSION,MODES,create,inspect,maybeCheckpoint,applyChoice,step,runAuto,summary,autoPick,latestReplay,latestDebugScene,sceneHistory,sceneById,episodeScenes,episodeReplay,episodeDebug,debugSummary,finalizeResult,normalizeMode,__test:{onBallOptionsV42,readyForIncomingPause,resultNarrative,updateResultTracker}};
 });
