@@ -70,7 +70,24 @@ jobs:
           extra=actual-(changed|{'.flr/deploy.json'})
           if extra: raise SystemExit('EXTRA_CHANGED_FILES:'+','.join(sorted(extra)))
           if changed-actual: raise SystemExit('CHANGED_FILE_NOT_IN_BRANCH:'+','.join(sorted(changed-actual)))
-          if m.get('validationStatus') != 'PASS_FOR_USER_VISUAL_RETEST':
+          status=m.get('validationStatus')
+          if status == 'USER_VISUAL_RETEST_ALLOWED_WITH_INTERNAL_RENDER_BLOCKED':
+              required={
+                  'deploymentClass':'FLR_TEST_USER_VISUAL_CANDIDATE',
+                  'testOnly':True,
+                  'sourceRepo':'1Lisam/FLR_DEV',
+                  'targetRepo':'1Lisam/FLR_TEST',
+                  'technicalStatus':'NON_RENDER_GATES_PASS',
+                  'integratedTechnicalStatus':'UNVERIFIED',
+                  'internalRenderedStatus':'BLOCKED_ENVIRONMENT',
+                  'userVisualStatus':'NOT_EVALUATED',
+                  'internalRenderBlocker':'CHROMIUM_SANDBOX_OPERATION_NOT_PERMITTED',
+                  'step79Started':False,
+              }
+              for key,value in required.items():
+                  if type(m.get(key)) is not type(value) or m.get(key) != value:
+                      raise SystemExit('RENDER_BLOCKED_VISUAL_RETEST_FIELD_INVALID:'+key)
+          elif status != 'PASS_FOR_USER_VISUAL_RETEST':
               raise SystemExit('VALIDATION_STATUS_NOT_PASS')
           if m.get('step79Started') is not False:
               raise SystemExit('STEP79_MUST_REMAIN_FALSE')
