@@ -1,0 +1,429 @@
+{
+  "schema": 1,
+  "baseline_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+  "wbs2_commit": "196a08c0540da53a793985ebe61162963f39b3b2",
+  "step_seconds": 0.05,
+  "runtime_order": [
+    "runtime/match_flow_resolution.js",
+    "runtime/tactical_movement.js",
+    "runtime/restart_movement.js",
+    "runtime/free_kick_templates.js",
+    "runtime/free_kick_wall_model.js",
+    "runtime/corner_templates.js",
+    "runtime/v37_set_piece_liveliness_patch.js",
+    "runtime/match_choice_telemetry.js",
+    "runtime/attribute_match_adapter.js",
+    "runtime/action_candidate_engine.js",
+    "runtime/match_academy.js",
+    "runtime/aerial_contest.js",
+    "runtime/take_on_duel.js",
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/manager_tendency_adapter.js",
+    "runtime/choice_action_resolver.js",
+    "runtime/choice_action_resolver_step38.js",
+    "runtime/protagonist_match_controller.js"
+  ],
+  "overlays": [
+    "runtime/ball_strike_model.js",
+    "runtime/continuous_match_core.js",
+    "runtime/protagonist_match_controller.js",
+    "runtime/tactical_movement.js"
+  ],
+  "protected_baseline_paths": [
+    "runtime/restart_movement.js",
+    "runtime/free_kick_templates.js",
+    "runtime/free_kick_wall_model.js",
+    "runtime/corner_templates.js",
+    "runtime/v37_set_piece_liveliness_patch.js"
+  ],
+  "excluded_changed_runtime": [
+    "runtime/continuous_spatial_authority_v2.js"
+  ],
+  "dependency_imports": {
+    "control": {
+      "runtime/match_flow_resolution.js": [],
+      "runtime/tactical_movement.js": [
+        "runtime/match_flow_resolution.js"
+      ],
+      "runtime/restart_movement.js": [],
+      "runtime/free_kick_templates.js": [
+        "runtime/tactical_movement.js"
+      ],
+      "runtime/free_kick_wall_model.js": [],
+      "runtime/corner_templates.js": [
+        "runtime/tactical_movement.js"
+      ],
+      "runtime/v37_set_piece_liveliness_patch.js": [],
+      "runtime/match_choice_telemetry.js": [],
+      "runtime/attribute_match_adapter.js": [],
+      "runtime/action_candidate_engine.js": [],
+      "runtime/match_academy.js": [],
+      "runtime/aerial_contest.js": [],
+      "runtime/take_on_duel.js": [],
+      "runtime/ball_strike_model.js": [],
+      "runtime/continuous_match_core.js": [
+        "runtime/action_candidate_engine.js",
+        "runtime/aerial_contest.js",
+        "runtime/attribute_match_adapter.js",
+        "runtime/ball_strike_model.js",
+        "runtime/match_choice_telemetry.js",
+        "runtime/match_flow_resolution.js",
+        "runtime/restart_movement.js",
+        "runtime/tactical_movement.js",
+        "runtime/take_on_duel.js"
+      ],
+      "runtime/manager_tendency_adapter.js": [
+        "runtime/continuous_match_core.js"
+      ],
+      "runtime/choice_action_resolver.js": [
+        "runtime/continuous_match_core.js"
+      ],
+      "runtime/choice_action_resolver_step38.js": [
+        "runtime/attribute_match_adapter.js",
+        "runtime/choice_action_resolver.js",
+        "runtime/continuous_match_core.js"
+      ],
+      "runtime/protagonist_match_controller.js": [
+        "runtime/attribute_match_adapter.js",
+        "runtime/choice_action_resolver_step38.js",
+        "runtime/continuous_match_core.js",
+        "runtime/manager_tendency_adapter.js"
+      ]
+    },
+    "wbs2": {
+      "runtime/match_flow_resolution.js": [],
+      "runtime/tactical_movement.js": [
+        "runtime/match_flow_resolution.js"
+      ],
+      "runtime/restart_movement.js": [],
+      "runtime/free_kick_templates.js": [
+        "runtime/tactical_movement.js"
+      ],
+      "runtime/free_kick_wall_model.js": [],
+      "runtime/corner_templates.js": [
+        "runtime/tactical_movement.js"
+      ],
+      "runtime/v37_set_piece_liveliness_patch.js": [],
+      "runtime/match_choice_telemetry.js": [],
+      "runtime/attribute_match_adapter.js": [],
+      "runtime/action_candidate_engine.js": [],
+      "runtime/match_academy.js": [],
+      "runtime/aerial_contest.js": [],
+      "runtime/take_on_duel.js": [],
+      "runtime/ball_strike_model.js": [],
+      "runtime/continuous_match_core.js": [
+        "runtime/action_candidate_engine.js",
+        "runtime/aerial_contest.js",
+        "runtime/attribute_match_adapter.js",
+        "runtime/ball_strike_model.js",
+        "runtime/match_choice_telemetry.js",
+        "runtime/match_flow_resolution.js",
+        "runtime/restart_movement.js",
+        "runtime/tactical_movement.js",
+        "runtime/take_on_duel.js"
+      ],
+      "runtime/manager_tendency_adapter.js": [
+        "runtime/continuous_match_core.js"
+      ],
+      "runtime/choice_action_resolver.js": [
+        "runtime/continuous_match_core.js"
+      ],
+      "runtime/choice_action_resolver_step38.js": [
+        "runtime/attribute_match_adapter.js",
+        "runtime/choice_action_resolver.js",
+        "runtime/continuous_match_core.js"
+      ],
+      "runtime/protagonist_match_controller.js": [
+        "runtime/attribute_match_adapter.js",
+        "runtime/choice_action_resolver_step38.js",
+        "runtime/continuous_match_core.js",
+        "runtime/manager_tendency_adapter.js"
+      ]
+    }
+  },
+  "visual_reference": [
+    {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "QA/v58_football_visual_audit.html",
+      "git_blob": "3faf5eb345339d1cf2e4d29b63f63b5f3e739229",
+      "sha256": "8e6a7a6fcc11092200a3a81d7a8928487737f783aad3583055b756f8439113d8",
+      "bytes": 1526
+    },
+    {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "QA/v58_frame_tick_visual_qa_page.js",
+      "git_blob": "e6b4a8fda5cdf51f2fc7560c1ef702a6c79d6236",
+      "sha256": "2ec89878c0a890383cc7b8cf248236ec3a8cc51f7d9180163bd97264409c0919",
+      "bytes": 8510
+    }
+  ],
+  "files": {
+    "control/runtime/match_flow_resolution.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/match_flow_resolution.js",
+      "git_blob": "c8b85ae93223a254f2df9b38133b08f23a9019ba",
+      "sha256": "a7177331523130c8604cb8fa2714702e61ecdae5832ecd3efef01f6a80da3551",
+      "bytes": 13494
+    },
+    "control/runtime/tactical_movement.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/tactical_movement.js",
+      "git_blob": "dd344f5ee98cbb2502da6816d31c454905248887",
+      "sha256": "2763b859359f7af69795a1f0c6d84000fde1954e33d3116b78c5196bc60b7f1e",
+      "bytes": 168872
+    },
+    "control/runtime/restart_movement.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/restart_movement.js",
+      "git_blob": "1d67cd78a60d5abf785fd47197bb49fb05a4da33",
+      "sha256": "2c52e458199cfefcde65032cb155bd594c684d81065db97c126f90406a3887b6",
+      "bytes": 32445
+    },
+    "control/runtime/free_kick_templates.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/free_kick_templates.js",
+      "git_blob": "cb6309f43c67f9f08579ba3061a5361d6ee09d76",
+      "sha256": "6e433eaaece308457b4b6ecf47a281bd91ab8ff713f4309a4c6abbdefd899666",
+      "bytes": 13406
+    },
+    "control/runtime/free_kick_wall_model.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/free_kick_wall_model.js",
+      "git_blob": "84fb60033fc167a6b5c2124619d1015267c9c6b1",
+      "sha256": "2127d64ca57f7023be3c49b5ea489788f490981ce1c668cf63649e708b95dbda",
+      "bytes": 10391
+    },
+    "control/runtime/corner_templates.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/corner_templates.js",
+      "git_blob": "ce6ef228f2baed45857aef56230e788446d9a543",
+      "sha256": "20d84f3091482a69d87eb4eedd9d55f8f79d054f9a400d9c5ff668eb69952d3b",
+      "bytes": 8641
+    },
+    "control/runtime/v37_set_piece_liveliness_patch.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/v37_set_piece_liveliness_patch.js",
+      "git_blob": "a4436ed16582da36904d47ec91bddc125664a60f",
+      "sha256": "fe41e1e1fb63ef1468428e2977cf56f10fe4a15c8f764fd8016b8ca3a8b4b0f5",
+      "bytes": 2915
+    },
+    "control/runtime/match_choice_telemetry.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/match_choice_telemetry.js",
+      "git_blob": "55f42941776674fe02cea437d67042257668c0d4",
+      "sha256": "6c875d527e6394565548098bb91bff29ce16c74851fc64b08054eb649b59a9b7",
+      "bytes": 14000
+    },
+    "control/runtime/attribute_match_adapter.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/attribute_match_adapter.js",
+      "git_blob": "c27018f2ec964371e1f364bfeb6a22f890ad8703",
+      "sha256": "fa62c7ba112952472c8ea52fc75501aef8ea8219d1200abccc3b478c52217417",
+      "bytes": 5167
+    },
+    "control/runtime/action_candidate_engine.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/action_candidate_engine.js",
+      "git_blob": "a9ee5a589d9c6dd091f27baac449b6d143d90d06",
+      "sha256": "26b80c564b1b02bd9a3ec801cacbfd78235d7dd7b75897c9668c1bd5455baf53",
+      "bytes": 9277
+    },
+    "control/runtime/match_academy.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/match_academy.js",
+      "git_blob": "f9a8ebcc737da017df44f1836a7c98c0c42d2db0",
+      "sha256": "678152ed6ae3107fa4032eeadce3864507d113df6a479e6db279d858928d3062",
+      "bytes": 3770
+    },
+    "control/runtime/aerial_contest.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/aerial_contest.js",
+      "git_blob": "bccadb8617e6a8178ddeaeff588079e1c4b53744",
+      "sha256": "e4de9c1f5e9c24d036a639443b92bfe5e277d0c5d89f53e273064b1adb58d760",
+      "bytes": 1726
+    },
+    "control/runtime/take_on_duel.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/take_on_duel.js",
+      "git_blob": "b8be32dbe85aebf8bd758048ceeb6610b39ee790",
+      "sha256": "0fda708e61580fb97d91cb9f96e19e9fe3e08191edf48938e9be15e03302cc0e",
+      "bytes": 1000
+    },
+    "control/runtime/ball_strike_model.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/ball_strike_model.js",
+      "git_blob": "9cb1ea450395dd867d92569f1094c8fdc007155f",
+      "sha256": "2b28c59571f8155d065b276afb169ee4464427d1a101c8c3414395c6b33d8b0f",
+      "bytes": 5254
+    },
+    "control/runtime/continuous_match_core.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/continuous_match_core.js",
+      "git_blob": "1280c3719aa568d90ec915355485f1bb77f3c180",
+      "sha256": "73e497c2f4c623991ad2bbe26f5ae7b889ea699b623a6f3b1539250f743c825b",
+      "bytes": 292884
+    },
+    "control/runtime/manager_tendency_adapter.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/manager_tendency_adapter.js",
+      "git_blob": "45264b8ba1621ac9daac095b806b8a9a816fbb6c",
+      "sha256": "f4e534bb1c4af370c59e85f4a8b08c89ea60b96b8648a58f9a769e59cda2a680",
+      "bytes": 14000
+    },
+    "control/runtime/choice_action_resolver.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/choice_action_resolver.js",
+      "git_blob": "45d73e431a872393df89df8fd9ac80baa9a251c9",
+      "sha256": "990a4ebb9b6d1e940ff08faaa9e8847c583be10c01e442c0aec66e2cfda7edf5",
+      "bytes": 7856
+    },
+    "control/runtime/choice_action_resolver_step38.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/choice_action_resolver_step38.js",
+      "git_blob": "61ae31f462c474ff41d0c2f76789cfc055744ba1",
+      "sha256": "3efb736f6171590649b6e1fa9f2ee07375fc2bd2fbd78bc1f79c56f79931f44b",
+      "bytes": 7949
+    },
+    "control/runtime/protagonist_match_controller.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/protagonist_match_controller.js",
+      "git_blob": "2076dd3bf84ff8c95d440f04b52c4b6b43df90b5",
+      "sha256": "51ed815d6d78d2c67afaaca318304b845b7abdf79b65a0d37f9b913d879f46c6",
+      "bytes": 85623
+    },
+    "wbs2/runtime/match_flow_resolution.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/match_flow_resolution.js",
+      "git_blob": "c8b85ae93223a254f2df9b38133b08f23a9019ba",
+      "sha256": "a7177331523130c8604cb8fa2714702e61ecdae5832ecd3efef01f6a80da3551",
+      "bytes": 13494
+    },
+    "wbs2/runtime/tactical_movement.js": {
+      "source_commit": "196a08c0540da53a793985ebe61162963f39b3b2",
+      "source_path": "runtime/tactical_movement.js",
+      "git_blob": "ad7032938bad908371ec862003e5df921bc7e312",
+      "sha256": "9dfd6700b81cb7056e7f91f15be395856c2a2595b9f70114f816f84ff40787d9",
+      "bytes": 171281
+    },
+    "wbs2/runtime/restart_movement.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/restart_movement.js",
+      "git_blob": "1d67cd78a60d5abf785fd47197bb49fb05a4da33",
+      "sha256": "2c52e458199cfefcde65032cb155bd594c684d81065db97c126f90406a3887b6",
+      "bytes": 32445
+    },
+    "wbs2/runtime/free_kick_templates.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/free_kick_templates.js",
+      "git_blob": "cb6309f43c67f9f08579ba3061a5361d6ee09d76",
+      "sha256": "6e433eaaece308457b4b6ecf47a281bd91ab8ff713f4309a4c6abbdefd899666",
+      "bytes": 13406
+    },
+    "wbs2/runtime/free_kick_wall_model.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/free_kick_wall_model.js",
+      "git_blob": "84fb60033fc167a6b5c2124619d1015267c9c6b1",
+      "sha256": "2127d64ca57f7023be3c49b5ea489788f490981ce1c668cf63649e708b95dbda",
+      "bytes": 10391
+    },
+    "wbs2/runtime/corner_templates.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/corner_templates.js",
+      "git_blob": "ce6ef228f2baed45857aef56230e788446d9a543",
+      "sha256": "20d84f3091482a69d87eb4eedd9d55f8f79d054f9a400d9c5ff668eb69952d3b",
+      "bytes": 8641
+    },
+    "wbs2/runtime/v37_set_piece_liveliness_patch.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/v37_set_piece_liveliness_patch.js",
+      "git_blob": "a4436ed16582da36904d47ec91bddc125664a60f",
+      "sha256": "fe41e1e1fb63ef1468428e2977cf56f10fe4a15c8f764fd8016b8ca3a8b4b0f5",
+      "bytes": 2915
+    },
+    "wbs2/runtime/match_choice_telemetry.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/match_choice_telemetry.js",
+      "git_blob": "55f42941776674fe02cea437d67042257668c0d4",
+      "sha256": "6c875d527e6394565548098bb91bff29ce16c74851fc64b08054eb649b59a9b7",
+      "bytes": 14000
+    },
+    "wbs2/runtime/attribute_match_adapter.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/attribute_match_adapter.js",
+      "git_blob": "c27018f2ec964371e1f364bfeb6a22f890ad8703",
+      "sha256": "fa62c7ba112952472c8ea52fc75501aef8ea8219d1200abccc3b478c52217417",
+      "bytes": 5167
+    },
+    "wbs2/runtime/action_candidate_engine.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/action_candidate_engine.js",
+      "git_blob": "a9ee5a589d9c6dd091f27baac449b6d143d90d06",
+      "sha256": "26b80c564b1b02bd9a3ec801cacbfd78235d7dd7b75897c9668c1bd5455baf53",
+      "bytes": 9277
+    },
+    "wbs2/runtime/match_academy.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/match_academy.js",
+      "git_blob": "f9a8ebcc737da017df44f1836a7c98c0c42d2db0",
+      "sha256": "678152ed6ae3107fa4032eeadce3864507d113df6a479e6db279d858928d3062",
+      "bytes": 3770
+    },
+    "wbs2/runtime/aerial_contest.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/aerial_contest.js",
+      "git_blob": "bccadb8617e6a8178ddeaeff588079e1c4b53744",
+      "sha256": "e4de9c1f5e9c24d036a639443b92bfe5e277d0c5d89f53e273064b1adb58d760",
+      "bytes": 1726
+    },
+    "wbs2/runtime/take_on_duel.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/take_on_duel.js",
+      "git_blob": "b8be32dbe85aebf8bd758048ceeb6610b39ee790",
+      "sha256": "0fda708e61580fb97d91cb9f96e19e9fe3e08191edf48938e9be15e03302cc0e",
+      "bytes": 1000
+    },
+    "wbs2/runtime/ball_strike_model.js": {
+      "source_commit": "196a08c0540da53a793985ebe61162963f39b3b2",
+      "source_path": "runtime/ball_strike_model.js",
+      "git_blob": "0bb4b117d111b56f7037bf4f68b85607945d78d3",
+      "sha256": "26a5769ff0c9a6db74db531ccb4a0f1dbb71948551c5c79c1b51361b17e31e16",
+      "bytes": 10029
+    },
+    "wbs2/runtime/continuous_match_core.js": {
+      "source_commit": "196a08c0540da53a793985ebe61162963f39b3b2",
+      "source_path": "runtime/continuous_match_core.js",
+      "git_blob": "60dfede93aab13f7b160e44f46b12d9b4175525b",
+      "sha256": "d9e21c849a704b2279e4beda12882ab16d9e172ebf1b264b09dfb2a050cb9e1e",
+      "bytes": 329536
+    },
+    "wbs2/runtime/manager_tendency_adapter.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/manager_tendency_adapter.js",
+      "git_blob": "45264b8ba1621ac9daac095b806b8a9a816fbb6c",
+      "sha256": "f4e534bb1c4af370c59e85f4a8b08c89ea60b96b8648a58f9a769e59cda2a680",
+      "bytes": 14000
+    },
+    "wbs2/runtime/choice_action_resolver.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/choice_action_resolver.js",
+      "git_blob": "45d73e431a872393df89df8fd9ac80baa9a251c9",
+      "sha256": "990a4ebb9b6d1e940ff08faaa9e8847c583be10c01e442c0aec66e2cfda7edf5",
+      "bytes": 7856
+    },
+    "wbs2/runtime/choice_action_resolver_step38.js": {
+      "source_commit": "449aa7f05448d98726cd44ba029295567fc0816f",
+      "source_path": "runtime/choice_action_resolver_step38.js",
+      "git_blob": "61ae31f462c474ff41d0c2f76789cfc055744ba1",
+      "sha256": "3efb736f6171590649b6e1fa9f2ee07375fc2bd2fbd78bc1f79c56f79931f44b",
+      "bytes": 7949
+    },
+    "wbs2/runtime/protagonist_match_controller.js": {
+      "source_commit": "196a08c0540da53a793985ebe61162963f39b3b2",
+      "source_path": "runtime/protagonist_match_controller.js",
+      "git_blob": "243d0179ad2a25f7e08e91a3d5fd64eea0bac3ba",
+      "sha256": "ed4b3e3f2f160f8133c2499b9286449d8580598f78659d4a5f97b92ee180e13e",
+      "bytes": 87659
+    }
+  }
+}
