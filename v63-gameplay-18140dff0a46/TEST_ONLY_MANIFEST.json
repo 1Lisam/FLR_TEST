@@ -1,0 +1,10 @@
+{
+  "mode": "TEST_ONLY",
+  "gameplay_commit": "18140dff0a4638716bda2cdc9c429dff51aadee5",
+  "user_visual_pass": false,
+  "internal_visual_review": "ACCEPTABLE",
+  "visual_evidence_commit": "e9438da2caae1b6c5b154b6a088cfa739bfe27b0",
+  "source_template": "v63_wbs2_baseline_visual_r2",
+  "deployed_folder": "v63-gameplay-18140dff0a46",
+  "local_dirty_repo_untouched": true
+}
