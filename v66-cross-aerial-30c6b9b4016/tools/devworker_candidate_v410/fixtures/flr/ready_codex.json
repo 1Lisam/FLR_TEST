@@ -1,0 +1,13 @@
+{
+  "mode": "CODEX",
+  "model": "gpt-5.6-luna",
+  "prompt": "Characterize only; do not modify gameplay.",
+  "git_managed": true,
+  "git_delivery_owner": "DEVWORKER",
+  "git_branch": "devworker/flr-characterize-example",
+  "commit_message": "Characterize FLR example",
+  "success_marker": "FLR_CHARACTERIZATION_PASS",
+  "git_managed_base_sha": "0123456789abcdef0123456789abcdef01234567",
+  "delivery_policy": "exact",
+  "delivery_paths": ["docs/example.md"]
+}

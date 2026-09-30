@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "package": "devworker_candidate_v410",
+  "stage": "M0_CURRENT_BEHAVIOR_BASELINE_ONLY",
+  "live_source": {
+    "path": "/home/hong/DevWorker/worker.py",
+    "version": "V4.10-MANUAL-CHAT-ANALYSIS",
+    "sha256": "93540610a2e833a380f77e66cc8afbb728629464eacbbb7533c89c6efe9ca70a",
+    "size_bytes": 136416,
+    "line_count": 2747,
+    "verified_before_m0": true,
+    "verified_after_m0": true
+  },
+  "audit_source": {
+    "commit": "b6c0bd0325d8897e5ac3975bc095b00bb7265692",
+    "report": "docs/worker_audit/DEVWORKER_RELIABILITY_ASTRA_AUDIT.md",
+    "checkpoint": "docs/worker_audit/ASTRA_RELIABILITY_AUDIT_CHECKPOINT.md",
+    "evidence": "evidence/worker_audit/devworker_reliability_astra_audit.json"
+  },
+  "rules_source": {
+    "ref": "devworker/v53-operating-rules-recovery-simplification-r3",
+    "path": "docs/operations/FLR_OPERATING_RULES.md",
+    "blob": "9c90e07bcacc59a39279d9ba8b2f2f1671b8cabd"
+  },
+  "snapshot": {
+    "included": true,
+    "required_byte_identity": true,
+    "literal_secret_scan": {
+      "result": "PASS_NO_REAL_SECRET_LIKE_LITERALS",
+      "secret_like_literal_occurrences": 9,
+      "real_secret_like_literals": 0,
+      "values_logged": false
+    }
+  },
+  "safety_notes": [
+    "Non-live package only; it must never be installed as /home/hong/DevWorker/worker.py by M0.",
+    "Tests use AST extraction and inert mocks; no GitHub, model, Git write, deploy, or notification action is allowed.",
+    "Known current gaps are recorded as gaps, not promoted to desired behavior.",
+    "Work auto-analysis remains disabled and is only AST-characterized."
+  ],
+  "future_compatibility_requirements": [
+    "Existing FLR READY/CODEX/SHELL envelopes remain accepted unless an explicit migration is approved.",
+    "Future TaskSpec, ResultStore, and DeliveryEngine core must not require FLR names or paths.",
+    "Project-specific deploy and QA rules belong in configuration or adapters, not generic core.",
+    "Legacy FLR recovery artifacts remain readable through compatibility adapters.",
+    "A new project must be added by configuration or adapter registration, without editing core algorithms."
+  ]
+}

@@ -1,0 +1,4 @@
+'use strict';
+const E=require('../runtime/continuous_match_core.js'),T=require('../runtime/tactical_movement.js');
+function place(m,id,x,y){const p=m.playersById[id];p.x=x;p.y=y;p.tx=x;p.ty=y;p.vx=0;p.vy=0;p.hasBall=false;p.markTargetId=null;return p;}
+const m=E.createMatch('G8-SEVERE-BODY',{telemetry:{}});m.time=100;m.possession='AWAY';m._lastTacticalPossession='AWAY';m.transitionUntil=0;m.restart=null;const o=place(m,'A-ST',22,34);m.ball.mode='CONTROLLED';m.ball.ownerId='A-ST';m.ball.x=22;m.ball.y=34;m.ball.vx=0;m.ball.vy=0;o.hasBall=true;o.controlledSince=98;for(const [id,x,y] of [['H-LCB',18,31],['H-RCB',18,39],['H-CM',16,34],['H-LCM',26,24],['H-RCM',26,44],['H-LB',18,10],['H-RB',18,58],['A-LCM',40,22],['A-RCM',40,46],['A-LW',50,10],['A-RW',50,58]])place(m,id,x,y);T.assign(m);const cm=m.playersById['H-CM'];const pass=cm.x<=17&&cm.tx>18;console.log(JSON.stringify({pass,cm:{x:cm.x,tx:cm.tx,task:cm.tacticalTask}},null,2));if(!pass)process.exit(1);

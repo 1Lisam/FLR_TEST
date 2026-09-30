@@ -1,0 +1,26 @@
+{
+  "schema": "FLR_HANDOFF_STATUS_1.0",
+  "version": "V33_FINAL_CODEX_MIGRATION",
+  "status": "FROZEN_HANDOFF_READY",
+  "authoritative_source": "SOURCE/AUTHORITATIVE_V33_FINAL",
+  "authoritative_tree_sha256": "251ea6c30ad528a2f5d6ce2f8bf01f04cccc7fa6bf43a693d78b08b72809b4df",
+  "core_sha256": "e764db748a9a624349f019fa897abad32a8a01078a2f094666bfb0a4163939fd",
+  "stable_donor": "SOURCE/STABLE_V32_STAGE_C_FINAL",
+  "stable_tree_sha256": "551835f2605e09f613f0e749bb8482e6df8f494d5ab72bf31c894eefe1dfc4ef",
+  "v33_entry_baseline": "SOURCE/V33_ENTRY_C12_RECOVERED",
+  "v33_entry_tree_sha256": "e906ff4d812861c8e11d2be1e5049ede59d8af4602a2f0987da62ea14440e596",
+  "final_atomic_result": "PASS_FOR_USER_VISUAL_RETEST_TT052",
+  "known_watch": [
+    "G8_ACTUAL_BODY_LAYER",
+    "GK_CLOSE_RANGE_CONTACT_GEOMETRY",
+    "USER_VISUAL_RETEST_PENDING"
+  ],
+  "rejected_candidates": [
+    "V4",
+    "V5",
+    "V6",
+    "V8",
+    "V9"
+  ],
+  "v34_first_task": "bounded GK close-range shot-contact geometry repair from V7; reuse baseline evidence; no quota tuning"
+}

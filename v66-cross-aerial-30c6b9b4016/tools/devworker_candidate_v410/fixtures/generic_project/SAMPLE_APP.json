@@ -1,0 +1,22 @@
+{
+  "project": {"name": "SAMPLE_APP", "repository_root": "/tmp/sample-app"},
+  "codex_task": {
+    "mode": "CODEX",
+    "model": "gpt-5.6-luna",
+    "prompt": "Update a generic README only.",
+    "git_managed": true,
+    "git_delivery_owner": "DEVWORKER",
+    "git_branch": "devworker/sample-app-readme",
+    "commit_message": "Document sample app",
+    "success_marker": "SAMPLE_APP_DOCS_PASS",
+    "git_managed_base_sha": "0123456789abcdef0123456789abcdef01234567",
+    "delivery_policy": "exact",
+    "delivery_paths": ["README.md"]
+  },
+  "shell_task": {
+    "mode": "SHELL",
+    "confirm": "DEVWORKER_V3",
+    "commands": [["python3", "-c", "print('sample app check')"]]
+  },
+  "assertions": ["No project-specific paths or names", "No issue number assumptions", "No gameplay policy"]
+}

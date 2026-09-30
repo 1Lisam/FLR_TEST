@@ -1,0 +1,37 @@
+{
+  "module": "V41_HOST_FINDING_DISAMBIGUATION",
+  "disposition": "READY_FOR_HOST_REVALIDATION",
+  "validatorIntegrationIssuesFound": [
+    "Freeze gate revalidated the nested captureManifest, not the complete hosted-evidence wrapper; browser was therefore missing.",
+    "The adapter assigned every family from the first scenario in array order.",
+    "The ready verdict did not require hostedEvidenceContract=true."
+  ],
+  "validatorIntegrationIssuesFixed": true,
+  "actualRuntimeFindingsFromAvailableCorrectlyBoundEvidence": [],
+  "unresolvedObservationGaps": [
+    "The #343 GK_SHOT_CLOSE capture has no gk-player-body transform telemetry; NON_FINITE_RENDER_TRANSFORM from CROSS_LEFT is inadmissible as GK evidence."
+  ],
+  "scenarioFamilyBindings": {
+    "DEFENSIVE_RESPONSIBILITY": {"scenario": "CROSS_LEFT", "seed": "FINAL-MATCH-TEST-77"},
+    "PROTAGONIST_AUTHORITY": {"scenario": "ST_BREAKAWAY", "seed": "FINAL-MATCH-TEST-95"},
+    "CONTINUITY_REPLAY": {"scenario": "ST_BREAKAWAY", "seed": "FINAL-MATCH-TEST-95"},
+    "SET_PIECE_CAUSALITY": {"scenario": "CORNER_ATTACK_RIGHT", "seed": "V40-P0-RUNTIME"},
+    "GK_ENGINE_TO_RENDER": {"scenario": "GK_SHOT_CLOSE", "seed": "FINAL-MATCH-TEST-135"}
+  },
+  "hostedEvidenceContractSelftest": {
+    "validOrchestratorShape": "PASS",
+    "browserRemoved": "BLOCKED_VALIDATOR_GAP",
+    "wrongIdentity": "BLOCKED_VALIDATOR_GAP"
+  },
+  "tests": {
+    "shuffledScenarioOrder": "PASS",
+    "crossLeftGkLookingFamilyEvidenceRejected": "PASS",
+    "freezeSyntheticGreen": "READY_FOR_FINAL_HOST_FREEZE_VALIDATION",
+    "freezeSyntheticRuntimeFinding": "VALIDATOR_READY_RUNTIME_FINDINGS",
+    "freezeSyntheticGap": "BLOCKED_VALIDATOR_GAP"
+  },
+  "runtimeDiffFrom95079c7ff5cbaab3b5f6038ef305a63b6f9813b4": "EMPTY",
+  "userFailOpen": "OPEN",
+  "step79": "NOT_STARTED",
+  "nextHostCommand": "node tools/v41_host_validation_orchestrator.js --page-url=https://1lisam.github.io/FLR_TEST/ --output=/absolute/path/v41-host-revalidation"
+}

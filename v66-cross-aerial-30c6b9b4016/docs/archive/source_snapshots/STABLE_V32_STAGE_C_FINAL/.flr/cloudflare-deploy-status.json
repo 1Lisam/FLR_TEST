@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "FLR_CLOUDFLARE_D1_DEPLOY_STATUS_1.0",
+  "status": "DEPLOYED_D1",
+  "worker": "flr-bug-reporter",
+  "storage": "D1",
+  "database": "flr-bug-reports",
+  "workerUrl": "https://flr-bug-reporter.sikarops.workers.dev",
+  "endpoint": "https://flr-bug-reporter.sikarops.workers.dev/report",
+  "missingSecrets": [],
+  "deployOutcome": "success",
+  "liveRoundTrip": {
+    "ok": true,
+    "postReport": "201"
+  },
+  "errorExcerpt": null,
+  "sourceCommit": "50f13f2c3d024d4834ce0a384c0aeff638b48b98"
+}

@@ -1,0 +1,6 @@
+{
+  "mode": "SHELL",
+  "confirm": "DEVWORKER_V3",
+  "commands": [["python3", "-c", "print('check')"]],
+  "timeout_seconds": 30
+}

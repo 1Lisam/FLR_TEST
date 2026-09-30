@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "FLR_V42_REPORTER_SOURCE_IDENTITY_CONTRACT_1.0",
+  "scope": "actual index.html browser reporter path only; no gameplay, deployment, FLR_TEST, STEP79, or USER_FAIL_OPEN mutation",
+  "contract": {
+    "runtimeIdentity": ["schemaVersion", "buildId", "entryPath", "sessionId", "capturedAt"],
+    "loadedSourceEvidence": ["indexScriptChain", "manifestId", "manifestSha256", "observedManifestSha256", "sourceStatuses"],
+    "sceneSessionEvidence": ["matchSecond", "boundaryIdOrSceneId", "heroPlayerId", "heroRole", "pendingChoice", "committedChoice", "currentStateMarkers", "futureOutcomePrecomputed"],
+    "boundedness": ["no future results", "no unbounded match-state dump", "only current or already-captured scene evidence"],
+    "classifications": ["CURRENT_MATCH", "STALE_OR_MISMATCHED", "LEGACY_NOT_LOADED", "AMBIGUOUS"]
+  },
+  "acceptance": {
+    "current": "A current report has the exact deterministic build ID, the actual DOM script chain equals the authoritative chain, each manifest-covered loaded source hash equals its expected SHA-256, and futureOutcomePrecomputed is false.",
+    "staleOrMismatched": "A stale build label, stale manifest ID/hash, script-chain difference, or any covered source hash mismatch is explicitly non-current.",
+    "legacy": "A payload without the V42 identity envelope is LEGACY_NOT_LOADED and is never promoted to current by a label alone.",
+    "ambiguous": "Capture/hash availability failure or incomplete required evidence is AMBIGUOUS, never CURRENT_MATCH."
+  },
+  "knownLossPointsBeforeV42": [
+    "normal scene payload used build TT-0.52 while compact summary used b TT-0.51",
+    "forced and UI-only payloads used unrelated FINAL-MATCH labels",
+    "Worker safeBuild stored client build labels without authoritative source validation",
+    "V42 validation manifest omitted reporter/config/controller/UI sources",
+    "413 metadata fallback could retain only unbound summary metadata"
+  ]
+}

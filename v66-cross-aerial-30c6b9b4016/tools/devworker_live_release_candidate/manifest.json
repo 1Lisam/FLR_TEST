@@ -1,0 +1,261 @@
+{
+  "schema_version": 2,
+  "release_id": "devworker-v410-host-compat-f9104a526d1ecba0da5d",
+  "package_hash": "f9104a526d1ecba0da5de6b50c0c9ad765a5b03b714f738faf9845be819ba8d9",
+  "package_hash_scope": "all runtime payload files except self-referential manifest and compatibility release-id metadata; every listed file including compatibility is independently hashed",
+  "identity_paths": [
+    "SELFTEST.md",
+    "__init__.py",
+    "build_manifest.py",
+    "candidate_launcher.sh",
+    "delivery/__init__.py",
+    "delivery/engine.py",
+    "delivery/model.py",
+    "delivery/postcheck.py",
+    "healthcheck.py",
+    "host_fingerprints.json",
+    "host_preflight.sh",
+    "install_release.sh",
+    "issue_adapter/__init__.py",
+    "issue_adapter/adapter.py",
+    "issue_adapter/model.py",
+    "issue_adapter/outbox.py",
+    "issue_adapter/profiles.py",
+    "live_adapters.py",
+    "release/__init__.py",
+    "release/health.py",
+    "release/model.py",
+    "resultstore/__init__.py",
+    "resultstore/journal.py",
+    "resultstore/legacy_reader.py",
+    "resultstore/model.py",
+    "resultstore/store.py",
+    "rollback_release.sh",
+    "runtime.py",
+    "taskspec/__init__.py",
+    "taskspec/canonical.py",
+    "taskspec/consumer.py",
+    "taskspec/legacy_adapter.py",
+    "taskspec/model.py",
+    "taskspec/presubmit.py",
+    "taskspec/profiles.py",
+    "taskspec/validator.py",
+    "temp_root.py",
+    "tests/__init__.py",
+    "tests/test_live_release.py",
+    "verify_manifest.py",
+    "worker.py"
+  ],
+  "files": [
+    {
+      "path": "SELFTEST.md",
+      "sha256": "5d33a857fdcdec65c2438ba858c2c8ceb5809b47583020ed9ba34a0b38737c8a",
+      "size": 637
+    },
+    {
+      "path": "__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "build_manifest.py",
+      "sha256": "01a3c59393dac5f227683cf6e7fd70a4b48bb908f61f600648fdb859ef2a3b14",
+      "size": 2297
+    },
+    {
+      "path": "candidate_launcher.sh",
+      "sha256": "ea2abdc9855e2c1f213189833e02c6abc471bca26cf6c7fea48437a4f0dea253",
+      "size": 2229
+    },
+    {
+      "path": "compatibility.json",
+      "sha256": "4190d5cd1eadea2bcbfafb595a1fa2bdf4c636cacbfe379c5de9df0f25cae8ed",
+      "size": 565
+    },
+    {
+      "path": "delivery/__init__.py",
+      "sha256": "0dac81f6f744e6b22ae12a5a196aeeef869663777a3bb4b4fc1be8b9b177d0fc",
+      "size": 480
+    },
+    {
+      "path": "delivery/engine.py",
+      "sha256": "53292a258bf5c8c9b499b6bf1affd949a9e30d40860db8a9fe3c3af97f62d53b",
+      "size": 12034
+    },
+    {
+      "path": "delivery/model.py",
+      "sha256": "7e292c37d8be135f6507d3b238fc5a5990f29eefdb2bf38ce5e3e74fb419d4d3",
+      "size": 2171
+    },
+    {
+      "path": "delivery/postcheck.py",
+      "sha256": "03ae3c48d59264929b2b44ff86ad843202b926266acc421a369bcd011b4d65ce",
+      "size": 2260
+    },
+    {
+      "path": "healthcheck.py",
+      "sha256": "a735f7c446932841a1dd17c9d3b12147a4e7c084c47d8f23924093ff491e897f",
+      "size": 801
+    },
+    {
+      "path": "host_fingerprints.json",
+      "sha256": "48e04c665f7ce217286f349de661301b86f91ed18834d92d7b6eeaba3666bc51",
+      "size": 469
+    },
+    {
+      "path": "host_preflight.sh",
+      "sha256": "6731b89ea6882b3a383a9e39f6453ea365f250d6ef33e38b2b873831f0361f30",
+      "size": 4606
+    },
+    {
+      "path": "install_release.sh",
+      "sha256": "9a3e1ba6d8de4d9a92a5f27bff45979c4827df1b42f944f536b8932e81400343",
+      "size": 6114
+    },
+    {
+      "path": "issue_adapter/__init__.py",
+      "sha256": "4ea62a1932554a3aadb2ae08289a35a577f0b9887a20483bd171ea165fa3498f",
+      "size": 516
+    },
+    {
+      "path": "issue_adapter/adapter.py",
+      "sha256": "9fa4233c0253f3e5ccf337cb0a0cfe535312b34b8e3135834c14316d6d0f4b41",
+      "size": 3179
+    },
+    {
+      "path": "issue_adapter/model.py",
+      "sha256": "a8200524c744621e4f0d55104edfb9bae6f2014c18cb862ace59af055b4b4993",
+      "size": 1207
+    },
+    {
+      "path": "issue_adapter/outbox.py",
+      "sha256": "c7d3d66cabe860f06644b6eef8c31bf5165cbc52a76a640aa571bd4b8af64a8e",
+      "size": 3350
+    },
+    {
+      "path": "issue_adapter/profiles.py",
+      "sha256": "f9a65594ec18a312af70114dd9298464f695a7c17b3973ea2cb6aed035fec477",
+      "size": 418
+    },
+    {
+      "path": "live_adapters.py",
+      "sha256": "2841f26077464d6809b4d8b75d00bba2fe02800a2daf5d4ef2b4befbcef826e7",
+      "size": 18914
+    },
+    {
+      "path": "release/__init__.py",
+      "sha256": "63d39903720f0827d8d7670b33b3035751ee4520844a57f238d0c57d67e3b13f",
+      "size": 273
+    },
+    {
+      "path": "release/health.py",
+      "sha256": "26eb61cadffec8395b8e73b484dfb9360cfb0172b3292c18ef1a339f01b7135d",
+      "size": 692
+    },
+    {
+      "path": "release/model.py",
+      "sha256": "6ae25f1e527090abe503db5b69c304f5683ceb873228c0bdb5ee358740c2f612",
+      "size": 527
+    },
+    {
+      "path": "resultstore/__init__.py",
+      "sha256": "0569ccbc47cd0b57128326902138bf86ecb8eaecb1a4ab47feb9f6839500a028",
+      "size": 275
+    },
+    {
+      "path": "resultstore/journal.py",
+      "sha256": "845539969045c598c0fe6195db7c659fe9cbee245bdea9cf8c0e41d120197d3a",
+      "size": 3124
+    },
+    {
+      "path": "resultstore/legacy_reader.py",
+      "sha256": "2bb143c3ff9ed6ef4385a644e51d58e84ce072ddea28c0e18439026e6f5e763d",
+      "size": 6880
+    },
+    {
+      "path": "resultstore/model.py",
+      "sha256": "54d100fdc55dfdbc3b60dd0a28d8b4e3514c89a6e6bdc22ec03cdddeef67888f",
+      "size": 1726
+    },
+    {
+      "path": "resultstore/store.py",
+      "sha256": "1701b26b7e07d368e8b6b818483e206ee9746b85df9072305d86a16bdf29a546",
+      "size": 17914
+    },
+    {
+      "path": "rollback_release.sh",
+      "sha256": "c53953a9c7db545e4a84ae324b8907bd4d7f8197073ccbbfa3c796ec933657cf",
+      "size": 1898
+    },
+    {
+      "path": "runtime.py",
+      "sha256": "58af439b07220552cddc8dca853456cd2a3c6f8628bbaaa7603e0f7d194ee983",
+      "size": 8525
+    },
+    {
+      "path": "taskspec/__init__.py",
+      "sha256": "aa272a0a433289afbfc3a52725934140a66ee2d37dd9d9def3d1f8f44f16ea6d",
+      "size": 430
+    },
+    {
+      "path": "taskspec/canonical.py",
+      "sha256": "d48cafd62e359a56838340d2ec3ea5fd5eb577da370a3a48e760e255189cd4ca",
+      "size": 3758
+    },
+    {
+      "path": "taskspec/consumer.py",
+      "sha256": "776ba48e7b1d5d97544391827cc97f12adc43da663dfac489fb156ec7ef316bb",
+      "size": 241
+    },
+    {
+      "path": "taskspec/legacy_adapter.py",
+      "sha256": "dc0155c31189acf2f21b73a6971e7cd738a7fd06cff39031baa8f2a7ef2cd194",
+      "size": 2923
+    },
+    {
+      "path": "taskspec/model.py",
+      "sha256": "0ecc35f65b2a9caaf6ce5f5196fa08ea04d8facb484819dd5836c6d41672c398",
+      "size": 1732
+    },
+    {
+      "path": "taskspec/presubmit.py",
+      "sha256": "c355efac627481c715ce18fd1272b55fab6ec357d94ae1230be034d635b5bf85",
+      "size": 237
+    },
+    {
+      "path": "taskspec/profiles.py",
+      "sha256": "36a2546ff90ab9b70820468420c319b780f64fe9793835a5b6931daafec5241b",
+      "size": 2307
+    },
+    {
+      "path": "taskspec/validator.py",
+      "sha256": "6081a1ddf437c4f540a8cedaa1c05f40680308242f51dcf66101ab111dfb305f",
+      "size": 15260
+    },
+    {
+      "path": "temp_root.py",
+      "sha256": "dcbde8c3ccc8a7802e34f2948ba46afb9ea8dbe3bc0a85bf069938b450506d02",
+      "size": 2507
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "tests/test_live_release.py",
+      "sha256": "88c9f1d1baca06b6fbad93c3f2cc1374285e1ec8a9b97231c31e3ae746a94dbe",
+      "size": 28287
+    },
+    {
+      "path": "verify_manifest.py",
+      "sha256": "c52e1f1fed7071ffbbc4372476292e701ebbd6708c9519dc0cc6f36472b2e9c0",
+      "size": 1591
+    },
+    {
+      "path": "worker.py",
+      "sha256": "59c0ecd88978f1dd8020e34b234755239d2bae6c0791015075348ea8038d29c0",
+      "size": 5809
+    }
+  ]
+}

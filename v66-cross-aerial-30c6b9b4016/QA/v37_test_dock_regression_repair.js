@@ -1,0 +1,12 @@
+const fs=require('fs');
+const assert=require('assert');
+const dock=fs.readFileSync('final_match_test_dock.js','utf8');
+const index=fs.readFileSync('index.html','utf8');
+for(const s of ["ctx.arc(px(52.5),py(34)","ctx.strokeRect(px(0),py(13.84)","ctx.strokeRect(px(88.5),py(13.84)","replayFrames(result,status)","final-match-test-dock__status","data-action=\"new-seed\"","data-action=\"rerun\"","data-action=\"collapse\""]) assert(dock.includes(s),s);
+assert(dock.includes('Number.isFinite(p.bodyAngle)'), 'GK bodyAngle orientation missing');
+assert(!dock.includes('r*2.15'), 'old GK direction line returned');
+assert(!dock.includes('GK_SAVE_ICON_CIRCLE'), 'old circle override returned');
+const corner=index.indexOf('runtime/corner_templates.js'), core=index.indexOf('runtime/continuous_match_core.js'), close=index.indexOf('</body></html>');
+assert(corner>0 && corner<core && corner<close,'corner loader order');
+assert.strictEqual((index.match(/runtime\/corner_templates\.js/g)||[]).length,1,'corner loader duplicate');
+console.log('V37_TEST_DOCK_FOCUSED_QA_PASS');

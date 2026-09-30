@@ -1,0 +1,1 @@
+{"schemaVersion":"FLR_V41_CAPTURED_BOUNDARY_1.0","incidentId":"INC-CORNER-FK-OWNERSHIP-COLLAPSE","sourceHead":"b4777768f41ee252ba38ecfa84a01fc8409fb182","scenario":"CORNER_ATTACK_RIGHT","seed":"FINAL-MATCH-TEST-13","startState":{"restart":"CORNER"},"observable":{"distinctOwners":4,"clustered":false},"resultStatus":"CONTROL_REPRODUCTION"}

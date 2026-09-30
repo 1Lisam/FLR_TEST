@@ -1,0 +1,6 @@
+{
+  "case": "untracked_markdown_whitespace",
+  "plain_diff_check_scope": "tracked diff only",
+  "selected_new_file_check_scope": "declared and selected untracked file",
+  "expected": "publisher-level selected-new-file checking detects trailing whitespace that plain tracked diff checking does not"
+}

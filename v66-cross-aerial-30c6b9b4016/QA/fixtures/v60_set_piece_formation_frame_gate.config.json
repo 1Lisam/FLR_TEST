@@ -1,0 +1,13 @@
+{
+  "pitch": {"length": 105, "width": 68}, "left": 27, "right": 41, "boxStart": 82, "edgeStart": 68, "restMax": 62, "nearBallMax": 10, "targetDiagnosticFar": 18,
+  "corner": {"boxMin": 4, "boxMax": 6, "restMin": 1}, "wideFk": {"nearMin": 1, "boxMin": 3, "restMin": 1}, "defence": {"protectionMin": 5},
+  "quick": {"largeMove": 18, "massMoveRatio": 0.6, "nearbyMoveAllowance": 3, "minComparable": 8, "blobPlayers": 8, "blobMaxX": 18, "blobMaxY": 18}, "general": {"blobMaxX": 18, "blobMaxY": 18, "extremeStagger": 75},
+  "scenarioPolicies": {
+    "DEEP_DIRECT": {"restartMode": "QUICK_RESTART", "attackTeam": "AWAY", "attackDirection": "LEFT", "kind": "FREE_KICK", "side": "ATTACK", "freeKickType": "DIRECT"},
+    "DEEP_INDIRECT": {"restartMode": "QUICK_RESTART", "attackTeam": "AWAY", "attackDirection": "LEFT", "kind": "FREE_KICK", "side": "ATTACK", "freeKickType": "INDIRECT"},
+    "ATTACK_DIRECT": {"restartMode": "SETTLED_RESTART", "attackTeam": "AWAY", "attackDirection": "LEFT", "kind": "FREE_KICK", "side": "ATTACK", "freeKickType": "DIRECT"},
+    "ATTACK_INDIRECT": {"restartMode": "SETTLED_RESTART", "attackTeam": "AWAY", "attackDirection": "LEFT", "kind": "FREE_KICK", "side": "ATTACK", "freeKickType": "INDIRECT"},
+    "CORNER_TOP": {"restartMode": "SETTLED_RESTART", "attackTeam": "AWAY", "attackDirection": "LEFT", "kind": "CORNER", "side": "ATTACK"},
+    "CORNER_BOTTOM": {"restartMode": "SETTLED_RESTART", "attackTeam": "AWAY", "attackDirection": "LEFT", "kind": "CORNER", "side": "ATTACK"}
+  }
+}

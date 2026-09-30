@@ -1,0 +1,15 @@
+{
+  "mode": "CODEX",
+  "model": "gpt-5.6-luna",
+  "prompt": "한글 Unicode draft validation.",
+  "git_managed": true,
+  "git_delivery_owner": "DEVWORKER",
+  "git_branch": "devworker/taskspec-example",
+  "commit_message": "Add candidate TaskSpec",
+  "success_marker": "TASKSPEC_PASS",
+  "git_managed_base_sha": "0123456789abcdef0123456789abcdef01234567",
+  "delivery_policy": "exact",
+  "delivery_paths": ["docs/example.md"],
+  "PLAN": "Compile first",
+  "PASS_CONDITION": "TASKSPEC_PASS"
+}

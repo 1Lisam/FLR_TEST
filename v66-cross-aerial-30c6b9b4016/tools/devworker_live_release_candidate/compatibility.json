@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "release_id": "devworker-v410-host-compat-f9104a526d1ecba0da5d",
+  "baseline_worker_sha256": "93540610a2e833a380f77e66cc8afbb728629464eacbbb7533c89c6efe9ca70a",
+  "envelopes": [
+    "READY",
+    "CODEX",
+    "SHELL"
+  ],
+  "legacy_recovery": "read_only_via_LegacyReader",
+  "work_auto_analysis": "disabled_no_backlog_replay",
+  "authority": {
+    "task_validation": "TaskSpec",
+    "accepted_result": "ResultStore",
+    "delivery_recovery": "DeliveryEngine",
+    "postcheck": "PostcheckRunner",
+    "display": "IssueDisplayAdapter"
+  }
+}

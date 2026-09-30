@@ -1,0 +1,10 @@
+'use strict';
+require('./v37_movement_gate_luna_calibration.js');
+require('../runtime/v39_free_kick_role_completion_patch.js');
+require('../runtime/v39_free_kick_channel_owner_patch.js');
+require('../runtime/v39_free_kick_defensive_layers_patch.js');
+require('../runtime/v39_corner_responsibility_patch.js');
+require('../runtime/v39_corner_gk_recover_patch.js');
+require('../runtime/v39_open_play_responsibility_patch.js');
+require('../runtime/v39_gk_reaction_timing_patch.js');
+module.exports={version:'V39-RUNTIME-CANDIDATE-0.7'};

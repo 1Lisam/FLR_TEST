@@ -1,0 +1,1 @@
+{"task_id":"flr-stale-root","base_sha":"0123456789abcdef0123456789abcdef01234567","model_success":true,"recovery_root":"/retired/recovery/another-folder","actual_changed_or_untracked_staging_paths":["docs/stale.txt"]}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "baseline_sha256": "93540610a2e833a380f77e66cc8afbb728629464eacbbb7533c89c6efe9ca70a",
+  "INTENTIONAL_SAFETY": [
+    {"id": "ready-prefix", "behavior": "Only non-#901 titles starting exactly [DEVWORKER READY] are eligible."},
+    {"id": "json-envelope", "behavior": "Pretty/multiline JSON objects parse; malformed JSON, invalid escapes, and non-objects reject."},
+    {"id": "shell-pre-model", "behavior": "SHELL requires a non-empty allowed argv list during contract validation, before any handler/model invocation."},
+    {"id": "managed-owner", "behavior": "git-managed CODEX requires git_delivery_owner=DEVWORKER before model execution."},
+    {"id": "aggregate-contract", "behavior": "Managed contract reports multiple deterministic field errors in one pass."},
+    {"id": "argv-capability", "behavior": "SHELL/QA accepts only listed executable basenames and limited git subcommands."},
+    {"id": "dirty-guards", "behavior": "SHELL clean and dirty-readonly fingerprint paths are distinct; managed CODEX validates an exact 40-character base before staging."},
+    {"id": "success-preservation", "behavior": "Managed delivery retry uses the same staging output and does not rerun Codex in the delivery exception path."},
+    {"id": "work-disabled", "behavior": "poll_work_results returns 0 and post_terminal_event returns DISABLED_MANUAL_CHAT before active Work/event behavior."}
+  ],
+  "CURRENT_COMPATIBILITY": [
+    {"id": "exact-with-roots", "behavior": "delivery_policy=exact with non-empty delivery_roots uses reconciliation scope and may publish actual in-root paths."},
+    {"id": "phase-output", "behavior": "Accepted managed model success emits implementation SUCCESS while QA remains UNKNOWN; delivery success is separately represented."},
+    {"id": "title-projection", "behavior": "Issue state labels are projected by replacing [DEVWORKER READY] with RUNNING, event, or ERROR; snapshot-only in M0."},
+    {"id": "path-enumeration", "behavior": "staging_changed_and_untracked_paths strips line-oriented git output; publisher has the stronger temporary-index whitespace check."}
+  ],
+  "KNOWN_GAP_NOT_FIXED": [
+    {"id": "fingerprint-omits-postcheck-and-effort", "behavior": "task_fingerprint omits host_post_commands, postcheck settings, and reasoning_effort; changed postcheck can no-op under the same fingerprint.", "desired_future_behavior": "Separate canonical identities for model input, delivery, and postcheck."},
+    {"id": "exact-roots-name-mismatch", "behavior": "Exact plus roots is compatibility reconciliation rather than strict exact equality.", "desired_future_behavior": "Explicit legacy policy name and approved migration."},
+    {"id": "qa-unknown", "behavior": "No universal QA receipt extraction turns managed model-reported QA into worker QA truth.", "desired_future_behavior": "Typed QA receipts tied to delivered source identity."},
+    {"id": "phase-truth-split", "behavior": "model_result may be SUCCESS before terminal marker acceptance; final user/Issue labels are not a typed phase ledger.", "desired_future_behavior": "Typed implementation, QA, delivery, and postcheck records."},
+    {"id": "path-whitespace-boundary", "behavior": "Plain diff checking can omit untracked files; selected publisher temporary-index checking catches them (#1701 regression case).", "desired_future_behavior": "One NUL-safe selected-path contract used before and at delivery."},
+    {"id": "recovery-layout", "behavior": "Recovery has competing snapshot/repository layouts and non-atomic manifests.", "desired_future_behavior": "Immutable ResultBundle with artifact resolver."},
+    {"id": "host-post-identity", "behavior": "host_post executes configured host workdir after delivery rather than a guaranteed delivered tree.", "desired_future_behavior": "Explicit postcheck source identity and idempotency receipt."}
+  ]
+}

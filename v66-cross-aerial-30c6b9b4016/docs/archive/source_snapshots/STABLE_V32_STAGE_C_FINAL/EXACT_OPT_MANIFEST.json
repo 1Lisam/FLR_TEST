@@ -1,0 +1,15 @@
+{
+  "tool": "FLR_EXACT_OPT_RUNTIME_V0.1",
+  "source": "/mnt/data/flrpg_work/screen_event_ecology_v2",
+  "sourceCoreSha256": "fc8e1a5d2d7fabf696e7f32c6a80e6b2235ab3f15a50b3d79027ea42652f24d9",
+  "generatedCoreSha256": "4aeafbbcd4de058ec00cf8ec6e30a0ef902cb0f54c171b361f5c4fee263a3809",
+  "changes": [
+    "resolveSpacing axis-aligned exact broad-phase before Math.hypot",
+    "restart kicker id hoisted once per spacing call",
+    "reuse identical computed distance for collision normal"
+  ],
+  "claimedGameplaySemantics": "IDENTICAL",
+  "dtChanged": false,
+  "durationChanged": false,
+  "validationRequired": true
+}

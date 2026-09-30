@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "FLR_PERSISTENT_REGRESSION_REGISTRY_1.0",
+  "policyVersion": "PROTECTED_REVISION_ALLOWED_1.0",
+  "lifecycle": {
+    "statuses": ["ACTIVE", "REVISED", "SUPERSEDED", "RETIRED"],
+    "transitions": {
+      "ACTIVE": ["REVISED", "SUPERSEDED", "RETIRED"],
+      "REVISED": ["REVISED", "SUPERSEDED", "RETIRED"],
+      "SUPERSEDED": [],
+      "RETIRED": []
+    },
+    "revisionRecordRequired": ["reason", "replacementBehavior", "affectedChecks", "decisionRef"]
+  },
+  "contracts": [
+    {
+      "id": "FLR-CANON-001",
+      "scope": "match simulation and forced test harness",
+      "behaviorIntent": "Future outcomes are not computed or stored before the user commits the current choice.",
+      "status": "ACTIVE",
+      "protectionClass": "canonical",
+      "authoritativeEvidenceRefs": ["docs/handoff/V33_FINAL/HANDOFF_STATUS.json", "evidence/v40/V40_VALIDATION_CONFIDENCE_FOUNDATION.md"],
+      "affectedModules": ["runtime/", "final_match_rare_scenario_harness.js", "final_match_test_dock.js", "QA/v40_captured_boundary_replay.js"],
+      "entrypoints": ["runtime/choice_action_resolver.js", "runtime/choice_resolution_harness.js", "final_match_test_dock.js"],
+      "dependencyTags": ["choice-authority", "causal-state", "replay"],
+      "checks": [{"path": "QA/v40_l0_invariant_framework.js", "export": "selftest"}, {"path": "QA/v40_captured_boundary_replay.js", "export": "selftest"}],
+      "humanOnlyObservable": null,
+      "revisionPolicy": "May be intentionally revised only with an explicit product/design decision; implementation rewrites must retain the causal acceptance checks.",
+      "history": [{"event": "SEEDED", "ref": "evidence/v40/V40_VALIDATION_CONFIDENCE_FOUNDATION.md"}]
+    },
+    {
+      "id": "FLR-CANON-002",
+      "scope": "protagonist choice boundary",
+      "behaviorIntent": "The protagonist action and exact target are selected by the user; the engine does not auto-execute an unselected action or target.",
+      "status": "ACTIVE",
+      "protectionClass": "canonical",
+      "authoritativeEvidenceRefs": ["evidence/v40/V40_VALIDATION_CONFIDENCE_PHASE_B.md", "QA/v40_l0_invariant_framework.js"],
+      "affectedModules": ["runtime/protagonist_match_controller.js", "runtime/choice_action_resolver.js", "final_match_rare_scenario_harness.js", "final_match_test_dock.js"],
+      "entrypoints": ["runtime/protagonist_match_controller.js", "runtime/choice_action_resolver.js"],
+      "dependencyTags": ["choice-authority", "target-authority"],
+      "checks": [{"path": "QA/v40_l0_invariant_framework.js", "export": "selftest"}, {"path": "QA/v40_mutation_challenge_harness.js", "export": "selftest"}],
+      "humanOnlyObservable": null,
+      "revisionPolicy": "Never silently weaken exact choiceId plus targetId authority; an intentional control-model change needs a recorded product decision.",
+      "history": [{"event": "SEEDED", "ref": "evidence/v40/V40_VALIDATION_CONFIDENCE_FOUNDATION.md"}]
+    },
+    {
+      "id": "FLR-REPLAY-001",
+      "scope": "choice/replay continuity",
+      "behaviorIntent": "Committed choices continue from the live current state and preserve choice cursor/target continuity across replay; replay does not restart from an old frame.",
+      "status": "ACTIVE",
+      "protectionClass": "repeated-regression",
+      "authoritativeEvidenceRefs": ["evidence/v40/V40_VALIDATION_CONFIDENCE_PHASE_B.md", "QA/v40_captured_boundary_replay.js"],
+      "affectedModules": ["final_match_test_dock.js", "final_match_rare_scenario_harness.js", "runtime/choice_resolution_harness.js"],
+      "entrypoints": ["final_match_test_dock.js", "QA/v40_captured_boundary_replay.js"],
+      "dependencyTags": ["replay", "choice-authority", "current-state"],
+      "checks": [{"path": "QA/v40_captured_boundary_replay.js", "export": "selftest"}],
+      "humanOnlyObservable": "The replay visibly begins at the committed boundary and shows the next selected action, not a reset pre-choice scene.",
+      "revisionPolicy": "Replay presentation may be reimplemented, but continuity acceptance and explicit user choice must remain unless superseded by a documented product decision.",
+      "history": [{"event": "SEEDED", "ref": "evidence/v40/V40_VALIDATION_CONFIDENCE_PHASE_B.md"}]
+    },
+    {
+      "id": "FLR-CANON-003",
+      "scope": "set-piece defensive targets",
+      "behaviorIntent": "Defensive restart targets use the physically correct defending goal relation and direction; wrong-end assignments are rejected.",
+      "status": "ACTIVE",
+      "protectionClass": "canonical",
+      "authoritativeEvidenceRefs": ["evidence/v40/V40_P0_SET_PIECE_COORDINATE_REPAIR.md", "evidence/v40/V40_VALIDATION_CONFIDENCE_FOUNDATION.md"],
+      "affectedModules": ["runtime/restart_movement.js", "runtime/corner_templates.js", "runtime/free_kick_templates.js", "runtime/v39_corner_responsibility_patch.js"],
+      "entrypoints": ["runtime/restart_movement.js"],
+      "dependencyTags": ["physical-goal", "home-away", "left-right", "set-piece"],
+      "checks": [{"path": "QA/v40_p0_set_piece_wrong_end_detector.js", "export": "selftest"}],
+      "humanOnlyObservable": null,
+      "revisionPolicy": "Tactical placement may evolve, but physical goal/direction causality cannot be removed silently.",
+      "history": [{"event": "SEEDED", "ref": "evidence/v40/V40_P0_SET_PIECE_COORDINATE_REPAIR.md"}]
+    },
+    {
+      "id": "FLR-SETPIECE-291",
+      "scope": "corner-kick restart origin",
+      "behaviorIntent": "The designated corner kicker begins outside the field at the correct physical corner, approaches the live ball causally, and reaches contact without teleporting.",
+      "status": "ACTIVE",
+      "protectionClass": "repeated-regression",
+      "authoritativeEvidenceRefs": ["evidence/v40/V40_CORNER_KICKER_OUTSIDE_FIELD_FIX.md", "5dfba56"],
+      "affectedModules": ["runtime/restart_movement.js", "runtime/corner_templates.js", "runtime/continuous_match_core.js", "runtime/v37_set_piece_liveliness_patch.js"],
+      "entrypoints": ["runtime/restart_movement.js"],
+      "dependencyTags": ["corner", "outside-field", "run-up", "contact"],
+      "checks": [{"path": "QA/v40_corner_kicker_outside_field.js", "export": "run"}],
+      "humanOnlyObservable": "At each physical corner, the kicker is visibly outside the boundary before the run-up.",
+      "revisionPolicy": "The run-up implementation may change, but outside-origin, live-ball approach, and non-teleport contact are protected until an explicit revision.",
+      "history": [{"event": "FIXED", "ref": "5dfba56"}, {"event": "SEEDED", "ref": "evidence/v40/V40_CORNER_KICKER_OUTSIDE_FIELD_FIX.md"}]
+    },
+    {
+      "id": "FLR-SETPIECE-293",
+      "scope": "corner responsibility and cluster geometry",
+      "behaviorIntent": "Corner responsibilities retain identifiable ownership and plausible separated setup/live geometry; unrelated players do not collapse onto one target without a live football cause.",
+      "status": "ACTIVE",
+      "protectionClass": "repeated-regression",
+      "authoritativeEvidenceRefs": ["evidence/v40/V40_P0_CORNER_GEOMETRY_GATE_REPAIR.md", "32528cc"],
+      "affectedModules": ["runtime/corner_templates.js", "runtime/v39_corner_responsibility_patch.js", "final_match_test_dock.js"],
+      "entrypoints": ["runtime/corner_templates.js", "final_match_test_dock.js"],
+      "dependencyTags": ["corner", "responsibility", "cluster", "renderer"],
+      "checks": [{"path": "QA/v40_corner_geometry_gate.js", "export": "selftest"}],
+      "humanOnlyObservable": "The visible corner scene must read as distinct responsibilities rather than an unexplained player cluster; browser capture remains separately required.",
+      "revisionPolicy": "Zone geometry and role arbitration may be refactored or intentionally redesigned, but silent responsibility collapse is a regression.",
+      "history": [{"event": "FIXED", "ref": "32528cc"}, {"event": "SEEDED", "ref": "evidence/v40/V40_P0_CORNER_GEOMETRY_GATE_REPAIR.md"}]
+    },
+    {
+      "id": "FLR-RENDER-037",
+      "scope": "goalkeeper visible shape and dive travel",
+      "behaviorIntent": "The goalkeeper's visible shape and pose communicate the live internal reaction/travel state and terminal contact, without a renderer override silently contradicting engine state.",
+      "status": "ACTIVE",
+      "protectionClass": "user-visual-pass",
+      "authoritativeEvidenceRefs": ["evidence/v39/POST_DEPLOY_VISUAL_REPORT_BATCH_01.md", "evidence/v40/V40_VALIDATION_CONFIDENCE_PHASE_B.md", "a2f4a1c"],
+      "affectedModules": ["final_match_test_dock.js", "final_match_v37_test_visual_patch.js", "runtime/v37_match_feel_patch.js", "QA/v39_validation_truth_guards.js"],
+      "entrypoints": ["final_match_test_dock.js", "runtime/v37_match_feel_patch.js"],
+      "dependencyTags": ["GK", "renderer", "visual-shape", "dive-travel"],
+      "checks": [{"path": "QA/v39_validation_truth_selftest.js", "export": "run"}, {"path": "QA/v40_gk_renderer_semantic_selftest.js", "export": "run"}],
+      "humanOnlyObservable": "Browser capture is required to verify the actual canvas shape, first visible reaction, travel, and terminal pose; missing hosted capture remains QA_INFRA_BLOCKED.",
+      "browserCapture": {
+        "workflow": ".github/workflows/v40-browser-renderer-capture.yml",
+        "runner": "tools/v40_browser_renderer_capture.js",
+        "config": "QA/v40_browser_renderer_capture_config.json",
+        "requiredStatus": "CAPTURE_OK_WITH_FINDINGS_OR_CAPTURE_OK_CLEAN",
+        "qualification": "Do not claim visual PASS until a hosted Chromium capture has run and been reviewed."
+      },
+      "revisionPolicy": "The renderer may be reimplemented and the intended visible behavior may be revised, superseded, or retired only through an explicit decision with replacement behavior and affected checks recorded.",
+      "history": [
+        {"event": "GOOD_BEHAVIOR", "ref": "e215f7d", "marker": "GK_SAVE_ICON_CIRCLE_0.1"},
+        {"event": "SILENT_REVERSION_CONFIRMED", "ref": "db03ddd", "marker": "GK_DIVE_RENDER_NO_OVERRIDE_0.1", "reason": "No approval/evidence of intentional revision found in repository audit."},
+        {"event": "LIVE_TRAVEL_REPAIR", "ref": "a2f4a1c", "marker": "DIVE_PUSH_OFF_TRAVEL/PARRY"}
+      ]
+    }
+  ]
+}

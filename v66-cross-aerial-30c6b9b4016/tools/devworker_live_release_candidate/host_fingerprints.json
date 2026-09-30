@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "worker_sha256": "93540610a2e833a380f77e66cc8afbb728629464eacbbb7533c89c6efe9ca70a",
+  "config_sha256": "be1a4dbd016d340a0affc3e1283594cc2e81c968eea5649584546560aa3aee49",
+  "launcher_sha256": "d199b05c24a989ab9ab7f3545f4943c6aec04279e877dc97fbbef8359124850d",
+  "safe_config_structure": {
+    "root_fields": ["poll_seconds", "projects"],
+    "projects_type": "object",
+    "project_count": 1,
+    "project_fields": ["repo", "workdir"]
+  }
+}

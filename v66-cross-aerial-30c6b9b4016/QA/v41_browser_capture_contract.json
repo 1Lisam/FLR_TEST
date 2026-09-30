@@ -1,0 +1,9 @@
+{
+  "schemaVersion":"FLR_V41_BROWSER_CAPTURE_CONTRACT_1.0",
+  "targets":["LOCAL","HOSTED"],
+  "requiredFields":["candidateSourceSHA","runtimeSourceSHA","validatorHead","deployedBuildSHA","captureManifest","scenarioId","seed","startState","firstVisibleReaction","visiblePoseOrOwnership","terminalEvent","timestamps","frameIndices","screenshotsOrSerializedVisualEvidence","resultStatus","familyEvidence"],
+  "statuses":["CAPTURE_OK_CLEAN","CAPTURE_OK_WITH_FINDINGS","HOST_EXECUTION_REQUIRED","BLOCKED"],
+  "localCommand":"node tools/v40_browser_renderer_capture.js --source-sha=$(git rev-parse HEAD)",
+  "hostedCommand":"node QA/v41_browser_capture_runner.js --target=HOSTED --candidate-source-sha=b4777768f41ee252ba38ecfa84a01fc8409fb182 --runtime-source-sha=<declared-runtime-tree-sha> --validator-head=$(git rev-parse HEAD) --evidence=/absolute/path/manifest.json",
+  "policy":{"hostedCaptureCannotBeInferred":true,"rendererVisibleClaimsRequireScreenshots":true,"gkRequiresFirstReactionTravelTerminalPose":true,"familyEvidenceRequired":["PROTAGONIST_AUTHORITY","CONTINUITY_REPLAY","SET_PIECE_CAUSALITY","GK_ENGINE_TO_RENDER"],"defensiveResponsibilityMayUseTelemetry":true,"noGameplayMutation":true}
+}

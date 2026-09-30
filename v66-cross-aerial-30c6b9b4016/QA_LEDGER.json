@@ -1,0 +1,48 @@
+{
+  "schema": "FLR_QA_LEDGER_1.0",
+  "purpose": "Avoid meaningless duplicate deterministic QA while preserving necessary reruns after relevant source/config changes.",
+  "baseline": {
+    "label": "V33_FINAL_TT052_V7",
+    "source_tree_sha256": "251ea6c30ad528a2f5d6ce2f8bf01f04cccc7fa6bf43a693d78b08b72809b4df",
+    "verdict": "PASS_FOR_USER_VISUAL_RETEST_TT052"
+  },
+  "entries": [
+    {
+      "id": "V33_V7_GK_DISTANCE_SWEEP_400",
+      "status": "VALID_BASELINE",
+      "path": "evidence/v33_final/USER_TEST_TT052_READINESS/V7_REGRESSION/gk_open_window_distance_sweep_400.json",
+      "runner": "devtools/v33_qa/gk_open_window_distance_sweep.js",
+      "note": "Reuse until relevant GK-contact source/config changes."
+    },
+    {
+      "id": "V33_V7_SCREEN20",
+      "status": "VALID_BASELINE",
+      "path": "evidence/v33_final/USER_TEST_TT052_READINESS/V7_SCREEN20",
+      "note": "Final V7 20-match raw evidence preserved."
+    },
+    {
+      "id": "V33_V7_CAUSAL10",
+      "status": "VALID_BASELINE",
+      "path": "evidence/v33_final/USER_TEST_TT052_READINESS/V7_CAUSAL_PRESSURE10",
+      "note": "Final V7 causal evidence preserved."
+    },
+    {
+      "id": "V33_V7_LIVE90_3",
+      "status": "VALID_BASELINE",
+      "path": "evidence/v33_final/USER_TEST_TT052_READINESS/V7_LIVE90",
+      "note": "Three live90 evidence runs preserved."
+    },
+    {
+      "id": "V33_V8_GK_CONTACT",
+      "status": "REJECTED_REFERENCE_ONLY",
+      "path": "evidence/v33_final/USER_TEST_TT052_READINESS/V8_BODY_CONTACT",
+      "note": "Do not use as donor."
+    },
+    {
+      "id": "V33_V9_GK_CONTACT",
+      "status": "REJECTED_REFERENCE_ONLY",
+      "path": "evidence/v33_final/USER_TEST_TT052_READINESS/V9_SWEPT_CONTACT",
+      "note": "Do not use as donor."
+    }
+  ]
+}

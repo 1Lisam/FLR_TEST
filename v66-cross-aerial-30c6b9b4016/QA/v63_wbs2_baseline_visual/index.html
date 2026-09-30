@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V63 · WBS1 baseline / WBS2 continuous visual QA</title>
+<style>
+:root{color-scheme:dark}body{margin:0;background:#101820;color:#eef;font:14px system-ui}main{max-width:1260px;margin:auto;padding:12px}h1{font-size:20px;margin:0 0 10px}.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}button,select,input{font:inherit;padding:7px;border:1px solid #75818b;border-radius:5px;background:#203240;color:#fff}button{cursor:pointer}button:disabled{opacity:.45;cursor:default}button[aria-pressed=true]{outline:2px solid #ffed4a}input[type=number]{width:100px}canvas{display:block;width:100%;height:auto;background:#285b36}#score{font-size:18px;font-weight:bold}#status{min-height:1.5em;color:#ffed4a}#choices{padding:10px;background:#17232d;min-height:44px}#targets,#actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.lob{border-color:#ffed4a}small,details{color:#acbdc7}pre{white-space:pre-wrap;max-height:220px;overflow:auto;font-size:12px}ul{padding-left:22px}#debug{font-size:11px;color:#acbdc7}#source{overflow-wrap:anywhere}
+</style>
+</head>
+<body><main>
+<h1>WBS1 기준 화면 · WBS2 로빙 패스 연속 관찰</h1>
+<small id="source">격리 런타임을 불러오는 중…</small>
+<div class="controls">
+<label>모드 <select id="mode">
+<option value="BASELINE">BASELINE CONTROL</option>
+<option value="NO_LOB">WBS2 NO-LOB</option>
+<option value="FOCUS">WBS2 LOB FOCUS</option>
+<option value="NATURAL">WBS2 NATURAL FULL MATCH</option>
+</select></label>
+<label>Seed <input id="seed" type="number" min="0" max="4294967295" step="1" value="1"></label>
+<button id="same" disabled>같은 seed / 초기화</button><button id="next" disabled>다음 seed</button>
+<label>속도 <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label>
+<button id="start" disabled>시작</button><button id="pause" disabled>일시정지</button><button id="resume" disabled>계속</button>
+</div>
+<div id="score">HOME 0 : 0 AWAY · 00:00</div>
+<div id="status" role="status" aria-live="polite">준비 중</div>
+<canvas id="qaPitch" width="1260" height="820" aria-label="실제 0.05초 상태의 축구 경기장"></canvas>
+<section id="choices" aria-label="현재 실제 선택">
+<div id="choiceHint">FOCUS에서 실제 대상 선수를 고른 뒤 별도의 동작 버튼을 누르세요.</div>
+<div id="targets"></div><div id="actions"></div>
+</section>
+<label><input id="showDebug" type="checkbox"> 보조 디버그 표시</label><pre id="debug" hidden></pre>
+<details><summary>FOCUS fixture receipt (배치 변경 없음)</summary><pre id="receipt">이 모드에는 fixture가 없습니다.</pre></details>
+<ul>
+<li>같은 seed로 BASELINE → NO-LOB 전환: 선수 간격·움직임·재시작을 비교합니다.</li>
+<li>FOCUS: H-LCM의 자연스러운 선택까지 연속 관찰합니다. 대상 선택만으로는 실행되지 않습니다. 로빙 버튼을 직접 눌러 높이·낙하·실제 경합을 확인합니다.</li>
+<li>공의 지면 그림자와 떠 있는 공을 함께 확인합니다. 성공·접촉·결과는 강제하지 않습니다.</li>
+<li>NATURAL: fixture 없이 실제 세트피스와 경기 종료까지 관찰합니다. 관찰 모드의 선수는 NPC이며 사용자 주인공을 자동 조작하지 않습니다.</li>
+</ul>
+<small>이 전체 경기 보기는 QA 전용 연속 관찰입니다. 폐기된 제품 90분 경로를 되살리는 기능이 아닙니다. 모든 모드는 Legacy/core 0.05초 실행 상태를 직접 그립니다. 속도는 표시 간격만 변경하며, 탭이 숨겨지면 멈춥니다. 높은 속도는 화면 주사율에 의해 제한될 수 있습니다.</small>
+</main><script src="continuous_visual_driver.js"></script></body>
+</html>

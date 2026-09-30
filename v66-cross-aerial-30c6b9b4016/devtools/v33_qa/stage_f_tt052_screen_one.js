@@ -1,0 +1,4 @@
+'use strict';
+const path=require('path');const root=process.argv[2],seed=process.argv[3];if(!root||!seed){process.exit(2)}
+const E=require(path.resolve(root,'runtime/continuous_match_core.js'));const r=E.runToEnd(seed,{dt:.05,telemetry:{}}),s=r.snapshot,x=s.stats||{},goals=(s.score.HOME||0)+(s.score.AWAY||0),sot=(x.saves||0)+goals;
+console.log(JSON.stringify({seed,completed:!!s.completed,time:s.time,score:s.score,shots:x.shots||0,boxShots:x.boxShots||0,estimatedSoT:sot,saves:x.saves||0,goals,corners:x.corners||0,shotBlocks:x.shotBlocks||0,shotBlockCorners:x.shotBlockCorners||0,gkCatches:x.gkCatches||0,gkParries:x.gkParries||0,cleanKeeperChanceShots:x.cleanKeeperChanceShots||0,cleanKeeperChanceGoals:x.cleanKeeperChanceGoals||0,cleanKeeperChanceSaves:x.cleanKeeperChanceSaves||0,setPieceSetups:x.setPieceSetups||0,setPieceLiveEntries:x.setPieceLiveEntries||0,setPieceLiveExits:x.setPieceLiveExits||0,penalties:x.penalties||0,steps:r.steps},null,2));

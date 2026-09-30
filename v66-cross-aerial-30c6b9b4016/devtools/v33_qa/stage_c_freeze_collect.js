@@ -1,0 +1,8 @@
+'use strict';
+const path=require('path');const root=process.argv[2],seed=process.argv[3];if(!root||!seed)process.exit(2);
+const E=require(path.join(root,'runtime','continuous_match_core.js'));const m=E.createMatch(seed,{telemetry:{}}),dt=.05;let steps=0,prevShots=0,out=[];
+const other=t=>t==='HOME'?'AWAY':'HOME',dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const seg=(ax,ay,bx,by,px,py)=>{const vx=bx-ax,vy=by-ay,wx=px-ax,wy=py-ay,c1=vx*wx+vy*wy,c2=vx*vx+vy*vy,t=c2?Math.max(0,Math.min(1,c1/c2)):0,qx=ax+vx*t,qy=ay+vy*t;return Math.hypot(px-qx,py-qy)};
+while(!m.completed&&steps++<220000){E.step(m,dt);if(m.stats.shots<=prevShots){prevShots=m.stats.shots;continue;}prevShots=m.stats.shots;if(!(m.ball?.mode==='FLIGHT'&&m.ball.kind==='SHOT'))continue;const sh=m.playersById[m.ball.lastTouchPlayer];if(!sh)continue;const def=m.players.filter(p=>p.team===other(sh.team)&&p.role!=='GK'),gk=m.players.find(p=>p.team===other(sh.team)&&p.role==='GK');if(!gk)continue;const tx=m.ball.targetX,ty=m.ball.targetY,lane=def.filter(p=>seg(sh.x,sh.y,tx,ty,p.x,p.y)<1.6).length,nearest=Math.min(...def.map(p=>dist(p,sh)));
+if(m.ball.onTarget&&lane===0&&m.ball.shotDistance>=12&&m.ball.shotDistance<18&&!m.ball.shotOneVOne&&!m.ball.shotClearKeeperChance){out.push({seed,t:Number(m.time.toFixed(3)),shapeDelta:Number(Math.max(0,m.nextShape-m.time).toFixed(3)),shotTeam:m.ball.shotTeam,shooterId:sh.id,dGoal:Number(m.ball.shotDistance.toFixed(3)),nearestDefender:Number(nearest.toFixed(3)),ball:{...m.ball},gk:{id:gk.id,team:gk.team,x:gk.x,y:gk.y,vx:gk.vx,vy:gk.vy,tx:gk.tx,ty:gk.ty,action:gk.action,tacticalTask:gk.tacticalTask,sprint:gk.sprint,bodyAngle:gk.bodyAngle,faceTargetAngle:gk.faceTargetAngle}});}}
+console.log(JSON.stringify({seed,states:out}));

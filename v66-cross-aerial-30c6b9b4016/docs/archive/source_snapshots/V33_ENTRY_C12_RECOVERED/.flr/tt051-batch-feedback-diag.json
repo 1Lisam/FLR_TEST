@@ -1,0 +1,6667 @@
+{
+  "schemaVersion": "FLR_TT051_BATCH_FEEDBACK_DIAG_1.1",
+  "reports": [
+    {
+      "id": "tt051-259e1218-0586-4693-af88-7adfb22b6fc3",
+      "description": "이 부분에서는 원터치 상황이 나오는데 원터치로 돌려주는 상황과 내가 볼을 간수한다 두가지 선택 뿐인게 최선인가? 날아오는걸 바로 다시 되돌려 주는 리턴도 가능은 하긴 한데 확률상 다른쪽으로 전달하는것도 가능해지는거라서.",
+      "category": "패스/공격",
+      "reportedAt": "2026-08-21T02:28:56.240Z",
+      "current": {
+        "boundary": {
+          "at": 1687.200000000019,
+          "reason": "NON_HERO_SHOT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 40,
+          "post": 174,
+          "episode": 214
+        },
+        "options": [
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -12.592602695240814,
+            "d": 15.232071573864147,
+            "receiverPressure": 6.059578338964168,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "ONE_TOUCH_PASS",
+          "targetId": "H-LCM",
+          "label": "원터치 패스 → 같은 팀 LCM",
+          "targetSlot": "LCM",
+          "forward": -0.7707451572147335,
+          "d": 10.20475742204525,
+          "receiverPressure": 6.458669891066982,
+          "eta": 0.48769747620646065,
+          "contactZ": 0,
+          "flightKind": "PASS"
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "원터치 패스 → 같은 팀 LCM 결과",
+          "detail": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 1691.2000000000153,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1691.2000000000153,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: SAFE_PASS -> H-LCM"
+          },
+          {
+            "t": 1697.9000000000092,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: ONE_TOUCH_PASS -> H-LCM"
+          },
+          {
+            "t": 1698.6000000000085,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          }
+        ],
+        "hero": {
+          "samples": 214,
+          "start": [
+            89.55,
+            34.76
+          ],
+          "end": [
+            78.92,
+            30.63
+          ],
+          "path": 49.86,
+          "net": 11.41,
+          "pathToNet": 4.37,
+          "xRev": 5,
+          "yRev": 6,
+          "actions": [
+            [
+              1687.3,
+              "CLEAR_CARRIER_LANE"
+            ],
+            [
+              1687.6,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1689.4,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              1690.6,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              1691.5,
+              "POST_SAFE_PASS_SUPPORT"
+            ],
+            [
+              1693,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1693.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              1693.9,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1695.7,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              1696,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1698.1,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              1698.7,
+              "PIN_AND_RUN"
+            ],
+            [
+              1699.3,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1701.7,
+              "PIN_AND_RUN"
+            ],
+            [
+              1705.3,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1707.4,
+              "PIN_AND_RUN"
+            ],
+            [
+              1708,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              1708.3,
+              "PIN_AND_RUN"
+            ],
+            [
+              1708.6,
+              "MOVE_TO_RECEIVE"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-RCB",
+            "d": 1.75,
+            "x": 80.57,
+            "y": 30.06,
+            "task": "MARK_LANE_SCREEN",
+            "mark": "H-ST"
+          },
+          {
+            "id": "A-LCB",
+            "d": 11.24,
+            "x": 77.39,
+            "y": 41.76,
+            "task": "HOLD_BLOCK",
+            "mark": null
+          },
+          {
+            "id": "A-LCM",
+            "d": 11.87,
+            "x": 74.71,
+            "y": 41.73,
+            "task": "SHOT_LANE_COVER",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-RCB": {
+            "samples": 214,
+            "start": [
+              94.75,
+              27.81
+            ],
+            "end": [
+              80.57,
+              30.06
+            ],
+            "path": 49.55,
+            "net": 14.35,
+            "pathToNet": 3.45,
+            "xRev": 12,
+            "yRev": 10,
+            "actions": [
+              [
+                1687.3,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1687.6,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                1687.9,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1688.8,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1689.4,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1690.6,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1691.5,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                1691.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1692.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1694.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1697.5,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1698.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1699,
+                "HOLD_BLOCK"
+              ],
+              [
+                1699.6,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1699.9,
+                "HOLD_BLOCK"
+              ],
+              [
+                1701,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1702.3,
+                "HOLD_BLOCK"
+              ],
+              [
+                1703.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1703.8,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1704.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1707.1,
+                "MARK_LANE_SCREEN"
+              ]
+            ]
+          },
+          "A-LCB": {
+            "samples": 214,
+            "start": [
+              92.42,
+              43.08
+            ],
+            "end": [
+              77.39,
+              41.76
+            ],
+            "path": 55.75,
+            "net": 15.09,
+            "pathToNet": 3.69,
+            "xRev": 7,
+            "yRev": 6,
+            "actions": [
+              [
+                1687.3,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1687.9,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                1690,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1691.8,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                1692.1,
+                "HOLD_BLOCK"
+              ],
+              [
+                1693.3,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                1694.5,
+                "HOLD_BLOCK"
+              ],
+              [
+                1699,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1699.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1703.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1704.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1705.4,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1706.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1707.4,
+                "HOLD_BLOCK"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 214,
+            "start": [
+              72.72,
+              47.38
+            ],
+            "end": [
+              74.71,
+              41.73
+            ],
+            "path": 78.5,
+            "net": 5.99,
+            "pathToNet": 13.1,
+            "xRev": 4,
+            "yRev": 5,
+            "actions": [
+              [
+                1687.3,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1687.6,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1687.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1690,
+                "CUTBACK_TRACK"
+              ],
+              [
+                1691.5,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                1691.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1692.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1694.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1694.8,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                1695.7,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1696,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1696.1,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1698.1,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1699.4,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1701.1,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                1702.9,
+                "DEEP_TUCK"
+              ],
+              [
+                1703.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1704.4,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1705.6,
+                "ENGAGE"
+              ],
+              [
+                1706.8,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1707.1,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                1707.4,
+                "SHOT_LANE_COVER"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 1708.6,
+          "phase": "FINAL_THIRD",
+          "possession": "HOME",
+          "ball": {
+            "mode": "FLIGHT",
+            "x": 63.038,
+            "y": 34.428,
+            "ownerId": null,
+            "intendedReceiverId": "H-ST",
+            "kind": "PASS"
+          },
+          "heroPos": {
+            "x": 78.92,
+            "y": 30.627,
+            "vx": -2.459,
+            "vy": -2.887,
+            "action": "MOVE_TO_RECEIVE",
+            "tacticalTask": "MOVE_TO_RECEIVE"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 60.73,
+              "y": 23.42,
+              "vx": -5.86,
+              "vy": 0.18,
+              "task": "RECONNECT_8"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 61.06,
+              "y": 34.94,
+              "vx": 2.44,
+              "vy": 0.31,
+              "task": "POST_PASS_CONTINUE_RUN"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 78.5,
+              "y": 48.43,
+              "vx": -0.07,
+              "vy": 1.03,
+              "task": "RECOVER_MIDFIELD_8"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 87.41,
+              "y": 18,
+              "vx": 0,
+              "vy": 0,
+              "task": "FAR_SIDE_HOLD"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 87.91,
+              "y": 50,
+              "vx": 0,
+              "vy": 0,
+              "task": "FAR_SIDE_HOLD"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 960.1000000000175,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 56,
+          "post": 148,
+          "episode": 204
+        },
+        "options": [
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-CM",
+            "label": "안전한 패스 → 같은 팀 CM",
+            "targetSlot": "CM",
+            "forward": -18.83416127567059,
+            "d": 18.83512809196861,
+            "receiverPressure": 9.285901938730046,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -11.071029177290157,
+            "d": 13.984417243442671,
+            "receiverPressure": 3.641911552704775,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "SHOT",
+          "targetId": null,
+          "label": "슈팅",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": "GOAL",
+          "headline": "슈팅 → 득점",
+          "detail": "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0 세리머니와 킥오프 준비까지 실제 장면으로 이어졌습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 965.7000000000188,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: CARRY"
+          },
+          {
+            "t": 968.9000000000195,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 968.9000000000195,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 974.9000000000209,
+            "type": "SHOT",
+            "actorId": "H-ST",
+            "targetId": null,
+            "text": "블루팀 ST이 슈팅을 시도합니다."
+          },
+          {
+            "t": 974.9000000000209,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: SHOT"
+          },
+          {
+            "t": 975.500000000021,
+            "type": "GOAL",
+            "actorId": "H-ST",
+            "targetId": null,
+            "text": "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0"
+          }
+        ],
+        "hero": {
+          "samples": 204,
+          "start": [
+            75.17,
+            30.69
+          ],
+          "end": [
+            43.04,
+            34.01
+          ],
+          "path": 130.65,
+          "net": 32.3,
+          "pathToNet": 4.05,
+          "xRev": 3,
+          "yRev": 3,
+          "actions": [
+            [
+              960.2,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              964.1,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              965.1,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              965.8,
+              "CARRY_FORWARD"
+            ],
+            [
+              967.4,
+              "PROTECT_SCAN"
+            ],
+            [
+              969.2,
+              "POST_PASS_CONTINUE_RUN"
+            ],
+            [
+              971,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              974,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              975,
+              "POST_SHOT_FOLLOW"
+            ],
+            [
+              975.5,
+              "GOAL_SCORER_CELEBRATE"
+            ],
+            [
+              980.5,
+              "PRESS_CONTAIN"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-CM",
+            "d": 9.41,
+            "x": 52.45,
+            "y": 34,
+            "task": "CARRY_SCAN",
+            "mark": null
+          },
+          {
+            "id": "A-ST",
+            "d": 11.72,
+            "x": 54.76,
+            "y": 34,
+            "task": "ATTACK_OPEN_CHANNEL",
+            "mark": null
+          },
+          {
+            "id": "A-LCM",
+            "d": 23.24,
+            "x": 62.95,
+            "y": 45.99,
+            "task": "ADVANCING_8",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-CM": {
+            "samples": 204,
+            "start": [
+              64.7,
+              34.02
+            ],
+            "end": [
+              52.45,
+              34
+            ],
+            "path": 75.66,
+            "net": 12.25,
+            "pathToNet": 6.17,
+            "xRev": 2,
+            "yRev": 2,
+            "actions": [
+              [
+                960.2,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                961.4,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                964.7,
+                "DEEP_SCREEN"
+              ],
+              [
+                966.2,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                971.3,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                974,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                975.5,
+                "RETURN_FOR_KICKOFF"
+              ],
+              [
+                980.5,
+                "CARRY_SCAN"
+              ]
+            ]
+          },
+          "A-ST": {
+            "samples": 204,
+            "start": [
+              39.42,
+              32.77
+            ],
+            "end": [
+              54.76,
+              34
+            ],
+            "path": 28.79,
+            "net": 15.39,
+            "pathToNet": 1.87,
+            "xRev": 3,
+            "yRev": 4,
+            "actions": [
+              [
+                960.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                975.5,
+                "RETURN_FOR_KICKOFF"
+              ],
+              [
+                980.5,
+                "ATTACK_OPEN_CHANNEL"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 204,
+            "start": [
+              65.02,
+              46.22
+            ],
+            "end": [
+              62.95,
+              45.99
+            ],
+            "path": 73.04,
+            "net": 2.08,
+            "pathToNet": 35.11,
+            "xRev": 3,
+            "yRev": 4,
+            "actions": [
+              [
+                960.2,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                961.4,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                964.7,
+                "DEEP_TUCK"
+              ],
+              [
+                965.3,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                969.2,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                970.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                974,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                975.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                975.5,
+                "RETURN_FOR_KICKOFF"
+              ],
+              [
+                980.5,
+                "ADVANCING_8"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 980.5,
+          "phase": "PROGRESSION",
+          "possession": "AWAY",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 52.03,
+            "y": 34,
+            "ownerId": "A-CM",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 43.044,
+            "y": 34.006,
+            "vx": 0.435,
+            "vy": 0.063,
+            "action": "PRESS_CONTAIN",
+            "tacticalTask": "PRESS_CONTAIN"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 34.03,
+              "y": 22.02,
+              "vx": 0.35,
+              "vy": 0.2,
+              "task": "FAR_SIDE_BLOCK"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 36.03,
+              "y": 34,
+              "vx": 0.34,
+              "vy": 0,
+              "task": "SHOT_LANE_COVER"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 34.04,
+              "y": 45.97,
+              "vx": 0.39,
+              "vy": -0.26,
+              "task": "BALL_SIDE_BLOCK"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 42.05,
+              "y": 15.99,
+              "vx": 0.46,
+              "vy": -0.1,
+              "task": "HOLD_BLOCK"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 42.04,
+              "y": 52.01,
+              "vx": 0.43,
+              "vy": 0.09,
+              "task": "HOLD_BLOCK"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tt051-3f65b177-dbc9-41b2-81fe-2e7472edbda8",
+      "description": "1. 100경기 정도 시뮬레이션을 돌려서 나타나는 모든 선택지를 슈팅으로만 했을 경우 전체적인 경기당 몇 골을 득점하는지 계산해줘\n\n2. 플레이어 뿐만 아니라 NPC들도 원터치 패스 등 터치 행동을 할 수 있도록 해줘",
+      "category": "슈팅/GK",
+      "reportedAt": "2026-08-21T02:35:07.726Z",
+      "current": {
+        "boundary": {
+          "at": 5267.100000000299,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 74,
+          "post": 31,
+          "episode": 105
+        },
+        "options": [
+          {
+            "id": "TAKE_ON",
+            "targetId": null,
+            "label": "1대1 돌파",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -8.796521437357157,
+            "d": 9.62815306907431,
+            "receiverPressure": 3.7818409586280204,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "TAKE_ON",
+          "targetId": null,
+          "label": "1대1 돌파",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": "TACKLED",
+          "headline": "1대1 돌파 실패",
+          "detail": "블루팀 ST이 레드팀 LCB을 상대로 돌파를 시도합니다. → 레드팀 LCB이 블루팀 ST의 돌파를 막고 공을 빼앗았습니다. → 레드팀 LCB이 레드팀 CM 쪽으로 강한 지상 패스했습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 5274.500000000326,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TAKE_ON"
+          }
+        ],
+        "hero": {
+          "samples": 105,
+          "start": [
+            67.84,
+            35.25
+          ],
+          "end": [
+            81.48,
+            31.97
+          ],
+          "path": 28.3,
+          "net": 14.03,
+          "pathToNet": 2.02,
+          "xRev": 3,
+          "yRev": 3,
+          "actions": [
+            [
+              5267.2,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5268.4,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              5272.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              5273.5,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5273.9,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5274.6,
+              "TAKE_ON"
+            ],
+            [
+              5275,
+              "PRESS_CONTAIN"
+            ],
+            [
+              5277.1,
+              "HOLD_BLOCK"
+            ],
+            [
+              5277.4,
+              "SHOT_LANE_COVER"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-LCB",
+            "d": 2.79,
+            "x": 83.07,
+            "y": 34.26,
+            "task": "BUILD_PLATFORM",
+            "mark": null
+          },
+          {
+            "id": "A-RCB",
+            "d": 6.64,
+            "x": 79.87,
+            "y": 25.54,
+            "task": "BUILD_PLATFORM",
+            "mark": null
+          },
+          {
+            "id": "A-CM",
+            "d": 9.09,
+            "x": 72.63,
+            "y": 34.05,
+            "task": "FIRST_TOUCH_FLOW",
+            "mark": "H-LCM"
+          }
+        ],
+        "nearestMetrics": {
+          "A-LCB": {
+            "samples": 105,
+            "start": [
+              78.56,
+              43.07
+            ],
+            "end": [
+              83.07,
+              34.26
+            ],
+            "path": 26.66,
+            "net": 9.89,
+            "pathToNet": 2.69,
+            "xRev": 3,
+            "yRev": 0,
+            "actions": [
+              [
+                5267.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                5269.6,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5271.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5273.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5273.9,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5274.9,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5275,
+                "PROTECT_SCAN"
+              ],
+              [
+                5275.2,
+                "SHIELD_SCAN"
+              ],
+              [
+                5275.6,
+                "PROTECT_SCAN"
+              ],
+              [
+                5276.2,
+                "TURN_BACK"
+              ],
+              [
+                5277.1,
+                "BUILD_PLATFORM"
+              ]
+            ]
+          },
+          "A-RCB": {
+            "samples": 105,
+            "start": [
+              76.99,
+              24.66
+            ],
+            "end": [
+              79.87,
+              25.54
+            ],
+            "path": 33.39,
+            "net": 3.01,
+            "pathToNet": 11.1,
+            "xRev": 2,
+            "yRev": 6,
+            "actions": [
+              [
+                5267.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                5271,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5273.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5273.5,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5274.1,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5275,
+                "REST_DEFENCE"
+              ],
+              [
+                5276.8,
+                "BUILD_PLATFORM"
+              ]
+            ]
+          },
+          "A-CM": {
+            "samples": 105,
+            "start": [
+              57.4,
+              34.61
+            ],
+            "end": [
+              72.63,
+              34.05
+            ],
+            "path": 39.97,
+            "net": 15.24,
+            "pathToNet": 2.62,
+            "xRev": 1,
+            "yRev": 3,
+            "actions": [
+              [
+                5267.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5268.1,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5269,
+                "ENGAGE"
+              ],
+              [
+                5269.6,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                5269.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5270.5,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5271.1,
+                "DEEP_SCREEN"
+              ],
+              [
+                5271.4,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5273.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5274.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5275,
+                "DROP_BETWEEN_LINES"
+              ],
+              [
+                5277.1,
+                "MOVE_TO_RECEIVE"
+              ],
+              [
+                5277.6,
+                "FIRST_TOUCH_FLOW"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 5277.6,
+          "phase": "PROGRESSION",
+          "possession": "AWAY",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 73.308,
+            "y": 33.687,
+            "ownerId": "A-CM",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 81.484,
+            "y": 31.972,
+            "vx": -4.992,
+            "vy": 0.488,
+            "action": "SHOT_LANE_COVER",
+            "tacticalTask": "SHOT_LANE_COVER"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 78.08,
+              "y": 30.99,
+              "vx": -5.04,
+              "vy": -0.44,
+              "task": "BALL_SIDE_BLOCK"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 52.07,
+              "y": 33.83,
+              "vx": -5.47,
+              "vy": 0.14,
+              "task": "MIDFIELD_BLOCK"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 63.07,
+              "y": 40.71,
+              "vx": -5.47,
+              "vy": 0.09,
+              "task": "FAR_SIDE_BLOCK"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 75.49,
+              "y": 14.06,
+              "vx": -5.84,
+              "vy": -1.02,
+              "task": "HOLD_BLOCK"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 75.38,
+              "y": 51.79,
+              "vx": -5.59,
+              "vy": 1.98,
+              "task": "HOLD_BLOCK"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 5163.3000000001575,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 101,
+          "post": 200,
+          "episode": 301
+        },
+        "options": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW",
+            "label": "공간 침투 패스 → 같은 팀 LW",
+            "targetSlot": "LW",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW",
+            "label": "전진 패스 → 같은 팀 RW",
+            "targetSlot": "RW",
+            "forward": -0.6891311337172255,
+            "d": 20.374449357908308,
+            "receiverPressure": 3.0726120473328,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -14.081447163282235,
+            "d": 16.180811608165623,
+            "receiverPressure": 11.655991856761606,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": -12.95583404240736,
+            "d": 16.382060833427925,
+            "receiverPressure": 8.439686375179372,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "TRAP_CONTROL",
+          "targetId": null,
+          "label": "트래핑 후 컨트롤",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": 0.5288899484461002,
+          "contactZ": 0,
+          "flightKind": "PASS"
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "트래핑 후 컨트롤 결과",
+          "detail": "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다. → 패스 경합에서 공이 완전히 소유되지 않고 흘렀습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 5163.90000000016,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          },
+          {
+            "t": 5170.200000000183,
+            "type": "PASS_MISCONTROL",
+            "actorId": null,
+            "targetId": null,
+            "text": "블루팀 RW이 패스를 완전히 잡지 못해 공이 흘렀습니다."
+          },
+          {
+            "t": 5174.100000000197,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 5174.100000000197,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 5181.300000000223,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TRAP_CONTROL"
+          },
+          {
+            "t": 5184.500000000235,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          }
+        ],
+        "hero": {
+          "samples": 301,
+          "start": [
+            53.28,
+            18.25
+          ],
+          "end": [
+            75.37,
+            37.99
+          ],
+          "path": 78.18,
+          "net": 29.63,
+          "pathToNet": 2.64,
+          "xRev": 5,
+          "yRev": 3,
+          "actions": [
+            [
+              5164.1,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5164.9,
+              "CLEAR_CARRIER_LANE"
+            ],
+            [
+              5166.4,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5167,
+              "PIN_AND_RUN"
+            ],
+            [
+              5167.9,
+              "ATTACK_BACK_POST"
+            ],
+            [
+              5168.2,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              5173,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5173.5,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5174.2,
+              "POST_PASS_CONTINUE_RUN"
+            ],
+            [
+              5176.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              5178.1,
+              "PIN_AND_RUN"
+            ],
+            [
+              5181.4,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5181.9,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5182.6,
+              "PROTECT_SCAN"
+            ],
+            [
+              5184.7,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              5185.6,
+              "PULL_OFF_FOR_CROSS"
+            ],
+            [
+              5188.3,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              5188.6,
+              "PIN_AND_RUN"
+            ],
+            [
+              5192.5,
+              "PIN_CENTRE_BACKS"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-LCB",
+            "d": 1.05,
+            "x": 76.33,
+            "y": 38.42,
+            "task": "MARK_LANE_SCREEN",
+            "mark": "H-ST"
+          },
+          {
+            "id": "A-LCM",
+            "d": 13.61,
+            "x": 61.76,
+            "y": 37.89,
+            "task": "FAR_SIDE_BLOCK",
+            "mark": null
+          },
+          {
+            "id": "A-CM",
+            "d": 14.93,
+            "x": 62.72,
+            "y": 30.07,
+            "task": "MIDFIELD_BLOCK",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-LCB": {
+            "samples": 301,
+            "start": [
+              84.97,
+              41.66
+            ],
+            "end": [
+              76.33,
+              38.42
+            ],
+            "path": 74.48,
+            "net": 9.23,
+            "pathToNet": 8.07,
+            "xRev": 15,
+            "yRev": 21,
+            "actions": [
+              [
+                5164.1,
+                "HOLD_BLOCK"
+              ],
+              [
+                5170.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5173.3,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5173.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5174.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5175.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5180.5,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5181.4,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5181.9,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5184.7,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5185,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5185.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5188.3,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5189.2,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5191.3,
+                "MARK_LANE_SCREEN"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 301,
+            "start": [
+              62.5,
+              42.83
+            ],
+            "end": [
+              61.76,
+              37.89
+            ],
+            "path": 95.43,
+            "net": 4.99,
+            "pathToNet": 19.13,
+            "xRev": 7,
+            "yRev": 8,
+            "actions": [
+              [
+                5164.1,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                5167,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5169.1,
+                "DEEP_TUCK"
+              ],
+              [
+                5169.7,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5170,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5170.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5172.1,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5173,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5173.3,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5173.6,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5173.9,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                5175.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5175.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5178.4,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5179.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5181.7,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                5182.3,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5184.4,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5184.7,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5185.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5186.5,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                5188.6,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5192.8,
+                "FAR_SIDE_BLOCK"
+              ]
+            ]
+          },
+          "A-CM": {
+            "samples": 301,
+            "start": [
+              61.38,
+              31.82
+            ],
+            "end": [
+              62.72,
+              30.07
+            ],
+            "path": 89.65,
+            "net": 2.21,
+            "pathToNet": 40.54,
+            "xRev": 3,
+            "yRev": 7,
+            "actions": [
+              [
+                5164.1,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                5167,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5169.1,
+                "DEEP_SCREEN"
+              ],
+              [
+                5169.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5170.3,
+                "DEEP_SCREEN"
+              ],
+              [
+                5171.5,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5178.1,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5179,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5181.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5182,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5182.3,
+                "DEEP_SCREEN"
+              ],
+              [
+                5184.7,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5188.6,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5191.3,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5191.6,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5192.8,
+                "MIDFIELD_BLOCK"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 5194.1,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "ball": {
+            "mode": "LOOSE",
+            "x": 53.318,
+            "y": 1.004,
+            "ownerId": null,
+            "intendedReceiverId": null,
+            "kind": "LOOSE"
+          },
+          "heroPos": {
+            "x": 75.371,
+            "y": 37.994,
+            "vx": -0.381,
+            "vy": -0.172,
+            "action": "PIN_CENTRE_BACKS",
+            "tacticalTask": "PIN_CENTRE_BACKS"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 71.86,
+              "y": 27.85,
+              "vx": -5.44,
+              "vy": -1.59,
+              "task": "HALFSPACE_CONNECTOR_8"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 47.89,
+              "y": 31.71,
+              "vx": -5.42,
+              "vy": -0.77,
+              "task": "PIVOT_SCREEN"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 58.77,
+              "y": 43.08,
+              "vx": -2.23,
+              "vy": -0.69,
+              "task": "HALFSPACE_SUPPORT_8"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 75.05,
+              "y": 7.76,
+              "vx": -4.35,
+              "vy": -3.99,
+              "task": "WIDE_COMBINE"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 84.43,
+              "y": 52.5,
+              "vx": 0,
+              "vy": 0,
+              "task": "FAR_SIDE_HOLD"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tt051-53de8a05-f3f4-465c-9780-e51d381d66f8",
+      "description": "이전 선택지에서 '볼 트래핑' 이후 다시 ST에게 공이 들어왔으나 플레이어가 전혀 관여 하지 않은 패스가 나왔어. 이 부분 확인 해줘",
+      "category": "조작권/선택",
+      "reportedAt": "2026-08-21T02:33:15.699Z",
+      "current": {
+        "boundary": {
+          "at": 5267.100000000299,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 74,
+          "post": 0,
+          "episode": 0
+        },
+        "options": [
+          {
+            "id": "TAKE_ON",
+            "targetId": null,
+            "label": "1대1 돌파",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -8.796521437357157,
+            "d": 9.62815306907431,
+            "receiverPressure": 3.7818409586280204,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": null,
+          "targetId": null,
+          "label": null,
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": null,
+          "headline": null,
+          "detail": null
+        },
+        "keyEvents": [],
+        "hero": {
+          "samples": 74,
+          "start": [
+            67.84,
+            35.25
+          ],
+          "end": [
+            85.03,
+            31.02
+          ],
+          "path": 21.14,
+          "net": 17.7,
+          "pathToNet": 1.19,
+          "xRev": 2,
+          "yRev": 2,
+          "actions": [
+            [
+              5267.2,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5268.4,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              5272.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              5273.5,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5273.9,
+              "FIRST_TOUCH_FLOW"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-LCB",
+            "d": 1.53,
+            "x": 86.18,
+            "y": 32.03,
+            "task": "PRESS_CONTAIN",
+            "mark": null
+          },
+          {
+            "id": "A-RCB",
+            "d": 7.09,
+            "x": 90.29,
+            "y": 26.26,
+            "task": "PRESS_CONTAIN",
+            "mark": null
+          },
+          {
+            "id": "A-RCM",
+            "d": 9.13,
+            "x": 78.81,
+            "y": 24.34,
+            "task": "CUTBACK_TRACK",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-LCB": {
+            "samples": 74,
+            "start": [
+              78.56,
+              43.07
+            ],
+            "end": [
+              86.18,
+              32.03
+            ],
+            "path": 20.38,
+            "net": 13.41,
+            "pathToNet": 1.52,
+            "xRev": 2,
+            "yRev": 0,
+            "actions": [
+              [
+                5267.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                5269.6,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5271.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5273.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5273.9,
+                "PRESS_CONTAIN"
+              ]
+            ]
+          },
+          "A-RCB": {
+            "samples": 74,
+            "start": [
+              76.99,
+              24.66
+            ],
+            "end": [
+              90.29,
+              26.26
+            ],
+            "path": 21.4,
+            "net": 13.39,
+            "pathToNet": 1.6,
+            "xRev": 2,
+            "yRev": 5,
+            "actions": [
+              [
+                5267.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                5271,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5273.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5273.5,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5274.1,
+                "PRESS_CONTAIN"
+              ]
+            ]
+          },
+          "A-RCM": {
+            "samples": 74,
+            "start": [
+              56.0,
+              20.19
+            ],
+            "end": [
+              78.81,
+              24.34
+            ],
+            "path": 28.62,
+            "net": 23.19,
+            "pathToNet": 1.23,
+            "xRev": 1,
+            "yRev": 0,
+            "actions": [
+              [
+                5267.2,
+                "BALL_SIDE_BLOCK"
+              ],
+              [
+                5269.9,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                5271.1,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5271.4,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5273.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5274.1,
+                "CUTBACK_TRACK"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 5274.5,
+          "phase": "CHANCE",
+          "possession": "HOME",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 85.451,
+            "y": 31.017,
+            "ownerId": "H-ST",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 85.031,
+            "y": 31.017,
+            "vx": 2.344,
+            "vy": 0.423,
+            "action": "FIRST_TOUCH_FLOW",
+            "tacticalTask": "FIRST_TOUCH_FLOW"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 76.23,
+              "y": 27.1,
+              "vx": 5.35,
+              "vy": 1.14,
+              "task": "EDGE_SHOT"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 60.67,
+              "y": 33.63,
+              "vx": 2.3,
+              "vy": 0.23,
+              "task": "COUNTER_GUARD"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 73.04,
+              "y": 41.73,
+              "vx": 1.53,
+              "vy": -1.07,
+              "task": "ST_WALL_SUPPORT"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 88.13,
+              "y": 16.98,
+              "vx": 0.42,
+              "vy": -2.65,
+              "task": "POST_SAFE_PASS_SUPPORT"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 86.08,
+              "y": 46.1,
+              "vx": 0.31,
+              "vy": 1.58,
+              "task": "ST_RELEASE_RUN"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 5163.3000000001575,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 101,
+          "post": 200,
+          "episode": 301
+        },
+        "options": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW",
+            "label": "공간 침투 패스 → 같은 팀 LW",
+            "targetSlot": "LW",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW",
+            "label": "전진 패스 → 같은 팀 RW",
+            "targetSlot": "RW",
+            "forward": -0.6891311337172255,
+            "d": 20.374449357908308,
+            "receiverPressure": 3.0726120473328,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -14.081447163282235,
+            "d": 16.180811608165623,
+            "receiverPressure": 11.655991856761606,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": -12.95583404240736,
+            "d": 16.382060833427925,
+            "receiverPressure": 8.439686375179372,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "TRAP_CONTROL",
+          "targetId": null,
+          "label": "트래핑 후 컨트롤",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": 0.5288899484461002,
+          "contactZ": 0,
+          "flightKind": "PASS"
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "트래핑 후 컨트롤 결과",
+          "detail": "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다. → 패스 경합에서 공이 완전히 소유되지 않고 흘렀습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 5163.90000000016,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          },
+          {
+            "t": 5170.200000000183,
+            "type": "PASS_MISCONTROL",
+            "actorId": null,
+            "targetId": null,
+            "text": "블루팀 RW이 패스를 완전히 잡지 못해 공이 흘렀습니다."
+          },
+          {
+            "t": 5174.100000000197,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 5174.100000000197,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 5181.300000000223,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TRAP_CONTROL"
+          },
+          {
+            "t": 5184.500000000235,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          }
+        ],
+        "hero": {
+          "samples": 301,
+          "start": [
+            53.28,
+            18.25
+          ],
+          "end": [
+            75.37,
+            37.99
+          ],
+          "path": 78.18,
+          "net": 29.63,
+          "pathToNet": 2.64,
+          "xRev": 5,
+          "yRev": 3,
+          "actions": [
+            [
+              5164.1,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5164.9,
+              "CLEAR_CARRIER_LANE"
+            ],
+            [
+              5166.4,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5167,
+              "PIN_AND_RUN"
+            ],
+            [
+              5167.9,
+              "ATTACK_BACK_POST"
+            ],
+            [
+              5168.2,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              5173,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5173.5,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5174.2,
+              "POST_PASS_CONTINUE_RUN"
+            ],
+            [
+              5176.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              5178.1,
+              "PIN_AND_RUN"
+            ],
+            [
+              5181.4,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5181.9,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5182.6,
+              "PROTECT_SCAN"
+            ],
+            [
+              5184.7,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              5185.6,
+              "PULL_OFF_FOR_CROSS"
+            ],
+            [
+              5188.3,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              5188.6,
+              "PIN_AND_RUN"
+            ],
+            [
+              5192.5,
+              "PIN_CENTRE_BACKS"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-LCB",
+            "d": 1.05,
+            "x": 76.33,
+            "y": 38.42,
+            "task": "MARK_LANE_SCREEN",
+            "mark": "H-ST"
+          },
+          {
+            "id": "A-LCM",
+            "d": 13.61,
+            "x": 61.76,
+            "y": 37.89,
+            "task": "FAR_SIDE_BLOCK",
+            "mark": null
+          },
+          {
+            "id": "A-CM",
+            "d": 14.93,
+            "x": 62.72,
+            "y": 30.07,
+            "task": "MIDFIELD_BLOCK",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-LCB": {
+            "samples": 301,
+            "start": [
+              84.97,
+              41.66
+            ],
+            "end": [
+              76.33,
+              38.42
+            ],
+            "path": 74.48,
+            "net": 9.23,
+            "pathToNet": 8.07,
+            "xRev": 15,
+            "yRev": 21,
+            "actions": [
+              [
+                5164.1,
+                "HOLD_BLOCK"
+              ],
+              [
+                5170.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5173.3,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5173.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5174.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5175.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5180.5,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5181.4,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5181.9,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5184.7,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5185,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5185.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5188.3,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5189.2,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5191.3,
+                "MARK_LANE_SCREEN"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 301,
+            "start": [
+              62.5,
+              42.83
+            ],
+            "end": [
+              61.76,
+              37.89
+            ],
+            "path": 95.43,
+            "net": 4.99,
+            "pathToNet": 19.13,
+            "xRev": 7,
+            "yRev": 8,
+            "actions": [
+              [
+                5164.1,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                5167,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5169.1,
+                "DEEP_TUCK"
+              ],
+              [
+                5169.7,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5170,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5170.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5172.1,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5173,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5173.3,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5173.6,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5173.9,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                5175.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5175.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5178.4,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5179.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5181.7,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                5182.3,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5184.4,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5184.7,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5185.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5186.5,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                5188.6,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5192.8,
+                "FAR_SIDE_BLOCK"
+              ]
+            ]
+          },
+          "A-CM": {
+            "samples": 301,
+            "start": [
+              61.38,
+              31.82
+            ],
+            "end": [
+              62.72,
+              30.07
+            ],
+            "path": 89.65,
+            "net": 2.21,
+            "pathToNet": 40.54,
+            "xRev": 3,
+            "yRev": 7,
+            "actions": [
+              [
+                5164.1,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                5167,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5169.1,
+                "DEEP_SCREEN"
+              ],
+              [
+                5169.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5170.3,
+                "DEEP_SCREEN"
+              ],
+              [
+                5171.5,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5178.1,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5179,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5181.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5182,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5182.3,
+                "DEEP_SCREEN"
+              ],
+              [
+                5184.7,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5188.6,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5191.3,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5191.6,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5192.8,
+                "MIDFIELD_BLOCK"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 5194.1,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "ball": {
+            "mode": "LOOSE",
+            "x": 53.318,
+            "y": 1.004,
+            "ownerId": null,
+            "intendedReceiverId": null,
+            "kind": "LOOSE"
+          },
+          "heroPos": {
+            "x": 75.371,
+            "y": 37.994,
+            "vx": -0.381,
+            "vy": -0.172,
+            "action": "PIN_CENTRE_BACKS",
+            "tacticalTask": "PIN_CENTRE_BACKS"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 71.86,
+              "y": 27.85,
+              "vx": -5.44,
+              "vy": -1.59,
+              "task": "HALFSPACE_CONNECTOR_8"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 47.89,
+              "y": 31.71,
+              "vx": -5.42,
+              "vy": -0.77,
+              "task": "PIVOT_SCREEN"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 58.77,
+              "y": 43.08,
+              "vx": -2.23,
+              "vy": -0.69,
+              "task": "HALFSPACE_SUPPORT_8"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 75.05,
+              "y": 7.76,
+              "vx": -4.35,
+              "vy": -3.99,
+              "task": "WIDE_COMBINE"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 84.43,
+              "y": 52.5,
+              "vx": 0,
+              "vy": 0,
+              "task": "FAR_SIDE_HOLD"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tt051-81ee7089-fc98-4f05-99d2-b7f1b1fa7a3e",
+      "description": "여전히 선택지 이후 ST와 CB가 서로 비비면서 시간을 보내다 선택지 창이 뜸",
+      "category": "2D 움직임",
+      "reportedAt": "2026-08-21T02:29:25.783Z",
+      "current": {
+        "boundary": {
+          "at": 1687.200000000019,
+          "reason": "NON_HERO_SHOT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 101,
+          "post": 53,
+          "episode": 154
+        },
+        "options": [
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -12.592602695240814,
+            "d": 15.232071573864147,
+            "receiverPressure": 6.059578338964168,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "TRAP_CONTROL",
+          "targetId": null,
+          "label": "트래핑 후 컨트롤",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": 0.7231065099299202,
+          "contactZ": 0,
+          "flightKind": "PASS"
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "트래핑 후 컨트롤 결과",
+          "detail": "선택 이후 공을 유지하며 다음 상태로 이어졌습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 1691.2000000000153,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1691.2000000000153,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: SAFE_PASS -> H-LCM"
+          },
+          {
+            "t": 1697.9000000000092,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: ONE_TOUCH_PASS -> H-LCM"
+          },
+          {
+            "t": 1698.6000000000085,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1708.5999999999995,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TRAP_CONTROL"
+          }
+        ],
+        "hero": {
+          "samples": 154,
+          "start": [
+            78.22,
+            35.17
+          ],
+          "end": [
+            79.76,
+            30.68
+          ],
+          "path": 24.89,
+          "net": 4.75,
+          "pathToNet": 5.24,
+          "xRev": 3,
+          "yRev": 3,
+          "actions": [
+            [
+              1698.6,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              1698.7,
+              "PIN_AND_RUN"
+            ],
+            [
+              1699.3,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1701.7,
+              "PIN_AND_RUN"
+            ],
+            [
+              1705.3,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1707.4,
+              "PIN_AND_RUN"
+            ],
+            [
+              1708,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              1708.3,
+              "PIN_AND_RUN"
+            ],
+            [
+              1708.6,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              1709.5,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              1710.4,
+              "PROTECT_SCAN"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-RCB",
+            "d": 1.36,
+            "x": 80.91,
+            "y": 29.96,
+            "task": "PRESS_CONTAIN",
+            "mark": null
+          },
+          {
+            "id": "A-LCB",
+            "d": 4.79,
+            "x": 84.1,
+            "y": 32.7,
+            "task": "SHOT_LANE_COVER",
+            "mark": null
+          },
+          {
+            "id": "A-LCM",
+            "d": 9.38,
+            "x": 74.98,
+            "y": 38.76,
+            "task": "MIDFIELD_LANE_SCREEN",
+            "mark": "H-RCM"
+          }
+        ],
+        "nearestMetrics": {
+          "A-RCB": {
+            "samples": 154,
+            "start": [
+              78.81,
+              31.44
+            ],
+            "end": [
+              80.91,
+              29.96
+            ],
+            "path": 25.34,
+            "net": 2.57,
+            "pathToNet": 9.86,
+            "xRev": 26,
+            "yRev": 11,
+            "actions": [
+              [
+                1698.6,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1699,
+                "HOLD_BLOCK"
+              ],
+              [
+                1699.6,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1699.9,
+                "HOLD_BLOCK"
+              ],
+              [
+                1701,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1702.3,
+                "HOLD_BLOCK"
+              ],
+              [
+                1703.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1703.8,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1704.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1707.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1709.5,
+                "PRESS_CONTAIN"
+              ]
+            ]
+          },
+          "A-LCB": {
+            "samples": 154,
+            "start": [
+              79.18,
+              41.62
+            ],
+            "end": [
+              84.1,
+              32.7
+            ],
+            "path": 35.41,
+            "net": 10.19,
+            "pathToNet": 3.48,
+            "xRev": 4,
+            "yRev": 4,
+            "actions": [
+              [
+                1698.6,
+                "HOLD_BLOCK"
+              ],
+              [
+                1699,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1699.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1703.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1704.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1705.4,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1706.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1707.4,
+                "HOLD_BLOCK"
+              ],
+              [
+                1709.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1709.8,
+                "SHOT_LANE_COVER"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 154,
+            "start": [
+              69.25,
+              34.93
+            ],
+            "end": [
+              74.98,
+              38.76
+            ],
+            "path": 48.7,
+            "net": 6.89,
+            "pathToNet": 7.07,
+            "xRev": 2,
+            "yRev": 1,
+            "actions": [
+              [
+                1698.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1699.4,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1701.1,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                1702.9,
+                "DEEP_TUCK"
+              ],
+              [
+                1703.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1704.4,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1705.6,
+                "ENGAGE"
+              ],
+              [
+                1706.8,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1707.1,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                1707.4,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1709.8,
+                "MIDFIELD_LANE_SCREEN"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 1713.9,
+          "phase": "CHANCE",
+          "possession": "HOME",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 80.18,
+            "y": 30.68,
+            "ownerId": "H-ST",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 79.76,
+            "y": 30.68,
+            "vx": 0,
+            "vy": 0,
+            "action": "PROTECT_SCAN",
+            "tacticalTask": "PROTECT_SCAN"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 68.26,
+              "y": 24.5,
+              "vx": 0,
+              "vy": 0,
+              "task": "SECOND_BALL_SUPPORT"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 61.76,
+              "y": 33.6,
+              "vx": 0,
+              "vy": 0,
+              "task": "COUNTER_GUARD"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 74.56,
+              "y": 35.1,
+              "vx": 0,
+              "vy": 0,
+              "task": "ST_WALL_SUPPORT"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 83.25,
+              "y": 7,
+              "vx": 0,
+              "vy": 0,
+              "task": "WIDE_RELEASE_OUTLET"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 84.33,
+              "y": 48,
+              "vx": -1.31,
+              "vy": 0,
+              "task": "ST_RELEASE_RUN"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 960.1000000000175,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 56,
+          "post": 148,
+          "episode": 204
+        },
+        "options": [
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-CM",
+            "label": "안전한 패스 → 같은 팀 CM",
+            "targetSlot": "CM",
+            "forward": -18.83416127567059,
+            "d": 18.83512809196861,
+            "receiverPressure": 9.285901938730046,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -11.071029177290157,
+            "d": 13.984417243442671,
+            "receiverPressure": 3.641911552704775,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "SHOT",
+          "targetId": null,
+          "label": "슈팅",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": "GOAL",
+          "headline": "슈팅 → 득점",
+          "detail": "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0 세리머니와 킥오프 준비까지 실제 장면으로 이어졌습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 965.7000000000188,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: CARRY"
+          },
+          {
+            "t": 968.9000000000195,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 968.9000000000195,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 974.9000000000209,
+            "type": "SHOT",
+            "actorId": "H-ST",
+            "targetId": null,
+            "text": "블루팀 ST이 슈팅을 시도합니다."
+          },
+          {
+            "t": 974.9000000000209,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: SHOT"
+          },
+          {
+            "t": 975.500000000021,
+            "type": "GOAL",
+            "actorId": "H-ST",
+            "targetId": null,
+            "text": "블루팀 ST이 페널티지역 앞쪽에서 시도한 강하게 때린 슈팅이 골문 오른쪽 골망 안으로 들어갑니다. 1-0"
+          }
+        ],
+        "hero": {
+          "samples": 204,
+          "start": [
+            75.17,
+            30.69
+          ],
+          "end": [
+            43.04,
+            34.01
+          ],
+          "path": 130.65,
+          "net": 32.3,
+          "pathToNet": 4.05,
+          "xRev": 3,
+          "yRev": 3,
+          "actions": [
+            [
+              960.2,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              964.1,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              965.1,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              965.8,
+              "CARRY_FORWARD"
+            ],
+            [
+              967.4,
+              "PROTECT_SCAN"
+            ],
+            [
+              969.2,
+              "POST_PASS_CONTINUE_RUN"
+            ],
+            [
+              971,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              974,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              975,
+              "POST_SHOT_FOLLOW"
+            ],
+            [
+              975.5,
+              "GOAL_SCORER_CELEBRATE"
+            ],
+            [
+              980.5,
+              "PRESS_CONTAIN"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-CM",
+            "d": 9.41,
+            "x": 52.45,
+            "y": 34,
+            "task": "CARRY_SCAN",
+            "mark": null
+          },
+          {
+            "id": "A-ST",
+            "d": 11.72,
+            "x": 54.76,
+            "y": 34,
+            "task": "ATTACK_OPEN_CHANNEL",
+            "mark": null
+          },
+          {
+            "id": "A-LCM",
+            "d": 23.24,
+            "x": 62.95,
+            "y": 45.99,
+            "task": "ADVANCING_8",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-CM": {
+            "samples": 204,
+            "start": [
+              64.7,
+              34.02
+            ],
+            "end": [
+              52.45,
+              34
+            ],
+            "path": 75.66,
+            "net": 12.25,
+            "pathToNet": 6.17,
+            "xRev": 2,
+            "yRev": 2,
+            "actions": [
+              [
+                960.2,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                961.4,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                964.7,
+                "DEEP_SCREEN"
+              ],
+              [
+                966.2,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                971.3,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                974,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                975.5,
+                "RETURN_FOR_KICKOFF"
+              ],
+              [
+                980.5,
+                "CARRY_SCAN"
+              ]
+            ]
+          },
+          "A-ST": {
+            "samples": 204,
+            "start": [
+              39.42,
+              32.77
+            ],
+            "end": [
+              54.76,
+              34
+            ],
+            "path": 28.79,
+            "net": 15.39,
+            "pathToNet": 1.87,
+            "xRev": 3,
+            "yRev": 4,
+            "actions": [
+              [
+                960.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                975.5,
+                "RETURN_FOR_KICKOFF"
+              ],
+              [
+                980.5,
+                "ATTACK_OPEN_CHANNEL"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 204,
+            "start": [
+              65.02,
+              46.22
+            ],
+            "end": [
+              62.95,
+              45.99
+            ],
+            "path": 73.04,
+            "net": 2.08,
+            "pathToNet": 35.11,
+            "xRev": 3,
+            "yRev": 4,
+            "actions": [
+              [
+                960.2,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                961.4,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                964.7,
+                "DEEP_TUCK"
+              ],
+              [
+                965.3,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                969.2,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                970.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                974,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                975.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                975.5,
+                "RETURN_FOR_KICKOFF"
+              ],
+              [
+                980.5,
+                "ADVANCING_8"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 980.5,
+          "phase": "PROGRESSION",
+          "possession": "AWAY",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 52.03,
+            "y": 34,
+            "ownerId": "A-CM",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 43.044,
+            "y": 34.006,
+            "vx": 0.435,
+            "vy": 0.063,
+            "action": "PRESS_CONTAIN",
+            "tacticalTask": "PRESS_CONTAIN"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 34.03,
+              "y": 22.02,
+              "vx": 0.35,
+              "vy": 0.2,
+              "task": "FAR_SIDE_BLOCK"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 36.03,
+              "y": 34,
+              "vx": 0.34,
+              "vy": 0,
+              "task": "SHOT_LANE_COVER"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 34.04,
+              "y": 45.97,
+              "vx": 0.39,
+              "vy": -0.26,
+              "task": "BALL_SIDE_BLOCK"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 42.05,
+              "y": 15.99,
+              "vx": 0.46,
+              "vy": -0.1,
+              "task": "HOLD_BLOCK"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 42.04,
+              "y": 52.01,
+              "vx": 0.43,
+              "vy": 0.09,
+              "task": "HOLD_BLOCK"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tt051-ac85275c-b6a0-465c-851f-53296142d471",
+      "description": "이건 왜 ST가 수비진영에서 나오고 있는건지 도저히 이해가 안됨. 수비 가담을 했다고 하기엔 모든 포메이션이 정상 포메이션이거든",
+      "category": "2D 움직임",
+      "reportedAt": "2026-08-21T02:30:30.898Z",
+      "current": {
+        "boundary": {
+          "at": 2352.199999999959,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 16,
+          "post": 0,
+          "episode": 0
+        },
+        "options": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW",
+            "label": "공간 침투 패스 → 같은 팀 LW",
+            "targetSlot": "LW",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SWITCH_PASS",
+            "targetId": "H-LW",
+            "label": "전환 패스 → 같은 팀 LW",
+            "targetSlot": "LW",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-CM",
+            "label": "공간 침투 패스 → 같은 팀 CM",
+            "targetSlot": "CM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": 10.267,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LCM",
+            "label": "공간 침투 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": 10.686,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LB",
+            "label": "안전한 패스 → 같은 팀 LB",
+            "targetSlot": "LB",
+            "forward": -0.11257516150860525,
+            "d": 26.219692126439803,
+            "receiverPressure": 16.17475080260014,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RB",
+            "label": "안전한 패스 → 같은 팀 RB",
+            "targetSlot": "RB",
+            "forward": 3.3614835191944366,
+            "d": 27.301171846988325,
+            "receiverPressure": 12.844406237581447,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": null,
+          "targetId": null,
+          "label": null,
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": null,
+          "headline": null,
+          "detail": null
+        },
+        "keyEvents": [],
+        "hero": {
+          "samples": 16,
+          "start": [
+            17.69,
+            33.96
+          ],
+          "end": [
+            23.58,
+            33.91
+          ],
+          "path": 5.9,
+          "net": 5.9,
+          "pathToNet": 1.0,
+          "xRev": 0,
+          "yRev": 0,
+          "actions": [
+            [
+              2352.3,
+              "CARRY_SCAN"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-ST",
+            "d": 5.23,
+            "x": 28.26,
+            "y": 36.24,
+            "task": "PRESS_CONTAIN",
+            "mark": null
+          },
+          {
+            "id": "A-RW",
+            "d": 25.94,
+            "x": 38.78,
+            "y": 12.89,
+            "task": "HOLD_BLOCK",
+            "mark": null
+          },
+          {
+            "id": "A-LW",
+            "d": 26.1,
+            "x": 38.47,
+            "y": 55.34,
+            "task": "HOLD_BLOCK",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-ST": {
+            "samples": 16,
+            "start": [
+              31.64,
+              37.42
+            ],
+            "end": [
+              28.26,
+              36.24
+            ],
+            "path": 4.06,
+            "net": 3.58,
+            "pathToNet": 1.13,
+            "xRev": 1,
+            "yRev": 0,
+            "actions": [
+              [
+                2352.3,
+                "PRESS_CONTAIN"
+              ]
+            ]
+          },
+          "A-RW": {
+            "samples": 16,
+            "start": [
+              40.0,
+              7.25
+            ],
+            "end": [
+              38.78,
+              12.89
+            ],
+            "path": 5.83,
+            "net": 5.78,
+            "pathToNet": 1.01,
+            "xRev": 1,
+            "yRev": 0,
+            "actions": [
+              [
+                2352.3,
+                "HOLD_BLOCK"
+              ]
+            ]
+          },
+          "A-LW": {
+            "samples": 16,
+            "start": [
+              34.22,
+              60.57
+            ],
+            "end": [
+              38.47,
+              55.34
+            ],
+            "path": 6.76,
+            "net": 6.74,
+            "pathToNet": 1.0,
+            "xRev": 0,
+            "yRev": 0,
+            "actions": [
+              [
+                2352.3,
+                "HOLD_BLOCK"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 2353.8,
+          "phase": "TRANSITION",
+          "possession": "HOME",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 24.002,
+            "y": 33.913,
+            "ownerId": "H-ST",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 23.582,
+            "y": 33.913,
+            "vx": 4.273,
+            "vy": 0.001,
+            "action": "CARRY_SCAN",
+            "tacticalTask": "CARRY_SCAN"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 43.52,
+              "y": 22.47,
+              "vx": 7.13,
+              "vy": 0.95,
+              "task": "RECONNECT_8"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 38.41,
+              "y": 34.64,
+              "vx": 0.18,
+              "vy": -0.05,
+              "task": "PIVOT_SCREEN"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 46.13,
+              "y": 45.62,
+              "vx": 7.17,
+              "vy": -0.62,
+              "task": "RECOVER_MIDFIELD_8"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 62.04,
+              "y": 7.36,
+              "vx": 3.81,
+              "vy": -3.7,
+              "task": "HOLD_WIDTH"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 61.4,
+              "y": 60.07,
+              "vx": 4.29,
+              "vy": 3.86,
+              "task": "HOLD_WIDTH"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 1931.3999999999778,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 95,
+          "post": 102,
+          "episode": 197
+        },
+        "options": [
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW",
+            "label": "전진 패스 → 같은 팀 RW",
+            "targetSlot": "RW",
+            "forward": -1.1107998073856038,
+            "d": 15.316060190129587,
+            "receiverPressure": 1.2772420176518626,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -18.25400897213281,
+            "d": 19.125814640021783,
+            "receiverPressure": 10.31377380293527,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "ONE_TOUCH_PASS",
+          "targetId": "H-LCM",
+          "label": "원터치 패스 → 같은 팀 LCM",
+          "targetSlot": "LCM",
+          "forward": -11.97797656714934,
+          "d": 16.23565160695395,
+          "receiverPressure": 10.420579043647528,
+          "eta": 0.6258997852612971,
+          "contactZ": 0,
+          "flightKind": "PASS"
+        },
+        "result": {
+          "code": "POSSESSION_LOST",
+          "headline": "원터치 패스 → 같은 팀 LCM 결과",
+          "detail": "레드팀 CM이 공을 가로챘습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 1940.8999999999692,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 강한 지상 패스했습니다."
+          },
+          {
+            "t": 1940.8999999999692,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: SAFE_PASS -> H-LCM"
+          },
+          {
+            "t": 1945.8999999999646,
+            "type": "FOUL",
+            "actorId": null,
+            "targetId": null,
+            "text": "레드팀 RCM의 압박이 파울로 끊겼습니다."
+          },
+          {
+            "t": 1949.1999999999616,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: ONE_TOUCH_PASS -> H-LCM"
+          },
+          {
+            "t": 1949.799999999961,
+            "type": "INTERCEPT",
+            "actorId": null,
+            "targetId": null,
+            "text": "레드팀 CM이 공을 가로챘습니다."
+          }
+        ],
+        "hero": {
+          "samples": 197,
+          "start": [
+            72.79,
+            32.8
+          ],
+          "end": [
+            74.72,
+            34.28
+          ],
+          "path": 52.5,
+          "net": 2.44,
+          "pathToNet": 21.53,
+          "xRev": 4,
+          "yRev": 5,
+          "actions": [
+            [
+              1931.5,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              1931.8,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1936.6,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              1940.8,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              1940.9,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              1941.1,
+              "POST_SAFE_PASS_SUPPORT"
+            ],
+            [
+              1942.6,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              1945.6,
+              "PIN_AND_RUN"
+            ],
+            [
+              1945.9,
+              "FREE_KICK_ATTACK_SETUP"
+            ],
+            [
+              1949.4,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              1950,
+              "ENGAGE"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-CM",
+            "d": 4.06,
+            "x": 70.67,
+            "y": 33.94,
+            "task": "CARRY_FORWARD",
+            "mark": null
+          },
+          {
+            "id": "A-LCB",
+            "d": 8.06,
+            "x": 77.77,
+            "y": 41.74,
+            "task": "REST_DEFENCE",
+            "mark": "H-ST"
+          },
+          {
+            "id": "A-RCB",
+            "d": 8.37,
+            "x": 76.85,
+            "y": 26.19,
+            "task": "REST_DEFENCE",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-CM": {
+            "samples": 197,
+            "start": [
+              60.19,
+              35.78
+            ],
+            "end": [
+              70.67,
+              33.94
+            ],
+            "path": 80.46,
+            "net": 10.64,
+            "pathToNet": 7.56,
+            "xRev": 2,
+            "yRev": 2,
+            "actions": [
+              [
+                1931.5,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1933.6,
+                "ENGAGE"
+              ],
+              [
+                1933.9,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                1934.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1935.1,
+                "DEEP_SCREEN"
+              ],
+              [
+                1935.4,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                1940.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1941.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1943.5,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                1945.6,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1945.9,
+                "FREE_KICK_DEFENCE_SETUP"
+              ],
+              [
+                1949.4,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                1950,
+                "CARRY_SCAN"
+              ],
+              [
+                1950.9,
+                "CARRY_FORWARD"
+              ]
+            ]
+          },
+          "A-LCB": {
+            "samples": 197,
+            "start": [
+              82.5,
+              43.09
+            ],
+            "end": [
+              77.77,
+              41.74
+            ],
+            "path": 58.53,
+            "net": 4.92,
+            "pathToNet": 11.9,
+            "xRev": 0,
+            "yRev": 13,
+            "actions": [
+              [
+                1931.5,
+                "HOLD_BLOCK"
+              ],
+              [
+                1935.1,
+                "LAST_COVER_SCREEN"
+              ],
+              [
+                1938.6,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1938.7,
+                "LAST_COVER_SCREEN"
+              ],
+              [
+                1940.5,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1940.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1940.9,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1941.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1942,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1942.6,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1945.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                1945.9,
+                "FREE_KICK_DEFENCE_SETUP"
+              ],
+              [
+                1949.4,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1950,
+                "REST_DEFENCE"
+              ]
+            ]
+          },
+          "A-RCB": {
+            "samples": 197,
+            "start": [
+              83.14,
+              25.54
+            ],
+            "end": [
+              76.85,
+              26.19
+            ],
+            "path": 48.45,
+            "net": 6.32,
+            "pathToNet": 7.66,
+            "xRev": 3,
+            "yRev": 3,
+            "actions": [
+              [
+                1931.5,
+                "HOLD_BLOCK"
+              ],
+              [
+                1932.7,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                1935,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1938.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1938.7,
+                "PRESS_CONTAIN"
+              ],
+              [
+                1940.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1940.8,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                1941.7,
+                "HOLD_BLOCK"
+              ],
+              [
+                1945.9,
+                "FREE_KICK_DEFENCE_SETUP"
+              ],
+              [
+                1949.4,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                1950,
+                "REST_DEFENCE"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 1951.1,
+          "phase": "TRANSITION",
+          "possession": "AWAY",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 70.255,
+            "y": 33.939,
+            "ownerId": "A-CM",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 74.725,
+            "y": 34.285,
+            "vx": -5.46,
+            "vy": 0.364,
+            "action": "ENGAGE",
+            "tacticalTask": "ENGAGE"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 60.25,
+              "y": 24.41,
+              "vx": -5.81,
+              "vy": 1.37,
+              "task": "BALL_SIDE_BLOCK"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 66.81,
+              "y": 33.94,
+              "vx": -0.03,
+              "vy": 0.07,
+              "task": "SHOT_LANE_COVER"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 60.73,
+              "y": 43.8,
+              "vx": -5.42,
+              "vy": -1.26,
+              "task": "FAR_SIDE_BLOCK"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 74.56,
+              "y": 16.74,
+              "vx": -4.42,
+              "vy": -1.86,
+              "task": "HOLD_BLOCK"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 74.55,
+              "y": 51.25,
+              "vx": -4.42,
+              "vy": 1.86,
+              "task": "HOLD_BLOCK"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tt051-cc852f58-6718-4b71-9e39-bc67abd66574",
+      "description": "선수단 라커룸 복귀는 지금 속도보다 20% 정도 더 빨라져도 좋을거 같아.",
+      "category": "2D 움직임",
+      "reportedAt": "2026-08-21T02:33:55.509Z",
+      "current": {
+        "boundary": {
+          "at": 5267.100000000299,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 74,
+          "post": 31,
+          "episode": 105
+        },
+        "options": [
+          {
+            "id": "TAKE_ON",
+            "targetId": null,
+            "label": "1대1 돌파",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -8.796521437357157,
+            "d": 9.62815306907431,
+            "receiverPressure": 3.7818409586280204,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "TAKE_ON",
+          "targetId": null,
+          "label": "1대1 돌파",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": "TACKLED",
+          "headline": "1대1 돌파 실패",
+          "detail": "블루팀 ST이 레드팀 LCB을 상대로 돌파를 시도합니다. → 레드팀 LCB이 블루팀 ST의 돌파를 막고 공을 빼앗았습니다. → 레드팀 LCB이 레드팀 CM 쪽으로 강한 지상 패스했습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 5274.500000000326,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TAKE_ON"
+          }
+        ],
+        "hero": {
+          "samples": 105,
+          "start": [
+            67.84,
+            35.25
+          ],
+          "end": [
+            81.48,
+            31.97
+          ],
+          "path": 28.3,
+          "net": 14.03,
+          "pathToNet": 2.02,
+          "xRev": 3,
+          "yRev": 3,
+          "actions": [
+            [
+              5267.2,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5268.4,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              5272.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              5273.5,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5273.9,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5274.6,
+              "TAKE_ON"
+            ],
+            [
+              5275,
+              "PRESS_CONTAIN"
+            ],
+            [
+              5277.1,
+              "HOLD_BLOCK"
+            ],
+            [
+              5277.4,
+              "SHOT_LANE_COVER"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-LCB",
+            "d": 2.79,
+            "x": 83.07,
+            "y": 34.26,
+            "task": "BUILD_PLATFORM",
+            "mark": null
+          },
+          {
+            "id": "A-RCB",
+            "d": 6.64,
+            "x": 79.87,
+            "y": 25.54,
+            "task": "BUILD_PLATFORM",
+            "mark": null
+          },
+          {
+            "id": "A-CM",
+            "d": 9.09,
+            "x": 72.63,
+            "y": 34.05,
+            "task": "FIRST_TOUCH_FLOW",
+            "mark": "H-LCM"
+          }
+        ],
+        "nearestMetrics": {
+          "A-LCB": {
+            "samples": 105,
+            "start": [
+              78.56,
+              43.07
+            ],
+            "end": [
+              83.07,
+              34.26
+            ],
+            "path": 26.66,
+            "net": 9.89,
+            "pathToNet": 2.69,
+            "xRev": 3,
+            "yRev": 0,
+            "actions": [
+              [
+                5267.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                5269.6,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5271.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5273.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5273.9,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5274.9,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5275,
+                "PROTECT_SCAN"
+              ],
+              [
+                5275.2,
+                "SHIELD_SCAN"
+              ],
+              [
+                5275.6,
+                "PROTECT_SCAN"
+              ],
+              [
+                5276.2,
+                "TURN_BACK"
+              ],
+              [
+                5277.1,
+                "BUILD_PLATFORM"
+              ]
+            ]
+          },
+          "A-RCB": {
+            "samples": 105,
+            "start": [
+              76.99,
+              24.66
+            ],
+            "end": [
+              79.87,
+              25.54
+            ],
+            "path": 33.39,
+            "net": 3.01,
+            "pathToNet": 11.1,
+            "xRev": 2,
+            "yRev": 6,
+            "actions": [
+              [
+                5267.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                5271,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5273.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5273.5,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5274.1,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5275,
+                "REST_DEFENCE"
+              ],
+              [
+                5276.8,
+                "BUILD_PLATFORM"
+              ]
+            ]
+          },
+          "A-CM": {
+            "samples": 105,
+            "start": [
+              57.4,
+              34.61
+            ],
+            "end": [
+              72.63,
+              34.05
+            ],
+            "path": 39.97,
+            "net": 15.24,
+            "pathToNet": 2.62,
+            "xRev": 1,
+            "yRev": 3,
+            "actions": [
+              [
+                5267.2,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5268.1,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5269,
+                "ENGAGE"
+              ],
+              [
+                5269.6,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                5269.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5270.5,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5271.1,
+                "DEEP_SCREEN"
+              ],
+              [
+                5271.4,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5273.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5274.1,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5275,
+                "DROP_BETWEEN_LINES"
+              ],
+              [
+                5277.1,
+                "MOVE_TO_RECEIVE"
+              ],
+              [
+                5277.6,
+                "FIRST_TOUCH_FLOW"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 5277.6,
+          "phase": "PROGRESSION",
+          "possession": "AWAY",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 73.308,
+            "y": 33.687,
+            "ownerId": "A-CM",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 81.484,
+            "y": 31.972,
+            "vx": -4.992,
+            "vy": 0.488,
+            "action": "SHOT_LANE_COVER",
+            "tacticalTask": "SHOT_LANE_COVER"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 78.08,
+              "y": 30.99,
+              "vx": -5.04,
+              "vy": -0.44,
+              "task": "BALL_SIDE_BLOCK"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 52.07,
+              "y": 33.83,
+              "vx": -5.47,
+              "vy": 0.14,
+              "task": "MIDFIELD_BLOCK"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 63.07,
+              "y": 40.71,
+              "vx": -5.47,
+              "vy": 0.09,
+              "task": "FAR_SIDE_BLOCK"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 75.49,
+              "y": 14.06,
+              "vx": -5.84,
+              "vy": -1.02,
+              "task": "HOLD_BLOCK"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 75.38,
+              "y": 51.79,
+              "vx": -5.59,
+              "vy": 1.98,
+              "task": "HOLD_BLOCK"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 5163.3000000001575,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 101,
+          "post": 200,
+          "episode": 301
+        },
+        "options": [
+          {
+            "id": "THROUGH_PASS",
+            "targetId": "H-LW",
+            "label": "공간 침투 패스 → 같은 팀 LW",
+            "targetSlot": "LW",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "AVAILABLE_PASS",
+            "targetId": "H-RW",
+            "label": "전진 패스 → 같은 팀 RW",
+            "targetSlot": "RW",
+            "forward": -0.6891311337172255,
+            "d": 20.374449357908308,
+            "receiverPressure": 3.0726120473328,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -14.081447163282235,
+            "d": 16.180811608165623,
+            "receiverPressure": 11.655991856761606,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": -12.95583404240736,
+            "d": 16.382060833427925,
+            "receiverPressure": 8.439686375179372,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "TRAP_CONTROL",
+          "targetId": null,
+          "label": "트래핑 후 컨트롤",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": 0.5288899484461002,
+          "contactZ": 0,
+          "flightKind": "PASS"
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "트래핑 후 컨트롤 결과",
+          "detail": "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다. → 패스 경합에서 공이 완전히 소유되지 않고 흘렀습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 5163.90000000016,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LCM",
+            "text": "블루팀 ST이 블루팀 LCM 쪽으로 짧은 패스했습니다."
+          },
+          {
+            "t": 5170.200000000183,
+            "type": "PASS_MISCONTROL",
+            "actorId": null,
+            "targetId": null,
+            "text": "블루팀 RW이 패스를 완전히 잡지 못해 공이 흘렀습니다."
+          },
+          {
+            "t": 5174.100000000197,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공간 패스했습니다."
+          },
+          {
+            "t": 5174.100000000197,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: THROUGH_PASS -> H-LW"
+          },
+          {
+            "t": 5181.300000000223,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: TRAP_CONTROL"
+          },
+          {
+            "t": 5184.500000000235,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 강한 지상 패스했습니다."
+          }
+        ],
+        "hero": {
+          "samples": 301,
+          "start": [
+            53.28,
+            18.25
+          ],
+          "end": [
+            75.37,
+            37.99
+          ],
+          "path": 78.18,
+          "net": 29.63,
+          "pathToNet": 2.64,
+          "xRev": 5,
+          "yRev": 3,
+          "actions": [
+            [
+              5164.1,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5164.9,
+              "CLEAR_CARRIER_LANE"
+            ],
+            [
+              5166.4,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              5167,
+              "PIN_AND_RUN"
+            ],
+            [
+              5167.9,
+              "ATTACK_BACK_POST"
+            ],
+            [
+              5168.2,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              5173,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5173.5,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5174.2,
+              "POST_PASS_CONTINUE_RUN"
+            ],
+            [
+              5176.3,
+              "ATTACK_NEAR_POST"
+            ],
+            [
+              5178.1,
+              "PIN_AND_RUN"
+            ],
+            [
+              5181.4,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              5181.9,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              5182.6,
+              "PROTECT_SCAN"
+            ],
+            [
+              5184.7,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              5185.6,
+              "PULL_OFF_FOR_CROSS"
+            ],
+            [
+              5188.3,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              5188.6,
+              "PIN_AND_RUN"
+            ],
+            [
+              5192.5,
+              "PIN_CENTRE_BACKS"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-LCB",
+            "d": 1.05,
+            "x": 76.33,
+            "y": 38.42,
+            "task": "MARK_LANE_SCREEN",
+            "mark": "H-ST"
+          },
+          {
+            "id": "A-LCM",
+            "d": 13.61,
+            "x": 61.76,
+            "y": 37.89,
+            "task": "FAR_SIDE_BLOCK",
+            "mark": null
+          },
+          {
+            "id": "A-CM",
+            "d": 14.93,
+            "x": 62.72,
+            "y": 30.07,
+            "task": "MIDFIELD_BLOCK",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-LCB": {
+            "samples": 301,
+            "start": [
+              84.97,
+              41.66
+            ],
+            "end": [
+              76.33,
+              38.42
+            ],
+            "path": 74.48,
+            "net": 9.23,
+            "pathToNet": 8.07,
+            "xRev": 15,
+            "yRev": 21,
+            "actions": [
+              [
+                5164.1,
+                "HOLD_BLOCK"
+              ],
+              [
+                5170.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5173.3,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5173.6,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5174.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5175.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5180.5,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5181.4,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5181.9,
+                "PRESS_CONTAIN"
+              ],
+              [
+                5184.7,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                5185,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5185.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5188.3,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5189.2,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5191.3,
+                "MARK_LANE_SCREEN"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 301,
+            "start": [
+              62.5,
+              42.83
+            ],
+            "end": [
+              61.76,
+              37.89
+            ],
+            "path": 95.43,
+            "net": 4.99,
+            "pathToNet": 19.13,
+            "xRev": 7,
+            "yRev": 8,
+            "actions": [
+              [
+                5164.1,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                5167,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5169.1,
+                "DEEP_TUCK"
+              ],
+              [
+                5169.7,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5170,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5170.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5172.1,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5173,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5173.3,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5173.6,
+                "CUTBACK_TRACK"
+              ],
+              [
+                5173.9,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                5175.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5175.7,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5178.4,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5179.9,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5181.7,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                5182.3,
+                "EMERGENCY_TRACK"
+              ],
+              [
+                5184.4,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5184.7,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5185.6,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                5186.5,
+                "SECOND_BALL_TUCK"
+              ],
+              [
+                5188.6,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                5192.8,
+                "FAR_SIDE_BLOCK"
+              ]
+            ]
+          },
+          "A-CM": {
+            "samples": 301,
+            "start": [
+              61.38,
+              31.82
+            ],
+            "end": [
+              62.72,
+              30.07
+            ],
+            "path": 89.65,
+            "net": 2.21,
+            "pathToNet": 40.54,
+            "xRev": 3,
+            "yRev": 7,
+            "actions": [
+              [
+                5164.1,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                5167,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5169.1,
+                "DEEP_SCREEN"
+              ],
+              [
+                5169.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5170.3,
+                "DEEP_SCREEN"
+              ],
+              [
+                5171.5,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5177.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5178.1,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5179,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5181.7,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                5182,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5182.3,
+                "DEEP_SCREEN"
+              ],
+              [
+                5184.7,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                5188.6,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5191.3,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                5191.6,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                5192.8,
+                "MIDFIELD_BLOCK"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 5194.1,
+          "phase": "PROGRESSION",
+          "possession": "HOME",
+          "ball": {
+            "mode": "LOOSE",
+            "x": 53.318,
+            "y": 1.004,
+            "ownerId": null,
+            "intendedReceiverId": null,
+            "kind": "LOOSE"
+          },
+          "heroPos": {
+            "x": 75.371,
+            "y": 37.994,
+            "vx": -0.381,
+            "vy": -0.172,
+            "action": "PIN_CENTRE_BACKS",
+            "tacticalTask": "PIN_CENTRE_BACKS"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 71.86,
+              "y": 27.85,
+              "vx": -5.44,
+              "vy": -1.59,
+              "task": "HALFSPACE_CONNECTOR_8"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 47.89,
+              "y": 31.71,
+              "vx": -5.42,
+              "vy": -0.77,
+              "task": "PIVOT_SCREEN"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 58.77,
+              "y": 43.08,
+              "vx": -2.23,
+              "vy": -0.69,
+              "task": "HALFSPACE_SUPPORT_8"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 75.05,
+              "y": 7.76,
+              "vx": -4.35,
+              "vy": -3.99,
+              "task": "WIDE_COMBINE"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 84.43,
+              "y": 52.5,
+              "vx": 0,
+              "vy": 0,
+              "task": "FAR_SIDE_HOLD"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tt051-e418816c-7d1e-434e-9c09-1c740879b08e",
+      "description": "공간 전진을 했는데 서로 막힌 상태로 다음 선택까지 대치만 하고 있어 움직임이 전혀 없는건 의도하는 상황이 아니야 그래서도 안되고 완전히 막혔다면 상대가 내 공을 뺏던지 곧바로 다음 선택지가 뜨던지 해야 할거 같아.",
+      "category": "패스/공격",
+      "reportedAt": "2026-08-21T02:27:17.753Z",
+      "current": {
+        "boundary": {
+          "at": 960.1000000000175,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 56,
+          "post": 32,
+          "episode": 88
+        },
+        "options": [
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "슈팅",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-CM",
+            "label": "안전한 패스 → 같은 팀 CM",
+            "targetSlot": "CM",
+            "forward": -18.83416127567059,
+            "d": 18.83512809196861,
+            "receiverPressure": 9.285901938730046,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -11.071029177290157,
+            "d": 13.984417243442671,
+            "receiverPressure": 3.641911552704775,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "CARRY",
+          "targetId": null,
+          "label": "공간 전진",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": "POSSESSION_KEPT",
+          "headline": "전진 결과",
+          "detail": "공을 약 1.2m 운반했습니다. 공을 유지한 채 다음 판단 상태에 도달했습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 965.7000000000188,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: CARRY"
+          }
+        ],
+        "hero": {
+          "samples": 88,
+          "start": [
+            75.17,
+            30.69
+          ],
+          "end": [
+            80.09,
+            34.09
+          ],
+          "path": 16.54,
+          "net": 5.98,
+          "pathToNet": 2.77,
+          "xRev": 1,
+          "yRev": 0,
+          "actions": [
+            [
+              960.2,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              964.1,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              965.1,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              965.8,
+              "CARRY_FORWARD"
+            ],
+            [
+              967.4,
+              "PROTECT_SCAN"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-RCB",
+            "d": 1.36,
+            "x": 81.26,
+            "y": 33.4,
+            "task": "PRESS_CONTAIN",
+            "mark": null
+          },
+          {
+            "id": "A-LCB",
+            "d": 4.45,
+            "x": 84.39,
+            "y": 35.2,
+            "task": "SHOT_LANE_COVER",
+            "mark": null
+          },
+          {
+            "id": "A-LCM",
+            "d": 9.45,
+            "x": 74.2,
+            "y": 41.49,
+            "task": "MIDFIELD_LANE_SCREEN",
+            "mark": "H-RCM"
+          }
+        ],
+        "nearestMetrics": {
+          "A-RCB": {
+            "samples": 88,
+            "start": [
+              85.77,
+              26.88
+            ],
+            "end": [
+              81.26,
+              33.4
+            ],
+            "path": 14.37,
+            "net": 7.93,
+            "pathToNet": 1.81,
+            "xRev": 6,
+            "yRev": 9,
+            "actions": [
+              [
+                960.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                960.8,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                963.5,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                964.1,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                964.7,
+                "HOLD_BLOCK"
+              ],
+              [
+                965.1,
+                "PRESS_CONTAIN"
+              ],
+              [
+                966.2,
+                "ENGAGE"
+              ],
+              [
+                966.3,
+                "PRESS_CONTAIN"
+              ]
+            ]
+          },
+          "A-LCB": {
+            "samples": 88,
+            "start": [
+              86.1,
+              42.42
+            ],
+            "end": [
+              84.39,
+              35.2
+            ],
+            "path": 20.45,
+            "net": 7.42,
+            "pathToNet": 2.76,
+            "xRev": 1,
+            "yRev": 2,
+            "actions": [
+              [
+                960.2,
+                "HOLD_BLOCK"
+              ],
+              [
+                964.7,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                965.3,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                966.2,
+                "PRESS_CONTAIN"
+              ],
+              [
+                966.3,
+                "SHOT_LANE_COVER"
+              ]
+            ]
+          },
+          "A-LCM": {
+            "samples": 88,
+            "start": [
+              65.02,
+              46.22
+            ],
+            "end": [
+              74.2,
+              41.49
+            ],
+            "path": 30.86,
+            "net": 10.33,
+            "pathToNet": 2.99,
+            "xRev": 1,
+            "yRev": 3,
+            "actions": [
+              [
+                960.2,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                961.4,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                964.7,
+                "DEEP_TUCK"
+              ],
+              [
+                965.3,
+                "MIDFIELD_LANE_SCREEN"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 968.9,
+          "phase": "CHANCE",
+          "possession": "HOME",
+          "ball": {
+            "mode": "CONTROLLED",
+            "x": 80.506,
+            "y": 34.09,
+            "ownerId": "H-ST",
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 80.086,
+            "y": 34.09,
+            "vx": 0,
+            "vy": 0,
+            "action": "PROTECT_SCAN",
+            "tacticalTask": "PROTECT_SCAN"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 68.59,
+              "y": 24.5,
+              "vx": 0,
+              "vy": 0,
+              "task": "SECOND_BALL_SUPPORT"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 62.09,
+              "y": 34.01,
+              "vx": 0,
+              "vy": 0,
+              "task": "COUNTER_GUARD"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 74.89,
+              "y": 36.75,
+              "vx": 0,
+              "vy": 0,
+              "task": "ST_WALL_SUPPORT"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 83.52,
+              "y": 7,
+              "vx": 0,
+              "vy": 0,
+              "task": "WIDE_RELEASE_OUTLET"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 86.58,
+              "y": 48.08,
+              "vx": 2.54,
+              "vy": 0.04,
+              "task": "ST_RELEASE_RUN"
+            }
+          ]
+        }
+      },
+      "previous": {
+        "boundary": {
+          "at": 745.9000000000104,
+          "reason": "ATTACKING_INVOLVEMENT",
+          "hero": "H-ST"
+        },
+        "frames": {
+          "pre": 101,
+          "post": 42,
+          "episode": 143
+        },
+        "options": [
+          {
+            "id": "CARRY",
+            "targetId": null,
+            "label": "공간 전진",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-RCM",
+            "label": "안전한 패스 → 같은 팀 RCM",
+            "targetSlot": "RCM",
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SHOT",
+            "targetId": null,
+            "label": "중거리 슛",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "SAFE_PASS",
+            "targetId": "H-LCM",
+            "label": "안전한 패스 → 같은 팀 LCM",
+            "targetSlot": "LCM",
+            "forward": -14.59054433593407,
+            "d": 16.2344690755862,
+            "receiverPressure": 3.647036798418678,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          },
+          {
+            "id": "HOLD",
+            "targetId": null,
+            "label": "볼 지키기",
+            "targetSlot": null,
+            "forward": null,
+            "d": null,
+            "receiverPressure": null,
+            "eta": null,
+            "contactZ": null,
+            "flightKind": null
+          }
+        ],
+        "selected": {
+          "id": "SHOT",
+          "targetId": null,
+          "label": "중거리 슛",
+          "targetSlot": null,
+          "forward": null,
+          "d": null,
+          "receiverPressure": null,
+          "eta": null,
+          "contactZ": null,
+          "flightKind": null
+        },
+        "result": {
+          "code": "MISS",
+          "headline": "슈팅 → 빗나감",
+          "detail": "슈팅이 골문 왼쪽 바깥으로 벗어났고 골킥 준비 장면까지 이어졌습니다."
+        },
+        "keyEvents": [
+          {
+            "t": 746.4000000000106,
+            "type": "PASS",
+            "actorId": "H-ST",
+            "targetId": "H-LW",
+            "text": "블루팀 ST이 블루팀 LW 쪽으로 공중 롱패스했습니다."
+          },
+          {
+            "t": 758.4000000000133,
+            "type": "LOOSE",
+            "actorId": null,
+            "targetId": null,
+            "text": "레드팀 RCM과 블루팀 LCM의 경합으로 공이 흘렀습니다."
+          },
+          {
+            "t": 760.3000000000137,
+            "type": "PASS_MISCONTROL",
+            "actorId": null,
+            "targetId": null,
+            "text": "블루팀 LW이 패스를 완전히 잡지 못해 공이 흘렀습니다."
+          },
+          {
+            "t": 772.9000000000166,
+            "type": "SHOT",
+            "actorId": "H-ST",
+            "targetId": null,
+            "text": "블루팀 ST이 슈팅을 시도합니다."
+          },
+          {
+            "t": 772.9000000000166,
+            "type": "USER_CHOICE",
+            "actorId": null,
+            "targetId": null,
+            "text": "H-ST: SHOT"
+          }
+        ],
+        "hero": {
+          "samples": 143,
+          "start": [
+            77.7,
+            36.28
+          ],
+          "end": [
+            63.97,
+            29.54
+          ],
+          "path": 31.04,
+          "net": 15.29,
+          "pathToNet": 2.03,
+          "xRev": 3,
+          "yRev": 0,
+          "actions": [
+            [
+              762.9,
+              "PIN_AND_RUN"
+            ],
+            [
+              763.1,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              765.5,
+              "PIN_AND_RUN"
+            ],
+            [
+              766.1,
+              "ATTACK_OPEN_CHANNEL"
+            ],
+            [
+              770.6,
+              "PIN_CENTRE_BACKS"
+            ],
+            [
+              770.9,
+              "PIN_AND_RUN"
+            ],
+            [
+              771.8,
+              "MOVE_TO_RECEIVE"
+            ],
+            [
+              772.3,
+              "FIRST_TOUCH_FLOW"
+            ],
+            [
+              773,
+              "POST_SHOT_FOLLOW"
+            ],
+            [
+              773.6,
+              "ATTACK_CENTRAL_CHANNEL"
+            ],
+            [
+              774,
+              "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+            ]
+          ]
+        },
+        "nearest": [
+          {
+            "id": "A-RCB",
+            "d": 4.85,
+            "x": 68.11,
+            "y": 27.01,
+            "task": "LONG_GOAL_KICK_ATTACK_SETUP",
+            "mark": null
+          },
+          {
+            "id": "A-RCM",
+            "d": 10.22,
+            "x": 56.77,
+            "y": 22.3,
+            "task": "LONG_GOAL_KICK_ATTACK_SETUP",
+            "mark": null
+          },
+          {
+            "id": "A-CM",
+            "d": 10.73,
+            "x": 54.21,
+            "y": 34.01,
+            "task": "LONG_GOAL_KICK_ATTACK_SETUP",
+            "mark": null
+          }
+        ],
+        "nearestMetrics": {
+          "A-RCB": {
+            "samples": 143,
+            "start": [
+              78.34,
+              25.81
+            ],
+            "end": [
+              68.11,
+              27.01
+            ],
+            "path": 31.18,
+            "net": 10.3,
+            "pathToNet": 3.03,
+            "xRev": 8,
+            "yRev": 2,
+            "actions": [
+              [
+                762.9,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                764.9,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                765.8,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                766.8,
+                "PRESS_CONTAIN"
+              ],
+              [
+                768.2,
+                "MIDFIELD_LANE_SCREEN"
+              ],
+              [
+                768.5,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                772.3,
+                "PRESS_CONTAIN"
+              ],
+              [
+                773,
+                "HOLD_BLOCK"
+              ],
+              [
+                773.3,
+                "BOX_RECOVERY_LINE"
+              ],
+              [
+                774,
+                "LONG_GOAL_KICK_ATTACK_SETUP"
+              ]
+            ]
+          },
+          "A-RCM": {
+            "samples": 143,
+            "start": [
+              67.68,
+              25.87
+            ],
+            "end": [
+              56.77,
+              22.3
+            ],
+            "path": 54.04,
+            "net": 11.49,
+            "pathToNet": 4.7,
+            "xRev": 3,
+            "yRev": 2,
+            "actions": [
+              [
+                762.9,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                765.5,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                765.8,
+                "PRESS_CONTAIN"
+              ],
+              [
+                766.4,
+                "ENGAGE"
+              ],
+              [
+                768.2,
+                "PRESS_CONTAIN"
+              ],
+              [
+                768.5,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                769.4,
+                "FAR_SIDE_BLOCK"
+              ],
+              [
+                770.3,
+                "FAR_SIDE_TUCK"
+              ],
+              [
+                771.8,
+                "BALL_SIDE_RECOVER"
+              ],
+              [
+                773.3,
+                "CUTBACK_TRACK"
+              ],
+              [
+                774,
+                "LONG_GOAL_KICK_ATTACK_SETUP"
+              ]
+            ]
+          },
+          "A-CM": {
+            "samples": 143,
+            "start": [
+              69.62,
+              31.82
+            ],
+            "end": [
+              54.21,
+              34.01
+            ],
+            "path": 54.33,
+            "net": 15.56,
+            "pathToNet": 3.49,
+            "xRev": 3,
+            "yRev": 1,
+            "actions": [
+              [
+                762.9,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                764.9,
+                "MARK_LANE_SCREEN"
+              ],
+              [
+                765.2,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                765.7,
+                "PRESS_CONTAIN"
+              ],
+              [
+                767,
+                "SHOT_LANE_COVER"
+              ],
+              [
+                769.1,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                769.4,
+                "MIDFIELD_BLOCK"
+              ],
+              [
+                770.3,
+                "PIVOT_SCREEN_DEF"
+              ],
+              [
+                773.3,
+                "BOX_EDGE_SCREEN"
+              ],
+              [
+                774,
+                "LONG_GOAL_KICK_ATTACK_SETUP"
+              ]
+            ]
+          }
+        },
+        "last": {
+          "time": 777.1,
+          "phase": "GOAL_KICK",
+          "possession": "AWAY",
+          "ball": {
+            "mode": "DEAD",
+            "x": 99,
+            "y": 34,
+            "ownerId": null,
+            "intendedReceiverId": null,
+            "kind": "CONTROL"
+          },
+          "heroPos": {
+            "x": 63.972,
+            "y": 29.542,
+            "vx": -7.654,
+            "vy": -0.845,
+            "action": "LONG_GOAL_KICK_DEFENSIVE_SETUP",
+            "tacticalTask": "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+          },
+          "mates": [
+            {
+              "id": "H-LCM",
+              "slot": "LCM",
+              "x": 52.5,
+              "y": 22.45,
+              "vx": -7.16,
+              "vy": -0.72,
+              "task": "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+            },
+            {
+              "id": "H-CM",
+              "slot": "CM",
+              "x": 48.13,
+              "y": 34.17,
+              "vx": -4.11,
+              "vy": -0.62,
+              "task": "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+            },
+            {
+              "id": "H-RCM",
+              "slot": "RCM",
+              "x": 57.46,
+              "y": 44.91,
+              "vx": -6.59,
+              "vy": 0.21,
+              "task": "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+            },
+            {
+              "id": "H-LW",
+              "slot": "LW",
+              "x": 63.71,
+              "y": 16.29,
+              "vx": -7.8,
+              "vy": -0.17,
+              "task": "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+            },
+            {
+              "id": "H-RW",
+              "slot": "RW",
+              "x": 65.12,
+              "y": 51.03,
+              "vx": -7.78,
+              "vy": 0.5,
+              "task": "LONG_GOAL_KICK_DEFENSIVE_SETUP"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

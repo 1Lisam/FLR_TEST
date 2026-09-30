@@ -1,0 +1,28 @@
+[
+  {
+    "seed": "SCORE-QA-001",
+    "score": {
+      "HOME": 1,
+      "AWAY": 4
+    },
+    "totalGoals": 5,
+    "shots": 35,
+    "tacklesWon": 38,
+    "interceptions": 105,
+    "blocks": 21,
+    "steps": 81874
+  },
+  {
+    "seed": "SCORE-QA-002",
+    "score": {
+      "HOME": 3,
+      "AWAY": 1
+    },
+    "totalGoals": 4,
+    "shots": 37,
+    "tacklesWon": 56,
+    "interceptions": 84,
+    "blocks": 20,
+    "steps": 80836
+  }
+]

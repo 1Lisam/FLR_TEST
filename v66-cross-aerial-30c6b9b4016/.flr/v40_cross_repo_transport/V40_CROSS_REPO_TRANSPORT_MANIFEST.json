@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "V40_CROSS_REPO_TRANSPORT_1.0",
+  "sourceRepo": "1Lisam/FLR_DEV",
+  "sourceSHA": "b4777768f41ee252ba38ecfa84a01fc8409fb182",
+  "targetRepo": "1Lisam/FLR_TEST",
+  "targetBaseSHA": "24f9201c5f89438140f575d0d6f008f441bee528",
+  "targetBaseVerification": "WORKER_GITHUB_TREE_VERIFIED",
+  "payloadManifestSha256": "3f63b26308e5a936c7e4557936f17c6a28ac68da11e4b5975836af3708e64823",
+  "payloadManifest": {
+    "files": [
+      {
+        "path": "final_match_test_dock.js",
+        "sha256": "e99b86e96279b4cbdff085d53caebcfcf49e954d0f4cca1fb7162a4fcba8e33b",
+        "bytes": 13436
+      },
+      {
+        "path": "runtime/continuous_match_core.js",
+        "sha256": "43556bb256003a26bae8ef66a87bcc10a2564bd93004e3bb7c654afd011ce9bd",
+        "bytes": 264874
+      },
+      {
+        "path": "runtime/corner_templates.js",
+        "sha256": "122979121db70bd86c229c3f29162b55304bdce1803b564702e831433ced9f10",
+        "bytes": 13629
+      },
+      {
+        "path": "runtime/v39_corner_responsibility_patch.js",
+        "sha256": "885b5d8431b4174c9c8c6ea0d1c3686cc08358777f83dbae4bdbb4197fadc666",
+        "bytes": 9718
+      },
+      {
+        "path": "runtime/v39_free_kick_channel_owner_patch.js",
+        "sha256": "8584a4bc8af6fbc1c06a0a11d17509268246bdaa15790dbc01a9e18cd55546de",
+        "bytes": 6035
+      },
+      {
+        "path": "runtime/v39_free_kick_defensive_layers_patch.js",
+        "sha256": "b0fdb3bf72cb5ffb6b85a3f8bdce45495441eae417e2dd4e7e742923818fbfd7",
+        "bytes": 3134
+      },
+      {
+        "path": "runtime/v39_open_play_responsibility_patch.js",
+        "sha256": "3f8519496be71d16cb7f9c9e59b449afcccdfbad806d0004d755e97decf2968a",
+        "bytes": 12027
+      }
+    ],
+    "payloadManifestSha256": "3f63b26308e5a936c7e4557936f17c6a28ac68da11e4b5975836af3708e64823"
+  },
+  "priorPublicBaseline": {
+    "representedBy": "FLR_TEST main Git tree/blob comparison performed in Worker",
+    "targetBaseSHA": "24f9201c5f89438140f575d0d6f008f441bee528"
+  },
+  "changedFiles": [
+    "final_match_test_dock.js",
+    "runtime/continuous_match_core.js",
+    "runtime/corner_templates.js",
+    "runtime/v39_corner_responsibility_patch.js",
+    "runtime/v39_free_kick_channel_owner_patch.js",
+    "runtime/v39_free_kick_defensive_layers_patch.js",
+    "runtime/v39_open_play_responsibility_patch.js"
+  ],
+  "partsDirectory": ".flr/v40_cross_repo_transport/parts",
+  "oracleExcluded": [
+    "QA/v40_human_calibration_oracles.json"
+  ],
+  "workflowTemplate": ".github/workflows/flr-auto-deploy.yml",
+  "triggerFile": ".flr/deploy.json"
+}

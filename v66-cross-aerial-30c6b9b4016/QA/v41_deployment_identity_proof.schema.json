@@ -1,0 +1,7 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"FLR_V41_DEPLOYMENT_IDENTITY_PROOF_1.0",
+  "type":"object",
+  "required":["schemaVersion","candidateSourceSHA","runtimeSourceSHA","validatorHead","payloadManifest","triggerCommit","deployedMainSHA","triggerDescriptorOnTriggerBranch","triggerDescriptorExpectedOnDeployedMain","deployedMainContainsTriggerDescriptor"],
+  "properties":{"schemaVersion":{"const":"FLR_V41_DEPLOYMENT_IDENTITY_PROOF_1.0"},"candidateSourceSHA":{"type":"string"},"runtimeSourceSHA":{"type":"string"},"validatorHead":{"type":"string"},"payloadManifest":{"type":"object","required":["files","hash"]},"triggerCommit":{"type":"string"},"deployedMainSHA":{"type":"string"},"triggerDescriptorOnTriggerBranch":{"const":true},"triggerDescriptorExpectedOnDeployedMain":{"const":false},"deployedMainContainsTriggerDescriptor":{"const":false}}
+}

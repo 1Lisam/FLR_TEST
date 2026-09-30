@@ -1,0 +1,6 @@
+{
+  "schemaVersion":"FLR_V41_HUMAN_CALIBRATION_ORACLES_1.0",
+  "visibility":"validator-only; never browser/deploy payload",
+  "precommittedAt":"V41-A1-construction",
+  "oracles":{"HC-01":"AMBIGUOUS","HC-02":"FAIL","HC-03":"FAIL","HC-04":"PASS","HC-05":"FAIL","HC-06":"FAIL","HC-07":"AMBIGUOUS","HC-08":"FAIL","HC-09":"FAIL","HC-10":"AMBIGUOUS","HC-11":"FAIL","HC-12":"FAIL"}
+}

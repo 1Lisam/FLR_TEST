@@ -1,0 +1,34 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"FLR_V40_HUMAN_CALIBRATION_ORACLES_2.0",
+  "title":"V40 human calibration precommitted oracle contract",
+  "type":"object",
+  "required":["schemaVersion","visibility","precommittedAt","precommitSource","oracleSha256","oracles"],
+  "properties":{
+    "schemaVersion":{"const":"V40_HUMAN_CALIBRATION_ORACLES_2.0"},
+    "visibility":{"const":"validator-only"},
+    "precommittedAt":{"type":"string","format":"date-time"},
+    "precommitSource":{"type":"string","minLength":1},
+    "oracleSha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "oracles":{"type":"object","minProperties":1,"additionalProperties":{"$ref":"#/$defs/oracle"}}
+  },
+  "$defs":{
+    "oracle":{
+      "type":"object",
+      "required":["targetObservable","acceptanceRationale","caseType","weight","duplicateGroup"],
+      "properties":{
+        "expectedJudgment":{"enum":["PASS","FAIL","AMBIGUOUS"]},
+        "expectedClass":{"type":"string","minLength":1},
+        "targetObservable":{"type":"string","minLength":1},
+        "acceptanceRationale":{"type":"string","minLength":1},
+        "caseType":{"enum":["CONTROL","KNOWN_BAD","AMBIGUOUS_PROBE","PRESENTATION_PROBE"]},
+        "automated":{"type":"string","minLength":1},
+        "weight":{"type":"number","minimum":0},
+        "duplicateGroup":{"type":"string","minLength":1}
+      },
+      "oneOf":[{"required":["expectedJudgment"]},{"required":["expectedClass"]}],
+      "additionalProperties":false
+    }
+  },
+  "additionalProperties":false
+}

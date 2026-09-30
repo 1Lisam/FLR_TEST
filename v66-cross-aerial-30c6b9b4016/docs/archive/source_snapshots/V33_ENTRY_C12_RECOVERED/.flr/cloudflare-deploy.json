@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "FLR_CLOUDFLARE_D1_DEPLOY_REQUEST_1.0",
+  "version": "TT-0.51-JSON-GZIP",
+  "worker": "flr-bug-reporter",
+  "storage": "D1",
+  "database": "flr-bug-reports",
+  "purpose": "Deploy lossless gzip-base64 bug report storage with legacy plain JSON read compatibility",
+  "sourceCommit": "d4e3569d07faa3d7962ee9e8a5abdc3719e8d893",
+  "requestedAt": "2026-08-21T12:15:00+09:00",
+  "attemptNonce": "tt051-json-gzip-20260821-1215"
+}

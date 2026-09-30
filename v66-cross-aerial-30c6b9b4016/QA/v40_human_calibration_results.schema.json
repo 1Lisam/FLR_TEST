@@ -1,0 +1,26 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"FLR_V40_HUMAN_CALIBRATION_RESULTS_1.0",
+  "type":"object",
+  "required":["schemaVersion","source","caseOrder","results"],
+  "properties":{
+    "schemaVersion":{"const":"V40_HUMAN_CALIBRATION_RESULTS_1.0"},
+    "source":{"const":"FLR_TEST_ONLY_HUMAN_CALIBRATION_SURFACE"},
+    "caseOrder":{"type":"array","items":{"type":"string","pattern":"^HC-(0[1-9]|1[0-2])$"},"minItems":12,"maxItems":12},
+    "results":{"type":"array","items":{"$ref":"#/$defs/result"}}
+  },
+  "$defs":{
+    "result":{
+      "type":"object",
+      "required":["schemaVersion","caseId","category","scenario","seed","judgment","note","recordedAt"],
+      "properties":{
+        "schemaVersion":{"const":"V40_HUMAN_CALIBRATION_RESULT_1.0"},
+        "caseId":{"type":"string","pattern":"^HC-(0[1-9]|1[0-2])$"},
+        "category":{"type":"string"},"scenario":{"type":"string"},"seed":{"type":"string"},
+        "judgment":{"enum":["PASS","FAIL","AMBIGUOUS"]},"note":{"type":"string","maxLength":240},"recordedAt":{"type":"string","format":"date-time"}
+      },
+      "additionalProperties":false
+    }
+  },
+  "additionalProperties":false
+}

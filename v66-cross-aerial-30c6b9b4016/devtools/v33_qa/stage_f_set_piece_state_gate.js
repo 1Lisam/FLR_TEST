@@ -1,0 +1,9 @@
+'use strict';
+const path=require('path');const src=path.resolve(process.argv[2]);if(!src)process.exit(2);
+const E=require(path.join(src,'runtime/continuous_match_core.js'));const B=E.choiceActionBridge();
+function point(team,kind){if(kind==='CORNER')return team==='HOME'?{x:103.8,y:1.2}:{x:1.2,y:66.8};if(kind==='FREE_KICK')return team==='HOME'?{x:72,y:29}:{x:33,y:39};return{x:52.5,y:34};}
+function run(kind,team){const m=E.createMatch(`SP-${kind}-${team}`,{dt:.05});m.restart=null;m.phase='OPEN_PLAY';m.events=[];const p=point(team,kind);B.startDeadRestart(m,kind,team,p.x,p.y);let sawSetup=m.phase==='SET_PIECE_SETUP',sawLive=false,roleCount=0,liveAt=null,exitAt=null;const phases=[m.phase];
+ for(let i=0;i<500;i++){E.step(m,.05);const ph=E.snapshot(m).phase;if(phases[phases.length-1]!==ph)phases.push(ph);if(ph==='SET_PIECE_SETUP')sawSetup=true;if(m.setPieceLive){sawLive=true;roleCount=Math.max(roleCount,Object.keys(m.setPieceLive.roles||{}).length);if(liveAt==null)liveAt=m.time;}if(sawLive&&!m.setPieceLive&&!m.restart){exitAt=m.time;break;}if(sawLive&&m.restart&&!m.setPieceLive){exitAt=m.time;break;}}
+ const ended=sawLive&&exitAt!=null,pass=sawSetup&&sawLive&&roleCount>=21&&ended;
+ return{kind,team,pass,sawSetup,sawLive,roleCount,liveAt,exitAt,finalPhase:E.snapshot(m).phase,ballMode:m.ball.mode,restart:m.restart?.kind||null,stats:{setPieceSetups:m.stats.setPieceSetups||0,setPieceLiveEntries:m.stats.setPieceLiveEntries||0,setPieceLiveExits:m.stats.setPieceLiveExits||0,penalties:m.stats.penalties||0},phases,events:m.events.slice(-8).map(e=>e.type)};}
+const cases=[];for(const kind of ['CORNER','FREE_KICK','PENALTY'])for(const team of ['HOME','AWAY'])cases.push(run(kind,team));const pass=cases.every(x=>x.pass);console.log(JSON.stringify({schema:'FLR_STAGE_F_SET_PIECE_STATE_GATE_V1',source:src,pass,cases},null,2));if(!pass)process.exit(1);

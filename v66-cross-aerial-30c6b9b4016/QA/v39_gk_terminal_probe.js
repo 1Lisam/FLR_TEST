@@ -1,0 +1,10 @@
+'use strict';
+const path=require('path');
+require('./v37_movement_gate_luna_calibration.js');
+const H=require('../final_match_rare_scenario_harness.js');
+global.FLRPG_FINAL_MATCH_RARE_SCENARIOS=H;
+require('../final_match_v37_forced_harness_patch.js');
+const r=H.run('GK_SHOT_BOX','FINAL-MATCH-TEST-12',{runtimeDir:path.resolve(__dirname,'../runtime')});
+const term=(r.actualEvents||[]).find(e=>['GOAL','SAVE','CHIP_SAVE','PARRY','PARRY_SAFE','PARRY_DANGER'].includes(e.type));
+const rows=(r.frames||[]).filter(f=>term&&f.time>=term.t-.55&&f.time<=term.t+1.0).map(f=>{const g=(f.players||[]).find(p=>p.id==='H-GK');return{time:f.time,ballMode:f.ball?.mode,ballKind:f.ball?.kind,ballX:f.ball?.x,ballY:f.ball?.y,gk:g&&{x:g.x,y:g.y,tx:g.tx,ty:g.ty,vx:g.vx,vy:g.vy,action:g.action,tacticalTask:g.tacticalTask,v37DivePresentation:g.v37DivePresentation||null}};});
+console.log(JSON.stringify({module:'V39_GK_TERMINAL_PROBE',terminal:term,rows},null,2));

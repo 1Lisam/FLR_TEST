@@ -1,0 +1,21 @@
+{
+  "schemaVersion":"V40_HUMAN_CALIBRATION_FUTURE_SESSION_1.0",
+  "sessionId":"V40-HUMAN-CALIBRATION-FUTURE-01",
+  "surfaceManifest":"QA/v40_human_calibration_manifest.json",
+  "oracle":"QA/v40_human_calibration_oracles.json",
+  "materializationPolicy":"Precommit and binding must pass before any case is materialized.",
+  "mapping":[
+    {"caseId":"HC-01","targetObservable":"choice-boundary-current-state","weight":1,"duplicateGroup":"ST_BREAKAWAY_95"},
+    {"caseId":"HC-02","targetObservable":"corner-live-responsibility-and-spacing","weight":1,"duplicateGroup":"HC-02"},
+    {"caseId":"HC-03","targetObservable":"renderer-gk-body-pose-travel-recovery","weight":1,"duplicateGroup":"GK_SHOT_135"},
+    {"caseId":"HC-04","targetObservable":"forward-layer-responsibility","weight":1,"duplicateGroup":"HC-04"},
+    {"caseId":"HC-05","targetObservable":"set-piece-channel-ownership-and-purpose","weight":1,"duplicateGroup":"HC-05"},
+    {"caseId":"HC-06","targetObservable":"corner-live-responsibility-and-spacing","weight":1,"duplicateGroup":"HC-06"},
+    {"caseId":"HC-07","targetObservable":"choice-boundary-current-state","weight":1,"duplicateGroup":"HC-07"},
+    {"caseId":"HC-08","targetObservable":"set-piece-channel-ownership-and-purpose","weight":1,"duplicateGroup":"HC-08"},
+    {"caseId":"HC-09","targetObservable":"corner-live-responsibility-and-spacing","weight":1,"duplicateGroup":"HC-09"},
+    {"caseId":"HC-10","targetObservable":"choice-boundary-current-state","weight":0,"duplicateGroup":"ST_BREAKAWAY_95"},
+    {"caseId":"HC-11","targetObservable":"renderer-gk-body-pose-travel-recovery","weight":1,"duplicateGroup":"GK_SHOT_BOX_135"},
+    {"caseId":"HC-12","targetObservable":"corner-live-responsibility-and-spacing","weight":1,"duplicateGroup":"HC-12"}
+  ]
+}

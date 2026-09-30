@@ -1,0 +1,28 @@
+{
+  "schema": "FLR_V33_FINAL_SOURCE_INTEGRITY_1.0",
+  "authoritative": {
+    "tree_sha256": "251ea6c30ad528a2f5d6ce2f8bf01f04cccc7fa6bf43a693d78b08b72809b4df",
+    "file_count": 78,
+    "total_bytes": 1217782
+  },
+  "stable_v32_stage_c": {
+    "tree_sha256": "551835f2605e09f613f0e749bb8482e6df8f494d5ab72bf31c894eefe1dfc4ef",
+    "file_count": 73,
+    "total_bytes": 1207216
+  },
+  "v33_entry_c12": {
+    "tree_sha256": "e906ff4d812861c8e11d2be1e5049ede59d8af4602a2f0987da62ea14440e596",
+    "file_count": 74,
+    "total_bytes": 1208928
+  },
+  "important_files": {
+    "SOURCE/AUTHORITATIVE_V33_FINAL/runtime/continuous_match_core.js": "e764db748a9a624349f019fa897abad32a8a01078a2f094666bfb0a4163939fd",
+    "SOURCE/AUTHORITATIVE_V33_FINAL/runtime/restart_movement.js": "3a3f6f3ae638d77225599ec35115e5bf39bf374ccef561babb90b8bac634f163",
+    "SOURCE/AUTHORITATIVE_V33_FINAL/live_hybrid_session_v02.js": "47e1f8e6cef02d9a5b7cb83c208dbd5c16fc1559c9ec416ad516296a946c1e3f",
+    "QA/master_gate_runner.js": "e7abcd8f3eed51f349abce4efdb615bae98999dffd8a1f2ffe7eea905249f998",
+    "QA/gk_open_window_distance_sweep.js": "20df5b19d022e54242736b23e9ece1a57aa79946fa041d9a23ebef53eb82027a",
+    "QA/gk_clear_keeper_reaction_gate.js": "40025210187d6fb8182e93b19a0f9aca100cefe24071172084578dacc5287f09",
+    "EVIDENCE/USER_TEST_TT052_READINESS/v7_screen20_summary.json": "5c48b1f343836591f90fbc80349d43dedc5ea1f251417eb974fcb70684e4a649",
+    "EVIDENCE/USER_TEST_TT052_READINESS/TT052_FINAL/master_gate.json": "6acc825823c2bcfbea326dc8bf3a466d3e896ba53d0a3ccc2ea74f639103574f"
+  }
+}

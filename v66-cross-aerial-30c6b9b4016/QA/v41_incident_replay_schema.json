@@ -1,0 +1,8 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"FLR_V41_CAPTURED_BOUNDARY_1.0",
+  "type":"object",
+  "required":["schemaVersion","incidentId","sourceHead","scenario","seed","startState","observable","resultStatus"],
+  "properties":{"schemaVersion":{"const":"FLR_V41_CAPTURED_BOUNDARY_1.0"},"incidentId":{"type":"string"},"sourceHead":{"type":"string","pattern":"^[a-f0-9]{40}$"},"scenario":{"type":"string"},"seed":{"type":"string"},"startState":{"type":"object"},"observable":{"type":"object"},"resultStatus":{"enum":["BAD_REPRODUCTION","CONTROL_REPRODUCTION"]}},
+  "additionalProperties":true
+}

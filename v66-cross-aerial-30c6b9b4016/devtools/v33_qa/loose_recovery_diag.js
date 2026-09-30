@@ -1,0 +1,9 @@
+'use strict';
+const path=require('path');const root=process.argv[2],seed=process.argv[3];if(!root||!seed)process.exit(2);const E=require(path.resolve(root,'runtime/continuous_match_core.js'));const m=E.createMatch(seed,{dt:.05,telemetry:{}});let steps=0,prevMode=m.ball.mode,prevOwner=m.ball.ownerId,prevShots=0;const acqs=[],pending=new Map();
+const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+while(!m.completed&&steps++<110000){const before={mode:m.ball.mode,owner:m.ball.ownerId,vx:m.ball.vx||0,vy:m.ball.vy||0,x:m.ball.x,y:m.ball.y,lastTeam:m.ball.lastTouchTeam,lastPlayer:m.ball.lastTouchPlayer};E.step(m,.05);
+ if(before.mode==='LOOSE'&&m.ball.mode==='CONTROLLED'&&m.ball.ownerId){const p=m.players.find(x=>x.id===m.ball.ownerId);if(p){const rivals=m.players.filter(q=>q.team!==p.team&&q.role!=='GK').map(q=>d(q,{x:before.x,y:before.y}));const row={idx:acqs.length+1,at:+m.time.toFixed(2),playerId:p.id,team:p.team,role:p.role,speed:+Math.hypot(before.vx,before.vy).toFixed(2),rivalDist:+(Math.min(...rivals)).toFixed(2),sourceTeam:before.lastTeam,sourcePlayer:before.lastPlayer,shotWithin24:false,shotReason:null,shotAt:null};acqs.push(row);pending.set(p.id,row);}}
+ if((m.stats.shots||0)>prevShots){const ev=[...m.events].reverse().find(e=>(e.type==='SHOT'||e.type==='HEADER_SHOT')&&e.actorId);if(ev&&pending.has(ev.actorId)){const row=pending.get(ev.actorId);if(m.time-row.at<=2.4){row.shotWithin24=true;row.shotAt=+m.time.toFixed(2); const reasons=m.stats.shotReasons||{}; row.shotReason=Object.keys(reasons).sort((a,b)=>(reasons[b]||0)-(reasons[a]||0))[0]||null;}pending.delete(ev.actorId);}prevShots=m.stats.shots||0;}
+ for(const [id,row] of [...pending])if(m.time-row.at>2.4)pending.delete(id);
+}
+console.log(JSON.stringify({seed,completed:m.completed,score:m.score,acquisitions:acqs.length,quickShots:acqs.filter(x=>x.shotWithin24).length,rows:acqs},null,2));

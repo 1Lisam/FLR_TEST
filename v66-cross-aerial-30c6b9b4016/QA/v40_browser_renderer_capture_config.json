@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "FLR_BROWSER_RENDER_CAPTURE_1.0",
+  "page": "index.html",
+  "dockId": "finalMatchTestDock",
+  "canvasId": "heroPitch",
+  "browser": "chromium",
+  "scenarios": [
+    {"scenario": "GK_SHOT_CLOSE", "seed": "FINAL-MATCH-TEST-135"},
+    {"scenario": "GK_SHOT_BOX", "seed": "FINAL-MATCH-TEST-135"}
+  ],
+  "requiredArtifacts": ["manifest.json", "*.png"],
+  "requiredTelemetry": [
+    "sourceSHA", "scenario", "seed", "pageURL", "browserVersion",
+    "canvasDimensions", "runState", "futureOutcomePrecomputed",
+    "frames", "lifecycleStages", "primitiveMetrics", "screenshots",
+    "primitiveMetrics[].semantic", "primitiveMetrics[].player"
+  ],
+  "diagnosticStatuses": ["CAPTURE_OK_WITH_FINDINGS", "CAPTURE_OK_CLEAN", "QA_INFRA_BLOCKED"]
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "baseline_sha256": "93540610a2e833a380f77e66cc8afbb728629464eacbbb7533c89c6efe9ca70a",
+  "classification_values": ["CONFIGURABLE_ALREADY", "ADAPTER_CANDIDATE", "CORE_COUPLING_TO_REMOVE_LATER", "INTENTIONAL_PROJECT_POLICY"],
+  "gaps": [
+    {"function_or_constant": "EVENT_BUS_PR", "line": 51, "assumption": "Issue/PR #901 is the FLR event bus.", "severity": "high", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "WORK_RESULT_PREFIX, WORK_RESULT_*", "line": 52, "assumption": "FLR_WORK_RESULT message protocol and local .flr state filename.", "severity": "high", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "CONTROL_PATH, CONTROL_REF", "line": 60, "assumption": "FLR automation control file and main ref are global runtime policy.", "severity": "high", "classification": "INTENTIONAL_PROJECT_POLICY"},
+    {"function_or_constant": "REPORT_API_ENDPOINT", "line": 66, "assumption": "FLR bug reporter endpoint is included in Worker core.", "severity": "medium", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "fetch_open_issues", "line": 171, "assumption": "GitHub Issues are the universal queue and one page of 30 is sufficient.", "severity": "high", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "is_worker_ready_issue", "line": 167, "assumption": "Exact [DEVWORKER READY] title protocol is globally embedded.", "severity": "medium", "classification": "CONFIGURABLE_ALREADY"},
+    {"function_or_constant": "create_managed_staging_workspace", "line": 880, "assumption": "Worker host BASE/tmp staging layout is the result workspace convention.", "severity": "high", "classification": "CORE_COUPLING_TO_REMOVE_LATER"},
+    {"function_or_constant": "capture_managed_delivery_recovery / preserve_managed_staging", "lines": [1202, 1502], "assumption": "BASE/recovery/managed is the durable recovery store and FLR layout is readable directly.", "severity": "high", "classification": "CORE_COUPLING_TO_REMOVE_LATER"},
+    {"function_or_constant": "process_host_post", "line": 1978, "assumption": "Configured project host workdir is the post-delivery verification target.", "severity": "high", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "process_direct", "line": 2206, "assumption": "Generic direct mode owns commit/push itself; a future DeliveryEngine cannot share its phase truth yet.", "severity": "high", "classification": "CORE_COUPLING_TO_REMOVE_LATER"},
+    {"function_or_constant": "process_worker_update", "line": 2231, "assumption": "Worker installation, config.json and start_worker.sh are project task capabilities.", "severity": "high", "classification": "INTENTIONAL_PROJECT_POLICY"},
+    {"function_or_constant": "dispatch_notification", "line": 1841, "assumption": "Korean FLR-facing wording, quota telemetry and ntfy formatting are universal notifications.", "severity": "medium", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "post_terminal_event / poll_work_results", "lines": [1946, 2302], "assumption": "FLR Work event semantics are embedded even though the active paths are disabled.", "severity": "medium", "classification": "INTENTIONAL_PROJECT_POLICY"},
+    {"function_or_constant": "process_issue", "line": 2328, "assumption": "GitHub title/comment/close calls implement outcome projection in the execution orchestrator.", "severity": "high", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "git_managed_contract_errors", "line": 577, "assumption": "devworker/ branch namespace and DEVWORKER delivery owner are a common delivery protocol.", "severity": "low", "classification": "CONFIGURABLE_ALREADY"},
+    {"function_or_constant": "SAFE_SHELL_EXECUTABLES / validate_argv_commands", "lines": [48, 402], "assumption": "Permitting npx and Python is treated as a generic capability even though commands can carry project-specific deployment effects such as a platform deploy.", "severity": "high", "classification": "INTENTIONAL_PROJECT_POLICY"},
+    {"function_or_constant": "process_direct", "line": 2206, "assumption": "DIRECT delivery pushes origin HEAD directly, binding a project remote/deployment convention into the orchestration path.", "severity": "high", "classification": "ADAPTER_CANDIDATE"},
+    {"function_or_constant": "poll", "line": 2375, "assumption": "config.projects with GitHub repo/workdir is the only project registration form.", "severity": "medium", "classification": "CONFIGURABLE_ALREADY"}
+  ],
+  "pure_core_verified_with_SAMPLE_APP": [
+    "READY prefix eligibility logic when given a generic title",
+    "JSON object parsing and rejection behavior",
+    "SHELL argv allowlist validation",
+    "git-managed aggregate contract validation",
+    "task fingerprint calculation",
+    "delivery exact/scoped compatibility classification with inert path mocks"
+  ],
+  "not_claimed_portable": [
+    "GitHub polling and issue lifecycle", "FLR Work/event behavior", "notifications", "host postcheck", "recovery storage", "deployment conventions"
+  ]
+}
