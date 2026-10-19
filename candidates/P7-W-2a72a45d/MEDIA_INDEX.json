@@ -1,0 +1,69 @@
+{
+  "scope": "Bounded rejected proof. Actual videos have different natural routes. Saved comparisons use equal inputs, original renderer, and no further NPC action decisions.",
+  "source_commit": "2a72a45dbd82c44d25ecb09e653748a5b5805c36",
+  "status": "NOT_ADOPTED",
+  "videos": [
+    {
+      "label": "baseline",
+      "file": "baseline-actual.mp4",
+      "sha256": "ec5d179b9612a5c87d45822a17b1e999c00d5df8d426072dcff7ab145a1f1994"
+    },
+    {
+      "label": "A",
+      "file": "A-actual.mp4",
+      "sha256": "11052678f7c9d75cd2ee6eea6cd366118f19a1f3fe4acab2cfafc233d8cf749c"
+    },
+    {
+      "label": "B",
+      "file": "B-actual.mp4",
+      "sha256": "1c7a7e2d8143c0b0e3ed829b09a70694d265d0c273a3481ac71ee2352bd91b9b"
+    }
+  ],
+  "saved": [
+    {
+      "id": "ST4_SPLIT_PRESS",
+      "file": "ST4_SPLIT_PRESS.mp4",
+      "inputHash": "c0a65a7f0c0481c82a67f920ef3396dbee4fe3114eaddf923ad84a5afe988920",
+      "inputSha256": "fa680bc55f322fb336b8ecf2920adbd46dc246b31d4a675b90903fc8e4f73935",
+      "scope": "Same saved causal input, V2 physical continuation; not a new natural reproduction of original choice route",
+      "duration": 6,
+      "sha256": "f767485928e78eb0db627e3c8d30a6024e746c1f49ed1a72a60cc237031599ed"
+    },
+    {
+      "id": "ST_SUPPORT_AFTER_LB_CONTROL",
+      "file": "ST_SUPPORT_AFTER_LB_CONTROL.mp4",
+      "inputHash": "c4b52672eae1537931ba492dbc06ecce1157e102b6d62116f0feaed2d68818ad",
+      "inputSha256": "e26fec9b11ea0bada2252f04ccb233d94ef9b00494e6695f81cf4a64b7302c3e",
+      "scope": "Same saved causal input, V2 physical continuation; not a new natural reproduction of original choice route",
+      "duration": 5.599999999999994,
+      "sha256": "79e82f8f36a30b4433a47129d62508ecdeebef2bc49f1d31230f3bf22e0a85fb"
+    },
+    {
+      "id": "CENTRAL_CARRY",
+      "file": "CENTRAL_CARRY.mp4",
+      "inputHash": "9d94b52adf6f2d5b8dca6510528e5caa3a1f4b8eb0a9cd4705bac1c58c2aab81",
+      "inputSha256": "2996c43b06184f0737d171669f74a3a376496f22c56a5ee1d4f552df8ac312ae",
+      "scope": "Same saved causal input, V2 physical continuation; not a new natural reproduction of original choice route",
+      "duration": 4,
+      "sha256": "0268c17ab15b1758ea5e5ffdd91968d534c47f71643c52d80c87993919ea3515"
+    },
+    {
+      "id": "FULLBACK_POSSESSION_LOSS_PRESS",
+      "file": "FULLBACK_POSSESSION_LOSS_PRESS.mp4",
+      "inputHash": "bafe0c03da17fa62e670a9d73a47b7b309d2473861d3ccdf5ff26cc0100faa55",
+      "inputSha256": "67d3bb95a6343ac4a00649cec90b65f0fd117fe6fb927bbed6c9837fb0d2e298",
+      "scope": "Recorded all22 geometry over a current constructor; missing historical timers/RNG/body angles are NOT reconstructed. Diagnostic continuation only, not exact original causal replay.",
+      "duration": 4,
+      "sha256": "45f105f5035532cdcf395633005a368c422953573ed40a7b4a02bb6c62d314ba"
+    },
+    {
+      "id": "FULLBACK_RB_FINAL_ADVANCE",
+      "file": "FULLBACK_RB_FINAL_ADVANCE.mp4",
+      "inputHash": "4e474038231334101fc9ae414b290a99938ea035f959f0b1bba0261273738b64",
+      "inputSha256": "d55c47cc87eb7034292fd73939f7348a2cf786558313fdfff79400b33163b8df",
+      "scope": "Recorded all22 geometry over a current constructor; missing historical timers/RNG/body angles are NOT reconstructed. Diagnostic continuation only, not exact original causal replay.",
+      "duration": 4,
+      "sha256": "1ec3633db53af27e0bf3e17542d9194f33cad3c9911b5386eb9e471d4532fcba"
+    }
+  ]
+}
