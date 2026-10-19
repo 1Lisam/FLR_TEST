@@ -1,0 +1,41 @@
+{
+  "stage": "D",
+  "verdict": "중원·전방의 똑같은 줄 이동을 줄인 수리 시험판입니다. 공격 정지·압박 간격 등은 남아 있어 전체 움직임 완료 판정은 아닙니다.",
+  "scenes": [
+    {
+      "id": "same-1",
+      "file": "data/same-1.json",
+      "label": "같은 상태 · 1번"
+    },
+    {
+      "id": "natural-1",
+      "file": "data/natural-1.json",
+      "label": "처음부터 · 1번"
+    },
+    {
+      "id": "same-33737",
+      "file": "data/same-33737.json",
+      "label": "같은 상태 · 33737번"
+    },
+    {
+      "id": "natural-33737",
+      "file": "data/natural-33737.json",
+      "label": "처음부터 · 33737번"
+    },
+    {
+      "id": "same-77779",
+      "file": "data/same-77779.json",
+      "label": "같은 상태 · 77779번"
+    },
+    {
+      "id": "natural-77779",
+      "file": "data/natural-77779.json",
+      "label": "처음부터 · 77779번"
+    },
+    {
+      "id": "unseen-4443",
+      "file": "data/unseen-4443.json",
+      "label": "별도 새 경기 · 4443번"
+    }
+  ]
+}

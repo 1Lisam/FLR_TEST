@@ -1,0 +1,117 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded rigidity comparison; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "c9984ac136528e42cd5d97d52c396b93dd991268",
+  "runtimeFiles": 10,
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4108,
+      "sha256": "833d3fd364a43477e02fa6abc1b214d696de5340800249a16aca0131494db233"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3531,
+      "sha256": "9d0202d81bb9e97dcac21c23d4936dc695228e337871f5c559a05d2b818c493d"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4236,
+      "sha256": "8300350a052897c4028f045d27e134d9b896ab9315e54fbcb88d4d2b4dd3f97c"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6518,
+      "sha256": "973a06b6cf9f5412443b2f2b79deb0b2e788dbdfce4d00a8ddafef1cfee0ac17"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 10632,
+      "sha256": "95e0d876496eeac0b13aee3090cc1e0226bcbd2295c31801d87cc5c33354289a"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 1144,
+      "sha256": "4ed7ddd263b42b5bf75c15da7b280d71565cf16ba680128d57d00a2c3e3c03d8"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3061,
+      "sha256": "98084cc13e751a2a398a69e119a3523d8df069645c54a1c8548f3b2d12b6ad18"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 5982,
+      "sha256": "8c3bb7aa14bb8f1af65b2f95ab6808e16ee17fa2a34262f4d21fd31b6763aa87"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 2957,
+      "sha256": "228ad0d183208ecc532c70e422ecbfdf84f10fc33ab0ea9f31ff6b35a50df15b"
+    },
+    {
+      "path": "review/rigidity-comparison/app.mjs",
+      "bytes": 5090,
+      "sha256": "6f515d63bc46fe1ff85769f8678d3b85bfd388c80ec677705bcf59e535f416d8"
+    },
+    {
+      "path": "review/rigidity-comparison/data/index.json",
+      "bytes": 1062,
+      "sha256": "4e9ca469565122b878495a67e89a6a40f585ea899aa847533fab8838e27b55f6"
+    },
+    {
+      "path": "review/rigidity-comparison/data/natural-1.json",
+      "bytes": 2155326,
+      "sha256": "5fe772086ecd5b25467727a29c7f8d6b6c88602a5eb276d19e46cb3b5aca6fb5"
+    },
+    {
+      "path": "review/rigidity-comparison/data/natural-33737.json",
+      "bytes": 2142479,
+      "sha256": "e0eb21ecbeab7a2522bb82600f4fbd2231737fe3a8f7efbb3fba35ba6eb6ca85"
+    },
+    {
+      "path": "review/rigidity-comparison/data/natural-77779.json",
+      "bytes": 2176467,
+      "sha256": "da9cd9d94e9fdb39b5f5ad2b23a4f909f14688894fb2e241b52d4e8fa9f4233e"
+    },
+    {
+      "path": "review/rigidity-comparison/data/same-1.json",
+      "bytes": 352778,
+      "sha256": "6614ea79836d1ee4c1d2b51eca2bc2d84aba3cf71c130ad4122ee4a4c39345a7"
+    },
+    {
+      "path": "review/rigidity-comparison/data/same-33737.json",
+      "bytes": 366673,
+      "sha256": "dcd3ef2611d0eeb21454ab61bd81b41f8b74bc4f875870c09b1c78be5cb176e3"
+    },
+    {
+      "path": "review/rigidity-comparison/data/same-77779.json",
+      "bytes": 371300,
+      "sha256": "31cc45b5c22a1e93df2c52cf1cb259297aa29e5d218e89327fbb0757a5d72521"
+    },
+    {
+      "path": "review/rigidity-comparison/data/unseen-4443.json",
+      "bytes": 2182300,
+      "sha256": "1af10dea65c67ea05d368022a4d262ed652821f0fb19e0f8acd21ca2e89dd260"
+    },
+    {
+      "path": "review/rigidity-comparison/index.html",
+      "bytes": 2048,
+      "sha256": "a57ef8e87c692d1da1ac94a0c8652a8b32d526e4bedd5b11503e74d7fa9baac6"
+    },
+    {
+      "path": "review/rigidity-comparison/render.mjs",
+      "bytes": 2957,
+      "sha256": "228ad0d183208ecc532c70e422ecbfdf84f10fc33ab0ea9f31ff6b35a50df15b"
+    },
+    {
+      "path": "review/rigidity-comparison/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}
