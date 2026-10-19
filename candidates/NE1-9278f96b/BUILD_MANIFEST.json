@@ -1,0 +1,113 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded ball-flight-comparison; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "9278f96b3620eb7d08b083384fa34431d600c482",
+  "runtimeFiles": 10,
+  "review": "ball-flight-comparison",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4289,
+      "sha256": "82c130605d99b2fe95791842518173ae0420a37421a6cf5a8fb8a4d54d3613ef"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3778,
+      "sha256": "184c58e87c4c529eaa076ea8a1f84d7d14f532dda96b58d75de56d53c79b50ee"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4693,
+      "sha256": "00ae5433309d55aaa8161224e92ff4e9d51383d27fd8c2d0ba8bd7fe30805168"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6711,
+      "sha256": "ce229e55e314a836ba77082089e11fccfaf4ffb454d37414b291d9c1557af0c5"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 12319,
+      "sha256": "a88469a2a5ed905b9634beca8c3324623fc012c1d57f076acd23d058c7f3081d"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 2135,
+      "sha256": "341ad6123fb34a3470f5a51b3009e365c4552ca0274c8d5f05383cb9d0c744f9"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3082,
+      "sha256": "b819e7ef437ed3aa525d15a36723521c36d2ab0d886d6db8c5ea6ecda4dcba19"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 7011,
+      "sha256": "5ef4c104ab8d718ced9931bf3a6de81f642b706656e60ba7f0a2409c543fc487"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/ball-flight-comparison/app.mjs",
+      "bytes": 5182,
+      "sha256": "644e2c4d235de6c5ff8396d47ce315bb0388cefcf9faa1fc6f008ed7c3df208a"
+    },
+    {
+      "path": "review/ball-flight-comparison/before-render.mjs",
+      "bytes": 2957,
+      "sha256": "228ad0d183208ecc532c70e422ecbfdf84f10fc33ab0ea9f31ff6b35a50df15b"
+    },
+    {
+      "path": "review/ball-flight-comparison/data/index.json",
+      "bytes": 874,
+      "sha256": "e4294b74654582fe0816b6d0d10fc0ea45e51cc0fa65a7b00707c5d841da15b3"
+    },
+    {
+      "path": "review/ball-flight-comparison/data/loft.json",
+      "bytes": 750387,
+      "sha256": "4d83cba56b852d31d0ad469e54a8d2429eabd7817a6586a2322d04b74cbc0b8a"
+    },
+    {
+      "path": "review/ball-flight-comparison/data/natural-1.json",
+      "bytes": 1474561,
+      "sha256": "4ef719cfe56c4d14551a9da38ff521629c9eafa5f565f3bb89c867c57a30e294"
+    },
+    {
+      "path": "review/ball-flight-comparison/data/short.json",
+      "bytes": 347988,
+      "sha256": "a9e653f34a92f2842a23823123f2d27e970ce5e3774e1bf7cc2083b5d118e743"
+    },
+    {
+      "path": "review/ball-flight-comparison/data/shot.json",
+      "bytes": 452056,
+      "sha256": "740c5a29788bb3b281b18aa0165ab7a9b2f879a49b940d61bad525c4d5fed0c0"
+    },
+    {
+      "path": "review/ball-flight-comparison/data/unseen-4830.json",
+      "bytes": 1464831,
+      "sha256": "9baf18fca1696730bb07026d4a9124974f17d793dfa836d220b78579abce8f1a"
+    },
+    {
+      "path": "review/ball-flight-comparison/index.html",
+      "bytes": 2102,
+      "sha256": "32622181ec9b867546447c628468ffe653cd724e78dca44b3be19670783b6cf1"
+    },
+    {
+      "path": "review/ball-flight-comparison/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/ball-flight-comparison/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}

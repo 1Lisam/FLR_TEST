@@ -1,0 +1,31 @@
+{
+  "stage": "BALL-B",
+  "verdict": "공의 실제 높이와 속도 변화 수리 비교입니다. 기본1번에는 긴 전방 패스·슛이 없어 높이가0m로 남습니다. 공격 지원 정체·긴 정지는 미해결이며 전체 움직임 정상 판정은 아닙니다.",
+  "scenes": [
+    {
+      "id": "loft",
+      "file": "data/loft.json",
+      "label": "같은 상태 · 긴 패스"
+    },
+    {
+      "id": "shot",
+      "file": "data/shot.json",
+      "label": "같은 상태 · 슈팅"
+    },
+    {
+      "id": "short",
+      "file": "data/short.json",
+      "label": "같은 상태 · 짧은 패스 보존"
+    },
+    {
+      "id": "natural-1",
+      "file": "data/natural-1.json",
+      "label": "처음부터 · 1번"
+    },
+    {
+      "id": "unseen-4830",
+      "file": "data/unseen-4830.json",
+      "label": "별도 새 경기 · 4830번"
+    }
+  ]
+}
