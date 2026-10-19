@@ -1,0 +1,77 @@
+{
+  "scope": "Read-only suspicious defence-response observer. Not whole-engine movement acceptance.",
+  "sourceCommit": "0d370620b58ab6503419bf878ffafb69d7ac05fe",
+  "gameProduct": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 2930,
+      "sha256": "0c3877d31df9e0a553cf70c2d383208f098d22e2d2481301423a7867483263f9"
+    },
+    {
+      "path": "style.css",
+      "bytes": 2883,
+      "sha256": "5f384ae52baf358454d292da36b986728ba02beecc39a582df87539e6b170c2a"
+    },
+    {
+      "path": "app.mjs",
+      "bytes": 13767,
+      "sha256": "91eb72a4946f430fbf5881ab9c88605ee284e410f2e8915368b115c36a2e9ca5"
+    },
+    {
+      "path": "data/holdout-13415.json",
+      "bytes": 218295,
+      "sha256": "8251102da795f35a7752361b74d6a5e92fc1a25c99a57a626ea9e7d87c1e98b5"
+    },
+    {
+      "path": "data/holdout-29281.json",
+      "bytes": 216799,
+      "sha256": "bd05dfc0055ad165ee32921c4832ad52c9dbfd069f42d86209453b6625523104"
+    },
+    {
+      "path": "data/holdout-95489.json",
+      "bytes": 215615,
+      "sha256": "71aca77786cd7f9b72429729e549287092d65152d6c4cbd9f1bd64e2cd24e0a4"
+    },
+    {
+      "path": "data/index.json",
+      "bytes": 9032,
+      "sha256": "befba579512955b591b09db3397bebd1d114c4678a3c71821d4729925a421842"
+    },
+    {
+      "path": "data/ne1-current-1.json",
+      "bytes": 430242,
+      "sha256": "4829238ad0bc58e3b40fbb1ac10f083b9ee67b249202dbaa0fd9a5d70a5237f1"
+    },
+    {
+      "path": "data/ne1-reported-wide.json",
+      "bytes": 344548,
+      "sha256": "fef6e3037b81f5f0344fb7c714fe949384533abbe7351ce1a69915a6d70e9c7a"
+    },
+    {
+      "path": "data/p7-central_after.json",
+      "bytes": 20593,
+      "sha256": "8149c6febc44c5fca223f9729321a0626368f91f992c370a1efdfbf18e18d556"
+    },
+    {
+      "path": "data/p7-central_before.json",
+      "bytes": 14499,
+      "sha256": "a1dc0ae9e31fc9f93644aefeaf18e75a01c3e794d081bf1c0749a6c627215e27"
+    },
+    {
+      "path": "data/p7-near_after.json",
+      "bytes": 10548,
+      "sha256": "d0a22c48ad4cea80411a9812efa9b68a75a2cf0b481a0ba31065e2f4f9641834"
+    },
+    {
+      "path": "data/p7-near_before.json",
+      "bytes": 10158,
+      "sha256": "6b7c2c326fd1476662c9f7ef8c7ef32908309b92e669750c45fa153fca0e7b6d"
+    },
+    {
+      "path": "data/reviews.json",
+      "bytes": 37894,
+      "sha256": "50cb69017e11c951a457d6a095581242a45eb58ff275a3d3cf2fde7be5fa2f1f"
+    }
+  ]
+}

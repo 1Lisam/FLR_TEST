@@ -1,0 +1,306 @@
+{
+  "schema": "FOOTBALL_OBSERVER_WEB_1",
+  "detectorHashes": {
+    "lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9",
+    "lib/observe.mjs": "13f5761f543ea992f391cae0ae0f80927bc2155444b3a009d847dca9525936a1",
+    "lib/review.mjs": "ee2c00610af0556b22b51a4509eb4d2008da0194662859140754aa87a3c0c141",
+    "existingP7Near": "835cc0d6959033fbb757b969708e44e2c923e1ae473c26fa6e9101577867ece1"
+  },
+  "records": [
+    {
+      "id": "ne1-reported-wide",
+      "source": {
+        "product": "402ef3e5",
+        "kind": "ACTUAL_BROWSER_5HZ",
+        "path": "fresh-engine/evidence/browser/1792393592289-FLR-NE1-seed1-report.json.gz",
+        "sha256": "655a054a72a2f85f758d1410e7edb25b3607b34571c88dc6f09757a1e25a15cd"
+      },
+      "candidates": 6,
+      "coverage": {
+        "inputFrames": 721,
+        "validFrames": 721,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 144,
+        "controlledOutfieldSeconds": 77.6,
+        "restartSeconds": 6.4,
+        "uncontrolledBallSeconds": 55.4,
+        "keeperPossessionSeconds": 4.6,
+        "missingOrGappedIntervals": [],
+        "from": 0,
+        "to": 144
+      },
+      "auditWindows": [],
+      "file": "data/ne1-reported-wide.json"
+    },
+    {
+      "id": "ne1-current-1",
+      "source": {
+        "product": "482ce9ed",
+        "kind": "ACTUAL_BROWSER_5HZ",
+        "path": "fresh-engine/evidence/browser/1792393975602-FLR-NE1-seed1-report.json.gz",
+        "sha256": "363b23e0e6d7c789e13948c3c8142bb4b29cc8efa17bd5b9854133c8fa49696b"
+      },
+      "candidates": 6,
+      "coverage": {
+        "inputFrames": 901,
+        "validFrames": 901,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 180,
+        "controlledOutfieldSeconds": 58.8,
+        "restartSeconds": 21.6,
+        "uncontrolledBallSeconds": 97.2,
+        "keeperPossessionSeconds": 2.4,
+        "missingOrGappedIntervals": [],
+        "from": 0,
+        "to": 180
+      },
+      "auditWindows": [],
+      "file": "data/ne1-current-1.json"
+    },
+    {
+      "id": "p7-near_before",
+      "source": {
+        "product": "95874771",
+        "path": "evidence/p7-football-repair/near-goal-response-20261019/C2_CLOSE_TICKS/COARSE_MOTION_5.json.gz",
+        "sha256": "557151f7b94dd32646a079921f95aca935afe0130df97d7e5654513a10edd865",
+        "from": 24.2,
+        "to": 27.7,
+        "kind": "ACTUAL_PRODUCTION_BROWSER_COARSE_LEAVES",
+        "fixtureSha256": "c23dcbf96435ef5ce014de5a056c8ccdc481362924ecb469a76f97ae93794abb"
+      },
+      "candidates": 1,
+      "coverage": {
+        "inputFrames": 14,
+        "validFrames": 14,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 3.5,
+        "controlledOutfieldSeconds": 3,
+        "restartSeconds": 0,
+        "uncontrolledBallSeconds": 0.5,
+        "keeperPossessionSeconds": 0,
+        "missingOrGappedIntervals": [],
+        "from": 24.2,
+        "to": 27.7
+      },
+      "auditWindows": [],
+      "file": "data/p7-near_before.json"
+    },
+    {
+      "id": "p7-near_after",
+      "source": {
+        "product": "fdd7ff86",
+        "path": "evidence/p7-football-repair/near-goal-engagement-20261019/C_PRECHOICE/COARSE_MOTION_5.json.gz",
+        "sha256": "f9914a1a42c4675420f3926ce9116d9019a80ea5f8d7e75d699fb4d54266bb5b",
+        "from": 24.2,
+        "to": 28.1,
+        "kind": "ACTUAL_PRODUCTION_BROWSER_COARSE_LEAVES",
+        "fixtureSha256": "c23dcbf96435ef5ce014de5a056c8ccdc481362924ecb469a76f97ae93794abb"
+      },
+      "candidates": 0,
+      "coverage": {
+        "inputFrames": 18,
+        "validFrames": 18,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 3.9,
+        "controlledOutfieldSeconds": 3,
+        "restartSeconds": 0,
+        "uncontrolledBallSeconds": 0.9,
+        "keeperPossessionSeconds": 0,
+        "missingOrGappedIntervals": [],
+        "from": 24.2,
+        "to": 28.1
+      },
+      "auditWindows": [],
+      "file": "data/p7-near_after.json"
+    },
+    {
+      "id": "p7-central_before",
+      "source": {
+        "product": "f5ffb886",
+        "path": "evidence/p7-football-repair/position-priority-20261018/BASE_PRECHOICE/COARSE_MOTION_5.json.gz",
+        "sha256": "d5c01592b2221f1d134fea4eb767999805af6fe948fd26cd0a5e610ffbb45b64",
+        "from": 6,
+        "to": 16,
+        "kind": "ACTUAL_PRODUCTION_BROWSER_COARSE_LEAVES",
+        "fixtureSha256": "c23dcbf96435ef5ce014de5a056c8ccdc481362924ecb469a76f97ae93794abb"
+      },
+      "candidates": 1,
+      "coverage": {
+        "inputFrames": 23,
+        "validFrames": 23,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 10,
+        "controlledOutfieldSeconds": 9.9,
+        "restartSeconds": 0,
+        "uncontrolledBallSeconds": 0.1,
+        "keeperPossessionSeconds": 0,
+        "missingOrGappedIntervals": [],
+        "from": 6,
+        "to": 16
+      },
+      "auditWindows": [],
+      "file": "data/p7-central_before.json"
+    },
+    {
+      "id": "p7-central_after",
+      "source": {
+        "product": "fdd7ff86",
+        "path": "evidence/p7-football-repair/near-goal-engagement-20261019/C_PRECHOICE/COARSE_MOTION_5.json.gz",
+        "sha256": "f9914a1a42c4675420f3926ce9116d9019a80ea5f8d7e75d699fb4d54266bb5b",
+        "from": 6,
+        "to": 16,
+        "kind": "ACTUAL_PRODUCTION_BROWSER_COARSE_LEAVES",
+        "fixtureSha256": "c23dcbf96435ef5ce014de5a056c8ccdc481362924ecb469a76f97ae93794abb"
+      },
+      "candidates": 2,
+      "coverage": {
+        "inputFrames": 30,
+        "validFrames": 30,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 10,
+        "controlledOutfieldSeconds": 9.1,
+        "restartSeconds": 0,
+        "uncontrolledBallSeconds": 0.9,
+        "keeperPossessionSeconds": 0,
+        "missingOrGappedIntervals": [],
+        "from": 6,
+        "to": 16
+      },
+      "auditWindows": [],
+      "file": "data/p7-central_after.json"
+    },
+    {
+      "id": "holdout-95489",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "seed": 95489,
+        "seconds": 90
+      },
+      "candidates": 3,
+      "coverage": {
+        "inputFrames": 451,
+        "validFrames": 451,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 90,
+        "controlledOutfieldSeconds": 29.4,
+        "restartSeconds": 12.4,
+        "uncontrolledBallSeconds": 47,
+        "keeperPossessionSeconds": 1.2,
+        "missingOrGappedIntervals": [],
+        "from": 0,
+        "to": 90
+      },
+      "auditWindows": [
+        {
+          "from": 0,
+          "to": 15
+        },
+        {
+          "from": 30,
+          "to": 45
+        },
+        {
+          "from": 60,
+          "to": 75
+        }
+      ],
+      "file": "data/holdout-95489.json"
+    },
+    {
+      "id": "holdout-13415",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "seed": 13415,
+        "seconds": 90
+      },
+      "candidates": 4,
+      "coverage": {
+        "inputFrames": 451,
+        "validFrames": 451,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 90,
+        "controlledOutfieldSeconds": 35,
+        "restartSeconds": 2.4,
+        "uncontrolledBallSeconds": 50.4,
+        "keeperPossessionSeconds": 2.2,
+        "missingOrGappedIntervals": [],
+        "from": 0,
+        "to": 90
+      },
+      "auditWindows": [
+        {
+          "from": 0,
+          "to": 15
+        },
+        {
+          "from": 30,
+          "to": 45
+        },
+        {
+          "from": 60,
+          "to": 75
+        }
+      ],
+      "file": "data/holdout-13415.json"
+    },
+    {
+      "id": "holdout-29281",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "seed": 29281,
+        "seconds": 90
+      },
+      "candidates": 3,
+      "coverage": {
+        "inputFrames": 451,
+        "validFrames": 451,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "directionBreaks": 0,
+        "timelineSeconds": 90,
+        "controlledOutfieldSeconds": 31.8,
+        "restartSeconds": 5.8,
+        "uncontrolledBallSeconds": 51.4,
+        "keeperPossessionSeconds": 1,
+        "missingOrGappedIntervals": [],
+        "from": 0,
+        "to": 90
+      },
+      "auditWindows": [
+        {
+          "from": 0,
+          "to": 15
+        },
+        {
+          "from": 30,
+          "to": 45
+        },
+        {
+          "from": 60,
+          "to": 75
+        }
+      ],
+      "file": "data/holdout-29281.json"
+    }
+  ],
+  "scope": "Read-only defence-response candidate discovery. No all-clear, no engine repair."
+}
