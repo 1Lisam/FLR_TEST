@@ -1,0 +1,113 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded team-response-comparison; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "e70940fd97681f56ecbc7fca5a15a48d639d79d2",
+  "runtimeFiles": 10,
+  "review": "team-response-comparison",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4289,
+      "sha256": "82c130605d99b2fe95791842518173ae0420a37421a6cf5a8fb8a4d54d3613ef"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3778,
+      "sha256": "184c58e87c4c529eaa076ea8a1f84d7d14f532dda96b58d75de56d53c79b50ee"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4693,
+      "sha256": "00ae5433309d55aaa8161224e92ff4e9d51383d27fd8c2d0ba8bd7fe30805168"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6711,
+      "sha256": "ce229e55e314a836ba77082089e11fccfaf4ffb454d37414b291d9c1557af0c5"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 12755,
+      "sha256": "b2ae259291d97faf4c5456c93d7deb9a8897075abe8f620a32146b702ef5b39c"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 2135,
+      "sha256": "341ad6123fb34a3470f5a51b3009e365c4552ca0274c8d5f05383cb9d0c744f9"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3082,
+      "sha256": "b819e7ef437ed3aa525d15a36723521c36d2ab0d886d6db8c5ea6ecda4dcba19"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 7011,
+      "sha256": "5ef4c104ab8d718ced9931bf3a6de81f642b706656e60ba7f0a2409c543fc487"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/team-response-comparison/app.mjs",
+      "bytes": 5180,
+      "sha256": "fa5a1e9fd1f2d068be41c776cdc77f033fee619c6024b3e2752f81079fce8902"
+    },
+    {
+      "path": "review/team-response-comparison/before-render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/team-response-comparison/data/block.json",
+      "bytes": 301687,
+      "sha256": "590402da196142480a1df1164f4dd0359495eb9dbd37bbd44ddf72ff72823cf4"
+    },
+    {
+      "path": "review/team-response-comparison/data/index.json",
+      "bytes": 908,
+      "sha256": "d663f052236bad50c8728fb530a0183bd3d25f9483450a5cf5813f7a594559cd"
+    },
+    {
+      "path": "review/team-response-comparison/data/natural-1.json",
+      "bytes": 1476092,
+      "sha256": "cca814699952ee4ff4b0f503b3955a13aaa661c26d7a527a77cce1ee45f48e2c"
+    },
+    {
+      "path": "review/team-response-comparison/data/support.json",
+      "bytes": 202925,
+      "sha256": "bd0228dc84efd53cfa9fa411b7ffc14a1a629243c5bdc8745dfd075edaab5ebd"
+    },
+    {
+      "path": "review/team-response-comparison/data/swapped.json",
+      "bytes": 1485495,
+      "sha256": "1071412d0e2faf79bbca12cb32652d11d4ccc4343193a03decd0af296ef25f3d"
+    },
+    {
+      "path": "review/team-response-comparison/data/unseen-20706.json",
+      "bytes": 1481647,
+      "sha256": "825557b3d28f72a65bb3f5f07516d9fb0e0b19cc7f251b7b264907634d9d4c49"
+    },
+    {
+      "path": "review/team-response-comparison/index.html",
+      "bytes": 2064,
+      "sha256": "3dcd4b45eceff58f0a91a9ede36ebebe66d1e9e8554ccf44a90d288419443dfa"
+    },
+    {
+      "path": "review/team-response-comparison/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/team-response-comparison/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "stage": "TEAM-B",
+  "verdict": "수비선이 고정 지점에 남는 원인 하나를 정리했습니다. 기본1번에는 왕복·대기가 남고 관찰 경고도48→56입니다. 양 팀 전체 움직임 정상 판정은 아닙니다.",
+  "scenes": [
+    {
+      "id": "block",
+      "file": "data/block.json",
+      "label": "같은 상태 · 레드 압박과 후방 연결"
+    },
+    {
+      "id": "support",
+      "file": "data/support.json",
+      "label": "이전 신고 · RW 지원과 상대 대응"
+    },
+    {
+      "id": "natural-1",
+      "file": "data/natural-1.json",
+      "label": "처음부터 · 기본1번 양 팀"
+    },
+    {
+      "id": "swapped",
+      "file": "data/swapped.json",
+      "label": "대형 교환 · 블루442/레드433"
+    },
+    {
+      "id": "unseen-20706",
+      "file": "data/unseen-20706.json",
+      "label": "별도 새 경기 · 20706번"
+    }
+  ]
+}
