@@ -1,0 +1,26 @@
+{
+  "stage": "BRAKE-A",
+  "verdict": "저속 제동을 짧게 고친 시험입니다. 최고속도·출발 가속과 고속 제동 거리는 유지합니다. 기본1번 경고56→61/새26785는36→65이며 전술의 왕복·대기는 남아 있습니다. 전체 자연스러움 합격은 아닙니다.",
+  "scenes": [
+    {
+      "id": "st",
+      "file": "data/st.json",
+      "label": "같은 실제 상태 · ST 제동·방향 전환"
+    },
+    {
+      "id": "defender",
+      "file": "data/defender.json",
+      "label": "같은 실제 상태 · 레드 중원 방향 전환"
+    },
+    {
+      "id": "natural-1",
+      "file": "data/natural-1.json",
+      "label": "처음부터 · 기본1번 양 팀"
+    },
+    {
+      "id": "unseen-26785",
+      "file": "data/unseen-26785.json",
+      "label": "별도 새 경기 · 26785번"
+    }
+  ]
+}

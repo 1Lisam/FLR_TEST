@@ -1,0 +1,108 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded braking-comparison; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "546a2f6f53684348699d46fd47d7df1b8c9fd408",
+  "runtimeFiles": 10,
+  "review": "braking-comparison",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4289,
+      "sha256": "82c130605d99b2fe95791842518173ae0420a37421a6cf5a8fb8a4d54d3613ef"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3778,
+      "sha256": "184c58e87c4c529eaa076ea8a1f84d7d14f532dda96b58d75de56d53c79b50ee"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4693,
+      "sha256": "00ae5433309d55aaa8161224e92ff4e9d51383d27fd8c2d0ba8bd7fe30805168"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6711,
+      "sha256": "ce229e55e314a836ba77082089e11fccfaf4ffb454d37414b291d9c1557af0c5"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 12755,
+      "sha256": "b2ae259291d97faf4c5456c93d7deb9a8897075abe8f620a32146b702ef5b39c"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 2135,
+      "sha256": "341ad6123fb34a3470f5a51b3009e365c4552ca0274c8d5f05383cb9d0c744f9"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3082,
+      "sha256": "b819e7ef437ed3aa525d15a36723521c36d2ab0d886d6db8c5ea6ecda4dcba19"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 7499,
+      "sha256": "b865da7be99a6320957766795062f91952d55e6b9f54ceaade64a3bb19d2d6b5"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/braking-comparison/app.mjs",
+      "bytes": 5181,
+      "sha256": "ab47fb3517328160f1c9761907e1ed64b7e227f3fce3dcc66ab7a2e9711636dc"
+    },
+    {
+      "path": "review/braking-comparison/before-render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/braking-comparison/data/defender.json",
+      "bytes": 394352,
+      "sha256": "a1b8d753efc79d0030f0b282c24c42043b9d415738148abdff363d5ac026b0d4"
+    },
+    {
+      "path": "review/braking-comparison/data/index.json",
+      "bytes": 849,
+      "sha256": "4d0d949a4ae2f3c2086727b854e6bccbc7a60be4d002579e089280abb6b5257e"
+    },
+    {
+      "path": "review/braking-comparison/data/natural-1.json",
+      "bytes": 1482597,
+      "sha256": "dda81b501e343f3e358f71cb963221240021d6633477560add35ef2bed24850e"
+    },
+    {
+      "path": "review/braking-comparison/data/st.json",
+      "bytes": 394047,
+      "sha256": "e88e1e9407c32336094f9037d52a706dc1e83c659f6c897ba0ed44278d76b790"
+    },
+    {
+      "path": "review/braking-comparison/data/unseen-26785.json",
+      "bytes": 1467420,
+      "sha256": "43bcc67c7fe2332c406ba1042b5dd644d600bddec06e5585775a0e99c934eb6e"
+    },
+    {
+      "path": "review/braking-comparison/index.html",
+      "bytes": 2119,
+      "sha256": "678c7df91d902acc51cdebea483980b0e405376dbfd600b6ceb32afbb1e0c4fd"
+    },
+    {
+      "path": "review/braking-comparison/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/braking-comparison/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}
