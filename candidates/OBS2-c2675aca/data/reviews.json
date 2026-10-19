@@ -1,0 +1,821 @@
+{
+  "_meta": {
+    "schema": "FORMATION_CONTEXT_REVIEWS_2",
+    "physicalRigidityIsNotUniversalFootballError": true,
+    "reviewedPrimaryEpisodePeaks": 19,
+    "currentExtraCohorts": 2,
+    "reviewedAuditWindows": 8,
+    "auditSeconds": 96,
+    "pilotInputs": {
+      "count": 2,
+      "secondsEach": 75,
+      "notIndependentAfterRevision": true
+    },
+    "finalIndependentInput": {
+      "seed": 60395,
+      "seconds": 45,
+      "candidates": 6,
+      "rigidityConfirmed": 1,
+      "plausibleGroupMovement": 1,
+      "suspicious": 4
+    },
+    "unknownErrorRecall": "NOT_ESTABLISHED",
+    "continuousVisualAcceptance": false,
+    "method": "All22 5Hz realised coordinates;16-panel full-pitch sheets;8s trails. Current actual source was browser-bound in prior task. New short inputs are native trajectories only.",
+    "ownerChangesMeaning": "Includes player/null transitions during ball flight; not a pass count or a team-possession-change count."
+  },
+  "ne1-current-1": {
+    "shape-2-cohort-2": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "14.8~22.8초에 LW·ST·RW가 폭 약35m, 깊이 약31m의 일렬 배치를 거의 그대로 유지합니다. 세 선수 모두 옆으로 약3.69m 이동하는 동안 묶음 내 위치 관계 변화는 약0.001m입니다. 사용자가 지적한 테이블 축구 같은 경직을 실제 기록에서 확인했습니다.",
+      "counterEvidence": "상대가 블루 진영에서 공격 중이므로 전방 출구를 유지하고 수비 블록이 함께 이동할 이유는 있습니다. 그 이유와 별개로 세 선수의 배치·이동이 거의 완전히 같은 틀로 유지되는 모습이 확인됐다는 판정입니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "3f695fc058a588a23b9b21561374a37fa7561974a7a4e985abc99a74eb5748b4",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 14.799999999999999,
+        "to": 22.8,
+        "actors": [
+          "H-LW",
+          "H-RW",
+          "H-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400729547-FLR-NE1-observer-ne1-current-1-shape-2-cohort-2.png",
+          "sha256": "2303f2ba24150b90343415c3a9cdb9a5305882a54709fc72f1cf362357576278",
+          "bytes": 431588,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-2-cohort-3": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "같은8초 동안 LCM까지 네 명이 각각 약3.69m 옆으로 움직입니다. 네 명 전체는 한 줄이 아니지만, 서로의 상대 위치가 약0.001m 변화에 그쳐 여러 줄도 통째로 옮겨지는 모습을 확인했습니다. 공은45m 이동하고 소유자는2회 바뀝니다.",
+      "counterEvidence": "각 선수에게 반드시 다른 움직임을 요구하는 것은 아닙니다. 이 판정은 선택·마킹 실패나 전체 전술 오류가 아니라, 사용자가 문제로 삼은 지나치게 동일한 집단 움직임을 확인한 것입니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "3f695fc058a588a23b9b21561374a37fa7561974a7a4e985abc99a74eb5748b4",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 14.799999999999999,
+        "to": 22.8,
+        "actors": [
+          "H-LCM",
+          "H-LW",
+          "H-RW",
+          "H-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400743552-FLR-NE1-observer-ne1-current-1-shape-2-cohort-3.png",
+          "sha256": "a253cf2699ab400d1be1558742719c544b8111852c85825a8e0d5fa1354d04e2",
+          "bytes": 436468,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "_defaultKey": "shape-2-cohort-2",
+    "shape-3": {
+      "verdict": "PLAUSIBLE_GROUP_MOVEMENT",
+      "reason": "20.8~24.8초에는 압박하는 RCB와 별도로 LB·LCB·RB가 골문 앞 라인을 유지하며 함께 이동합니다. 세 명이 맞춰 움직였다는 사실만으로 수비 오류로 확정하지 않았습니다.",
+      "counterEvidence": "줄을 유지하는 경직된 모습은 있습니다. 하지만 가까운 공에 대응하는 선수와 뒤 공간 보호가 분리돼 있어, 전방 세 선수의 완전히 같은 이동과 동일하게 판정하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "3f695fc058a588a23b9b21561374a37fa7561974a7a4e985abc99a74eb5748b4",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 20.8,
+        "to": 24.8,
+        "actors": [
+          "H-LB",
+          "H-LCB",
+          "H-RB"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400217102-FLR-NE1-observer-ne1-current-1-shape-3.png",
+          "sha256": "2ec413c62802fa3f77d01f322edbae167c56d90a941de86f028a115a16a77cc2",
+          "bytes": 368843,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    }
+  },
+  "formation-holdout-75143": {
+    "shape-1": {
+      "verdict": "PLAUSIBLE_GROUP_MOVEMENT",
+      "reason": "초반3~7초 중원4명이 약15m 함께 전진합니다. 상대의 후방 공 이동을 따라 블록을 올리는 이유가 있어 이것만으로 오류라고 확정하지 않았습니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 3,
+        "to": 7,
+        "actors": [
+          "A-LCM",
+          "A-LM",
+          "A-RCM",
+          "A-RM"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400238112-FLR-NE1-observer-formation-holdout-75143-shape-1.png",
+          "sha256": "aa2cac7a2aeb1f3ef25905b2de36cb18f2e7eb799890d412e82f6eeb1da3af08",
+          "bytes": 468763,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-2": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "24.2~32.2초에 서로 다른 줄의 블루6명이 각 줄의 깊이를 고정하고 거의 함께 옆으로 움직입니다. 공이 약57.8m 이동하고 소유자가6회 바뀌는 동안 형태 변화는 약0.173m입니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 24.2,
+        "to": 32.2,
+        "actors": [
+          "H-DM",
+          "H-LCM",
+          "H-RB",
+          "H-RCB",
+          "H-RCM",
+          "H-RW"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400241112-FLR-NE1-observer-formation-holdout-75143-shape-2.png",
+          "sha256": "9aeafe0279f7098312ec4042c2319d75e57b64f3bc48564aa8028e89999c2cab",
+          "bytes": 451274,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-3": {
+      "verdict": "SUSPICIOUS",
+      "reason": "14.2~18.2초 서로 멀리 있던 레드5명이 약26~28m 함께 복귀합니다. 비슷한 궤적 때문에 의심을 남기지만, 긴 공 이동에 대한 팀 전체 전환이라는 설명도 가능합니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 14.2,
+        "to": 18.2,
+        "actors": [
+          "A-LB",
+          "A-LCB",
+          "A-LCM",
+          "A-RCM",
+          "A-RST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400244115-FLR-NE1-observer-formation-holdout-75143-shape-3.png",
+          "sha256": "5dc2a97f7982553329c1e1d5edc1713e7b12f8eb0740c0431638bba76d76cdba",
+          "bytes": 564559,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-4": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "47.6~51.6초 레드7명이 약6.75m씩 같은 방향으로 이동하고 상대 위치 변화가 약0.007m에 그칩니다. 수비·중원·전방의 여러 줄이 거의 같은 틀로 옮겨집니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 47.6,
+        "to": 51.6,
+        "actors": [
+          "A-LB",
+          "A-LCM",
+          "A-RB",
+          "A-RCB",
+          "A-RCM",
+          "A-RM",
+          "A-RST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400247116-FLR-NE1-observer-formation-holdout-75143-shape-4.png",
+          "sha256": "9d33d7b9bd7f7ed1e7ba00dbab5b64a3e30c04823b5f17078d5d9875e630ef54",
+          "bytes": 499858,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-5": {
+      "verdict": "SUSPICIOUS",
+      "reason": "56.6~64.6초 블루4명의 전진이 비슷합니다. 하지만 공이 반대쪽으로 길게 이동하는 전환이어서 집단 복귀/전진과 기계적인 이동을 더 구분해야 합니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 56.6,
+        "to": 64.6,
+        "actors": [
+          "H-DM",
+          "H-LCM",
+          "H-RCM",
+          "H-RW"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400250118-FLR-NE1-observer-formation-holdout-75143-shape-5.png",
+          "sha256": "ce451f5ba8483f25eb81120b567d5c97efd039c8ef026a1c535c23dd0b6d219b",
+          "bytes": 563789,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-6": {
+      "verdict": "SUSPICIOUS",
+      "reason": "57.6~61.6초 레드5명이 약27~29m를 비슷하게 이동합니다. 전체 전환에 따른 이동일 수 있어 완전한 동기화 오류로 확정하지 않습니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 57.6,
+        "to": 61.6,
+        "actors": [
+          "A-LCM",
+          "A-LST",
+          "A-RCM",
+          "A-RM",
+          "A-RST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400253118-FLR-NE1-observer-formation-holdout-75143-shape-6.png",
+          "sha256": "d277aa46bd496524b7b5b1ba96a615e29d62dbbcbf80f74d8a44a368c1b2cf22",
+          "bytes": 554918,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-0": {
+      "verdict": "SUSPICIOUS",
+      "reason": "미리 정한 구간에서 한 줄 배치·집단 전환과 개별 압박이 섞이는 모습을 확인했습니다. 위 후보에 겹치는 구간이며, 경고가 없는 전체를 정상 처리하지 않습니다.",
+      "counterEvidence": "비교 그림의 표본 관찰입니다. 모든 프레임·모든 후보를 승인한 것은 아닙니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400256116-FLR-NE1-observer-formation-holdout-75143-audit-0.png",
+          "sha256": "c417c710e913a44f42dd1ced8f77d6e0bcebc8f7f5e0e004080f91d386d7e249",
+          "bytes": 409315,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-1": {
+      "verdict": "SUSPICIOUS",
+      "reason": "미리 정한 구간에서 한 줄 배치·집단 전환과 개별 압박이 섞이는 모습을 확인했습니다. 위 후보에 겹치는 구간이며, 경고가 없는 전체를 정상 처리하지 않습니다.",
+      "counterEvidence": "비교 그림의 표본 관찰입니다. 모든 프레임·모든 후보를 승인한 것은 아닙니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400260110-FLR-NE1-observer-formation-holdout-75143-audit-1.png",
+          "sha256": "859c6379d364697cdb12d6fe904e46e9d05d6564390e7a92b1a1a61aae0d01e7",
+          "bytes": 382199,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-2": {
+      "verdict": "SUSPICIOUS",
+      "reason": "미리 정한 구간에서 한 줄 배치·집단 전환과 개별 압박이 섞이는 모습을 확인했습니다. 위 후보에 겹치는 구간이며, 경고가 없는 전체를 정상 처리하지 않습니다.",
+      "counterEvidence": "비교 그림의 표본 관찰입니다. 모든 프레임·모든 후보를 승인한 것은 아닙니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400264119-FLR-NE1-observer-formation-holdout-75143-audit-2.png",
+          "sha256": "b16898f152476c2dc07012fe6fd62c8ae233ec5d71ddcca9f70a0eae6c3895aa",
+          "bytes": 450506,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    }
+  },
+  "formation-holdout-83132": {
+    "shape-1": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "17.6~21.6초 블루8명의 여러 줄이 비슷한 틀을 유지합니다. 특히 중원4명은 깊이57m에서 같은 약1.79m의 측면 이동을 반복합니다. 묶음 전체의 형태 변화는 약0.202m입니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 17.6,
+        "to": 21.6,
+        "actors": [
+          "H-LCB",
+          "H-LCM",
+          "H-LM",
+          "H-LST",
+          "H-RB",
+          "H-RCB",
+          "H-RCM",
+          "H-RM"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400284127-FLR-NE1-observer-formation-holdout-83132-shape-1.png",
+          "sha256": "d9b631fc94ffe505d60ca156b26d171e0aae41e6fcc29b938a59d325c9f4d961",
+          "bytes": 486486,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-2": {
+      "verdict": "SUSPICIOUS",
+      "reason": "8.6~12.6초 레드4명이 약23~25m를 비슷하게 이동합니다. 소유권 전환·긴 공을 따라 복귀하는 상황도 있어 기계적인 경직으로 단정하지 않습니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 8.6,
+        "to": 12.6,
+        "actors": [
+          "A-LCM",
+          "A-LW",
+          "A-RB",
+          "A-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400288126-FLR-NE1-observer-formation-holdout-83132-shape-2.png",
+          "sha256": "6ece8902d74477472ad3d834cdfa3186ff261f5ab0c9e2d99291608a73a7ce65",
+          "bytes": 586385,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-3": {
+      "verdict": "SUSPICIOUS",
+      "reason": "17.6~21.6초 레드 전방3명의 일렬 배치가 이어집니다. 다만 ST는 약4.65m, 윙은 약2.6m 이동해 개별 차이도 있으므로 완전히 같은 움직임으로 확정하지 않습니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 17.6,
+        "to": 21.6,
+        "actors": [
+          "A-LW",
+          "A-RW",
+          "A-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400291133-FLR-NE1-observer-formation-holdout-83132-shape-3.png",
+          "sha256": "5e57815cdd236bc29b1ce86116ccc647d701852cf92b41daaa8806b5747651ac",
+          "bytes": 460298,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-4": {
+      "verdict": "SUSPICIOUS",
+      "reason": "31.8~35.8초 블루6명의 약27~29m 이동이 비슷합니다. 반대 진영으로 가는 공을 따라 전체가 복귀하는 설명도 있어 의심 상태로 남깁니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 31.8,
+        "to": 35.8,
+        "actors": [
+          "H-LB",
+          "H-LCB",
+          "H-LST",
+          "H-RB",
+          "H-RCB",
+          "H-RM"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400294134-FLR-NE1-observer-formation-holdout-83132-shape-4.png",
+          "sha256": "ed3a6edd6cbda87caf7b9f2a18d3350138af29305e4ec9d37d75081fe8b23577",
+          "bytes": 536429,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-5": {
+      "verdict": "SUSPICIOUS",
+      "reason": "같은31.8~35.8초 레드5명도 약28m씩 전진합니다. 양 팀 전환을 동반한 긴 공 이동이어서, 동반 질주라는 이유만으로 오류라고 확정하지 않습니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 31.8,
+        "to": 35.8,
+        "actors": [
+          "A-DM",
+          "A-LCM",
+          "A-RB",
+          "A-RCM",
+          "A-RW"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400297135-FLR-NE1-observer-formation-holdout-83132-shape-5.png",
+          "sha256": "3c08fc9d4739b9d5072f07c1ced44892912c4f994dc0f996c2616746e9f8c628",
+          "bytes": 542406,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-6": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "64.4~68.4초 레드8명 중 대부분이 각 줄의 깊이를 고정하고 약3.4~3.7m 같은 방향으로 움직입니다. 공의 약32m 이동과 소유자2회 변경 중에도 여러 줄의 형태 변화가 약0.113m에 그칩니다.",
+      "counterEvidence": "집단 경직과 합리적인 라인 이동은 구분합니다. 이 표본은 관찰기 첫 구현 중 이미 열어봤으므로 최종 관찰기의 독립 성능 근거로 계산하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 64.4,
+        "to": 68.4,
+        "actors": [
+          "A-DM",
+          "A-LB",
+          "A-LCB",
+          "A-LCM",
+          "A-RB",
+          "A-RCB",
+          "A-RCM",
+          "A-RW"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400300134-FLR-NE1-observer-formation-holdout-83132-shape-6.png",
+          "sha256": "8be4b9da822bb826ffa3f3af57d567abeb9325cc5b005b9f99195bbcacda21f0",
+          "bytes": 403801,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-0": {
+      "verdict": "SUSPICIOUS",
+      "reason": "미리 정한 구간에서 한 줄 배치·집단 전환과 개별 압박이 섞이는 모습을 확인했습니다. 위 후보에 겹치는 구간이며, 경고가 없는 전체를 정상 처리하지 않습니다.",
+      "counterEvidence": "비교 그림의 표본 관찰입니다. 모든 프레임·모든 후보를 승인한 것은 아닙니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400303135-FLR-NE1-observer-formation-holdout-83132-audit-0.png",
+          "sha256": "74b79bc50acf38e1b8ee5f77b694d09a09d49d0b738db7f35892b2a1a8411bb9",
+          "bytes": 439544,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-1": {
+      "verdict": "SUSPICIOUS",
+      "reason": "미리 정한 구간에서 한 줄 배치·집단 전환과 개별 압박이 섞이는 모습을 확인했습니다. 위 후보에 겹치는 구간이며, 경고가 없는 전체를 정상 처리하지 않습니다.",
+      "counterEvidence": "비교 그림의 표본 관찰입니다. 모든 프레임·모든 후보를 승인한 것은 아닙니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400306136-FLR-NE1-observer-formation-holdout-83132-audit-1.png",
+          "sha256": "d757c4052483210a173102b751c5895b75d9846bf3e8c73ce6846db88b5c4055",
+          "bytes": 427525,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-2": {
+      "verdict": "SUSPICIOUS",
+      "reason": "미리 정한 구간에서 한 줄 배치·집단 전환과 개별 압박이 섞이는 모습을 확인했습니다. 위 후보에 겹치는 구간이며, 경고가 없는 전체를 정상 처리하지 않습니다.",
+      "counterEvidence": "비교 그림의 표본 관찰입니다. 모든 프레임·모든 후보를 승인한 것은 아닙니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400309136-FLR-NE1-observer-formation-holdout-83132-audit-2.png",
+          "sha256": "474ba2543eef2b23dece00d4efc97f23ca09e22d3e5c1aa789241949fc0e65ec",
+          "bytes": 336386,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    }
+  },
+  "formation-holdout-60395": {
+    "shape-1": {
+      "verdict": "PLAUSIBLE_GROUP_MOVEMENT",
+      "reason": "3~7초 레드 중원3명이 줄을 유지하며 약15m 전진합니다. 공이 후방으로 이동하는 동안 수비 블록을 올리는 이유가 있어 동반 이동만으로 오류라고 하지 않았습니다.",
+      "counterEvidence": "45초의 네이티브 위치 기록과 전체22명 비교 그림을 본 범위입니다. 실제 브라우저 경기 영상·90분·미지 오류 재현율 검증으로 확대하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 3,
+        "to": 7,
+        "actors": [
+          "A-LCM",
+          "A-LM",
+          "A-RCM"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400552481-FLR-NE1-observer-formation-holdout-60395-shape-1.png",
+          "sha256": "93a4bad2cac58a5f1d363e67c0bdee28f5d4c7fcc359fe56c85a71e0154eb5a6",
+          "bytes": 463299,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-2": {
+      "verdict": "SUSPICIOUS",
+      "reason": "19.6~23.6초 블루5명이 여러 깊이에서 비슷한 위치 관계를 유지합니다. 골문 근처에서 개별 접근과 커버도 진행돼, 기계적인 경직인지에 대한 의심을 남깁니다.",
+      "counterEvidence": "45초의 네이티브 위치 기록과 전체22명 비교 그림을 본 범위입니다. 실제 브라우저 경기 영상·90분·미지 오류 재현율 검증으로 확대하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 19.6,
+        "to": 23.6,
+        "actors": [
+          "H-DM",
+          "H-RCB",
+          "H-RCM",
+          "H-RW",
+          "H-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400555481-FLR-NE1-observer-formation-holdout-60395-shape-2.png",
+          "sha256": "a3061a2dc6bf05aa253225f26a0f296bbcfcd892e805a9f9e84e4d97bb47fe8a",
+          "bytes": 434095,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-3": {
+      "verdict": "SUSPICIOUS",
+      "reason": "16.6~24.6초 레드4명의 형태가 비슷하게 유지됩니다. 하지만 소유자 변경8회와 실제 박스 근처 패스/접근도 함께 있어 전체 전술 실패로 확정하지 않습니다.",
+      "counterEvidence": "45초의 네이티브 위치 기록과 전체22명 비교 그림을 본 범위입니다. 실제 브라우저 경기 영상·90분·미지 오류 재현율 검증으로 확대하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 16.6,
+        "to": 24.6,
+        "actors": [
+          "A-LCM",
+          "A-LST",
+          "A-RB",
+          "A-RCB"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400558482-FLR-NE1-observer-formation-holdout-60395-shape-3.png",
+          "sha256": "33eb779056f729b24f83bdb9baf555bb959667d5c75fc964f4fea9d34f760e35",
+          "bytes": 462106,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-4": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "39.6~43.6초 레드7명이 수비·중원 두 줄의 깊이를 고정한 채 거의 함께 옆으로 움직입니다. 공은약29m 이동하고 소유자가3회 바뀌는데 형태 변화가 약0.082m입니다. 새로 뽑은 표본에서도 테이블 축구 같은 집단 경직이 확인됩니다.",
+      "counterEvidence": "45초의 네이티브 위치 기록과 전체22명 비교 그림을 본 범위입니다. 실제 브라우저 경기 영상·90분·미지 오류 재현율 검증으로 확대하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 39.6,
+        "to": 43.6,
+        "actors": [
+          "A-LB",
+          "A-LCB",
+          "A-LCM",
+          "A-LM",
+          "A-RB",
+          "A-RCB",
+          "A-RCM"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400561486-FLR-NE1-observer-formation-holdout-60395-shape-4.png",
+          "sha256": "c7e12c2c94fd92bcac2b0fbc5b5436eb483539e7fef9003572243f29b01cc77b",
+          "bytes": 428875,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-5": {
+      "verdict": "SUSPICIOUS",
+      "reason": "26.6~30.6초 블루 윙2명은 거의 멈춘 채 폭과 같은 깊이를 유지하고 ST는약2.23m 따로 움직입니다. 일렬 배치 의심은 있으나 세 선수가 모두 동일하게 움직이는 것은 아닙니다.",
+      "counterEvidence": "45초의 네이티브 위치 기록과 전체22명 비교 그림을 본 범위입니다. 실제 브라우저 경기 영상·90분·미지 오류 재현율 검증으로 확대하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 26.599999999999998,
+        "to": 30.599999999999998,
+        "actors": [
+          "H-LW",
+          "H-RW",
+          "H-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400564484-FLR-NE1-observer-formation-holdout-60395-shape-5.png",
+          "sha256": "ab4c989709bdcfcd9e978c75c1ace3da377acaa9b87d7b405662ca836f4c957f",
+          "bytes": 451706,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "shape-6": {
+      "verdict": "SUSPICIOUS",
+      "reason": "38.6~42.6초에도 윙2명은 거의 정지하고 ST만약2.49m 움직입니다. 공을 받기 위한 폭 유지·전방 출구라는 설명도 가능하므로 정렬만으로 오류를 확정하지 않았습니다.",
+      "counterEvidence": "45초의 네이티브 위치 기록과 전체22명 비교 그림을 본 범위입니다. 실제 브라우저 경기 영상·90분·미지 오류 재현율 검증으로 확대하지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": {
+        "from": 38.6,
+        "to": 42.6,
+        "actors": [
+          "H-LW",
+          "H-RW",
+          "H-ST"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400567485-FLR-NE1-observer-formation-holdout-60395-shape-6.png",
+          "sha256": "883ae74ff6b3bb79311b613eca9b4928f54297971af5bcdccb2165409058740b",
+          "bytes": 414858,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-0": {
+      "verdict": "SUSPICIOUS",
+      "reason": "0~12초에는 초기 줄 이동과 개별 압박이 섞입니다. 알려진 초기 후보와 겹치며 별도 새 오류라고 중복 계산하지 않습니다.",
+      "counterEvidence": "경고와 무관하게 미리 정한 구간을 확인했습니다. 그림 표본을 전체 움직임 PASS로 바꾸지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400570486-FLR-NE1-observer-formation-holdout-60395-audit-0.png",
+          "sha256": "ac5db95020db18f8a11427981dfce50f09f67d04befaf53ec59d70ec0c12a611",
+          "bytes": 412522,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    },
+    "audit-1": {
+      "verdict": "SUSPICIOUS",
+      "reason": "30~42초에서 양 팀 줄과 집단 이동이 보이며 39.6초 이후 레드7명 후보와 겹칩니다.",
+      "counterEvidence": "경고와 무관하게 미리 정한 구간을 확인했습니다. 그림 표본을 전체 움직임 PASS로 바꾸지 않습니다.",
+      "scope": "대표 관측창의 22명 5Hz 좌표·16장 비교 그림·이동 경로를 검토했습니다. 집단 경직 확인은 위치 관계가 기계적으로 유지된다는 관찰이며, 모든 수비 라인 이동을 전술 오류로 판정한 것이 아닙니다. 긴 묶음 전체·모든 세부 후보의 연속 영상 수락은 아닙니다.",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9",
+      "detectorHashes": {
+        "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+        "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+      },
+      "reviewedWindow": null,
+      "evidence": [
+        {
+          "path": "evidence/browser/1792400573486-FLR-NE1-observer-formation-holdout-60395-audit-1.png",
+          "sha256": "3a568d2c7cc0c20c0a58da75ec1c15630c639becac78565eb9ff5287187c58bb",
+          "bytes": 361496,
+          "kind": "5HZ_COORDINATE_TRAIL_SHEET"
+        }
+      ]
+    }
+  }
+}

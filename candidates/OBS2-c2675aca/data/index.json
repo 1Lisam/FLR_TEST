@@ -1,0 +1,265 @@
+{
+  "schema": "FORMATION_OBSERVER_WEB_1",
+  "scope": "FORMATION",
+  "detectorHashes": {
+    "observe.mjs": "7c9619021873e7a13ec76dbf37bab466ea6280cdae465073b9267201e6c9d728",
+    "../lib/records.mjs": "2362eaeefd0eff3e4d86037ef309f076715c76741a983de7ab3a96be2bde4ee9"
+  },
+  "records": [
+    {
+      "id": "ne1-reported-wide",
+      "source": {
+        "product": "402ef3e5",
+        "kind": "ACTUAL_BROWSER_5HZ",
+        "path": "fresh-engine/evidence/browser/1792393592289-FLR-NE1-seed1-report.json.gz",
+        "sha256": "655a054a72a2f85f758d1410e7edb25b3607b34571c88dc6f09757a1e25a15cd"
+      },
+      "candidates": 13,
+      "cohortWitnesses": 94,
+      "coverage": {
+        "inputFrames": 721,
+        "validFrames": 721,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 6.4,
+        "examinedSeconds": 137.6,
+        "windowsExamined": 468
+      },
+      "auditWindows": [],
+      "file": "data/ne1-reported-wide.json",
+      "inputKind": "ALREADY_OPENED_DEVELOPMENT",
+      "inputSha256": "a918f8ac9068c240aef85437377f9860dd0195d8cdd1360f22a31b3ab5a54c30"
+    },
+    {
+      "id": "ne1-current-1",
+      "source": {
+        "product": "482ce9ed",
+        "kind": "ACTUAL_BROWSER_5HZ",
+        "path": "fresh-engine/evidence/browser/1792393975602-FLR-NE1-seed1-report.json.gz",
+        "sha256": "363b23e0e6d7c789e13948c3c8142bb4b29cc8efa17bd5b9854133c8fa49696b"
+      },
+      "candidates": 13,
+      "cohortWitnesses": 53,
+      "coverage": {
+        "inputFrames": 901,
+        "validFrames": 901,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 21.6,
+        "examinedSeconds": 158.4,
+        "windowsExamined": 462
+      },
+      "auditWindows": [],
+      "file": "data/ne1-current-1.json",
+      "inputKind": "ALREADY_OPENED_DEVELOPMENT",
+      "inputSha256": "3f695fc058a588a23b9b21561374a37fa7561974a7a4e985abc99a74eb5748b4"
+    },
+    {
+      "id": "holdout-95489",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "seed": 95489,
+        "seconds": 90
+      },
+      "candidates": 6,
+      "cohortWitnesses": 32,
+      "coverage": {
+        "inputFrames": 451,
+        "validFrames": 451,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 12.4,
+        "examinedSeconds": 77.6,
+        "windowsExamined": 204
+      },
+      "auditWindows": [],
+      "file": "data/holdout-95489.json",
+      "inputKind": "ALREADY_OPENED_DEVELOPMENT",
+      "inputSha256": "df5c7f7b1f15926cbefbababcbe9267bfb2b960e6f31d5ae551e2d8d1cd95181"
+    },
+    {
+      "id": "holdout-13415",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "seed": 13415,
+        "seconds": 90
+      },
+      "candidates": 10,
+      "cohortWitnesses": 75,
+      "coverage": {
+        "inputFrames": 451,
+        "validFrames": 451,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 2.4,
+        "examinedSeconds": 87.6,
+        "windowsExamined": 308
+      },
+      "auditWindows": [],
+      "file": "data/holdout-13415.json",
+      "inputKind": "ALREADY_OPENED_DEVELOPMENT",
+      "inputSha256": "63c54ac913c8573c1f96e6f9d171a7f77bd6f4158daaac8a5b9ecab393fbadd5"
+    },
+    {
+      "id": "holdout-29281",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "seed": 29281,
+        "seconds": 90
+      },
+      "candidates": 6,
+      "cohortWitnesses": 40,
+      "coverage": {
+        "inputFrames": 451,
+        "validFrames": 451,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 5.8,
+        "examinedSeconds": 84.2,
+        "windowsExamined": 272
+      },
+      "auditWindows": [],
+      "file": "data/holdout-29281.json",
+      "inputKind": "ALREADY_OPENED_DEVELOPMENT",
+      "inputSha256": "acc1986b82e33e9ac65b68d05bc741cfab5589f3fdb7815217f182d4f640791b"
+    },
+    {
+      "id": "formation-holdout-75143",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "configuration": {
+          "seed": 75143,
+          "formations": [
+            "433",
+            "442"
+          ],
+          "styles": [
+            "neutral",
+            "neutral"
+          ]
+        }
+      },
+      "candidates": 6,
+      "cohortWitnesses": 24,
+      "coverage": {
+        "inputFrames": 376,
+        "validFrames": 376,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 9.8,
+        "examinedSeconds": 65.2,
+        "windowsExamined": 162
+      },
+      "auditWindows": [
+        {
+          "from": 0,
+          "to": 12
+        },
+        {
+          "from": 30,
+          "to": 42
+        },
+        {
+          "from": 60,
+          "to": 72
+        }
+      ],
+      "file": "data/formation-holdout-75143.json",
+      "inputKind": "OPENED_V1_PILOT",
+      "inputSha256": "9131677db6322dc0ce8bc35401c57610222742cd82262822807616a41322fae0"
+    },
+    {
+      "id": "formation-holdout-83132",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "configuration": {
+          "seed": 83132,
+          "formations": [
+            "442",
+            "433"
+          ],
+          "styles": [
+            "defensive",
+            "attacking"
+          ]
+        }
+      },
+      "candidates": 6,
+      "cohortWitnesses": 41,
+      "coverage": {
+        "inputFrames": 376,
+        "validFrames": 376,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 8.4,
+        "examinedSeconds": 66.6,
+        "windowsExamined": 186
+      },
+      "auditWindows": [
+        {
+          "from": 0,
+          "to": 12
+        },
+        {
+          "from": 30,
+          "to": 42
+        },
+        {
+          "from": 60,
+          "to": 72
+        }
+      ],
+      "file": "data/formation-holdout-83132.json",
+      "inputKind": "OPENED_V1_PILOT",
+      "inputSha256": "70a729330b84b30525112aefcc5597d7601b3d81faeb667eb40e6e3e1e52a3ce"
+    },
+    {
+      "id": "formation-holdout-60395",
+      "source": {
+        "product": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+        "kind": "NATIVE_REALIZED_5HZ",
+        "configuration": {
+          "seed": 60395,
+          "formations": [
+            "433",
+            "442"
+          ],
+          "styles": [
+            "neutral",
+            "neutral"
+          ]
+        }
+      },
+      "candidates": 6,
+      "cohortWitnesses": 28,
+      "coverage": {
+        "inputFrames": 226,
+        "validFrames": 226,
+        "invalidFrames": 0,
+        "clockBreaks": 0,
+        "restartSeconds": 2.4,
+        "examinedSeconds": 42.6,
+        "windowsExamined": 128
+      },
+      "auditWindows": [
+        {
+          "from": 0,
+          "to": 12
+        },
+        {
+          "from": 30,
+          "to": 42
+        }
+      ],
+      "file": "data/formation-holdout-60395.json",
+      "inputKind": "NEW_FROZEN_HOLDOUT",
+      "inputSha256": "83deb6d9bb2dde9e9d002429b0cf1cc29d8801351e3d4f68e3d7b97daa9b50a9"
+    }
+  ],
+  "defaultRecord": "ne1-current-1"
+}

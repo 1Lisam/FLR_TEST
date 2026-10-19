@@ -1,0 +1,72 @@
+{
+  "scope": "Read-only formation cohort observer. Not automatic football error or whole-engine acceptance.",
+  "sourceCommit": "c2675aca4b4f7728081b5391e3d8a596a5e79300",
+  "gameProduct": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 3206,
+      "sha256": "16b1b680009b0f4edcccb16c59669d0798bcf89964ee60d2f15e00efc52583dd"
+    },
+    {
+      "path": "style.css",
+      "bytes": 2883,
+      "sha256": "5f384ae52baf358454d292da36b986728ba02beecc39a582df87539e6b170c2a"
+    },
+    {
+      "path": "app.mjs",
+      "bytes": 16854,
+      "sha256": "85e0babcae351e0646539b6712a996ba0dc43bac8b5b8ee7ec49acb59a70ac19"
+    },
+    {
+      "path": "data/formation-holdout-60395.json",
+      "bytes": 175496,
+      "sha256": "2990e72cd2a24952b48a721c60f55bda663a84042cf2e61d7a765a0a6b1d7226"
+    },
+    {
+      "path": "data/formation-holdout-75143.json",
+      "bytes": 238035,
+      "sha256": "e664f8972422a57f0a30e429473fac248ecbb5f24bf758d0a8483bd9b9ac126c"
+    },
+    {
+      "path": "data/formation-holdout-83132.json",
+      "bytes": 274730,
+      "sha256": "6eafcf17fa56b97e1aa3b0046ee869d6be5fa98b40d7ff4249ff63d447bc1527"
+    },
+    {
+      "path": "data/holdout-13415.json",
+      "bytes": 391518,
+      "sha256": "a2c80e6013815702a1132b4f651ed7c668c20edbd07b55fc74a55b44e1a079ae"
+    },
+    {
+      "path": "data/holdout-29281.json",
+      "bytes": 306143,
+      "sha256": "74b35d396d0cb8f5e2bf9013ada2503b49eed4ebedc3636716a39ffd6a29e10a"
+    },
+    {
+      "path": "data/holdout-95489.json",
+      "bytes": 289393,
+      "sha256": "dcfcd592a17f4f0ee0d5f19a6de5d8c669e7bea4dc1e1884ba6ca88f9ccaa46c"
+    },
+    {
+      "path": "data/index.json",
+      "bytes": 7250,
+      "sha256": "4bebdb2e7a823ce1af175d6bb1c27cb6ade491741cee4093ba3c68fb67a3c366"
+    },
+    {
+      "path": "data/ne1-current-1.json",
+      "bytes": 557884,
+      "sha256": "61a99baa4b3ca1ec4824d2eea9f03edac7f907034cb709ffac11016f5b014dc8"
+    },
+    {
+      "path": "data/ne1-reported-wide.json",
+      "bytes": 568945,
+      "sha256": "a7c9a8eaf7e24760d644d1e0f8f2e41fe3d9253ec8dff829662d7c8cb29c4519"
+    },
+    {
+      "path": "data/reviews.json",
+      "bytes": 48626,
+      "sha256": "77b419c1441bb0802e3dbabc12c916f816e35821a2636c1305c2b19c3635cf47"
+    }
+  ]
+}
