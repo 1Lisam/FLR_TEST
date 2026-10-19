@@ -1,0 +1,56 @@
+{
+  "scope": "NE1 180-second autonomous preview; NOT 90-minute acceptance",
+  "source_commit": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4108,
+      "sha256": "833d3fd364a43477e02fa6abc1b214d696de5340800249a16aca0131494db233"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3531,
+      "sha256": "9d0202d81bb9e97dcac21c23d4936dc695228e337871f5c559a05d2b818c493d"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4236,
+      "sha256": "8300350a052897c4028f045d27e134d9b896ab9315e54fbcb88d4d2b4dd3f97c"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6518,
+      "sha256": "973a06b6cf9f5412443b2f2b79deb0b2e788dbdfce4d00a8ddafef1cfee0ac17"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 9308,
+      "sha256": "1776ca8a53b05e79b4a4b47f7d4f4f0974a2ec41cabd9f682b41361415da004c"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 1144,
+      "sha256": "4ed7ddd263b42b5bf75c15da7b280d71565cf16ba680128d57d00a2c3e3c03d8"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3061,
+      "sha256": "98084cc13e751a2a398a69e119a3523d8df069645c54a1c8548f3b2d12b6ad18"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 5982,
+      "sha256": "8c3bb7aa14bb8f1af65b2f95ab6808e16ee17fa2a34262f4d21fd31b6763aa87"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 2957,
+      "sha256": "228ad0d183208ecc532c70e422ecbfdf84f10fc33ab0ea9f31ff6b35a50df15b"
+    }
+  ]
+}
