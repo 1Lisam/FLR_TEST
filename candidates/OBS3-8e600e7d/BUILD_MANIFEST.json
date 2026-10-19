@@ -1,0 +1,47 @@
+{
+  "scope": "Read-only all22 relationship shortlist and exhaustive review queue. Not autonomous football judgement.",
+  "sourceCommit": "8e600e7d2df38625b046d9ef43cdc7183372ae16",
+  "gameProduct": "482ce9ed712501f9f7bffb9b6c0808811ac7bcab",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 3426,
+      "sha256": "e601adf7120dce105392e0a6e7d48119335a689194f289d28b2679bec578027c"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3049,
+      "sha256": "bc50e3cce9eb41fb289277ba55c5e3614fc4c5c1a07dc512a164a5151904ac13"
+    },
+    {
+      "path": "app.mjs",
+      "bytes": 23125,
+      "sha256": "7c757c2e97053e609f58c8f6d7d304edd032176f786166152653be537f59a921"
+    },
+    {
+      "path": "data/audit-33737.json",
+      "bytes": 240276,
+      "sha256": "d82b884637aab5364d7ebd8083766339af3336016001744f9047abcb6680bed9"
+    },
+    {
+      "path": "data/audit-77779.json",
+      "bytes": 188743,
+      "sha256": "d85939e8d96c975e9842ccd424acec201b3094d1e202ada8ac9b4c8e635e52b7"
+    },
+    {
+      "path": "data/index.json",
+      "bytes": 2951,
+      "sha256": "6afd9f1068dfeea4f6d04f655f0fb483c5ceb2d05622d171bc2a4b47a84f4021"
+    },
+    {
+      "path": "data/ne1-current-1.json",
+      "bytes": 204854,
+      "sha256": "34242baa756702dedb2754ae24712cd908860f44806c8c2bf414d694c47c5c7c"
+    },
+    {
+      "path": "data/reviews.json",
+      "bytes": 16021,
+      "sha256": "c3458028dbcd36db8697e7357dfaf73ba99890c54cb571a93bd092ae1460ba1c"
+    }
+  ]
+}

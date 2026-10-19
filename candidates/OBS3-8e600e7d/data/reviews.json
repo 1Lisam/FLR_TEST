@@ -1,0 +1,194 @@
+{
+  "_meta": {
+    "scope": "Read-only relational review. Numeric candidates are not errors. All10s cells queued. No paid AI or automatic football judgement."
+  },
+  "ne1-current-1": {
+    "cell-1": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "블루 ST의 출발과 패스 뒤 레드 두 공격수는 실제로 접근한다. 첫 대응 경고를 무대응 오류로 확정하지 않는다. 양 팀 폭은 남지만 공과 먼 줄이 같은 틀로 이동하는 기계적 모습은 검토 대상으로 남긴다.",
+      "counterEvidence": "레드 RST가 9.9→1.9m로 실제 접근하며, 블루 RB도 측면 공을 향해 움직인다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-2": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "레드 LM의 측면 운반에 블루 RB·RCM이 접근·복귀한다. 동시에 블루 LW·ST·RW가 고정된 깊이를 공유하며 옆으로 같이 움직이는 경직이 보인다. LCB의 정지는 상대 RST와의 관계도 있어 모두 오류로 묶지 않는다.",
+      "counterEvidence": "공 근처에 실제 수비 접근이 있고 중앙에는 별도 상대가 남아 있다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-3": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "레드 LM이 터치라인·골라인 쪽에서 계속 운반하고 근처 블루 선수들이 쫓는다. 중앙 공격 지원은 멀고 제한된 출구만 보인다. 블루 전방 세 명의 고정 줄과 양 팀 공 먼 정지·같은 틀 이동은 남는다.",
+      "counterEvidence": "골문 각도가 작아 슈팅하지 않았다는 사실만으로 오류가 아니다. 수비 RB·RCM은 실제 이동했다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-4": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "측면 공 순환에 블루 RB·DM과 레드 LM·LB가 대응한다. 여러 먼 선수가 공을 따라 함께 좌우 왕복하고, 블루 전방 줄은 깊이를 거의 유지한다. 왕복 자체는 확인하되 모든 방향 전환을 선수 판단 오류로 확정하지 않는다.",
+      "counterEvidence": "공 자체가 측면에서 반복 순환하므로 추격과 블록 이동 중 일부는 설명 가능하다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-5": {
+      "verdict": "REVIEWED_NO_ADDITIONAL_FINDING",
+      "reason": "새 경고가 거의 없는 40~50초도 양 팀 22명으로 살폈다. 블루가 긴 전환 뒤 왼쪽으로 올라가고 레드 RM·RB가 접근한다. 전체 줄의 전진은 길게 전환된 공의 위치와 이어진다. 이 표본 그림에서 추가 오류는 확정하지 못했다.",
+      "counterEvidence": "긴 이동은 공의 반대편 전환과 연결되며, 공 근처에는 양 팀 경합이 있다. 정상 경기 전체의 승인 아님.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-6": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "다시 왼쪽에서 풀린 공을 블루 DM이 실제로 쫓고 상대도 전진한다. 자유 공 경고의 DM 경로는 약26m여서 가만히 구경한 사례가 아니다. 블루 LCB의 긴 정지와 마지막 전방 일렬 배치는 문맥 의심으로 남긴다.",
+      "counterEvidence": "DM이 공과 평행하게 달린다는 반대 근거가 있어 거리 감소가 작다는 이유만으로 회수 무대응을 확정하지 않는다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "case-1": {
+      "verdict": "PLAUSIBLE_RESPONSE",
+      "reason": "RST·LST가 실제로 가까워졌다. 전진 허용만으로 무대응이 아니다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-6": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "14.8~22.8초 LW·ST·RW의 거의 같은 깊이·같은 측면 이동을 확인했다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-14": {
+      "verdict": "SUSPICIOUS",
+      "reason": "LM이 골라인 가까이 운반을 지속하고 중앙 지원이 멀다. 작은 슈팅 각도라는 반대 근거가 있다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-26": {
+      "verdict": "SUSPICIOUS",
+      "reason": "RB의 실제 왕복은 보이나 공 순환도 반복되어 원인 문맥을 더 봐야 한다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-40": {
+      "verdict": "PLAUSIBLE_RESPONSE",
+      "reason": "DM이 실제 약26m 쫓는다. 거리 감소가 작아도 가만히 있는 것이 아니다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "_defaultKey": "case-6"
+  },
+  "audit-33737": {
+    "cell-1": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "중앙의 첫 패스에 레드 RST·LST가 실제로 접근한다. 블루 측면 전개에 풀백도 뒤로 복귀한다. 레드 미드필드가 공유하는 정확한 줄·같은 방향 이동은 기하 경직 후보지만 첫 수비 대응은 무대응으로 보지 않는다.",
+      "counterEvidence": "첫 경고의 소유자와 수비 거리가 줄어든다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-2": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "레드 중앙 진입에 블루 RCM이 접근하고 GK도 공 쪽으로 조정한다. 그렇지만 블루 전방 세 명의 같은 깊이와 레드 먼 줄의 동반 정렬이 지속된다. 수비가 돌파당한 것과 반응하지 않은 것을 분리한다.",
+      "counterEvidence": "RCM의 실제 접근 경로가 있고 RCB는 별도 LST를 지킨다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-3": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "블루가 공을 회수해 측면으로 전달한다. 레드 수비 네 명과 중앙 미드필드가 각 줄을 유지하며 같은 틀로 움직이는 경직이 보인다. 블루 RW가 마크된 위치에 오래 머무는 모습은 실제 지원 의미를 추가로 봐야 한다.",
+      "counterEvidence": "후방 라인 유지와 측면 마크는 이유가 있으므로 한 줄 자체를 오류로 확정하지 않는다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-4": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "블루 RB·RCM이 공에 연결하고 레드 LST가 따라온다. H-LCB가 먼 쪽에 오래 정지하고 레드 중원이 거의 한 틀로 옆 이동한다. 반복 왕복 경고와 공 방향 변화를 함께 보니 일부 반전은 공 순환과 연결된다.",
+      "counterEvidence": "LCB는 후방 잔류 역할일 수 있고, 공 가까운 선수들은 실제 접근한다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-5": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "블루 RCM의 측면 운반을 레드 LM이 압박하며 연결이 일어난다. 반대쪽 LB·LCB와 RW의 정지, 레드 미드필더들의 같은 깊이·같은 변위가 특히 뚜렷하다. 정지가 모두 오류인 것은 아니나 집단 경직은 확인한다.",
+      "counterEvidence": "공 주변 경합은 활발하고 뒤 공간을 남기는 동작도 있다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-6": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "블루가 위쪽 측면으로 공을 보내고 레드 RM·RB가 따라간다. 양 팀 줄이 크게 전진·후퇴한다. 50초 이전부터 이어진 레드 중앙 세 명의 거의 동일한 틀 이동을 확인한다. 길게 전환한 뒤의 모든 동반 달리기를 오류로 확정하지 않는다.",
+      "counterEvidence": "51초 이후 큰 이동은 실제 공의 위쪽 전환과 대응한다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "case-1": {
+      "verdict": "PLAUSIBLE_RESPONSE",
+      "reason": "RST가 9.9m에서1.9m로 접근한다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-33": {
+      "verdict": "SUSPICIOUS",
+      "reason": "LCB의 긴 정지는 사실이나 후방 보호·상대와의 거리를 함께 봐야 한다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-45": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "43.8~51.8초 레드 LCM·RCM·RM의 상대 위치 변화는 반올림0m다. 같은 깊이와 측면 동반 이동이 보인다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "_defaultKey": "case-45"
+  },
+  "audit-77779": {
+    "cell-1": {
+      "verdict": "REVIEWED_NO_ADDITIONAL_FINDING",
+      "reason": "블루의 전방·측면 패스와 레드 반대 전개를 양 팀 전체로 살폈다. 레드 RW와 블루 LB·LM이 접근하며 나머지 선수도 전환한다. 이 그림에서 추가 상식 밖 행동은 확정하지 못했다. 마지막 두 초의 묶음 이동은 전환 문맥 의심으로 남긴다.",
+      "counterEvidence": "실제 공이 길게 이동하므로 일시적인 다수 동반 달리기는 설명 가능하다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-2": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "레드 RCB 쪽 공을 블루 공격수가 따라간다. 블루 중원 네 명과 RCB가 깊이·간격을 거의 그대로 유지하며 옆 이동하는 기계적 묶음이 15.8~19.8초에 보인다. 레드 LCB 정지는 공과 먼 후방 보호일 수 있다.",
+      "counterEvidence": "RCB의 루즈볼 경고는 실제 약23.6m 추격과 함께 발생해 무대응 오류로 보지 않는다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-3": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "측면 경합 후 반대 방향 긴 공에 양 팀이 움직인다. 여러 줄이 정확한 틀로 내려가고 올라가는 시각적 경직은 의심스럽다. 다만 전환 구간의 큰 이동만으로 부당한 포지션 이탈이나 무대응은 확정하지 않는다.",
+      "counterEvidence": "공이 반대 방향으로 크게 이동했고 공 주변 선수는 접근한다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-4": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "블루 RB와 레드 LW가 공을 따라 아래 측면으로 달린다. RB는 약17.7m 움직이며 공과 1m 안팎을 유지하므로 자유 공 경고를 정지 오류로 보지 않는다. 공 먼 줄들의 정렬은 계속 의심으로 남긴다.",
+      "counterEvidence": "공 회수 실패와 선수 무대응은 다르다. 실제 접근·경합이 있다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-5": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "레드 공격이 중앙에서 아래 측면으로 바뀌고 블루 RST·RM·RB가 가까이 대응한다. 바깥쪽 공과 먼 여러 선수가 줄을 공유하는 경직은 남는다. 측면 세 명의 근접만으로 전원 몰림 오류를 확정하지 않는다.",
+      "counterEvidence": "공과 상대가 실제로 측면에 있어 인접 선수들이 모일 이유가 있다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "cell-6": {
+      "verdict": "REVIEWED_WITH_FINDINGS",
+      "reason": "레드가 아래 측면으로 다시 공을 보내고 블루 RB가 따라간다. 중앙 여러 선수가 전체 틀로 움직이는 전환을 보았다. A-LCB 자유 공 후보는 약27.3m의 실제 추격이 있으므로 무대응은 아니다.",
+      "counterEvidence": "긴 공의 방향 변화와 함께 움직이며, 일부 간격 유지에는 전환 대비 근거가 있다.",
+      "scope": "16 full-pitch panels/10s with overlapping trails; 5Hz coordinate replay. Sampled visual review, NOT continuous30fps all22 acceptance."
+    },
+    "case-8": {
+      "verdict": "CONFIRMED_RIGIDITY",
+      "reason": "15.8~19.8초 블루 중원 네 명이 거의 같은 상대 위치로4.1m 이동한다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-10": {
+      "verdict": "PLAUSIBLE_RESPONSE",
+      "reason": "RCB는 약23.6m를 쫓았다. 접근하지 않았다는 판정은 부적절하다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-13": {
+      "verdict": "PLAUSIBLE_RESPONSE",
+      "reason": "RB가 공 바로 옆을 약17.7m 따라간다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "case-20": {
+      "verdict": "PLAUSIBLE_RESPONSE",
+      "reason": "LCB는 실제 약27.3m를 달렸다.",
+      "counterEvidence": "See the overlapping complete10s cells for both teams and context.",
+      "scope": "Only stated actor/window reviewed; all other candidates remain AI_NOT_REVIEWED."
+    },
+    "_defaultKey": "case-8"
+  }
+}
