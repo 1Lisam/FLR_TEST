@@ -1,0 +1,31 @@
+{
+  "stage": "A",
+  "verdict": "다가오는 공을 받을 선수와 골키퍼의 대응을 수리한 시험판입니다. 공격 정체·윙어 장기 정지·짧은 왕복은 남아 있어 경기 전체 정상 판정은 아닙니다.",
+  "scenes": [
+    {
+      "id": "pass",
+      "file": "data/pass.json",
+      "label": "같은 상태 · 패스 수신"
+    },
+    {
+      "id": "keeper",
+      "file": "data/keeper.json",
+      "label": "같은 상태 · 골키퍼"
+    },
+    {
+      "id": "cb",
+      "file": "data/cb.json",
+      "label": "같은 상태 · CB 수신"
+    },
+    {
+      "id": "natural-1",
+      "file": "data/natural-1.json",
+      "label": "처음부터 · 1번"
+    },
+    {
+      "id": "unseen-1385",
+      "file": "data/unseen-1385.json",
+      "label": "별도 새 경기 · 1385번"
+    }
+  ]
+}
