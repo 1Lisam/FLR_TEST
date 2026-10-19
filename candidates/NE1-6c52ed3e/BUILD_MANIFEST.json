@@ -1,0 +1,113 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded attack-support-comparison; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "6c52ed3ed9252283c16499f21707f32c6ce81452",
+  "runtimeFiles": 10,
+  "review": "attack-support-comparison",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4289,
+      "sha256": "82c130605d99b2fe95791842518173ae0420a37421a6cf5a8fb8a4d54d3613ef"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3778,
+      "sha256": "184c58e87c4c529eaa076ea8a1f84d7d14f532dda96b58d75de56d53c79b50ee"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4693,
+      "sha256": "00ae5433309d55aaa8161224e92ff4e9d51383d27fd8c2d0ba8bd7fe30805168"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6711,
+      "sha256": "ce229e55e314a836ba77082089e11fccfaf4ffb454d37414b291d9c1557af0c5"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 12492,
+      "sha256": "27099c2d2b2ff765fab692437001a98c9906d4390294f1324e08332fdf8d217a"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 2135,
+      "sha256": "341ad6123fb34a3470f5a51b3009e365c4552ca0274c8d5f05383cb9d0c744f9"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3082,
+      "sha256": "b819e7ef437ed3aa525d15a36723521c36d2ab0d886d6db8c5ea6ecda4dcba19"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 7011,
+      "sha256": "5ef4c104ab8d718ced9931bf3a6de81f642b706656e60ba7f0a2409c543fc487"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/attack-support-comparison/app.mjs",
+      "bytes": 5183,
+      "sha256": "012778f06e825375a497fabd403af5a34e6ee3d117c9d35ca6becd93c3def599"
+    },
+    {
+      "path": "review/attack-support-comparison/before-render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/attack-support-comparison/data/counter-1.json",
+      "bytes": 326260,
+      "sha256": "a4206df7e67494b67e1d55a4908169b0e500ba68a541b5aeb69cc590996b47ef"
+    },
+    {
+      "path": "review/attack-support-comparison/data/deep.json",
+      "bytes": 203507,
+      "sha256": "7e914ff2d2ea34ef1540e8099cecd8752daf5a232682f1f9afa042f6468ec088"
+    },
+    {
+      "path": "review/attack-support-comparison/data/index.json",
+      "bytes": 908,
+      "sha256": "48a86ab9249ce412f7252eea7edbc904f8587ae4495f10630b60667846647722"
+    },
+    {
+      "path": "review/attack-support-comparison/data/natural-1.json",
+      "bytes": 1474709,
+      "sha256": "c657fe7d9fd5e8c7b73c7098127243c2fe97ba4863991c40ef1577a523b5cecb"
+    },
+    {
+      "path": "review/attack-support-comparison/data/unseen-18740.json",
+      "bytes": 1474989,
+      "sha256": "74f659af5cfbdd7dcd6b8e3bcd0dae3486e680430858bd840d910c62bf2b8ad8"
+    },
+    {
+      "path": "review/attack-support-comparison/data/wing.json",
+      "bytes": 252146,
+      "sha256": "07d2d27e8f4225086b371e950dbb9c39f997234ede009d4d36fa4e894a04febe"
+    },
+    {
+      "path": "review/attack-support-comparison/index.html",
+      "bytes": 2064,
+      "sha256": "79ce71c311c926b4afbf03a9734eaa8a3fd1ff7cbf4b7b6a0857349e9140d975"
+    },
+    {
+      "path": "review/attack-support-comparison/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/attack-support-comparison/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "stage": "SUPPORT-A",
+  "verdict": "같은 실제 장면에서 전방 지원·수신의 개선을 확인했습니다. 별도 경기에는 왕복·정지가 남아 있고 경고도31→37로 늘었습니다. 전체 움직임 정상 판정은 아닙니다.",
+  "scenes": [
+    {
+      "id": "wing",
+      "file": "data/wing.json",
+      "label": "같은 상태 · 멈춘 윙어의 지원"
+    },
+    {
+      "id": "deep",
+      "file": "data/deep.json",
+      "label": "같은 상태 · 뒤로 내려간 공과 전방"
+    },
+    {
+      "id": "natural-1",
+      "file": "data/natural-1.json",
+      "label": "처음부터 · 1번"
+    },
+    {
+      "id": "unseen-18740",
+      "file": "data/unseen-18740.json",
+      "label": "별도 새 경기 · 18740번"
+    },
+    {
+      "id": "counter-1",
+      "file": "data/counter-1.json",
+      "label": "자연1번 · 이후 역습·수비 확인"
+    }
+  ]
+}
