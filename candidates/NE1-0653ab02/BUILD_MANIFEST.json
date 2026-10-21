@@ -1,0 +1,103 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded facing-comparison; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "0653ab02b934a1e070ca59b7865de54a96aef714",
+  "runtimeFiles": 10,
+  "review": "facing-comparison",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4289,
+      "sha256": "82c130605d99b2fe95791842518173ae0420a37421a6cf5a8fb8a4d54d3613ef"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3778,
+      "sha256": "184c58e87c4c529eaa076ea8a1f84d7d14f532dda96b58d75de56d53c79b50ee"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4713,
+      "sha256": "21b707ca61786d6c0908bc172d1e54ea71a6e7ef12255233846fdb60d91de9b1"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6711,
+      "sha256": "ce229e55e314a836ba77082089e11fccfaf4ffb454d37414b291d9c1557af0c5"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1212,
+      "sha256": "3f2e804cf530d9f3e259f4c5ef94faadd44a360737f44a63e93b354b439025b0"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 13950,
+      "sha256": "4bde047a481d1b5e708ac0393165196f371c157297a0a14a1207654f6d6c85dd"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 3426,
+      "sha256": "35c31effac245fca396b209a132c67c0185ce83d00f0df12473f2328a451fcd4"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3082,
+      "sha256": "b819e7ef437ed3aa525d15a36723521c36d2ab0d886d6db8c5ea6ecda4dcba19"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 8200,
+      "sha256": "f88f5c53cd12b85603866aa91fd92551527460abb666407e93b71b031d577a2e"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 3398,
+      "sha256": "d0a57dfaf37b9dfe4bfaa571b3c10f3d3f81ad05bf8b526138fc1fef53c7009a"
+    },
+    {
+      "path": "review/facing-comparison/app.mjs",
+      "bytes": 5547,
+      "sha256": "6c1ed09f485dd68265c0a29f9a3c2152ff77de678c103f9f28beb22ac5967a8f"
+    },
+    {
+      "path": "review/facing-comparison/before-render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/facing-comparison/data/fullback.json",
+      "bytes": 288680,
+      "sha256": "8ac7ca0b6180e19891ac5776dfd810b1f2e911a1ee98545d025252e858927071"
+    },
+    {
+      "path": "review/facing-comparison/data/index.json",
+      "bytes": 594,
+      "sha256": "215ae5899d298af1daa1573186f64e6522ee8c4b96e6a8cfebd5e00e9cfd79be"
+    },
+    {
+      "path": "review/facing-comparison/data/midfield.json",
+      "bytes": 288519,
+      "sha256": "c7c1e0ef1edb02e10bd2bfa6b25c7fdec93fc2c7b577eb9563628e7d94833817"
+    },
+    {
+      "path": "review/facing-comparison/data/striker.json",
+      "bytes": 289496,
+      "sha256": "e5d9b337c974eb0567b9f922deb761e48e2ae5763fdcd82984db463b748250b0"
+    },
+    {
+      "path": "review/facing-comparison/index.html",
+      "bytes": 2204,
+      "sha256": "860d2c613c309e9ccae20449d07da1412b596ac7782cf8305a96a9469ed0daed"
+    },
+    {
+      "path": "review/facing-comparison/render.mjs",
+      "bytes": 3398,
+      "sha256": "d0a57dfaf37b9dfe4bfaa571b3c10f3d3f81ad05bf8b526138fc1fef53c7009a"
+    },
+    {
+      "path": "review/facing-comparison/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}

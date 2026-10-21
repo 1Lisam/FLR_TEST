@@ -1,0 +1,21 @@
+{
+  "stage": "B-20261022",
+  "verdict": "느린 공 없는 이동의 몸 방향 표시 수리입니다. 경기 전개는 보존했고, 전체 포메이션 완성 판정은 별도입니다.",
+  "scenes": [
+    {
+      "id": "striker",
+      "label": "ST · 짧게 물러나며 공 보기",
+      "file": "data/striker.json"
+    },
+    {
+      "id": "midfield",
+      "label": "CM · 옆걸음 지원과 시선 유지",
+      "file": "data/midfield.json"
+    },
+    {
+      "id": "fullback",
+      "label": "RB · 뒤로 이동하며 경기 관찰",
+      "file": "data/fullback.json"
+    }
+  ]
+}
