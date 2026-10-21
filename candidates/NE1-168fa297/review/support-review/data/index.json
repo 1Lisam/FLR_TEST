@@ -1,0 +1,21 @@
+{
+  "stage": "candidate-I-20261021",
+  "verdict": "짧은 비교·직접 실행용 시험판입니다. 전체 움직임·90분 엔진은 아직 완성 판정 전입니다.",
+  "scenes": [
+    {
+      "id": "opening",
+      "label": "시작부터 1분 · 기존 공개판과 현재 후보",
+      "file": "data/opening.json"
+    },
+    {
+      "id": "same-input",
+      "label": "동일한 실제9.733초 상태 · 이후8초",
+      "file": "data/same-input.json"
+    },
+    {
+      "id": "new-game",
+      "label": "별도 경기7362169 · 대형·성향을 바꾼 첫1분",
+      "file": "data/new-game.json"
+    }
+  ]
+}

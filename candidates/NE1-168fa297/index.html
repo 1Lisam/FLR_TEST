@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FLR · 새 경기장</title><link rel="stylesheet" href="style.css"></head>
+<body><main>
+<header><div><span class="eyebrow">FOOTBALL LIFE RPG / NEW ENGINE</span><h1>새 경기장 <span>첫 움직임 시험</span></h1></div><span class="badge">3분 · 자동 경기</span></header>
+<p class="intro">새 코드로 진행하는 11 대 11입니다. 짧은 움직임을 확인하는 단계이며, 90분 엔진은 아직 완성 전입니다.</p>
+<section class="setup" aria-label="경기 설정">
+<div><strong class="blue">블루</strong><label>대형<select id="homeFormation"><option value="433">4-3-3</option><option value="442">4-4-2</option></select></label><label>성향<select id="homeStyle"><option value="neutral">중립적</option><option value="attacking">공격적</option><option value="defensive">수비적</option></select></label></div>
+<div><strong class="red">레드</strong><label>대형<select id="awayFormation"><option value="442">4-4-2</option><option value="433">4-3-3</option></select></label><label>성향<select id="awayStyle"><option value="neutral">중립적</option><option value="attacking">공격적</option><option value="defensive">수비적</option></select></label></div>
+<label>능력 비교<select id="quality"><option value="equal">비슷한 두 팀</option><option value="home">블루 우세</option><option value="away">레드 우세</option></select></label>
+<label>경기 번호<input id="seed" type="number" min="1" max="99999" value="1"></label><button id="reset">조건 적용 / 다시</button>
+</section>
+<section class="match">
+<div class="scoreboard"><span class="blue">블루</span><strong id="score">0 : 0</strong><span class="red">레드</span><time id="clock">00:00</time><span id="phase">시작 전</span><output id="ballStatus" aria-label="공 상태">공 · 0km/h · 높이 0.0m</output></div>
+<canvas id="pitch" width="1150" height="800" aria-label="양 팀 22명과 공을 보여 주는 축구 경기장"></canvas>
+<div class="controls"><button id="play" class="primary">경기 시작</button><div class="speeds" aria-label="재생 속도"><button data-speed="1" class="selected">1배속</button><button data-speed="8">8배속</button><button data-speed="16">16배속</button></div><button id="newSeed">새 경기</button><span id="viewStatus">현재 경기</span></div>
+<div class="past"><label for="history">지나간 장면</label><input id="history" type="range" min="0" max="0" value="0"><button id="live">현재로</button></div>
+</section>
+<section class="below"><article><h2>선수 살펴보기</h2><p id="actor">선수를 누르면 지금 맡은 행동을 볼 수 있습니다.</p><div class="exports"><button id="capture">화면 저장</button><button id="record">영상 기록 시작</button><button id="report">경기 기록 저장</button></div><p class="small" id="recordStatus">과거 장면만 다시 볼 수 있습니다. 아직 진행하지 않은 경기는 만들어 두지 않습니다.</p></article><article><h2>실제로 일어난 일</h2><div id="events" aria-live="off"></div><div id="community"></div></article></section>
+<details><summary>이번 시험 범위와 확인할 점</summary><p>공격 지원과 폭·깊이, 압박 뒤 커버, 풀백의 뒤 공간, 패스 이후 이동을 봐 주세요. 움직임 정상 판정은 아직 받지 않았습니다.</p><p>포함: 두 대형·세 성향·기본 능력·지상/긴 공중 패스와 슛·공 접촉·기본 아웃/재시작·수신 시 오프사이드·실제 사건에 따른 작은 팬 반응. 공과 바닥 그림자 사이의 간격은 높이입니다. 아직 미완성: 90분/전후반, 파울·페널티킥, 다양한 공중 경합과 GK 동작, 스로인 투구 동작, 사용자 선택·수동 조작. 이 시험의 자동 선수는 조종 중인 주인공이 아닙니다.</p><p>같은 조건으로 다시 시작하면 동일 경기를 계산합니다. 배속은 계산 결과를 바꾸지 않습니다. 화면이 숨겨지면 경기는 멈춥니다.</p></details>
+<footer>FLR NEW ENGINE · NE1 / 2026-10-19 <span id="build"></span></footer>
+</main><script type="module" src="src/app.mjs"></script></body></html>

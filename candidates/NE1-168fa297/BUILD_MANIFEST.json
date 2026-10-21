@@ -1,0 +1,103 @@
+{
+  "scope": "NE1 180-second autonomous preview + bounded support-review; whole movement NOT_READY, NOT 90-minute acceptance",
+  "source_commit": "168fa297afb5fe97187ea0cb15cd62e9ded2a16f",
+  "runtimeFiles": 10,
+  "review": "support-review",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 4289,
+      "sha256": "82c130605d99b2fe95791842518173ae0420a37421a6cf5a8fb8a4d54d3613ef"
+    },
+    {
+      "path": "style.css",
+      "bytes": 3778,
+      "sha256": "184c58e87c4c529eaa076ea8a1f84d7d14f532dda96b58d75de56d53c79b50ee"
+    },
+    {
+      "path": "src/actions.mjs",
+      "bytes": 4713,
+      "sha256": "21b707ca61786d6c0908bc172d1e54ea71a6e7ef12255233846fdb60d91de9b1"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 6711,
+      "sha256": "ce229e55e314a836ba77082089e11fccfaf4ffb454d37414b291d9c1557af0c5"
+    },
+    {
+      "path": "src/engine.mjs",
+      "bytes": 1178,
+      "sha256": "ab80df84da2c97aeaf394e732ac8e18a04894e8d3d83e3ea576b26fad6b5c207"
+    },
+    {
+      "path": "src/intentions.mjs",
+      "bytes": 13950,
+      "sha256": "4bde047a481d1b5e708ac0393165196f371c157297a0a14a1207654f6d6c85dd"
+    },
+    {
+      "path": "src/math.mjs",
+      "bytes": 3426,
+      "sha256": "35c31effac245fca396b209a132c67c0185ce83d00f0df12473f2328a451fcd4"
+    },
+    {
+      "path": "src/model.mjs",
+      "bytes": 3082,
+      "sha256": "b819e7ef437ed3aa525d15a36723521c36d2ab0d886d6db8c5ea6ecda4dcba19"
+    },
+    {
+      "path": "src/physics.mjs",
+      "bytes": 7499,
+      "sha256": "b865da7be99a6320957766795062f91952d55e6b9f54ceaade64a3bb19d2d6b5"
+    },
+    {
+      "path": "src/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/support-review/app.mjs",
+      "bytes": 5183,
+      "sha256": "012778f06e825375a497fabd403af5a34e6ee3d117c9d35ca6becd93c3def599"
+    },
+    {
+      "path": "review/support-review/before-render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/support-review/data/index.json",
+      "bytes": 622,
+      "sha256": "a8ffdeca21c365e44476825431701e35bae014f93bb2512d83b9532d9cc4ca01"
+    },
+    {
+      "path": "review/support-review/data/new-game.json",
+      "bytes": 1488768,
+      "sha256": "364aca2aaf2355f2af2b9b09842ec4d35b1a648c95b193a0cef332859f52cf23"
+    },
+    {
+      "path": "review/support-review/data/opening.json",
+      "bytes": 1488047,
+      "sha256": "e3e7e660f138936a67246af27adf51ef6dc4c827f5c17d86dcb1a32e892b3602"
+    },
+    {
+      "path": "review/support-review/data/same-input.json",
+      "bytes": 1198703,
+      "sha256": "dc0961e6ab05a9dcb7f5d5d19a43d597ef67d68bf31c24320e2aa9fc18130f06"
+    },
+    {
+      "path": "review/support-review/index.html",
+      "bytes": 2130,
+      "sha256": "67d754e2162856c78a88d809457e68a1aec9232a5e180f385c711373fcd201e1"
+    },
+    {
+      "path": "review/support-review/render.mjs",
+      "bytes": 3366,
+      "sha256": "8868b02ed5d77c181e7edf6f3e70ccfe7c6733ec155fe4e8acb5208cb406ff3d"
+    },
+    {
+      "path": "review/support-review/style.css",
+      "bytes": 1097,
+      "sha256": "00e2283fb9f8d8aa828f9368ec182f36ac881a40bd32e94a197dcbd7a6e99e55"
+    }
+  ]
+}
