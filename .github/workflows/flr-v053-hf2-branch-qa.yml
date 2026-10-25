@@ -1,0 +1,145 @@
+name: FLR V0.5.3 HF2 branch QA
+
+on:
+  push:
+    branches:
+      - test/v053-hf2-visualfix
+
+permissions:
+  contents: write
+
+jobs:
+  hf2-qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout HF2 test branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/v053-hf2-visualfix
+          fetch-depth: 0
+
+      - name: Record exact HF1-derived baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > /tmp/hf2_baseline_sha
+          test "$(git merge-base HEAD origin/main)" = "$(git rev-parse origin/main)" || {
+            echo 'HF2 branch is not based on current main' >&2
+            exit 1
+          }
+
+      - name: Apply HF2 visual realism transformer
+        run: python .flr/apply_v053_hf2_visualfix.py
+
+      - name: Syntax gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check runtime/tactical_movement.js
+          node --check runtime/continuous_match_core.js
+          node --check runtime/hybrid_spatial_intent_v2.js
+          node --check step71_hybrid_v06_ui.js
+          node --check live_hybrid_session_v02.js
+          node --check live_v06_scene_authority_browser.js
+          node --check runtime/protagonist_match_controller.js
+
+      - name: Scope and identity gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          python - <<'PY'
+          import subprocess,sys
+          allowed={'index.html','runtime/tactical_movement.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','step71_hybrid_v06_ui.js','.flr/v053_hf2_patch_manifest.json'}
+          changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).split())
+          bad=sorted(changed-allowed)
+          if bad:
+              raise SystemExit('out-of-scope transformer changes: '+', '.join(bad))
+          required={'index.html','runtime/tactical_movement.js','runtime/continuous_match_core.js','runtime/hybrid_spatial_intent_v2.js','step71_hybrid_v06_ui.js'}
+          missing=sorted(required-changed)
+          if missing:
+              raise SystemExit('expected HF2 production changes missing: '+', '.join(missing))
+          print('scope PASS',sorted(changed))
+          PY
+          grep -q 'V0.5.3 HF2 TEST' index.html
+          grep -q 'USER-MATCH-TEST-V0.5.3-HF2' step71_hybrid_v06_ui.js
+          grep -q 'umt053h2-' step71_hybrid_v06_ui.js
+
+      - name: User visual seed regression
+        run: node .flr/v053_hf2_user_visual_regression.js
+
+      - name: 90-minute ST bench
+        run: node .flr/v053_integrated_90_role_bench.js ST
+      - name: 90-minute CM bench
+        run: node .flr/v053_integrated_90_role_bench.js CM
+      - name: 90-minute CB bench
+        run: node .flr/v053_integrated_90_role_bench.js CB
+      - name: 90-minute GK bench
+        run: node .flr/v053_integrated_90_role_bench.js GK
+
+      - name: Core invariant spot gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const P=fs.readFileSync('runtime/protagonist_match_controller.js','utf8');
+          const H=fs.readFileSync('live_hybrid_session_v02.js','utf8');
+          const C=fs.readFileSync('runtime/continuous_match_core.js','utf8');
+          const UI=fs.readFileSync('step71_hybrid_v06_ui.js','utf8');
+          const checks={
+            noFutureController:P.includes('futureOutcomePrecomputed:false'),
+            exactTargetGuard:P.includes('CHOICE_TARGET_RESOLUTION_MISMATCH'),
+            gkGoalSemantic:P.includes("code:'GOAL_CONCEDED'"),
+            finalWindow:H.includes("type:'FINAL_2D_WINDOW'"),
+            offsideReview:C.includes("stage:deferredOffside?'CALL_REVIEW':'SETUP'"),
+            reportableDev:UI.includes("rememberCompletedSituation(latestIntegratedDebug,'DEV_VISUAL')"),
+            exactDevSeed:UI.includes('developerScenarioActive?.seed||`${seed()}-${r.boundary.sceneId}`')
+          };
+          console.log(JSON.stringify(checks,null,2));
+          if(Object.values(checks).some(x=>!x))process.exit(1);
+          NODE
+
+      - name: Write authoritative branch QA result
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,hashlib,subprocess,datetime
+          from pathlib import Path
+          def load(p): return json.loads(Path(p).read_text(encoding='utf-8'))
+          visual=load('.flr/v053_hf2_user_visual_regression_status.json')
+          roles={r:load(f'.flr/v053_integrated_90_{r}_status.json') for r in ['ST','CM','CB','GK']}
+          manifest=load('.flr/v053_hf2_patch_manifest.json')
+          status='PASS' if visual.get('status')=='PASS' and all(v.get('status')=='PASS' for v in roles.values()) else 'FAIL'
+          out={
+            'schemaVersion':'FLR_V053_HF2_GITHUB_QA_1.0',
+            'status':status,
+            'branch':'test/v053-hf2-visualfix',
+            'baselineCommit':Path('/tmp/hf2_baseline_sha').read_text().strip(),
+            'checkedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'visual':visual,
+            'roles':roles,
+            'manifest':manifest,
+            'futureOutcomePrecomputed':False
+          }
+          Path('.flr/v053_hf2_github_qa.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if status!='PASS': raise SystemExit('HF2 authoritative QA FAIL')
+          print(json.dumps({'status':status,'baselineCommit':out['baselineCommit']},ensure_ascii=False))
+          PY
+
+      - name: Commit validated HF2 candidate to test branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'FLR HF2 QA Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html runtime/tactical_movement.js runtime/continuous_match_core.js runtime/hybrid_spatial_intent_v2.js step71_hybrid_v06_ui.js \
+            .flr/v053_hf2_patch_manifest.json .flr/v053_hf2_user_visual_regression_status.json \
+            .flr/v053_integrated_90_ST_status.json .flr/v053_integrated_90_CM_status.json \
+            .flr/v053_integrated_90_CB_status.json .flr/v053_integrated_90_GK_status.json \
+            .flr/v053_hf2_github_qa.json
+          git commit -m 'Validate V0.5.3 HF2 visual realism candidate'
+          git push origin HEAD:test/v053-hf2-visualfix
